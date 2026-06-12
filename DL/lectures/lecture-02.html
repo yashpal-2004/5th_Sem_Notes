@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deep Learning Foundations - Lecture 02</title>
+    <meta name="description" content="Study notes for Deep Learning Foundations, Lecture 02 covering Matrix spaces, Rank, Eigenvalues, SVD, Principal Component Analysis, and practice exercises.">
+    <link class="favicon" rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>02</text></svg>">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+    <header>
+        <div class="header-titles">
+            <h1>Deep Learning Foundations</h1>
+            <p>Lecture 02 - Matrix Structure, Decompositions, SVD & PCA</p>
+            <a href="../index.html" style="color: var(--text-dark); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/2.pdf" target="_blank" style="color: var(--text-dark); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search notes...">
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 5</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li>
+                    <a href="#topic-1">1. Vector Spaces & Matrix Rank<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-1-1">1.1 Linear Independence & Span</a></li>
+                         <li><a href="#sub-1-2">1.2 Matrix Rank & Information Efficiency</a></li>
+                         <li><a href="#sub-1-3">1.3 Column, Row & Null Spaces</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Orthogonality & Vector Projection<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-2-1">2.1 Orthogonality in Learning</a></li>
+                         <li><a href="#sub-2-2">2.2 Vector Projection</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Eigenvalues & Eigenvectors<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-3-1">3.1 Geometric Concept</a></li>
+                         <li><a href="#sub-3-2">3.2 Matrix Diagonalization</a></li>
+                         <li><a href="#sub-3-3">3.3 Symmetric Matrices & Covariance</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. SVD & PCA Connections<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-4-1">4.1 Singular Value Decomposition (SVD)</a></li>
+                         <li><a href="#sub-4-2">4.2 Low-Rank Matrix Compression</a></li>
+                         <li><a href="#sub-4-3">4.3 Principal Component Analysis (PCA)</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Conceptual Practice Exercises<span class="sub-count">8</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-5-1">5.1 100x100 Matrix of Rank 5</a></li>
+                         <li><a href="#sub-5-2">5.2 Matrix Null Space Implication</a></li>
+                         <li><a href="#sub-5-3">5.3 Linear Independence Quiz</a></li>
+                         <li><a href="#sub-5-4">5.4 Orthogonality Check</a></li>
+                         <li><a href="#sub-5-5">5.5 Projection of Null Space Vectors</a></li>
+                         <li><a href="#sub-5-6">5.6 Eigenvalue Stretching Intuition</a></li>
+                         <li><a href="#sub-5-7">5.7 Eigenvectors in PCA</a></li>
+                         <li><a href="#sub-5-8">5.8 PCA & Symmetric Covariance</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="notesContent">
+
+            <!-- Topic 1 -->
+            <section id="topic-1" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>Vector Spaces & Matrix Rank</h2>
+                </div>
+                <div id="content-1" class="collapsible-content">
+                    <h3 id="sub-1-1">1.1 Linear Independence & Span</h3>
+                    <p>A set of vectors is <strong>linearly independent</strong> if none of them can be written as a linear combination of the others. The <strong>span</strong> of a set of vectors is the set of all possible linear combinations that can be constructed with them.</p>
+                    
+                    <div style="text-align: center; margin: 1.5rem 0;">
+                        <img src="../images/vector_redundancy.png" alt="Linearly Independent vs Dependent Vectors" style="max-width: 100%;">
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; font-style: italic;">Comparison: Three independent vectors spanning 3D space vs. three dependent vectors restricted to a flat 2D plane.</p>
+                    </div>
+
+                    <h3 id="sub-1-2">1.2 Matrix Rank & Information Efficiency</h3>
+                    <p>The <strong>rank</strong> of a matrix is the number of linearly independent rows or columns it contains. Rank represents the unique, non-redundant information present in the matrix. In ML datasets, high correlation between features produces low-rank matrices where compression is possible.</p>
+                    
+                    <div class="box box-blue">
+                        <div class="box-title">Example of Low Rank</div>
+                        <p>Consider matrix A:</p>
+                        <pre class="code-block"><code>A = [1 2 3]
+    [2 4 6]</code></pre>
+                        <p>Row 2 is exactly 2 × Row 1. The rows are dependent. The rank of A is 1 (only one direction of unique information).</p>
+                    </div>
+
+                    <h3 id="sub-1-3">1.3 Column, Row & Null Spaces</h3>
+                    <p>A matrix defines three fundamental vector spaces:</p>
+                    <ul>
+                        <li><strong>Column Space (C(A)):</strong> All possible linear combinations of the columns (outputs of Ax). Represents the dimensions the matrix can transform inputs into.</li>
+                        <li><strong>Row Space:</strong> All possible linear combinations of the rows. Describes the constraints imposed on inputs.</li>
+                        <li><strong>Null Space (N(A)):</strong> All vectors x that satisfy Ax = 0. Represents the redundant input directions that the matrix completely ignores (maps to zero).</li>
+                    </ul>
+
+                    <div class="topic-nav">
+                        <button class="btn" disabled>Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section id="topic-2" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>Orthogonality & Vector Projection</h2>
+                </div>
+                <div id="content-2" class="collapsible-content">
+                    <h3 id="sub-2-1">2.1 Orthogonality in Learning</h3>
+                    <p>Two vectors are <strong>orthogonal</strong> if their inner product is zero: x · y = 0. Geometrically, they form a 90-degree angle. In machine learning, orthogonal weights minimize gradient overlapping and improve training flow, while orthogonal feature embeddings prevent feature interference.</p>
+
+                    <h3 id="sub-2-2">2.2 Vector Projection</h3>
+                    <p>The projection of vector b onto vector a computes the "shadow" of b along the direction of a. Projection is used in dimensionality reduction to isolate useful coordinates and drop irrelevant perpendicular noise components.</p>
+                    
+                    <div class="box box-beige">
+                        <div class="box-title">Projection Formula</div>
+                        <p>proj<sub>a</sub>(b) = ( (a · b) / (a · a) ) a</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section id="topic-3" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>Eigenvalues & Eigenvectors</h2>
+                </div>
+                <div id="content-3" class="collapsible-content">
+                    <h3 id="sub-3-1">3.1 Geometric Concept</h3>
+                    <p>For a square matrix A, an <strong>eigenvector</strong> (v) is a special direction that does not change direction when transformed by A. It is only stretched or compressed by a scalar factor, which is the <strong>eigenvalue</strong> (&lambda;).</p>
+                    
+                    <div class="box box-blue">
+                        <div class="box-title">Eigenvector Equation</div>
+                        <p>A v = &lambda; v</p>
+                    </div>
+
+                    <h3 id="sub-3-2">3.2 Matrix Diagonalization</h3>
+                    <p>If an n × n matrix has n linearly independent eigenvectors, it can be diagonalized into a scaling matrix: A = P D P<sup>-1</sup>, where columns of P are eigenvectors and diagonal elements of D are eigenvalues. Diagonalization decouples multi-dimensional transformations into independent scaling operations.</p>
+
+                    <h3 id="sub-3-3">3.3 Symmetric Matrices & Covariance</h3>
+                    <p>Symmetric matrices (A = A<sup>T</sup>) have ideal mathematical properties: all eigenvalues are real, and eigenvectors are orthogonal. The <strong>covariance matrix</strong> of a dataset (X<sup>T</sup>X) is symmetric, making its eigenvectors (principal directions) orthogonal and stable.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section id="topic-4" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>SVD & PCA Connections</h2>
+                </div>
+                <div id="content-4" class="collapsible-content">
+                    <h3 id="sub-4-1">4.1 Singular Value Decomposition (SVD)</h3>
+                    <p><strong>SVD</strong> generalizes eigen-decomposition to any m × n matrix. It decomposes the matrix into a rotation, an axis-aligned scaling, and a final rotation.</p>
+                    
+                    <div class="box box-beige">
+                        <div class="box-title">SVD Equation</div>
+                        <p>A = U &Sigma; V<sup>T</sup></p>
+                        <p>Where:</p>
+                        <ul>
+                            <li><strong>U:</strong> Left singular vectors (orthonormal matrix, output rotation).</li>
+                            <li><strong>&Sigma;:</strong> Singular values (diagonal matrix of scaling values, sorted by importance).</li>
+                            <li><strong>V:</strong> Right singular vectors (orthonormal matrix, input rotation).</li>
+                        </ul>
+                    </div>
+
+                    <div style="text-align: center; margin: 1.5rem 0;">
+                        <img src="../images/svd_geometry.png" alt="SVD Geometric Interpretation" style="max-width: 100%;">
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; font-style: italic;">The sequence of SVD transformations: Rotation by V<sup>T</sup>, scaling by &Sigma;, and final rotation by U.</p>
+                    </div>
+
+                    <h3 id="sub-4-2">4.2 Low-Rank Matrix Compression</h3>
+                    <p>According to the <strong>Eckart–Young Theorem</strong>, we can construct the best rank-k approximation of a matrix A by keeping only its top-k singular values and truncating the rest. This technique is used to compress word embeddings, Vision feature maps, and large linear layers in LLMs.</p>
+                    
+                    <h3 id="sub-4-3">4.3 Principal Component Analysis (PCA)</h3>
+                    <p><strong>PCA</strong> is a dimensionality reduction method that projects data onto the directions of maximum variance. Applying SVD to a centered data matrix X directly reveals the principal components:</p>
+                    <ul>
+                        <li>The columns of <strong>V</strong> are the principal component directions.</li>
+                        <li>The singular values in <strong>&Sigma;</strong> represent the explained variance of each component.</li>
+                    </ul>
+
+                    <div style="text-align: center; margin: 1.5rem 0;">
+                        <img src="../images/pca_procedure.png" alt="PCA Procedure Diagram" style="max-width: 100%;">
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; font-style: italic;">The step-by-step PCA process: centering the data, computing the covariance matrix, performing SVD, and reducing dimensions.</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 5 -->
+            <section id="topic-5" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>Conceptual Practice Exercises</h2>
+                </div>
+                <div id="content-5" class="collapsible-content">
+                    <p>Test your understanding of eigenvalues, matrix ranks, SVD, and PCA. Click on the questions to reveal step-by-step solutions.</p>
+
+                    <!-- Exercise 1 -->
+                    <h3 id="sub-5-1" onclick="toggleSection('ex-1-sol')" style="cursor: pointer; color: var(--blue);">5.1 If a matrix is 100&times;100 but its rank is only 5, what does that mean?</h3>
+                    <div id="ex-1-sol" class="collapsible-content" style="padding-left: 1rem; border-left: 3px solid var(--border-light); margin-bottom: 1.5rem;">
+                        <p>This means that out of 100 rows (or columns), only 5 are linearly independent. The remaining 95 rows/columns are redundant linear combinations of those 5. Geometrically, although the matrix is represented in a 100-dimensional space, the data is entirely confined to a 5-dimensional subspace. This indicates massive feature redundancy, meaning the matrix can be significantly compressed (e.g., via SVD/PCA) without losing essential information.</p>
+                    </div>
+
+                    <!-- Exercise 2 -->
+                    <h3 id="sub-5-2" onclick="toggleSection('ex-2-sol')" style="cursor: pointer; color: var(--blue);">5.2 What does a large null space imply about a matrix?</h3>
+                    <div id="ex-2-sol" class="collapsible-content" style="padding-left: 1rem; border-left: 3px solid var(--border-light); margin-bottom: 1.5rem;">
+                        <p>By the Rank-Nullity Theorem, <code>Rank(A) + Nullity(A) = n</code> (where n is the number of columns). A large null space implies a small column space (low rank). In machine learning, a large null space means the matrix collapses many different input vectors to zero, signifying that a high volume of input features are ignored or deemed redundant, and do not contribute to the output mapping.</p>
+                    </div>
+
+                    <!-- Exercise 3 -->
+                    <h3 id="sub-5-3" onclick="toggleSection('ex-3-sol')" style="cursor: pointer; color: var(--blue);">5.3 Which of these sets is linearly independent? A: {(1,2), (2,4)} vs. B: {(1,2), (2,3)}</h3>
+                    <div id="ex-3-sol" class="collapsible-content" style="padding-left: 1rem; border-left: 3px solid var(--border-light); margin-bottom: 1.5rem;">
+                        <p><strong>Set B is linearly independent.</strong></p>
+                        <p>In Set A, the second vector is exactly twice the first: <code>(2, 4) = 2 * (1, 2)</code>. Thus, they are linearly dependent (parallel, lying on the same line).</p>
+                        <p>In Set B, there is no scalar <em>c</em> such that <code>c * (1, 2) = (2, 3)</code>. They point in different directions, thus spanning a full 2D plane independently.</p>
+                    </div>
+
+                    <!-- Exercise 4 -->
+                    <h3 id="sub-5-4" onclick="toggleSection('ex-4-sol')" style="cursor: pointer; color: var(--blue);">5.4 If x = [3, 4] and y = [4, -3], are they orthogonal?</h3>
+                    <div id="ex-4-sol" class="collapsible-content" style="padding-left: 1rem; border-left: 3px solid var(--border-light); margin-bottom: 1.5rem;">
+                        <p>To check for orthogonality, compute their dot product:</p>
+                        <p style="font-family: monospace; padding-left: 1rem;">x · y = (3 &times; 4) + (4 &times; -3) = 12 - 12 = 0</p>
+                        <p><strong>Yes</strong>, since the dot product is exactly 0, the vectors are orthogonal (form a 90-degree angle).</p>
+                    </div>
+
+                    <!-- Exercise 5 -->
+                    <h3 id="sub-5-5" onclick="toggleSection('ex-5-sol')" style="cursor: pointer; color: var(--blue);">5.5 If vector b lies entirely in the null space of A, what is its projection onto the column space of A?</h3>
+                    <div id="ex-5-sol" class="collapsible-content" style="padding-left: 1rem; border-left: 3px solid var(--border-light); margin-bottom: 1.5rem;">
+                        <p>By fundamental vector space geometry, the null space N(A) is orthogonal to the row space of A, and the left null space N(A<sup>T</sup>) is orthogonal to the column space C(A). If we consider the column space of A, a vector lying entirely in the orthogonal null space will have no component in the direction of the column space.</p>
+                        <p>Therefore, its projection onto the column space is the <strong>zero vector (0)</strong>.</p>
+                    </div>
+
+                    <!-- Exercise 6 -->
+                    <h3 id="sub-5-6" onclick="toggleSection('ex-6-sol')" style="cursor: pointer; color: var(--blue);">5.6 If A v = 5v, what does the eigenvalue 5 mean?</h3>
+                    <div id="ex-6-sol" class="collapsible-content" style="padding-left: 1rem; border-left: 3px solid var(--border-light); margin-bottom: 1.5rem;">
+                        <p>It means that when the matrix linear transformation A is applied to the eigenvector v, v does not rotate or change its directional axis. It simply stretches in length by a scaling factor of <strong>5</strong>.</p>
+                    </div>
+
+                    <!-- Exercise 7 -->
+                    <h3 id="sub-5-7" onclick="toggleSection('ex-7-sol')" style="cursor: pointer; color: var(--blue);">5.7 Why do eigenvectors matter in PCA?</h3>
+                    <div id="ex-7-sol" class="collapsible-content" style="padding-left: 1rem; border-left: 3px solid var(--border-light); margin-bottom: 1.5rem;">
+                        <p>In PCA, we construct the covariance matrix of our features. The eigenvectors of this covariance matrix represent the <strong>Principal Components</strong> (the axes/directions of maximum variance along which the data is spread). By projecting our data onto the top-k eigenvectors (with the largest eigenvalues), we reduce dimensionality while preserving maximum information and removing feature correlation.</p>
+                    </div>
+
+                    <!-- Exercise 8 -->
+                    <h3 id="sub-5-8" onclick="toggleSection('ex-8-sol')" style="cursor: pointer; color: var(--blue);">5.8 Why does PCA always use a symmetric matrix?</h3>
+                    <div id="ex-8-sol" class="collapsible-content" style="padding-left: 1rem; border-left: 3px solid var(--border-light); margin-bottom: 1.5rem;">
+                        <p>PCA analyzes data variance via the covariance matrix (calculated as &Sigma; = X<sup>T</sup>X / (n - 1)). By definition, covariance between feature i and feature j equals covariance between j and i, making the matrix symmetric. Symmetric matrices are mathematically guaranteed to have:</p>
+                        <ol>
+                            <li>Only real eigenvalues (no imaginary scaling numbers).</li>
+                            <li>Mutually orthogonal eigenvectors, which ensures the principal component directions are perpendicular (completely decorrelated features).</li>
+                        </ol>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled>Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section id="original-pdf" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--text-dark); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div id="content-pdf" class="collapsible-content">
+                    <p>Below is the original PDF document for your reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled>Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/2.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--border-light); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>
