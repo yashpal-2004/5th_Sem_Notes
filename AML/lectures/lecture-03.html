@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Machine Learning - Lecture 03</title>
+    <meta name="description" content="Study notes for Advanced Machine Learning, Lecture 03 covering AutoRegressive (AR), Moving Average (MA), Integration (I), and ARIMA models.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>03</text></svg>">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+    <header>
+        <div class="header-titles">
+            <h1>Advanced Machine Learning</h1>
+            <p>Lecture 03 - Autoregressive, Moving Average, & ARIMA Models</p>
+            <a href="../index.html" style="color: var(--text-dark); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+        </div>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search notes...">
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 4</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li>
+                    <a href="#topic-1">1. Autoregressive (AR) Models<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-1-1">1.1 Linear Regression using Lags</a></li>
+                         <li><a href="#sub-1-2">1.2 The AutoRegressive Concept</a></li>
+                         <li><a href="#sub-1-3">1.3 Regression vs. AutoRegression</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Model Diagnostics: ACF vs. PACF<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-2-1">2.1 Autocorrelation Function (ACF)</a></li>
+                         <li><a href="#sub-2-2">2.2 Partial Autocorrelation Function (PACF)</a></li>
+                         <li><a href="#sub-2-3">2.3 Selecting Relevant Lags</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Moving Average (MA) Models<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-3-1">3.1 Error Terms & Shocks</a></li>
+                         <li><a href="#sub-3-2">3.2 MA Model Formulation</a></li>
+                         <li><a href="#sub-3-3">3.3 AR vs. MA Model Attributes</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Integration & ARIMA<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-4-1">4.1 Order of Integration I(d)</a></li>
+                         <li><a href="#sub-4-2">4.2 Finding the Integration Level</a></li>
+                         <li><a href="#sub-4-3">4.3 The Combined ARIMA(p,d,q) Model</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="notesContent">
+
+            <!-- Topic 1 -->
+            <section id="topic-1" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>Autoregressive (AR) Models</h2>
+                </div>
+                <div id="content-1" class="collapsible-content">
+                    <h3 id="sub-1-1">1.1 Linear Regression using Lags</h3>
+                    <p>To predict the value of a time series at the current step (t), we can establish relationships using historical data points (lags). Instead of predicting using external parameters, we structure a linear regression where the inputs (X) are the past values of the variable itself, and the output (Y) is today's value.</p>
+                    
+                    <div class="box box-blue">
+                        <div class="box-title">Lag-1 Regression Example</div>
+                        <p>If today's sales (Y<sub>t</sub>) are predicted solely by yesterday's sales (Y<sub>t-1</sub>):</p>
+                        <p>Y<sub>t</sub> = w<sub>1</sub>Y<sub>t-1</sub> + c + &epsilon;<sub>t</sub></p>
+                        <p>Where w<sub>1</sub> is the lag coefficient, c is a constant, and &epsilon;<sub>t</sub> represents white noise.</p>
+                    </div>
+
+                    <h3 id="sub-1-2">1.2 The AutoRegressive Concept</h3>
+                    <p>An **AutoRegressive (AR)** model predicts a variable using a linear combination of its own historical values. The order of the model, denoted as **p**, indicates how many previous time steps (lags) are included in the equation.</p>
+                    
+                    <div class="box box-beige">
+                        <div class="box-title">AR(p) General Formula</div>
+                        <p>Y<sub>t</sub> = c + &phi;<sub>1</sub>Y<sub>t-1</sub> + &phi;<sub>2</sub>Y<sub>t-2</sub> + ... + &phi;<sub>p</sub>Y<sub>t-p</sub> + &epsilon;<sub>t</sub></p>
+                        <p>Where &phi;<sub>1</sub>, &phi;<sub>2</sub>, ..., &phi;<sub>p</sub> are autoregressive parameters and &epsilon;<sub>t</sub> is white noise (random shock).</p>
+                    </div>
+
+                    <h3 id="sub-1-3">1.3 Regression vs. AutoRegression</h3>
+                    <p>The core differences between standard linear regression and autoregression are summarized below:</p>
+
+                    <div style="text-align: center; margin: 1.5rem 0;">
+                        <img src="../images/regression_vs_autoregression.png" alt="Regression vs AutoRegression Table" style="max-width: 100%;">
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; font-style: italic;">Comparative breakdown: Standard Regression relies on external variables, whereas AutoRegression uses internal historical values as features.</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" disabled>Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section id="topic-2" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>Model Diagnostics: ACF vs. PACF</h2>
+                </div>
+                <div id="content-2" class="collapsible-content">
+                    <h3 id="sub-2-1">2.1 Autocorrelation Function (ACF)</h3>
+                    <p>The **ACF** calculates the total correlation between a data point and its past values across multiple lags. Spikes extending outside the shaded blue confidence band (typically representing a 95% confidence interval) indicate statistically significant correlations.</p>
+
+                    <div style="text-align: center; margin: 1.5rem 0;">
+                        <img src="../images/acf_confidence_band.png" alt="ACF Plot Confidence Band" style="max-width: 100%;">
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; font-style: italic;">The ACF plot showcasing vertical spikes. Spikes exceeding the shaded box limits are statistically significant.</p>
+                    </div>
+
+                    <div class="box box-orange">
+                        <div class="box-title">Understanding Negative ACF Spikes</div>
+                        <p>A negative spike at a specific lag (e.g., lag 2) indicates an inverse or correction relationship: if values were high 2 steps ago, the current value tends to be lower; if low 2 steps ago, the current value tends to be higher.</p>
+                    </div>
+
+                    <h3 id="sub-2-2">2.2 Partial Autocorrelation Function (PACF)</h3>
+                    <p>While ACF shows the **total correlation** (including indirect paths, e.g., Day 1 affecting Day 3 through Day 2), the **PACF** isolates the **direct relationship** between two time steps by mathematically removing the influence of all intermediate lags.</p>
+
+                    <div style="text-align: center; margin: 1.5rem 0;">
+                        <img src="../images/acf_vs_pacf.png" alt="ACF vs PACF" style="max-width: 100%;">
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; font-style: italic;">Comparison summary: ACF illustrates the combined total influence, whereas PACF isolates the clean, direct influence between lags.</p>
+                    </div>
+
+                    <h3 id="sub-2-3">2.3 Selecting Relevant Lags</h3>
+                    <p>PACF plots are the primary diagnostic tool used to determine the order **p** of an AR model. When the PACF has a set of significant spikes and then drops abruptly into the confidence band, the number of significant spikes defines the AR model order.</p>
+
+                    <div style="text-align: center; margin: 1.5rem 0;">
+                        <img src="../images/pacf_interpretation.png" alt="PACF Plot Interpretation" style="max-width: 100%;">
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; font-style: italic;">Interpretation example: A strong positive spike at lag 1 and a negative spike at lag 2, with subsequent lags remaining within noise bounds, implies an AR(2) process.</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section id="topic-3" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>Moving Average (MA) Models</h2>
+                </div>
+                <div id="content-3" class="collapsible-content">
+                    <h3 id="sub-3-1">3.1 Error Terms & Shocks</h3>
+                    <p>No model forecast is perfect. The difference between the actual value and the model's past-value prediction is the **residual**, **innovation**, or **shock** (&epsilon;<sub>t</sub>). Shocks represent unexpected news, policy changes, or random events whose impact may persist across multiple steps (ripple effect).</p>
+
+                    <h3 id="sub-3-2">3.2 MA Model Formulation</h3>
+                    <p>A **Moving Average (MA)** model predicts today's value based on a linear combination of the series' historical error terms (shocks). The model order **q** indicates the number of past error terms included in the equation.</p>
+                    
+                    <div class="box box-blue">
+                        <div class="box-title">MA(q) General Formula</div>
+                        <p>Y<sub>t</sub> = &mu; + &epsilon;<sub>t</sub> + &theta;_<sub>1</sub>&epsilon;<sub>t-1</sub> + &theta;_<sub>2</sub>&epsilon;<sub>t-2</sub> + ... + &theta;_<sub>q</sub>&epsilon;<sub>t-q</sub></p>
+                        <p>Where &mu; is the series mean, &epsilon;<sub>t</sub> is the current shock, and &theta; coefficients represent how much past shocks persist into the present.</p>
+                    </div>
+
+                    <div class="box box-orange">
+                        <div class="box-title">Selecting MA Order (q)</div>
+                        <p>Unlike AR models which use PACF plots, <strong>MA model orders (q) are selected using ACF plots</strong>. If the ACF has significant spikes up to lag <em>q</em> and then cuts off, it suggests an MA(q) process.</p>
+                    </div>
+
+                    <h3 id="sub-3-3">3.3 AR vs. MA Model Attributes</h3>
+                    <p>A summary comparison of AR and MA model diagnostics and properties:</p>
+
+                    <div style="text-align: center; margin: 1.5rem 0;">
+                        <img src="../images/ar_vs_ma.png" alt="AR vs MA" style="max-width: 100%;">
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; font-style: italic;">Comparison matrix mapping AR and MA equations, diagnostic plots (ACF vs PACF), and correlation parameters.</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section id="topic-4" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>Integration & ARIMA</h2>
+                </div>
+                <div id="content-4" class="collapsible-content">
+                    <h3 id="sub-4-1">4.1 Order of Integration I(d)</h3>
+                    <p>Both AR and MA models assume that the time series is stationary. If the series contains trend or seasonality, we must difference it **d** times before it becomes stationary. The minimum number of differencing operations required is the **order of integration (d)**, written as **I(d)**.</p>
+
+                    <h3 id="sub-4-2">4.2 Finding the Integration Level</h3>
+                    <p>We determine the required level of integration by repeatedly differencing the series and evaluating stability:</p>
+
+                    <div style="text-align: center; margin: 1.5rem 0;">
+                        <img src="../images/differencing_order_calculation.png" alt="Order of Integration Calculation Table" style="max-width: 100%;">
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; font-style: italic;">Tabular example of differencing: the first difference increases systematically, but the second difference becomes stable and constant (d=2).</p>
+                    </div>
+
+                    <div class="box box-green">
+                        <div class="box-title">Methods to Detect Integration Order</div>
+                        <ul>
+                            <li><strong>Visual Inspection:</strong> Checking if a trend is present in the plot (typically I(1) or I(2)).</li>
+                            <li><strong>Statistical Tests:</strong> Utilizing unit root tests such as the <strong>Augmented Dickey–Fuller (ADF)</strong> test, the <strong>KPSS</strong> test, or the <strong>Phillips–Perron (PP)</strong> test.</li>
+                        </ul>
+                    </div>
+
+                    <h3 id="sub-4-3">4.3 The Combined ARIMA(p,d,q) Model</h3>
+                    <p>The **ARIMA** (AutoRegressive Integrated Moving Average) model integrates all three components to handle non-stationary series containing trends:</p>
+                    <ul>
+                        <li><strong>AR (p):</strong> Uses past values to predict current values (order checked via PACF).</li>
+                        <li><strong>I (d):</strong> Differences the series <em>d</em> times to make it stationary.</li>
+                        <li><strong>MA (q):</strong> Uses past errors/shocks to correct current predictions (order checked via ACF).</li>
+                    </ul>
+
+                    <div class="box box-blue">
+                        <div class="box-title">ARIMA(p, d, q) Parameters</div>
+                        <ul>
+                            <li><strong>p (AR order):</strong> Number of past lags to look at.</li>
+                            <li><strong>d (Integration order):</strong> Number of times the series is differenced to stabilize the mean.</li>
+                            <li><strong>q (MA order):</strong> Number of historical shocks to include.</li>
+                        </ul>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled>Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section id="original-pdf" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--text-dark); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div id="content-pdf" class="collapsible-content">
+                    <p>Below is the original PDF document for your reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled>Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/3.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--border-light); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>

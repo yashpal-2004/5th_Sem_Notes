@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecture 04 - Threads in Depth: Models and Implementations</title>
+    <meta name="description" content="Study notes covering thread models, concurrency vs parallelism, hazards, and pthreads.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%231E88E5%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>04</text></svg>">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+    <header>
+        <div class="header-titles">
+            <h1>Operating Systems Foundations</h1>
+            <p>Lecture 04 - Threads in Depth</p>
+            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+        </div>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search notes...">
+        </div>
+    </header>
+
+    <div class="container" style="margin-top: 2rem;">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 6</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li>
+                    <a href="#topic-1">1. Concurrency vs. Parallelism<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 Core Difference</a></li>
+                        <li><a href="#sub-1-2">1.2 Coffee Shop Analogy</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Multithreading Models<span class="sub-count">4</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 User-Level Threads (ULT)</a></li>
+                        <li><a href="#sub-2-2">2.2 Kernel-Level Threads (KLT)</a></li>
+                        <li><a href="#sub-2-3">2.3 Hybrid Threads (M:N)</a></li>
+                        <li><a href="#sub-2-4">2.4 Virtual Threads (Java 21+)</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. The Evolution of Execution<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 Phase 1: Sequential</a></li>
+                        <li><a href="#sub-3-2">3.2 Phase 2: Cooperative</a></li>
+                        <li><a href="#sub-3-3">3.3 Phase 3: Preemptive</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. OS Implementations<span class="sub-count">1</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 Linux & Java Realities</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Hazards & Synchronization<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 Race Conditions</a></li>
+                        <li><a href="#sub-5-2">5.2 Deadlocks</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-6">6. Pthread API<span class="sub-count">1</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-6-1">6.1 Core Functions</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="notesContent">
+            
+            <!-- Topic 1 -->
+            <section id="topic-1" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>Concurrency vs. Parallelism</h2>
+                </div>
+                <div id="content-1" class="collapsible-content">
+                    <h3 id="sub-1-1">1.1 Core Difference</h3>
+                    <p><strong>Concurrency</strong> is about dealing with lots of things at once (structure). <strong>Parallelism</strong> is about doing lots of things at once (execution).</p>
+
+                    <h3 id="sub-1-2">1.2 The Coffee Shop Analogy</h3>
+                    <div class="box box-green">
+                        <div class="box-title">Coffee Shop Analogy</div>
+                        <ul>
+                            <li><strong>Concurrency (Single Core):</strong> One barista, two lines of customers. The barista takes an order from Line A, starts the machine, switches to Line B, takes payment, and switches back to A. They are making progress on both lines, but only working on one at a time.</li>
+                            <li><strong>Parallelism (Multi-Core):</strong> Two baristas, two machines. Two customers get served at the exact same instant.</li>
+                        </ul>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" disabled>Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section id="topic-2" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>Multithreading Models</h2>
+                </div>
+                <div id="content-2" class="collapsible-content">
+                    <h3 id="sub-2-1">2.1 User-Level Threads (ULT)</h3>
+                    <p>Also known as "Invisible Threads", "Green Threads", or N:1 threads. The OS is oblivious and sees only one single process. A user-space library (like the JVM) slices time and switches between tasks manually.</p>
+                    <ul>
+                        <li><strong>Pros:</strong> Context switches are extremely fast (nanoseconds) because no system calls are needed.</li>
+                        <li><strong>Cons (The Fatal Flaw):</strong> If one thread calls a blocking operation (like reading a file), the OS pauses the entire process because it doesn't know there are other threads. The whole app freezes.</li>
+                    </ul>
+
+                    <h3 id="sub-2-2">2.2 Kernel-Level Threads (KLT)</h3>
+                    <p>Also known as Native Threads or 1:1 threads. The OS is fully aware and allocates a kernel structure for every thread.</p>
+                    <ul>
+                        <li><strong>Pros:</strong> True parallelism. If one thread blocks on I/O, the OS simply switches to another thread.</li>
+                        <li><strong>Cons:</strong> Expensive context switches (microseconds) requiring mode switches between user and kernel space.</li>
+                    </ul>
+
+                    <h3 id="sub-2-3">2.3 Hybrid Threads (M:N)</h3>
+                    <p>A pool of user threads is multiplexed onto a smaller pool of kernel threads.</p>
+                    <div class="box box-blue">
+                        <div class="box-title">Ride-Sharing Analogy</div>
+                        <p>Passengers = User Threads. Cars = Kernel Threads. A car picks up a passenger, drives them. If the passenger needs to stop (blocking I/O), they get out. The car immediately picks up the next passenger. The car never waits.</p>
+                    </div>
+                    <p><strong>Pros:</strong> High concurrency (millions of threads) with true parallelism.</p>
+                    <p><strong>Cons:</strong> Extremely complex to implement.</p>
+
+                    <h3 id="sub-2-4">2.4 Virtual Threads (Java 21+)</h3>
+                    <p>A modern, production-ready implementation of the M:N model.</p>
+                    <ul>
+                        <li><strong>Mounting:</strong> JVM assigns a Virtual Thread to a "Carrier Thread" (Kernel Thread).</li>
+                        <li><strong>Unmounting:</strong> When the code hits a blocking call, the JVM detaches it and stores it in heap memory, while the Carrier Thread grabs a new Virtual Thread to run.</li>
+                    </ul>
+                    <p>Allows for creating 10,000,000 threads on a standard laptop!</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section id="topic-3" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>The Evolution of Execution</h2>
+                </div>
+                <div id="content-3" class="collapsible-content">
+                    <h3 id="sub-3-1">3.1 Phase 1: Sequential Execution</h3>
+                    <p>Program runs strictly top-to-bottom. If a download takes 5 seconds, the CPU sits idle for 5 seconds waiting. Very inefficient.</p>
+
+                    <h3 id="sub-3-2">3.2 Phase 2: Cooperative Multitasking (User-Level)</h3>
+                    <p>Tasks voluntarily "yield" control. Efficient, but dangerous.</p>
+                    <div class="box box-red">
+                        <div class="box-title">Danger Scenario</div>
+                        <p>If Task A gets into an infinite loop and forgets to yield, Task B starves. One rogue task ruins the entire system.</p>
+                    </div>
+
+                    <h3 id="sub-3-3">3.3 Phase 3: Preemptive Multitasking (Kernel-Level)</h3>
+                    <p>The OS scheduler handles context switching automatically. True parallelism. The OS is the boss, not the code. Eliminates the requirement for manual yielding.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section id="topic-4" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>OS Implementations</h2>
+                </div>
+                <div id="content-4" class="collapsible-content">
+                    <h3 id="sub-4-1">4.1 Linux & Java Realities</h3>
+                    <p><strong>The Linux Revelation:</strong> In Linux, there is no separate concept of a "thread". It uses <code>task_struct</code>. Whether it acts like a process or thread depends purely on the sharing flags passed to the <code>clone()</code> system call.</p>
+                    <p><strong>Java's Evolution:</strong></p>
+                    <ul>
+                        <li>JDK 1.0: Green Threads (N:1).</li>
+                        <li>JDK 1.2 - 19: Native Threads (1:1). Stable, but heavy.</li>
+                        <li>JDK 21+: Virtual Threads (M:N). Returned to N:1 concepts with modern hardware support.</li>
+                    </ul>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 5 -->
+            <section id="topic-5" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>Hazards & Synchronization</h2>
+                </div>
+                <div id="content-5" class="collapsible-content">
+                    <p>With great power comes great synchronization problems.</p>
+                    
+                    <h3 id="sub-5-1">5.1 Race Conditions</h3>
+                    <p>Even a simple <code>count++</code> is actually three instructions: Read, Add, Write.</p>
+                    <div class="box box-red">
+                        <div class="box-title">The "Lost Update"</div>
+                        <p>If two threads try to increment 5 at the exact same time, they might both read 5, both add 1, and both write 6 back to memory. The count should be 7, but an update was lost.</p>
+                    </div>
+
+                    <h3 id="sub-5-2">5.2 Deadlocks</h3>
+                    <p><strong>Analogy:</strong> Four cars at a 4-way stop with the rule "Yield to the right". If 4 cars arrive simultaneously, everyone waits for the person on their right. No one moves. Forever.</p>
+                    <p><strong>The Technical Fix:</strong> Lock Ordering. Ensure threads always acquire locks in the exact same predefined order (e.g., always acquire Lock A before Lock B).</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 6 -->
+            <section id="topic-6" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-6')">
+                    <div class="topic-number">6</div>
+                    <h2>Pthread API</h2>
+                </div>
+                <div id="content-6" class="collapsible-content">
+                    <h3 id="sub-6-1">6.1 Core Functions</h3>
+                    <p>Pthreads (POSIX Threads) is the standard C/C++ API for thread management.</p>
+                    <pre class="code-block"><code><span class="code-comment">// Create a thread</span>
+<span class="code-type">int</span> pthread_create(pthread_t *thread, const pthread_attr_t *attr, <span class="code-type">void</span> *(*start_routine)(<span class="code-type">void</span>*), <span class="code-type">void</span> *arg);
+
+<span class="code-comment">// Wait for a thread (like waitpid)</span>
+<span class="code-type">int</span> pthread_join(pthread_t thread, <span class="code-type">void</span> **retval);
+
+<span class="code-comment">// Fire and forget (system reclaims resources automatically)</span>
+<span class="code-type">int</span> pthread_detach(pthread_t thread);
+
+<span class="code-comment">// Terminate calling thread</span>
+<span class="code-type">void</span> pthread_exit(<span class="code-type">void</span> *retval);</code></pre>
+                    <div class="box box-beige">
+                        <div class="box-title">Important</div>
+                        <p>You must call <code>pthread_join()</code> on joinable threads to release their resources, otherwise they become zombie threads.</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled>Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section id="original-pdf" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div id="content-pdf" class="collapsible-content">
+                    <p>Below is the original PDF document for your reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF4()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled>Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+
+    <script>
+        function loadPDF4() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/4.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>

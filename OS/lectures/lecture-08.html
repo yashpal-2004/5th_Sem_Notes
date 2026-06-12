@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecture 08 - CPU Scheduling Algorithms II: Round Robin and Priority</title>
+    <meta name="description" content="Study notes covering Round Robin, Priority Scheduling, MLQ, MLFQ, and macOS implementations.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%231E88E5%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>08</text></svg>">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+    <header>
+        <div class="header-titles">
+            <h1>Operating Systems Foundations</h1>
+            <p>Lecture 08 - CPU Scheduling Algorithms II</p>
+            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+        </div>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search notes...">
+        </div>
+    </header>
+
+    <div class="container" style="margin-top: 2rem;">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 6</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li>
+                    <a href="#topic-1">1. Quick Review<span class="sub-count">1</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 FCFS, SJF, SRTF Flaws</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Round Robin (RR)<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 The "Everyone Gets a Turn" Algorithm</a></li>
+                        <li><a href="#sub-2-2">2.2 The Quantum Effect</a></li>
+                        <li><a href="#sub-2-3">2.3 macOS Implementation</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Priority Scheduling<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 The VIP System</a></li>
+                        <li><a href="#sub-3-2">3.2 Preemptive vs Non-Preemptive</a></li>
+                        <li><a href="#sub-3-3">3.3 Starvation and Aging</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Multi-Level Queue (MLQ)<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 The Separate Lines Algorithm</a></li>
+                        <li><a href="#sub-4-2">4.2 The Airport Analogy</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Multi-Level Feedback Queue (MLFQ)<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 The Adaptive Learning Algorithm</a></li>
+                        <li><a href="#sub-5-2">5.2 Promotion and Demotion</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-6">6. macOS & MLFQ<span class="sub-count">1</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-6-1">6.1 Real-World Priority Hierarchy</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="notesContent">
+            
+            <!-- Topic 1 -->
+            <section id="topic-1" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>Quick Review</h2>
+                </div>
+                <div id="content-1" class="collapsible-content">
+                    <h3 id="sub-1-1">1.1 FCFS, SJF, SRTF Flaws</h3>
+                    <p>Previously, we saw that:</p>
+                    <ul>
+                        <li><strong>FCFS</strong> suffers from the Convoy Effect.</li>
+                        <li><strong>SJF</strong> suffers from Starvation (long processes never run).</li>
+                        <li><strong>SRTF</strong> fixes the Convoy Effect but introduces High Overhead (too many context switches).</li>
+                    </ul>
+                    <div class="box box-red">
+                        <div class="box-title">The Conclusion</div>
+                        <p>All three of these algorithms are not truly fair to all processes.</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" disabled>Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section id="topic-2" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>Round Robin (RR)</h2>
+                </div>
+                <div id="content-2" class="collapsible-content">
+                    <h3 id="sub-2-1">2.1 The "Everyone Gets a Turn" Algorithm</h3>
+                    <p><strong>Core Principle:</strong> Each process gets a small unit of CPU time called a <em>time quantum (q)</em>. After the quantum expires, the process is preempted and goes to the back of the ready queue. The CPU scheduler then picks the next process.</p>
+                    <ul>
+                        <li><strong>Criteria:</strong> Time Quantum (q).</li>
+                        <li><strong>Mode:</strong> Preemptive (Timer interrupt forces the switch).</li>
+                        <li><strong>Data Structure:</strong> Circular FIFO Queue.</li>
+                    </ul>
+
+                    <h3 id="sub-2-2">2.2 The Quantum Effect</h3>
+                    <p>Choosing the correct quantum size is the key to Round Robin:</p>
+                    <ul>
+                        <li><strong>Too Small (e.g., 1ms):</strong> High Context Switch Overhead. The barista spends more time switching cups than making coffee!</li>
+                        <li><strong>Too Large (e.g., 10 mins):</strong> It degrades into FCFS. Customer A hogs the barista while Customer B waits forever.</li>
+                        <li><strong>Perfect Quantum:</strong> Usually 10-100ms. This keeps context switch overhead &lt; 1% of the quantum while providing a good interactive response.</li>
+                    </ul>
+
+                    <h3 id="sub-2-3">2.3 macOS Implementation</h3>
+                    <p>When you run Safari, Spotify, and VS Code, macOS uses a Round Robin-style approach within the same priority level. It gives each app a tiny slice of time so they all feel "live".</p>
+                    <div class="box box-orange">
+                        <div class="box-title">The Spinning Beach Ball</div>
+                        <p>If an app exceeds its quantum repeatedly without yielding or responding, macOS flags it as unresponsive, giving you the infamous spinning beach ball.</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section id="topic-3" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>Priority Scheduling</h2>
+                </div>
+                <div id="content-3" class="collapsible-content">
+                    <h3 id="sub-3-1">3.1 The VIP System</h3>
+                    <p>What if some customers are more important? The "Importance First" Algorithm allocates the CPU to the highest priority process. Generally, a lower number means a higher priority.</p>
+                    
+                    <h3 id="sub-3-2">3.2 Preemptive vs Non-Preemptive</h3>
+                    <ul>
+                        <li><strong>Non-Preemptive:</strong> Once the CPU is allocated, it runs to completion. Priority is only checked when the current process finishes (like a VIP waiting for the current customer to finish their order).</li>
+                        <li><strong>Preemptive:</strong> A higher priority process can interrupt the current process immediately (like a VIP cutting the line).</li>
+                    </ul>
+
+                    <h3 id="sub-3-3">3.3 Starvation and Aging</h3>
+                    <div class="box box-red">
+                        <div class="box-title">The Starvation Problem</div>
+                        <p>If high-priority processes keep arriving, low-priority processes will starve and never get executed.</p>
+                    </div>
+                    <p><strong>The Solution: AGING.</strong> Gradually increase the priority of waiting processes over time. Eventually, even the lowest priority process becomes the highest priority and gets to run. Once it runs, its priority is reset.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section id="topic-4" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>Multi-Level Queue (MLQ)</h2>
+                </div>
+                <div id="content-4" class="collapsible-content">
+                    <h3 id="sub-4-1">4.1 The Separate Lines Algorithm</h3>
+                    <p>Processes are divided into separate queues based on their type (System, Interactive, Batch). Each queue has its own scheduling algorithm, and there is a fixed priority between the queues. A process stays in its assigned queue forever.</p>
+
+                    <h3 id="sub-4-2">4.2 The Airport Analogy</h3>
+                    <div class="box box-green">
+                        <div class="box-title">Airport Security Lines</div>
+                        <ul>
+                            <li><strong>First Class Line (Queue 1):</strong> Shortest wait time. Always served first.</li>
+                            <li><strong>Business Class Line (Queue 2):</strong> Medium wait time. Only served if First Class is empty.</li>
+                            <li><strong>Economy Line (Queue 3):</strong> Longest wait time. Only served if Q1 and Q2 are empty.</li>
+                        </ul>
+                        <p>In basic MLQ, you cannot switch lines. This leads to starvation for Economy if First Class keeps filling up!</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 5 -->
+            <section id="topic-5" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>Multi-Level Feedback Queue (MLFQ)</h2>
+                </div>
+                <div id="content-5" class="collapsible-content">
+                    <h3 id="sub-5-1">5.1 The Adaptive Learning Algorithm</h3>
+                    <p>MLFQ solves the starvation problem of MLQ by allowing processes to <strong>MOVE</strong> between queues. The system learns process behavior dynamically based on CPU usage and waiting time.</p>
+
+                    <h3 id="sub-5-2">5.2 Promotion and Demotion</h3>
+                    <ul>
+                        <li><strong>Demotion:</strong> If a process uses its FULL time quantum (it's a CPU hog), it gets demoted to the next lower queue.</li>
+                        <li><strong>Stays:</strong> If a process finishes or blocks for I/O before the quantum expires, it stays in the same queue (or gets promoted).</li>
+                        <li><strong>Promotion (Aging):</strong> After a certain period of waiting, all processes are moved back to the highest priority queue to prevent starvation.</li>
+                    </ul>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 6 -->
+            <section id="topic-6" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-6')">
+                    <div class="topic-number">6</div>
+                    <h2>macOS & MLFQ</h2>
+                </div>
+                <div id="content-6" class="collapsible-content">
+                    <h3 id="sub-6-1">6.1 Real-World Priority Hierarchy</h3>
+                    <p>macOS uses a sophisticated MLFQ with 128 priority levels. Here is the general hierarchy from highest to lowest:</p>
+                    <ol>
+                        <li><strong>Real-Time Threads (Audio, Video):</strong> Absolute highest priority (outside standard MLFQ).</li>
+                        <li><strong>User Interactive (Safari, Finder):</strong> Direct user actions like clicks and typing. Gets High priority.</li>
+                        <li><strong>User Initiated:</strong> Opening files, searching.</li>
+                        <li><strong>Default:</strong> General tasks, network requests.</li>
+                        <li><strong>Utility:</strong> Background work, downloads.</li>
+                        <li><strong>Background (Time Machine, Indexing):</strong> Maintenance tasks. Lowest priority. Can be delayed without the user noticing.</li>
+                    </ol>
+                    <div class="box box-blue">
+                        <div class="box-title">Example Scenario</div>
+                        <p>If you're watching a video (Interactive - P1) while a backup runs (Background - P5), the video preempts the backup if CPU is needed. The backup only continues when the CPU is idle. This extends battery life while maintaining perfect responsiveness.</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled>Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section id="original-pdf" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div id="content-pdf" class="collapsible-content">
+                    <p>Below is the original PDF document for your reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF8()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled>Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+
+    <script>
+        function loadPDF8() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/8.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operating Systems Foundations - Lectures</title>
+    <meta name="description" content="Dashboard for all Operating Systems Foundations lecture notes.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/home.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2240%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>OS</text></svg>">
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <nav>
+        <a href="../index.html" class="logo-container">
+            <svg class="logo-symbol" viewBox="0 0 24 24">
+                <circle cx="12" cy="6" r="3"/>
+                <circle cx="6" cy="16" r="3"/>
+                <circle cx="18" cy="16" r="3"/>
+            </svg>
+            <span class="logo-text">OS Notes</span>
+        </a>
+        <ul class="nav-menu">
+            <li><a href="../index.html">Main Hub</a></li>
+            <li><a href="../AML/index.html">Machine Learning</a></li>
+            <li><a href="../DL/index.html">Deep Learning</a></li>
+        </ul>
+        <div class="nav-stats">8 Lectures &bull; 50+ Topics</div>
+    </nav>
+
+
+
+    <!-- Lectures Section -->
+    <section class="coursework-section">
+        <div class="coursework-container">
+            <h3 class="section-label">Compiled Lectures</h3>
+            <div class="lectures-grid">
+                
+                <!-- Lecture 1 -->
+                <a href="lectures/lecture-01.html" class="lecture-card">
+                    <div class="lecture-number">01</div>
+                    <h2>Introduction to Operating Systems</h2>
+                    <p>Explore basic process concepts, system service boundaries, hardware control, and kernel space virtualization.</p>
+                    <div class="lecture-card-header">
+                        <span class="lecture-tag">Intro</span>
+                        <span class="lecture-stats">6 Topics</span>
+                    </div>
+                </a>
+
+                <!-- Lecture 2 -->
+                <a href="lectures/lecture-02.html" class="lecture-card">
+                    <div class="lecture-number">02</div>
+                    <h2>Process Concepts & Architecture</h2>
+                    <p>Examine PCBs (Process Control Blocks), context switching, state queues, and child generation forks.</p>
+                    <div class="lecture-card-header">
+                        <span class="lecture-tag">Processes</span>
+                        <span class="lecture-stats">8 Topics</span>
+                    </div>
+                </a>
+
+                <!-- Lecture 3 -->
+                <a href="lectures/lecture-03.html" class="lecture-card">
+                    <div class="lecture-number">03</div>
+                    <h2>Process Creation & Threads</h2>
+                    <p>POSIX process standards, zombie generation, parent waits, and thread memory isolation limits.</p>
+                    <div class="lecture-card-header">
+                        <span class="lecture-tag">Concurrency</span>
+                        <span class="lecture-stats">8 Topics</span>
+                    </div>
+                </a>
+
+                <!-- Lecture 4 -->
+                <a href="lectures/lecture-04.html" class="lecture-card">
+                    <div class="lecture-number">04</div>
+                    <h2>Threads in Depth</h2>
+                    <p>Parallel processing models, thread libraries, concurrency hazards, and lightweight process mappings.</p>
+                    <div class="lecture-card-header">
+                        <span class="lecture-tag">Threads</span>
+                        <span class="lecture-stats">6 Topics</span>
+                    </div>
+                </a>
+
+                <!-- Lecture 5 -->
+                <a href="lectures/lecture-05.html" class="lecture-card">
+                    <div class="lecture-number">05</div>
+                    <h2>Synchronization & Switching</h2>
+                    <p>Race condition analysis, critical section locks, hardware sync instructions, and scheduler context overhead.</p>
+                    <div class="lecture-card-header">
+                        <span class="lecture-tag">Sync</span>
+                        <span class="lecture-stats">6 Topics</span>
+                    </div>
+                </a>
+
+                <!-- Lecture 6 -->
+                <a href="lectures/lecture-06.html" class="lecture-card">
+                    <div class="lecture-number">06</div>
+                    <h2>CPU Scheduling Fundamentals</h2>
+                    <p>First-Come First-Served, Shortest Job First, preemptive models, and standard dispatcher performance metrics.</p>
+                    <div class="lecture-card-header">
+                        <span class="lecture-tag">Scheduling</span>
+                        <span class="lecture-stats">7 Topics</span>
+                    </div>
+                </a>
+
+                <!-- Lecture 7 -->
+                <a href="lectures/lecture-07.html" class="lecture-card">
+                    <div class="lecture-number">07</div>
+                    <h2>CPU Scheduling Algorithms I</h2>
+                    <p>Gantt charts, convoy effects, response times, and shortest remaining time first implementations.</p>
+                    <div class="lecture-card-header">
+                        <span class="lecture-tag">Algorithms</span>
+                        <span class="lecture-stats">6 Topics</span>
+                    </div>
+                </a>
+
+                <!-- Lecture 8 -->
+                <a href="lectures/lecture-08.html" class="lecture-card">
+                    <div class="lecture-number">08</div>
+                    <h2>CPU Scheduling Algorithms II</h2>
+                    <p>Round Robin quantums, Priority starvation, Multi-Level Queues, and real-world OS scheduler feedback.</p>
+                    <div class="lecture-card-header">
+                        <span class="lecture-tag">Advanced Scheduling</span>
+                        <span class="lecture-stats">6 Topics</span>
+                    </div>
+                </a>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Statistics Section -->
+    <section id="metrics" class="stats-section">
+        <h3 class="stats-title">OS Notes Metrics</h3>
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-val">8</div>
+                <div class="stat-label">Lectures Compiled</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-val">50+</div>
+                <div class="stat-label">Subtopics</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-val">10+</div>
+                <div class="stat-label">Code Snippets</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-val">100%</div>
+                <div class="stat-label">Completed</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Section -->
+    <footer>
+        <div class="footer-logo-row">
+            <div class="footer-brand-logo">nstnotes</div>
+            <svg class="footer-symbol" viewBox="0 0 24 24">
+                <circle cx="12" cy="6" r="3"/>
+                <circle cx="6" cy="16" r="3"/>
+                <circle cx="18" cy="16" r="3"/>
+            </svg>
+        </div>
+    </footer>
+
+</body>
+</html>

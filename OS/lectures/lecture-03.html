@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lecture 03 - Process Creation, Termination & Threads</title>
+    <meta name="description" content="Study notes covering POSIX, fork(), exec(), wait(), zombie processes, and multithreading.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%231E88E5%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>03</text></svg>">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+    <header>
+        <div class="header-titles">
+            <h1>Operating Systems Foundations</h1>
+            <p>Lecture 03 - Process Creation, Termination & Threads</p>
+            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+        </div>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search notes...">
+        </div>
+    </header>
+
+    <div class="container" style="margin-top: 2rem;">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 8</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li>
+                    <a href="#topic-1">1. POSIX Interface<span class="sub-count">1</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 What is POSIX?</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. fork() System Call<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 Creating a Duplicate</a></li>
+                        <li><a href="#sub-2-2">2.2 The Photocopy Analogy</a></li>
+                        <li><a href="#sub-2-3">2.3 Return Values</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Memory Model & Copy-on-Write<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 COW Optimization</a></li>
+                        <li><a href="#sub-3-2">3.2 vfork() System Call</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. exec() System Call Family<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 Program Replacement</a></li>
+                        <li><a href="#sub-4-2">4.2 Syntax and Variants</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Process Termination<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 Normal vs Abnormal</a></li>
+                        <li><a href="#sub-5-2">5.2 exit() and atexit()</a></li>
+                        <li><a href="#sub-5-3">5.3 _exit() System Call</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-6">6. wait() and waitpid()<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-6-1">6.1 Why we need wait()</a></li>
+                        <li><a href="#sub-6-2">6.2 waitpid() Options</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-7">7. Zombie & Orphan Processes<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-7-1">7.1 Zombies</a></li>
+                        <li><a href="#sub-7-2">7.2 Orphans</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-8">8. Threads (Lightweight Processes)<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-8-1">8.1 Process vs Thread</a></li>
+                        <li><a href="#sub-8-2">8.2 Memory Model & Benefits</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="notesContent">
+            
+            <!-- Topic 1 -->
+            <section id="topic-1" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>POSIX Interface</h2>
+                </div>
+                <div id="content-1" class="collapsible-content">
+                    <h3 id="sub-1-1">1.1 What is POSIX?</h3>
+                    <p><strong>POSIX</strong> (Portable Operating System Interface) is a set of standards (rulebook) created to make different operating systems behave in a similar, predictable way — especially Linux, Unix, macOS, and Solaris.</p>
+                    <div class="box box-blue">
+                        <div class="box-title">Did you know?</div>
+                        <p>Apple's macOS (formerly Mac OS X) and iOS are UNIX-certified and POSIX compliant. This is because macOS uses the <strong>XNU kernel</strong> (hybrid kernel) which incorporates BSD (UNIX-based, POSIX compatible).</p>
+                    </div>
+                    <p>Before POSIX, every UNIX version was different. Programs written for one system often did not run on another.</p>
+                    <p>POSIX standardizes:</p>
+                    <ul>
+                        <li><code>fork()</code> and <code>exec()</code></li>
+                        <li><code>open()</code>, <code>read()</code>, <code>write()</code></li>
+                        <li>Threads (pthreads)</li>
+                        <li>File permissions and shell commands</li>
+                    </ul>
+
+                    <div class="topic-nav">
+                        <button class="btn" disabled>Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section id="topic-2" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>fork() System Call</h2>
+                </div>
+                <div id="content-2" class="collapsible-content">
+                    <h3 id="sub-2-1">2.1 Creating a Duplicate</h3>
+                    <p><code>fork()</code> is a POSIX system call used to create a new process. It creates an almost exact copy of the current running program.</p>
+                    <ul>
+                        <li><strong>Same:</strong> code, environment, open file descriptors.</li>
+                        <li><strong>Same Layout:</strong> Code, Data, Stack (but separate physical memory).</li>
+                        <li><strong>Different:</strong> Allocates a new PID for the child.</li>
+                    </ul>
+                    <p>Note: Each process continues executing independently from the exact next line after <code>fork()</code>.</p>
+
+                    <h3 id="sub-2-2">2.2 The Photocopy Analogy</h3>
+                    <div class="box box-green">
+                        <div class="box-title">Photocopy Machine</div>
+                        <p>Imagine you (the parent process) give a page to a photocopy machine:</p>
+                        <ul>
+                            <li>The machine creates a duplicate page (child process).</li>
+                            <li>Both pages initially have the same content.</li>
+                            <li>You can write on your page, and someone else can write on the duplicate. These actions do not affect each other.</li>
+                        </ul>
+                    </div>
+
+                    <h3 id="sub-2-3">2.3 Return Values</h3>
+                    <pre class="code-block"><code><span class="code-comment">// C Example</span>
+<span class="code-keyword">#include</span> &lt;stdio.h&gt;
+<span class="code-keyword">#include</span> &lt;unistd.h&gt;
+
+<span class="code-type">int</span> main() {
+    <span class="code-type">pid_t</span> id = fork();
+    <span class="code-keyword">if</span> (id == 0) {
+        printf(<span class="code-type">"This is Child Process, pid = %d\n"</span>, id);
+    } <span class="code-keyword">else</span> {
+        printf(<span class="code-type">"This is Parent Process. Child PID = %d\n"</span>, id);
+    }
+    <span class="code-keyword">return</span> 0;
+}</code></pre>
+                    <ul>
+                        <li><strong>0:</strong> You are inside the new child process.</li>
+                        <li><strong>>0 (positive):</strong> Parent process. Value = Child's PID.</li>
+                        <li><strong>-1:</strong> fork failed, no child created.</li>
+                    </ul>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section id="topic-3" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>Memory Model & Copy-on-Write</h2>
+                </div>
+                <div id="content-3" class="collapsible-content">
+                    <h3 id="sub-3-1">3.1 COW Optimization</h3>
+                    <p>When <code>fork()</code> is called, the OS does <strong>not</strong> immediately copy the entire memory. This would be too slow.</p>
+                    <p>It uses <strong>Copy-On-Write (COW)</strong>:</p>
+                    <ul>
+                        <li>Parent and child share memory pages initially. Pages are marked as read-only.</li>
+                        <li>If either modifies a page, the OS intercepts the write and creates a separate copy just for that page.</li>
+                        <li>This saves massive amounts of memory and time, especially since most child processes immediately call <code>exec()</code> anyway.</li>
+                    </ul>
+
+                    <h3 id="sub-3-2">3.2 vfork() System Call</h3>
+                    <p><code>vfork()</code> is like <code>fork()</code> but with NO copying or COW.</p>
+                    <div class="box box-red">
+                        <div class="box-title">Danger!</div>
+                        <p>The child shares the parent's exact stack, data segment, and heap. The parent process is <strong>completely suspended</strong> until the child calls <code>exec()</code> or <code>_exit()</code>.</p>
+                        <p>It is dangerous because the child can corrupt parent memory or cause stack clashing. macOS man pages describe it as "obsolete".</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section id="topic-4" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>exec() System Call Family</h2>
+                </div>
+                <div id="content-4" class="collapsible-content">
+                    <h3 id="sub-4-1">4.1 Program Replacement</h3>
+                    <p><code>exec()</code> replaces the current running program with a new program.</p>
+                    <ul>
+                        <li><strong>No new process is created:</strong> The PID stays exactly the same.</li>
+                        <li>After a successful <code>exec()</code>, the old code is gone and cannot resume. The code segment, data, heap, and stack are replaced.</li>
+                        <li>File descriptors and User/group IDs remain the same.</li>
+                    </ul>
+
+                    <h3 id="sub-4-2">4.2 Syntax and Variants</h3>
+                    <p>There are several variants (<code>execl</code>, <code>execlp</code>, <code>execv</code>, <code>execve</code>, etc.):</p>
+                    <ul>
+                        <li><strong>l vs v:</strong> 'l' takes arguments as a list. 'v' takes arguments as a vector (array).</li>
+                        <li><strong>p:</strong> Searches the PATH for the executable.</li>
+                        <li><strong>e:</strong> Allows passing a custom environment array.</li>
+                    </ul>
+                    <pre class="code-block"><code><span class="code-comment">// execl(path, arg0, arg1, ..., NULL)</span>
+execl(<span class="code-type">"/bin/ls"</span>, <span class="code-type">"ls"</span>, <span class="code-type">"-l"</span>, <span class="code-type">"-a"</span>, <span class="code-type">NULL</span>);</code></pre>
+                    <p>Note: <code>execve()</code> is the actual system call used by the kernel; the others are C library wrappers.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 5 -->
+            <section id="topic-5" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>Process Termination</h2>
+                </div>
+                <div id="content-5" class="collapsible-content">
+                    <h3 id="sub-5-1">5.1 Normal vs Abnormal</h3>
+                    <ul>
+                        <li><strong>Normal Termination:</strong> Exits gracefully. Open files closed, buffers flushed to disk, exit handlers called. Caused by returning from <code>main()</code> or calling <code>exit()</code>.</li>
+                        <li><strong>Abnormal Termination:</strong> Unexpected kill. No cleanup, buffers may be lost. Caused by signals (SIGKILL, SIGSEGV, Ctrl+C).</li>
+                    </ul>
+
+                    <h3 id="sub-5-2">5.2 exit() and atexit()</h3>
+                    <p><code>exit(int status)</code> is a C library function that performs cleanup:</p>
+                    <ol>
+                        <li>Calls functions registered with <code>atexit()</code> in reverse order (LIFO).</li>
+                        <li>Flushes all open stdio streams.</li>
+                        <li>Closes all open streams and removes temp files.</li>
+                        <li>Calls <code>_exit()</code> to enter the kernel.</li>
+                    </ol>
+
+                    <h3 id="sub-5-3">5.3 _exit() System Call</h3>
+                    <p><code>_exit()</code> is a direct system call that immediately terminates without any cleanup. No buffers flushed, no <code>atexit()</code> handlers called. It is highly recommended to use <code>_exit()</code> inside a child process after a <code>fork()</code> to prevent it from accidentally flushing the parent's buffers or calling the parent's atexit handlers!</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 6 -->
+            <section id="topic-6" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-6')">
+                    <div class="topic-number">6</div>
+                    <h2>wait() and waitpid()</h2>
+                </div>
+                <div id="content-6" class="collapsible-content">
+                    <h3 id="sub-6-1">6.1 Why we need wait()</h3>
+                    <p>The <code>wait()</code> family allows a parent to sleep until its child terminates. Why is this needed?</p>
+                    <ul>
+                        <li><strong>Synchronization:</strong> Wait for a child to complete a task.</li>
+                        <li><strong>Zombie Prevention:</strong> Reaps terminated children (cleans up their PCB).</li>
+                        <li><strong>Status Collection:</strong> Retrieve the child's exit code.</li>
+                    </ul>
+
+                    <h3 id="sub-6-2">6.2 waitpid() Options</h3>
+                    <pre class="code-block"><code><span class="code-type">pid_t</span> waitpid(<span class="code-type">pid_t</span> pid, <span class="code-type">int</span> *status, <span class="code-type">int</span> options);</code></pre>
+                    <ul>
+                        <li><strong>> 0:</strong> Wait for a specific child PID.</li>
+                        <li><strong>-1:</strong> Wait for ANY child (same behavior as basic <code>wait()</code>).</li>
+                        <li><strong>0:</strong> Wait for any child in the same process group.</li>
+                    </ul>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-7').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 7 -->
+            <section id="topic-7" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-7')">
+                    <div class="topic-number">7</div>
+                    <h2>Zombie & Orphan Processes</h2>
+                </div>
+                <div id="content-7" class="collapsible-content">
+                    <h3 id="sub-7-1">7.1 Zombies</h3>
+                    <p><strong>Zombie Process:</strong> A process that has finished executing but still exists in the system's process table.</p>
+                    <p>It happens because a child exits, but the parent hasn't called <code>wait()</code> yet. The OS must keep a minimal PCB around so the parent can read the exit status later. Zombies consume no CPU or memory, but they do consume a PID slot. Calling <code>wait()</code> completely removes the zombie.</p>
+
+                    <h3 id="sub-7-2">7.2 Orphans</h3>
+                    <p><strong>Orphan Process:</strong> A process whose parent has died before the child finishes.</p>
+                    <p>When this happens, the kernel steps in and changes the child's Parent PID (PPID) to 1. The child is adopted by <code>init</code> (or <code>launchd</code> on macOS/ <code>systemd</code> on Linux). The init process automatically calls <code>wait()</code> on its adopted children, ensuring they don't become zombies when they eventually finish.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-8').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 8 -->
+            <section id="topic-8" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-8')">
+                    <div class="topic-number">8</div>
+                    <h2>Threads (Lightweight Processes)</h2>
+                </div>
+                <div id="content-8" class="collapsible-content">
+                    <h3 id="sub-8-1">8.1 Process vs Thread</h3>
+                    <p>A thread is a lightweight unit of execution within a process that shares resources but executes independently.</p>
+                    <div class="box box-green">
+                        <div class="box-title">Analogy</div>
+                        <ul>
+                            <li><strong>Process:</strong> A house with its own address, utilities, and furniture.</li>
+                            <li><strong>Thread:</strong> Multiple people living in the same house, sharing resources (kitchen) but doing different tasks.</li>
+                        </ul>
+                    </div>
+
+                    <h3 id="sub-8-2">8.2 Memory Model & Benefits</h3>
+                    <p><strong>Shared by Threads:</strong> Code, Data (globals), Heap, open files, PID.</p>
+                    <p><strong>Separate per Thread:</strong> Stack (local variables), Registers, Program Counter, Thread ID (TID).</p>
+                    <div class="box box-blue">
+                        <div class="box-title">Benefits of Multithreading</div>
+                        <ul>
+                            <li><strong>Performance:</strong> Creation and context-switching is much faster than full processes.</li>
+                            <li><strong>Easy Communication:</strong> They share the same memory space, so no complex IPC is needed.</li>
+                            <li><strong>Responsiveness:</strong> E.g., a Web Browser can have one thread downloading images while another renders the UI.</li>
+                        </ul>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-7').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled>Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section id="original-pdf" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div id="content-pdf" class="collapsible-content">
+                    <p>Below is the original PDF document for your reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF3()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-8').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled>Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+
+    <script>
+        function loadPDF3() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/3.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Machine Learning</title>
+    <meta name="description" content="Study notes for Advanced Machine Learning, Lecture 01 covering Time Series Foundations, components, and decomposition.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%231E88E5%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>01</text></svg>">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+    <header>
+        <div class="header-titles">
+            <h1>Advanced Machine Learning</h1>
+            <p>Lecture 01 - Time Series Foundations & Decomposition</p>
+            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+        </div>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search notes...">
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 5</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li>
+                    <a href="#topic-1">1. Introduction to Time Series Data<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 The Shuffling Test</a></li>
+                        <li><a href="#sub-1-2">1.2 Real-world Examples</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Case Study: Energy Demand Forecasting<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 Forecasting Horizons</a></li>
+                        <li><a href="#sub-2-2">2.2 Feature Engineering for Time Series</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Time Series Structures: Index & Frequency<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 The Time Index</a></li>
+                        <li><a href="#sub-3-2">3.2 Observation Frequency & Noise</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Core Behavioral Components<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 Linear vs. Non-linear Trends</a></li>
+                        <li><a href="#sub-4-2">4.2 Additive vs. Multiplicative Seasonality</a></li>
+                        <li><a href="#sub-4-3">4.3 White Noise vs. Structured Noise</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Time Series Decomposition<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 Additive vs. Multiplicative Formulation</a></li>
+                        <li><a href="#sub-5-2">5.2 Visualizing the Decomposition Stack</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="notesContent">
+
+            <!-- Topic 1 -->
+            <section id="topic-1" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>Introduction to Time Series Data</h2>
+                </div>
+                <div id="content-1" class="collapsible-content">
+                    <h3 id="sub-1-1">1.1 The Shuffling Test</h3>
+                    <p>Time series data is a sequence of data points collected or recorded at specific, sequential time intervals. The primary distinction between standard data and time series is that <strong>temporal ordering is critical</strong>.</p>
+                    
+                    <div class="box box-blue">
+                        <div class="box-title">The Shuffling Rule</div>
+                        <p><strong>"If you can shuffle the x-axis and nothing breaks, it was never a time series."</strong></p>
+                        <p>In standard datasets, the order of rows does not alter their meaning. In time series, values are indexed by time, and shuffling the sequence destroys the underlying information and relationships.</p>
+                    </div>
+
+                    <h3 id="sub-1-2">1.2 Real-world Examples</h3>
+                    <p>Time series datasets occur across many domains:</p>
+                    <ul>
+                        <li><strong>Weather Data:</strong> Daily temperature recordings.</li>
+                        <li><strong>Sales & Revenue:</strong> Monthly performance metrics.</li>
+                        <li><strong>IoT & Wearables:</strong> Daily step counts (e.g., Fitbit data).</li>
+                        <li><strong>Web Analytics:</strong> Website page views per hour or day.</li>
+                        <li><strong>Agriculture:</strong> Crop yield over consecutive years.</li>
+                        <li><strong>Finance:</strong> Minute-by-minute stock, commodity, or cryptocurrency prices.</li>
+                    </ul>
+
+                    <div class="box box-beige">
+                        <div class="box-title">Recitation: Sanskrit Reflection</div>
+                        <p>Our course opening slide references a classic reflection on how knowledge is acquired:</p>
+                        <p><em>"A student acquires knowledge in four equal parts: one-fourth from the teacher, one-fourth through self-reflection, one-fourth through discussions with peers, and the final one-fourth over time through personal experience."</em></p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" disabled>Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section id="topic-2" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>Case Study: Energy Demand Forecasting</h2>
+                </div>
+                <div id="content-2" class="collapsible-content">
+                    <h3 id="sub-2-1">2.1 Forecasting Horizons</h3>
+                    <p>A power distribution utility must forecast electricity demand (load) at multiple temporal scales to operate efficiently and safely. Incorrect forecasting leads to blackouts or wasted generation costs:</p>
+                    <ul>
+                        <li><strong>Real-time load balancing (15-minute ahead):</strong> Ensuring immediate supply matches demand on the grid.</li>
+                        <li><strong>Generation planning (Day-ahead):</strong> Scheduling power plants and purchasing energy resources.</li>
+                        <li><strong>Maintenance scheduling (Week-ahead):</strong> Shutting down transmission components for maintenance without outages.</li>
+                    </ul>
+
+                    <h3 id="sub-2-2">2.2 Feature Engineering for Time Series</h3>
+                    <p>To forecast a target variable like <strong>Load (in MW)</strong>, features are categorized into distinct groups:</p>
+                    <ul>
+                        <li><strong>Time-based Features:</strong> Extracting calendar variables like <code>hour</code> (0-23), <code>day_of_week</code>, <code>is_weekend</code> (boolean), and <code>month</code>.</li>
+                        <li><strong>Historical (Lag) Features:</strong> 
+                            <ul>
+                                <li><code>load_t-1</code>: Value from the last 15 minutes.</li>
+                                <li><code>load_t-4</code>: Value from 1 hour ago.</li>
+                                <li><code>load_t-96</code>: Value from the same time yesterday (96 steps * 15m = 24 hours).</li>
+                            </ul>
+                        </li>
+                        <li><strong>Rolling Statistics:</strong> Smooth values over a window, e.g., <code>rolling_mean_1h</code> and <code>rolling_mean_24h</code>.</li>
+                        <li><strong>External features:</strong> <code>temperature</code>, <code>humidity</code>, and <code>holiday_flag</code>.</li>
+                    </ul>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section id="topic-3" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>Time Series Structures: Index & Frequency</h2>
+                </div>
+                <div id="content-3" class="collapsible-content">
+                    <h3 id="sub-3-1">3.1 The Time Index</h3>
+                    <p>The time index represents the specific timestamp at which each observation was captured. Without a consistent time index, order becomes unclear, patterns break, and interpretation becomes unreliable.</p>
+                    <p>The Time Index allows algorithms to:</p>
+                    <ul>
+                        <li>Detect gaps or missing values in logging.</li>
+                        <li>Align and compare separate events.</li>
+                        <li>Measure the physical spacing between consecutive observations.</li>
+                    </ul>
+
+                    <h3 id="sub-3-2">3.2 Observation Frequency & Noise</h3>
+                    <p>Frequency represents the time gap between consecutive observations. Adjusting the frequency trade-offs detail against clarity:</p>
+                    <ul>
+                        <li><strong>Higher Frequency:</strong> Provides rich detail but introduces substantial high-frequency noise (e.g., per-second IoT sensors).</li>
+                        <li><strong>Lower Frequency:</strong> Smooths out local variance and highlights long-term trends, but can hide transient anomalies (e.g., yearly inflation).</li>
+                    </ul>
+
+                    <div class="box box-orange">
+                        <div class="box-title">Frequency Trade-offs Table</div>
+                        <table style="width:100%; border-collapse: collapse; margin-top: 0.5rem; font-size: 0.9rem;">
+                            <thead>
+                                <tr style="border-bottom: 2px solid var(--blue); text-align: left;">
+                                    <th style="padding: 0.5rem;">Frequency</th>
+                                    <th style="padding: 0.5rem;">Best For</th>
+                                    <th style="padding: 0.5rem;">Shows</th>
+                                    <th style="padding: 0.5rem;">Hides</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid var(--gray-border);">
+                                    <td style="padding: 0.5rem; font-weight: bold;">Yearly</td>
+                                    <td style="padding: 0.5rem;">Macroeconomics</td>
+                                    <td style="padding: 0.5rem;">Decadal Trends</td>
+                                    <td style="padding: 0.5rem;">Seasonal cycles</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid var(--gray-border);">
+                                    <td style="padding: 0.5rem; font-weight: bold;">Monthly</td>
+                                    <td style="padding: 0.5rem;">Climate & Business Planning</td>
+                                    <td style="padding: 0.5rem;">Seasonal swings</td>
+                                    <td style="padding: 0.5rem;">Daily spikes</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid var(--gray-border);">
+                                    <td style="padding: 0.5rem; font-weight: bold;">Daily</td>
+                                    <td style="padding: 0.5rem;">Operations</td>
+                                    <td style="padding: 0.5rem;">Weekly habits</td>
+                                    <td style="padding: 0.5rem;">Hourly peaks</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid var(--gray-border);">
+                                    <td style="padding: 0.5rem; font-weight: bold;">Hourly</td>
+                                    <td style="padding: 0.5rem;">Logistics & Web Traffic</td>
+                                    <td style="padding: 0.5rem;">Intraday peaks</td>
+                                    <td style="padding: 0.5rem;">Sensor glitches</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 0.5rem; font-weight: bold;">Per-Second</td>
+                                    <td style="padding: 0.5rem;">High-frequency IoT</td>
+                                    <td style="padding: 0.5rem;">Immediate failures</td>
+                                    <td style="padding: 0.5rem;">Long-term drift</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section id="topic-4" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>Core Behavioral Components</h2>
+                </div>
+                <div id="content-4" class="collapsible-content">
+                    <h3 id="sub-4-1">4.1 Linear vs. Non-linear Trends</h3>
+                    <p>A trend represents the long-term movement in the data, ignoring local wiggles. It is the underlying direction of the series:</p>
+                    <ul>
+                        <li><strong>Linear Trend:</strong> The value increases or decreases by a fixed, constant amount at each time step (represented as a straight line). Easy to forecast by extending the line.</li>
+                        <li><strong>Non-Linear Trend:</strong> The rate of change varies over time, resulting in a curved path (e.g., exponential growth, quadratic curves, or plateaus). Highly complex to forecast.</li>
+                    </ul>
+
+                    <h3 id="sub-4-2">4.2 Additive vs. Multiplicative Seasonality</h3>
+                    <p>Seasonality represents patterns that repeat at fixed, regular intervals (daily, weekly, monthly, or yearly):</p>
+                    <div class="box box-green">
+                        <div class="box-title">Additive Seasonality</div>
+                        <p>The amplitude of seasonal swings stays constant over time, regardless of the overall trend level. The seasonal component acts as a fixed value added to the base.</p>
+                        <p><strong>Example:</strong> Daily outdoor temperature. Summer is always warmer than winter by a relatively stable difference in degrees, even if the multi-year average temperature shifts slightly.</p>
+                    </div>
+
+                    <div class="box box-orange">
+                        <div class="box-title">Multiplicative Seasonality</div>
+                        <p>The amplitude of seasonal swings grows or shrinks in proportion to the trend level. The seasonal component represents a percentage scaling factor of the base.</p>
+                        <p><strong>Example:</strong> Retail sales of a growing business. Holiday sales spikes become larger in total volume every year because they scale proportionally with the overall growth of the business.</p>
+                    </div>
+
+                    <div style="text-align: center; margin: 1.5rem 0;">
+                        <img src="../images/seasonality_comparison.png" alt="Additive vs Multiplicative Seasonality" style="max-width: 100%; border-radius: 8px; border: 1px solid var(--gray-border); box-shadow: var(--shadow);">
+                        <p style="font-size: 0.85rem; color: #666; margin-top: 0.5rem; font-style: italic;">Comparison of Additive Seasonality (constant fluctuations) and Multiplicative Seasonality (fluctuations scale with trend level)</p>
+                    </div>
+
+                    <h3 id="sub-4-3">4.3 White Noise vs. Structured Noise</h3>
+                    <p>Noise (Residuals) is the random variation that cannot be explained by trends or seasonality:</p>
+                    <ul>
+                        <li><strong>White Noise:</strong> The variables are independent and identically distributed (i.i.d.) with a constant mean and variance. Knowing the past values provides zero predictive value for future points.</li>
+                        <li><strong>Structured Noise:</strong> Appears random but contains underlying correlation or dependencies over time (e.g., autoregressive processes where values are correlated with their immediate history). Mean and variance may fluctuate.</li>
+                    </ul>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 5 -->
+            <section id="topic-5" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>Time Series Decomposition</h2>
+                </div>
+                <div id="content-5" class="collapsible-content">
+                    <h3 id="sub-5-1">5.1 Additive vs. Multiplicative Formulation</h3>
+                    <p>Time series decomposition isolates the underlying components of a complex signal into three independent series: Trend (T<sub>t</sub>), Seasonality (S<sub>t</sub>), and Residuals/Noise (I<sub>t</sub>).</p>
+                    
+                    <div class="box box-blue">
+                        <div class="box-title">Mathematical Formulations</div>
+                        <ul>
+                            <li><strong>Additive Model:</strong> Used when seasonal variations do not scale with the level of the trend.
+                                <p style="font-family: monospace; font-size: 1.1rem; margin-top: 0.5rem;">x(t) = T(t) + S(t) + I(t)</p>
+                            </li>
+                            <li><strong>Multiplicative Model:</strong> Used when seasonal variations increase or decrease in proportion to the trend.
+                                <p style="font-family: monospace; font-size: 1.1rem; margin-top: 0.5rem;">x(t) = T(t) &times; S(t) &times; I(t)</p>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <h3 id="sub-5-2">5.2 Visualizing the Decomposition Stack</h3>
+                    <p>A classical decomposition plot is visualized as a vertical stack of four synchronized graphs sharing the same horizontal time axis:</p>
+                    <ol>
+                        <li><strong>Observed (Original):</strong> The raw, noisy time series data.</li>
+                        <li><strong>Trend (T<sub>t</sub>):</strong> The extracted long-term directional movement.</li>
+                        <li><strong>Seasonality (S<sub>t</sub>):</strong> The extracted repeating cyclical patterns.</li>
+                        <li><strong>Residuals (I<sub>t</sub>):</strong> The remaining random noise or error terms.</li>
+                    </ol>
+
+                    <div style="text-align: center; margin: 1.5rem 0;">
+                        <img src="../images/decomposition_plot.png" alt="Time Series Decomposition Stack" style="max-width: 100%; border-radius: 8px; border: 1px solid var(--gray-border); box-shadow: var(--shadow);">
+                        <p style="font-size: 0.85rem; color: #666; margin-top: 0.5rem; font-style: italic;">Classical decomposition stack showing the Observed Data, Trend Component, Seasonal Component, and Noise/Residual Component</p>
+                    </div>
+
+                    <div style="text-align: center; margin: 1.5rem 0;">
+                        <img src="../images/decomposition_comparison.png" alt="Additive vs Multiplicative Decomposition" style="max-width: 100%; border-radius: 8px; border: 1px solid var(--gray-border); box-shadow: var(--shadow);">
+                        <p style="font-size: 0.85rem; color: #666; margin-top: 0.5rem; font-style: italic;">Visual comparison of Additive Decomposition versus Multiplicative Decomposition</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled>Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section id="original-pdf" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div id="content-pdf" class="collapsible-content">
+                    <p>Below is the original PDF document for your reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled>Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/1.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>

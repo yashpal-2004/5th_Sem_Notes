@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Machine Learning - Lecture 04</title>
+    <meta name="description" content="Study notes for Advanced Machine Learning, Lecture 04 covering ANOVA, forecasting error metrics (MAE, MSE, RMSE), SARIMA, VAR, and LSTM models.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>04</text></svg>">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+    <header>
+        <div class="header-titles">
+            <h1>Advanced Machine Learning</h1>
+            <p>Lecture 04 - Model Evaluation, ANOVA, & Advanced Forecasting Models</p>
+            <a href="../index.html" style="color: var(--text-dark); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+        </div>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search notes...">
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 4</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li>
+                    <a href="#topic-1">1. ANOVA in Time Series<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-1-1">1.1 What is ANOVA?</a></li>
+                         <li><a href="#sub-1-2">1.2 Sum of Squares & F-Statistic</a></li>
+                         <li><a href="#sub-1-3">1.3 Application to Time Series Workflows</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Forecasting Evaluation Metrics<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-2-1">2.1 MAE, MSE, and RMSE</a></li>
+                         <li><a href="#sub-2-2">2.2 Step-by-Step MAE Calculation</a></li>
+                         <li><a href="#sub-2-3">2.3 Model Selection Strategy</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Advanced Forecasting Models<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-3-1">3.1 Seasonal ARIMA (SARIMA)</a></li>
+                         <li><a href="#sub-3-2">3.2 ARIMAX and SARIMAX Models</a></li>
+                         <li><a href="#sub-3-3">3.3 Vector Autoregression (VAR)</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Deep Learning: From ARIMA to LSTM<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-4-1">4.1 Limitations of Classical Models</a></li>
+                         <li><a href="#sub-4-2">4.2 The LSTM Memory Advantage</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="notesContent">
+
+            <!-- Topic 1 -->
+            <section id="topic-1" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>ANOVA in Time Series</h2>
+                </div>
+                <div id="content-1" class="collapsible-content">
+                    <h3 id="sub-1-1">1.1 What is ANOVA?</h3>
+                    <p>**Analysis of Variance (ANOVA)** is a statistical technique used to determine whether the difference between the means of three or more groups is statistically significant, or simply the result of random variation. In time series, it answers: <em>"Is the observed difference in level across different time blocks larger than what random fluctuations produce?"</em></p>
+                    
+                    <div class="box box-blue">
+                        <div class="box-title">Variations Compared by ANOVA</div>
+                        <ul>
+                            <li><strong>Within-Group Variation:</strong> The random spread of values inside the same group (e.g., daily rating changes inside the same restaurant).</li>
+                            <li><strong>Between-Group Variation:</strong> How much the group averages differ from each other. True differences between groups imply between-group variation is much larger.</li>
+                        </ul>
+                    </div>
+
+                    <h3 id="sub-1-2">1.2 Sum of Squares & F-Statistic</h3>
+                    <p>To compute variation scientifically, we calculate the sum of squared differences (SS). The ratio of between-group variation to within-group variation yields the F-statistic.</p>
+
+                    <div style="text-align: center; margin: 1.5rem 0;">
+                        <img src="../images/anova_f_statistic.png" alt="ANOVA F-Statistic Formulas" style="max-width: 100%;">
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; font-style: italic;">The mathematical formulas for Sum of Squares, Mean Squares, and the F-Ratio.</p>
+                    </div>
+
+                    <div class="box box-orange">
+                        <div class="box-title">Interpreting the F-Ratio</div>
+                        <p>A higher F-statistic indicates that the variation between group means is significantly larger than the variation within the groups, making it highly probable that the groups are genuinely different.</p>
+                    </div>
+
+                    <h3 id="sub-1-3">1.3 Application to Time Series Workflows</h3>
+                    <p>ANOVA is adapted to time series categories to establish evidence of level shifts across different regimes:</p>
+                    <ul>
+                        <li><strong>Detecting Seasonality:</strong> Testing if the mean level changes significantly across months (Jan vs. Feb) or days of the week (Mon vs. Fri).</li>
+                        <li><strong>Testing Interventions:</strong> Analyzing changes before and after policy changes, marketing campaigns, or festival periods (change point detection).</li>
+                        <li><strong>ANOVA on Residuals:</strong> Because time series data violates the independence assumption of ANOVA due to autocorrelation, the standard workflow is to fit the time-series model (e.g., ARIMA) first, extract the residuals (which should be uncorrelated white noise), and then run ANOVA on the residuals grouped by seasonal blocks.</li>
+                    </ul>
+
+                    <div class="topic-nav">
+                        <button class="btn" disabled>Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section id="topic-2" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>Forecasting Evaluation Metrics</h2>
+                </div>
+                <div id="content-2" class="collapsible-content">
+                    <h3 id="sub-2-1">2.1 MAE, MSE, and RMSE</h3>
+                    <p>Evaluating model error is crucial to establish forecasting reliability. The three core metrics used to evaluate time series predictions are:</p>
+                    
+                    <div class="box box-blue">
+                        <div class="box-title">Evaluation Metrics Definitions</div>
+                        <ul>
+                            <li><strong>Mean Absolute Error (MAE):</strong> Measures the average magnitude of absolute errors: MAE = (1/n) &Sigma; |Actual - Predicted|. It is robust to outliers and matches the unit of the data.</li>
+                            <li><strong>Mean Squared Error (MSE):</strong> Measures the average squared errors: MSE = (1/n) &Sigma; (Actual - Predicted)<sup>2</sup>. Squaring heavily penalizes large errors, but results in squared units that are hard to interpret.</li>
+                            <li><strong>Root Mean Squared Error (RMSE):</strong> The square root of MSE. It preserves the large-error penalty of MSE but returns the metric to the original data unit scale.</li>
+                        </ul>
+                    </div>
+
+                    <h3 id="sub-2-2">2.2 Step-by-Step MAE Calculation</h3>
+                    <p>Below is a step-by-step example calculating MAE for a 5-day electricity demand forecasting model:</p>
+
+                    <div style="text-align: center; margin: 1.5rem 0;">
+                        <img src="../images/mae_calculation.png" alt="MAE Calculation sheet" style="max-width: 100%;">
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; font-style: italic;">Computing error column (Actual - Predicted) and taking the average of absolute values: (|2| + |-5| + |2| + |10| + |-10|) / 5 = 29 / 5 = 5.8.</p>
+                    </div>
+
+                    <h3 id="sub-2-3">2.3 Model Selection Strategy</h3>
+                    <p>When comparing different forecasting models, we evaluate their error profiles over time. Models with lower average error and stable, predictable patterns are selected over volatile models that might produce occasional zero-error points but result in catastrophic failures on other days.</p>
+
+                    <div style="text-align: center; margin: 1.5rem 0;">
+                        <img src="../images/model_comparison_forecast.png" alt="Model comparison prediction table" style="max-width: 100%;">
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; font-style: italic;">Comparison: Model A behaves predictably with low average error. Model B behaves erratically with massive prediction spikes.</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section id="topic-3" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>Advanced Forecasting Models</h2>
+                </div>
+                <div id="content-3" class="collapsible-content">
+                    <h3 id="sub-3-1">3.1 Seasonal ARIMA (SARIMA)</h3>
+                    <p>While standard ARIMA models learn trends and short-term autoregressive patterns, they cannot capture repeating cyclical seasons. **Seasonal ARIMA (SARIMA)** adds extra seasonal terms to account for repeating cycles (e.g., weekly, monthly, or yearly patterns).</p>
+                    
+                    <div class="box box-beige">
+                        <div class="box-title">SARIMA Structure</div>
+                        <p>Represented as: SARIMA(p, d, q) x (P, D, Q)<sub>s</sub></p>
+                        <p>Where (p, d, q) are the non-seasonal orders, (P, D, Q) are the seasonal orders, and <em>s</em> is the seasonal period length (e.g., s=7 for weekly cycles in daily data).</p>
+                    </div>
+
+                    <h3 id="sub-3-2">3.2 ARIMAX and SARIMAX Models</h3>
+                    <p>When external factors (exogenous variables, e.g., promotions, price cuts, or rainfall) influence the time series, we extend ARIMA models by including these variables as predictors:</p>
+
+                    <div style="text-align: center; margin: 1.5rem 0;">
+                        <img src="../images/sarimax_components.png" alt="SARIMAX components mapping" style="max-width: 100%;">
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; font-style: italic;">SARIMAX incorporates past values (AR), past errors (MA), differencing (I), seasonal routines (S), and external factors (X).</p>
+                    </div>
+
+                    <h3 id="sub-3-3">3.3 Vector Autoregression (VAR)</h3>
+                    <p>When multiple time series variables influence each other simultaneously, we use a **Vector Autoregression (VAR)** model. In a VAR model, each variable is a linear function of its own past values and the past values of all other variables in the system, treating all variables as endogenous.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section id="topic-4" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>Deep Learning: From ARIMA to LSTM</h2>
+                </div>
+                <div id="content-4" class="collapsible-content">
+                    <h3 id="sub-4-1">4.1 Limitations of Classical Models</h3>
+                    <p>Classical statistical models (AR, MA, ARIMA) rely on linear combinations of a fixed number of past steps (lags) and errors. In complex real-world datasets, we often do not know how far back to look, and relationships may be highly non-linear.</p>
+
+                    <h3 id="sub-4-2">4.2 The LSTM Memory Advantage</h3>
+                    <p>**Long Short-Term Memory (LSTM)** is a deep learning model designed specifically to automatically learn long-term temporal dependencies without requiring fixed lag specifications.</p>
+
+                    <div style="text-align: center; margin: 1.5rem 0;">
+                        <img src="../images/lstm_vs_arima.png" alt="From ARIMA to LSTM comparison" style="max-width: 100%;">
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; font-style: italic;">LSTM features gate mechanisms that dynamically decide what to remember, what to forget, and what to use for predictions.</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled>Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section id="original-pdf" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--text-dark); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div id="content-pdf" class="collapsible-content">
+                    <p>Below is the original PDF document for your reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled>Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/4.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--border-light); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Machine Learning - Lecture 02</title>
+    <meta name="description" content="Study notes for Advanced Machine Learning, Lecture 02 covering Stationarity, Differencing, Log Transformations, and Autocorrelation.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>02</text></svg>">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+    <header>
+        <div class="header-titles">
+            <h1>Advanced Machine Learning</h1>
+            <p>Lecture 02 - Stationarity, Transformations & Autocorrelation</p>
+            <a href="../index.html" style="color: var(--text-dark); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+        </div>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search notes...">
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 4</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li>
+                    <a href="#topic-1">1. Stationarity vs. Non-Stationarity<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-1-1">1.1 Core Mathematical Properties</a></li>
+                         <li><a href="#sub-1-2">1.2 Mean & Variance Stability</a></li>
+                         <li><a href="#sub-1-3">1.3 Why Stationarity Matters</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Transformations & Stationarization<span class="sub-count">4</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-2-1">2.1 Difference Transformation</a></li>
+                         <li><a href="#sub-2-2">2.2 Why Differencing Fails</a></li>
+                         <li><a href="#sub-2-3">2.3 Log Transformation</a></li>
+                         <li><a href="#sub-2-4">2.4 Log-Differencing</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Lag Dependence & Granularity<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-3-1">3.1 Understanding Lags</a></li>
+                         <li><a href="#sub-3-2">3.2 Domain-Specific Lag Guidelines</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Autocorrelation (ACF)<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-4-1">4.1 Definition & Patterns</a></li>
+                         <li><a href="#sub-4-2">4.2 Mathematical Formulation</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="notesContent">
+
+            <!-- Topic 1 -->
+            <section id="topic-1" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>Stationarity vs. Non-Stationarity</h2>
+                </div>
+                <div id="content-1" class="collapsible-content">
+                    <h3 id="sub-1-1">1.1 Core Mathematical Properties</h3>
+                    <p>A time series is stationary if its statistical behavior does not change over time. In modeling, this means that the core joint probability distribution of the observations remains stable across temporal shifts.</p>
+                    
+                    <div class="box box-blue">
+                        <div class="box-title">Mathematical Conditions for Weak/Wide-Sense Stationarity</div>
+                        <ul>
+                            <li><strong>Constant Mean:</strong> E[X<sub>t</sub>] = &mu; (stays constant over all time points).</li>
+                            <li><strong>Constant Variance:</strong> Var(X<sub>t</sub>) = &sigma;<sup>2</sup> (the spread/volatility stays stable).</li>
+                            <li><strong>Autocovariance:</strong> Cov(X<sub>t</sub>, X<sub>t-k</sub>) = &gamma;<sub>k</sub> depends only on the lag (k) between observations, not on the actual time point (t).</li>
+                        </ul>
+                    </div>
+
+                    <div style="text-align: center; margin: 1.5rem 0;">
+                        <img src="../images/mean_variance_timeseries.png" alt="Mean and Variance in Time Series" style="max-width: 100%;">
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; font-style: italic;">Visualizing deviations from the constant mean &mu;. Deviations from the mean determine the variance of the series.</p>
+                    </div>
+
+                    <h3 id="sub-1-2">1.2 Mean & Variance Stability</h3>
+                    <p>To build an intuitive model of stationarity, we can compare indoor temperatures vs. outdoor temperatures:</p>
+                    <ul>
+                        <li><strong>Mean Stability (e.g., Temperature inside a Fridge):</strong> A refrigerator is set to a constant cold temperature. Even if opening the door creates minor fluctuations, it constantly returns to the same baseline level. The mean remains constant over time.</li>
+                        <li><strong>Non-Mean Stability (e.g., Outdoor City Temperature):</strong> Outdoor temperature shifts depending on daily cycles (day/night) and seasonal cycles (summer/winter). The mean level changes systematically over the course of the year.</li>
+                        <li><strong>Variance Stability:</strong> A series has stable variance if its spread stays consistent. In contrast, financial asset values often show non-variance stability where volatility starts small but undergoes sudden jumps or expands over time.</li>
+                    </ul>
+
+                    <div style="text-align: center; margin: 1.5rem 0;">
+                        <img src="../images/stationarity_comparison.png" alt="Stationary vs Non-Stationary Time Series" style="max-width: 100%;">
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; font-style: italic;">Categorized time series behaviors showcasing stable flat bounds (Stationary) versus structured shifts and trends (Non-Stationary).</p>
+                    </div>
+
+                    <h3 id="sub-1-3">1.3 Why Stationarity Matters</h3>
+                    <p>Stationarity is a fundamental requirement for most statistical modeling and forecasting frameworks (such as ARIMA models):</p>
+                    <div class="box box-green">
+                        <div class="box-title">Why We Stationarize Data</div>
+                        <ul>
+                            <li><strong>Consistent Predictability:</strong> If statistical parameters (mean, variance, correlation structure) remain constant, the past behavior of the series can be safely used to model future behavior.</li>
+                            <li><strong>Mathematical Reliability:</strong> Standard statistical tests and estimation procedures assume that variance and mean do not drift. Drifting properties make standard estimators invalid.</li>
+                            <li><strong>Model Simplicity:</strong> Estimating relationships on stable bounds is much more robust than modeling variables that grow indefinitely.</li>
+                        </ul>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" disabled>Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section id="topic-2" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>Transformations & Stationarization</h2>
+                </div>
+                <div id="content-2" class="collapsible-content">
+                    <h3 id="sub-2-1">2.1 Difference Transformation</h3>
+                    <p>When a time series exhibits an upward or downward trend, it is non-stationary because the mean level changes over time. We can apply the <strong>Difference Transformation</strong> to stabilize the mean by subtracting the value of the previous time step from the current value.</p>
+                    
+                    <div class="box box-blue">
+                        <div class="box-title">First-Order Differencing Equation</div>
+                        <p>&Delta;Y<sub>t</sub> = Y<sub>t</sub> - Y<sub>t-1</sub></p>
+                        <p>Where:</p>
+                        <ul>
+                            <li>Y<sub>t</sub> is the current value.</li>
+                            <li>Y<sub>t-1</sub> is the value at Lag-1 (previous step).</li>
+                            <li>&Delta;Y<sub>t</sub> is the change in value, which represents the stationarized series.</li>
+                        </ul>
+                    </div>
+
+                    <div style="text-align: center; margin: 1.5rem 0;">
+                        <img src="../images/difference_transformation.png" alt="Difference Transformation Result" style="max-width: 100%;">
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; font-style: italic;">A linear upward trend in values transformed into a stationary series hovering around a constant value of 2.</p>
+                    </div>
+
+                    <h3 id="sub-2-2">2.2 Why Simple Differencing Fails</h3>
+                    <p>If a time series has non-constant variance (e.g., its fluctuations grow larger as the actual values grow), a simple difference transformation will fail to make the series stationary. The variance of the differenced values will continue to expand over time.</p>
+
+                    <div style="text-align: center; margin: 1.5rem 0;">
+                        <img src="../images/nonstationary_sales.png" alt="Non-stationary growing variance sales" style="max-width: 100%;">
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; font-style: italic;">Original sales plot showing fluctuations that expand in magnitude as time progresses.</p>
+                    </div>
+
+                    <div style="text-align: center; margin: 1.5rem 0;">
+                        <img src="../images/differencing_failure.png" alt="Why Differencing Fails" style="max-width: 100%;">
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; font-style: italic;">Differenced values plotted showing that differencing fails because the size of the jumps is proportional to the size of the underlying values.</p>
+                    </div>
+
+                    <h3 id="sub-2-3">2.3 Log Transformation</h3>
+                    <p>To handle expanding variance and exponential patterns, we compress the variance before modeling. The <strong>Log Transformation</strong> is highly effective at stabilizing variance across time.</p>
+                    
+                    <div class="box box-green">
+                        <div class="box-title">Properties of Log Transformation</div>
+                        <ul>
+                            <li>Compresses large swings and values, stabilizing variance.</li>
+                            <li>Transforms exponential growth trends into linear growth trends.</li>
+                            <li>Helps expose underlying seasonal/cyclical components that were previously overwhelmed by expanding values.</li>
+                        </ul>
+                    </div>
+
+                    <h3 id="sub-2-4">2.4 Log-Differencing</h3>
+                    <p>When dealing with volatile, growing series (such as sales or financial data), the standard stationarization pipeline is to apply the **Log Transformation first**, and then apply the **Difference Transformation second**.</p>
+
+                    <div style="text-align: center; margin: 1.5rem 0;">
+                        <img src="../images/transformation_comparison.png" alt="Transformation Steps Comparison" style="max-width: 100%;">
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; font-style: italic;">Comparison layout showing original data, differenced data, log-transformed data, and final log-differenced stationary data.</p>
+                    </div>
+
+                    <div class="box box-beige">
+                        <div class="box-title">Log Difference Stationary Data</div>
+                        <p>Taking the difference of the log values yields a stable mean and variance: &Delta;(log(Y<sub>t</sub>)) = log(Y<sub>t</sub>) - log(Y<sub>t-1</sub>). This value physically represents the <em>relative rate of change</em> or percentage change of the series at step t.</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section id="topic-3" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>Lag Dependence & Granularity</h2>
+                </div>
+                <div id="content-3" class="collapsible-content">
+                    <h3 id="sub-3-1">3.1 Understanding Lags</h3>
+                    <p>A lag represents the number of time steps back we look to compare or construct relationship parameters. If the current value is index <strong>t</strong>, then the value at <strong>Lag-k</strong> is the value recorded <strong>k</strong> steps prior.</p>
+                    
+                    <div class="box box-blue">
+                        <div class="box-title">Lag Formulation</div>
+                        <p>Let the series value at current time be Y<sub>t</sub>. The Lag-k value is defined as:</p>
+                        <p>Y<sub>t-k</sub></p>
+                        <p>For example, in daily data:</p>
+                        <ul>
+                            <li><strong>Lag 1:</strong> Yesterday's value (Y<sub>t-1</sub>)</li>
+                            <li><strong>Lag 2:</strong> Value from two days ago (Y<sub>t-2</sub>)</li>
+                            <li><strong>Lag 7:</strong> Value from same day last week (Y<sub>t-7</sub>)</li>
+                        </ul>
+                    </div>
+
+                    <div style="text-align: center; margin: 1.5rem 0;">
+                        <img src="../images/timeseries_lags.png" alt="Lags Visual Representation" style="max-width: 100%;">
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; font-style: italic;">Visual mapping of current point x(t) linked to historical steps back (Lag-1, Lag-3, Lag-7, Lag-K).</p>
+                    </div>
+
+                    <h3 id="sub-3-2">3.2 Domain-Specific Lag Guidelines</h3>
+                    <p>The time duration represented by a single lag unit depends entirely on the observation frequency/granularity of the dataset:</p>
+
+                    <div style="text-align: center; margin: 1.5rem 0;">
+                        <img src="../images/lag_granularity.png" alt="Lag Granularity Mapping" style="max-width: 100%;">
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; font-style: italic;">Mapping lag representations according to second-wise, minute-wise, hourly, and daily metrics.</p>
+                    </div>
+
+                    <div class="box box-orange">
+                        <div class="box-title">Selecting Useful Lags</div>
+                        <p>Always select lags that correspond to physical cycles in the domain:</p>
+                        <ul>
+                            <li><strong>Daily series:</strong> Lag-1 (yesterday) and Lag-7 (weekly cycle).</li>
+                            <li><strong>Hourly series:</strong> Lag-1 (last hour) and Lag-24 (same hour yesterday).</li>
+                            <li><strong>15-minute series:</strong> Lag-1 (last 15-min) and Lag-96 (same time yesterday).</li>
+                        </ul>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section id="topic-4" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>Autocorrelation (ACF)</h2>
+                </div>
+                <div id="content-4" class="collapsible-content">
+                    <h3 id="sub-4-1">4.1 Definition & Patterns</h3>
+                    <p>Autocorrelation measures the strength of the linear relationship between a time series variable and its past values (lags). It is a critical mathematical diagnostic tool to test if today's values are dependent on historical values, rather than varying completely at random.</p>
+                    
+                    <div class="box box-blue">
+                        <div class="box-title">Why Autocorrelation is Crucial</div>
+                        <ul>
+                            <li><strong>Detecting Patterns:</strong> Identifies underlying periodic structures and repeating cycles (such as weekly seasonality).</li>
+                            <li><strong>Model Selection:</strong> Determines the optimal number of autoregressive (AR) lags to include in time series predictive models.</li>
+                            <li><strong>Randomness Test:</strong> Confirms if a residual series is indeed white noise (no remaining autocorrelation) or still contains structural patterns.</li>
+                        </ul>
+                    </div>
+
+                    <h3 id="sub-4-2">4.2 Mathematical Formulation</h3>
+                    <p>Autocorrelation at lag <em>k</em> (denoted &rho;<sub>k</sub>) is defined as the covariance between Y<sub>t</sub> and Y<sub>t-k</sub> divided by the variance of the series.</p>
+
+                    <div style="text-align: center; margin: 1.5rem 0;">
+                        <img src="../images/autocorrelation_formula.png" alt="Autocorrelation Formula" style="max-width: 100%;">
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; font-style: italic;">The mathematical formula for autocorrelation coefficients &rho;<sub>k</sub> at lag k.</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled>Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section id="original-pdf" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--text-dark); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div id="content-pdf" class="collapsible-content">
+                    <p>Below is the original PDF document for your reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled>Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/2.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--border-light); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>
