@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Lecture 16 - Deadlocks I: Characterization and Conditions</title>
+    <meta content="Study notes covering Deadlocks I: Characterization and Conditions." name="description"/>
+    <link class="favicon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>16</text></svg>" rel="icon"/>
+    <link href="../css/style.css" rel="stylesheet"/>
+</head>
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Operating Systems Foundations</h1>
+            <p>Lecture 16 - Deadlocks I: Characterization and Conditions</p>
+            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/16.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text"/>
+        </div>
+    </header>
+    <div class="container" style="margin-top: 2rem;">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 6</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li>
+                    <a href="#topic-1">1. Deadlocks Introduction<span class="sub-count">5</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-1-1">1.1 Join the lecture online on your dashboard</a></li>
+                         <li><a href="#sub-1-2">1.2 Today’s Agenda</a></li>
+                         <li><a href="#sub-1-3">1.3 Let's Start with a Challenge!</a></li>
+                         <li><a href="#sub-1-4">1.4 What is a Deadlock?</a></li>
+                         <li><a href="#sub-1-5">1.5 Deadlock vs Other Blocking States</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Starvation vs. Livelock vs. Deadlock<span class="sub-count">5</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-2-1">2.1 System Model Resources</a></li>
+                         <li><a href="#sub-2-2">2.2 Process-Resource Interaction</a></li>
+                         <li><a href="#sub-2-3">2.3 Deadlock Characterization</a></li>
+                         <li><a href="#sub-2-4">2.4 Necessary Conditions (Coffman Conditions)</a></li>
+                         <li><a href="#sub-2-5">2.5 Condition 1 Mutual Exclusion</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. System Resource Models<span class="sub-count">5</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-3-1">3.1 Code Example - Mutual Exclusion with Mutex</a></li>
+                         <li><a href="#sub-3-2">3.2 Condition 2 Hold and Wait</a></li>
+                         <li><a href="#sub-3-3">3.3 Code Example - Hold and Wait Pattern</a></li>
+                         <li><a href="#sub-3-4">3.4 Condition 3 No Preemption</a></li>
+                         <li><a href="#sub-3-5">3.5 Code Example - Non-Preemptible Mutex</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. The Four Necessary Coffman Conditions<span class="sub-count">5</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-4-1">4.1 Condition 4 Circular Wait</a></li>
+                         <li><a href="#sub-4-2">4.2 Code Example - Three-Process Circular Wait</a></li>
+                         <li><a href="#sub-4-3">4.3 Resource Allocation Graph (RAG) Introduction</a></li>
+                         <li><a href="#sub-4-4">4.4 RAG Notation and Symbols</a></li>
+                         <li><a href="#sub-4-5">4.5 RAG Example 1 No Deadlock</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Resource Allocation Graphs (RAG)<span class="sub-count">5</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-5-1">5.1 RAG Example 2 Deadlock Exists</a></li>
+                         <li><a href="#sub-5-2">5.2 RAG Example 3 Cycle But No Deadlock</a></li>
+                         <li><a href="#sub-5-3">5.3 RAG Analysis Summary Rules</a></li>
+                         <li><a href="#sub-5-4">5.4 Deadlock Example Dining Philosophers</a></li>
+                         <li><a href="#sub-5-5">5.5 Consequences of Deadlocks</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-6">6. RAG Analysis Rules<span class="sub-count">5</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-6-1">6.1 Necessary vs Sufficient Conditions</a></li>
+                         <li><a href="#sub-6-2">6.2 Practice Problems</a></li>
+                         <li><a href="#sub-6-3">6.3 Practice Problems</a></li>
+                         <li><a href="#sub-6-4">6.4 Key Takeaways</a></li>
+                         <li><a href="#sub-6-5">6.5 Thank You!</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Topic 1 -->
+            <section id="topic-1" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>Deadlocks Introduction</h2>
+                </div>
+                <div id="content-1" class="collapsible-content">
+                    <h3 id="sub-1-1">1.1 Join the lecture online on your dashboard</h3>
+<p>2</p>
+<p>0</p>
+
+<h3 id="sub-1-2">1.2 Today’s Agenda</h3>
+<p>01</p>
+<p>Part I — Foundation</p>
+<p>🧩</p>
+<p>Introduction to deadlocks</p>
+<p>🌍</p>
+<p>Real-world analogies & motivation</p>
+<p>📦</p>
+<p>System model & resource concepts</p>
+<p>Part II — Theoretical Framework</p>
+<p>📐</p>
+<p>Deadlock characterization</p>
+<p>🧱</p>
+<p>Four necessary (Coffman) conditions</p>
+<p>🔍</p>
+<p>Deep dive into each condition</p>
+<p>Part III — Visual Analysis</p>
+<p>📊</p>
+<p>Resource Allocation Graphs (RAGs)</p>
+<p>🛠</p>
+<p>RAG construction & interpretation</p>
+<p>🧪</p>
+<p>Examples of increasing complexity</p>
+<p>Part IV — Application</p>
+<p>♟</p>
+<p>Classic deadlock problems</p>
+<p>🏭</p>
+<p>Real-world case studies</p>
+<p>⚠</p>
+<p>System impacts & consequences</p>
+<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
+<h3 id="sub-1-3">1.3 Let's Start with a Challenge!</h3>
+<p>02</p>
+<p>Deadlock Analogy: Narrow Bridge</p>
+<p>🚗</p>
+<p>↔🚗</p>
+<p>One-lane bridge, two cars arrive</p>
+<p>together</p>
+<p>Both drivers refuse to reverse.❓</p>
+<p>What happens?</p>
+<p>No movement</p>
+<p>Stuck situation</p>
+<p>Someone must give way</p>
+<p>A rule is required</p>
+<p>💻</p>
+<p>Bridge to Computing</p>
+<p>Same in computer systems: Processes</p>
+<p>competing for resources can deadlock — no</p>
+<p>progress.</p>
+<ul>
+    <li>❌</li>
+    <li>🔒</li>
+    <li>↩</li>
+    <li>🚦</li>
+</ul>
+<div class="box box-green"><div class="box-title">Analogy</div><p>Deadlock Analogy: Narrow Bridge</p></div>
+
+<h3 id="sub-1-4">1.4 What is a Deadlock?</h3>
+<p>03</p>
+<p>Definition</p>
+<p>A state where processes wait on each other indefinitely, so no</p>
+<p>progress is possible.</p>
+<p>Simplified</p>
+<p>Blocked processes holding resources while waiting for others.</p>
+<p>Key Characteristics</p>
+<p>Permanent block (no timeout)</p>
+<p>Circular dependency</p>
+<p>No self-recovery</p>
+<p>Affects all involved processes</p>
+<p>Formal View</p>
+<p>P₀ → P₁ → … → Pⱼ → P₀</p>
+<ul>
+    <li>🔒</li>
+    <li>🔁</li>
+    <li>🛑</li>
+    <li>⚠</li>
+    <li>Each process waits for another</li>
+    <li>Circular wait exists:</li>
+</ul>
+<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
+<h3 id="sub-1-5">1.5 Deadlock vs Other Blocking States</h3>
+<p>04</p>
+<p>Starvation vs Livelock vs Deadlock</p>
+<p>🕒</p>
+<p>Starvation</p>
+<p>🔒</p>
+<p>Deadlock</p>
+<p>Simple Analogies</p>
+<p>🔄</p>
+<p>Livelock</p>
+<ul>
+    <li>Low-priority process waits</li>
+    <li>Others make progress</li>
+    <li>May resolve later</li>
+    <li>Total standstill</li>
+    <li>No state changes</li>
+    <li>Progress impossible</li>
+    <li>Starvation: Queue that never reaches you</li>
+    <li>Livelock: Two people sidestepping endlessly</li>
+    <li>Deadlock: Cars stuck on a one-lane road</li>
+    <li>State keeps changing</li>
+    <li>No real progress</li>
+    <li>Overreaction loop</li>
+</ul>
+<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
+                    
+                    <div class="topic-nav">
+                        <a href="lecture-15.html" class="btn" style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;">Previous Lecture</a>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 2 -->
+            <section id="topic-2" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>Starvation vs. Livelock vs. Deadlock</h2>
+                </div>
+                <div id="content-2" class="collapsible-content">
+                    <h3 id="sub-2-1">2.1 System Model Resources</h3>
+<p>05</p>
+<p>Resource Types</p>
+<p>🔁</p>
+<p>Reusable Resources</p>
+<p>🔥</p>
+<p>Consumable Resources</p>
+<p>📦</p>
+<p>Resource Instances</p>
+<ul>
+    <li>Used by one process at a time</li>
+    <li>Released after use</li>
+    <li>CPU, memory, I/O, files</li>
+    <li>Created & destroyed</li>
+    <li>Used once</li>
+    <li>Signals, interrupts, messages</li>
+    <li>Multiple identical units</li>
+    <li>Allocated independently</li>
+    <li>e.g., 4 CPUs, 2 printers</li>
+</ul>
+
+<h3 id="sub-2-2">2.2 Process-Resource Interaction</h3>
+<p>06</p>
+<p>Standard Resource Usage Pattern</p>
+<p>📥</p>
+<p>Request</p>
+<p>⚙</p>
+<p>Use</p>
+<p>📤</p>
+<p>Release</p>
+<p>System Call Examples (Unix/Linux)</p>
+<p>📥</p>
+<p>⚙</p>
+<p>Use: read(), write(), memory access</p>
+<p>📤</p>
+<p>⚠</p>
+<p>Important</p>
+<p>Request → Use → Release is mandatory.</p>
+<p>Failure to release ⇒ starvation or deadlock.</p>
+<ul>
+    <li>Ask for resource</li>
+    <li>Wait if unavailable</li>
+    <li>Access resource</li>
+    <li>Critical section</li>
+    <li>Free resource</li>
+    <li>Allow others to proceed</li>
+</ul>
+<pre class="code-block"><code>Request: open(), malloc(), wait()
+Release: close(), free(), signal()</code></pre>
+
+<h3 id="sub-2-3">2.3 Deadlock Characterization</h3>
+<p>07</p>
+<p>Definition</p>
+<p>A set of processes is in deadlock when each</p>
+<p>process waits for an event that only another</p>
+<p>process in the set can cause.</p>
+<p>Key Characteristics</p>
+<p>At least 2 processes</p>
+<p>At least 2 resources</p>
+<p>Circular wait</p>
+<p>No independent progress</p>
+<ul>
+    <li>👥</li>
+    <li>📦</li>
+    <li>🔁</li>
+    <li>⛔</li>
+</ul>
+<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
+<h3 id="sub-2-4">2.4 Necessary Conditions (Coffman Conditions)</h3>
+<p>08</p>
+<p>Deadlock occurs if all four hold simultaneously</p>
+<p>🔒</p>
+<p>Mutual Exclusion</p>
+<p>Only one process uses it</p>
+<p>🔁</p>
+<p>Circular Wait</p>
+<p>⚠</p>
+<p>Critical Insight</p>
+<p>These conditions are necessary but not sufficient</p>
+<p>→ All must exist, but their presence alone doesn’t guarantee deadlock.</p>
+<p>🚫</p>
+<p>No Preemption</p>
+<p>✋</p>
+<p>Hold & Wait</p>
+<ul>
+    <li>Resource is non-shareable</li>
+    <li>Closed chain of processes</li>
+    <li>Each waits for the next</li>
+    <li>Resources not forcibly taken</li>
+    <li>Released voluntarily</li>
+    <li>Holding one resource</li>
+    <li>Waiting for another</li>
+</ul>
+<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
+<h3 id="sub-2-5">2.5 Condition 1 Mutual Exclusion</h3>
+<p>09</p>
+<p>Definition</p>
+<p>Only one process can use a resource at a time. Others</p>
+<p>must wait until it’s released.</p>
+<p>Why It Exists</p>
+<p>Code Example: Mutex (C / POSIX)</p>
+<p>pthread_mutex_t lock;</p>
+<p>pthread_mutex_lock(&lock); // Acquire</p>
+<p>access_shared_resource();  // Critical section</p>
+<p>pthread_mutex_unlock(&lock); // Release</p>
+<p>Examples</p>
+<p>✅</p>
+<p>Shareable (No Mutual Exclusion)</p>
+<p>code</p>
+<p>❌</p>
+<p>Non-Sharable (Needs Mutual Exclusion)</p>
+<p>records and Critical sections (mutex)</p>
+<ul>
+    <li>Non-shareable resources (e.g., printer)</li>
+    <li>Data consistency (file writes)</li>
+    <li>Hardware limits</li>
+    <li>Read-only files, Read-only memory and Reentrant</li>
+    <li>Printers, scanners, Tape drives, Writable database</li>
+</ul>
+
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 3 -->
+            <section id="topic-3" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>System Resource Models</h2>
+                </div>
+                <div id="content-3" class="collapsible-content">
+                    <h3 id="sub-3-1">3.1 Code Example - Mutual Exclusion with Mutex</h3>
+<p>10</p>
+<p>Mutual Exclusion with Mutex</p>
+<p>❌</p>
+<p>Without Mutual Exclusion</p>
+<p>✅</p>
+<p>With Mutual Exclusion</p>
+<p>Risk of deadlock (multiple mutexes)</p>
+<ul>
+    <li>Race condition</li>
+    <li>Lost updates</li>
+    <li>Counter < 200000</li>
+    <li>One thread at a time</li>
+    <li>Correct result: 200000</li>
+    <li>⚠</li>
+</ul>
+
+<h3 id="sub-3-2">3.2 Condition 2 Hold and Wait</h3>
+<p>11</p>
+<p>Definition</p>
+<p>A process holds at least one resource while waiting</p>
+<p>for others held by different processes.</p>
+<p>Scenario</p>
+<p>🔑</p>
+<p>Key Insight</p>
+<p>Hold-and-wait increases resource utilization,</p>
+<p>but combined with other conditions → deadlock risk.</p>
+<p>Real Example</p>
+<p>📝</p>
+<p>Text Editor</p>
+<ul>
+    <li>P1 holds R1</li>
+    <li>P1 requests R2 (held by P2)</li>
+    <li>P1 keeps R1 while waiting</li>
+    <li>Holds: Keyboard buffer (R1)</li>
+    <li>Waiting for: Printer (R2)</li>
+    <li>Keyboard not released while waiting</li>
+</ul>
+
+<h3 id="sub-3-3">3.3 Code Example - Hold and Wait Pattern</h3>
+<p>12</p>
+<p>Hold and Wait Pattern</p>
+<p>Output: Hold & Wait Deadlock</p>
+<p>Process A holds R1, waits for R2</p>
+<p>Process B holds R2, waits for R1</p>
+<p>Resources not released while waiting</p>
+<p>Circular wait formed</p>
+<ul>
+    <li>🔒</li>
+    <li>🔒</li>
+    <li>✋</li>
+    <li>🔁</li>
+</ul>
+<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
+<h3 id="sub-3-4">3.4 Condition 3 No Preemption</h3>
+<p>13</p>
+<p>Definition</p>
+<p>Resources cannot be forcibly taken. They are released only</p>
+<p>voluntarily by the holding process.</p>
+<p>Why It Matters</p>
+<p>🔑</p>
+<p>Key Insight</p>
+<p>No preemption preserves correctness, but contributes to</p>
+<p>deadlock when combined with other conditions.</p>
+<p>Examples</p>
+<p>❌</p>
+<p>Non-Preemptable Resources</p>
+<p>✅</p>
+<p>Preemptable Resources</p>
+<ul>
+    <li>Data integrity</li>
+    <li>Prevents corruption</li>
+    <li>Consistent process state</li>
+    <li>Printer (mid-print)</li>
+    <li>Tape drive (write)</li>
+    <li>Database locks (transaction)</li>
+    <li>CPU (context switch)</li>
+    <li>Memory pages (swapping)</li>
+</ul>
+
+<h3 id="sub-3-5">3.5 Code Example - Non-Preemptible Mutex</h3>
+<p>14</p>
+<p>Non-Preemptible Mutex</p>
+<p>Output: No Preemption Demonstrated</p>
+<p>High-priority process acquires resource first</p>
+<p>Low-priority process requests urgently</p>
+<p>Cannot preempt the holder</p>
+<p>Must wait until release</p>
+<ul>
+    <li>🔒</li>
+    <li>⏳</li>
+    <li>❌</li>
+    <li>🕰</li>
+</ul>
+
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 4 -->
+            <section id="topic-4" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>The Four Necessary Coffman Conditions</h2>
+                </div>
+                <div id="content-4" class="collapsible-content">
+                    <h3 id="sub-4-1">4.1 Condition 4 Circular Wait</h3>
+<p>15</p>
+<p>Definition</p>
+<p>A closed chain of processes exists where each process waits</p>
+<p>for a resource held by the next.</p>
+<p>Formal View</p>
+<p>P₀ → P₁ → … → Pⱼ → P₀</p>
+<p>(Pᵢ waits for a resource held by Pⱼ)</p>
+<p>Example Scenario</p>
+<p>➡</p>
+<p>P1 → P2 → P3 → P1</p>
+<p>🔑</p>
+<p>Key Insight</p>
+<p>Circular wait is the final condition that completes deadlock.</p>
+<p>Breaking the cycle ⇒ deadlock prevention.</p>
+<p>Deadlock-Prone Code</p>
+<p>// Process P1</p>
+<p>acquire(R1);</p>
+<p>acquire(R2);   // waits if P2 holds R2</p>
+<p>// Process P2</p>
+<p>acquire(R2);</p>
+<p>acquire(R1);   // waits if P1 holds R1</p>
+<ul>
+    <li>P1 holds R1, waits for R2</li>
+    <li>P2 holds R2, waits for R3</li>
+    <li>P3 holds R3, waits for R1</li>
+</ul>
+<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
+<h3 id="sub-4-2">4.2 Code Example - Three-Process Circular Wait</h3>
+<p>16</p>
+<p>Three-Process Circular Wait</p>
+<p>Circular wait chain:</p>
+<p>Cycle: P1 → R2 → P2 → R3 → P3 → R1 → P1</p>
+<ul>
+    <li>P1 holds R1, wants R2</li>
+    <li>P2 holds R2, wants R3</li>
+    <li>P3 holds R3, wants R1</li>
+</ul>
+
+<h3 id="sub-4-3">4.3 Resource Allocation Graph (RAG) Introduction</h3>
+<p>17</p>
+<p>Purpose</p>
+<p>A directed graph that visually represents resource</p>
+<p>allocation and deadlock situations.</p>
+<p>Graph Components</p>
+<p>🔵</p>
+<p>Vertices</p>
+<p>Processes (P) – Circles</p>
+<p>🟥</p>
+<p>Resources (R) – Rectangles</p>
+<p>Edges</p>
+<p>➡</p>
+<p>Request Edge: Pᵢ → Rⱼ</p>
+<p>⬅</p>
+<p>Assignment Edge: Rⱼ → Pᵢ</p>
+<p>🔑</p>
+<p>Key Idea</p>
+<p>Cycles in the graph indicate possible or actual deadlock.</p>
+<ul>
+    <li>● Dots inside = resource instances</li>
+    <li>Process Pᵢ is waiting for Rⱼ</li>
+    <li>Resource Rⱼ allocated to Pᵢ</li>
+</ul>
+<pre class="code-block"><code>● P = {P₁, P₂, …, Pⱼ}
+● R = {R₁, R₂, …, Rⱼ}</code></pre>
+
+<h3 id="sub-4-4">4.4 RAG Notation and Symbols</h3>
+<p>18</p>
+<p>Symbols</p>
+<p>Edges</p>
+<p>Request: Pᵢ → Rⱼ (process waiting)</p>
+<p>Assignment: Rⱼ → Pᵢ (resource held)</p>
+<p>Example</p>
+<p>How to Read the Graph</p>
+<p>resource</p>
+<p>instances</p>
+<p>Important Notes</p>
+<ul>
+    <li>○ Process: P₁, P₂, …</li>
+    <li>□ Resource: R₁, R₂, …</li>
+    <li>• Dots: resource instances</li>
+    <li>➡</li>
+    <li>⬅</li>
+    <li>P₁ → R₁ : P₁ requests R₁</li>
+    <li>R₂ → P₃ : R₂ allocated to P₃</li>
+    <li>Edge into process → resource held</li>
+    <li>Edge out of process → waiting for</li>
+    <li>Edges from resource → allocated</li>
+    <li>Edges to resource → waiting requests</li>
+    <li>Request ➜ Assignment when granted</li>
+    <li>Assignment removed on release</li>
+    <li>Graph updates dynamically</li>
+</ul>
+<div class="box box-blue"><div class="box-title">Important Note</div><p>Make sure to enforce ordering and handle edge conditions to ensure correctness and stability.</p></div>
+
+<h3 id="sub-4-5">4.5 RAG Example 1 No Deadlock</h3>
+<p>19</p>
+<p>Setup</p>
+<p>○ R₁ (1 instance)</p>
+<p>○ R₂ (2 instances)</p>
+<p>○ R₃ (1 instance)</p>
+<p>Allocations & Requests</p>
+<p>Safe Execution Order</p>
+<p>P₃ → P₂ → P₁</p>
+<p>Conclusion</p>
+<p>✅</p>
+<p>NO DEADLOCK</p>
+<p>System is in a safe state.</p>
+<p>Analysis</p>
+<p>No cycle in graph</p>
+<p>P₃ can finish first</p>
+<p>Releases R₃ → P₂ proceeds</p>
+<p>P₁ completes afterward</p>
+<p>P1</p>
+<p>P2</p>
+<p>P3</p>
+<p>R2</p>
+<ul>
+    <li>Processes: P₁, P₂, P₃</li>
+    <li>Resources:</li>
+    <li>R₁ → P₁</li>
+    <li>R₂ → P₁, R₂ → P₂</li>
+    <li>P₂ → R₃</li>
+    <li>R₃ → P₃</li>
+    <li>❌</li>
+    <li>✅</li>
+    <li>🔓</li>
+    <li>🔓</li>
+    <li>R1</li>
+    <li></li>
+    <li></li>
+    <li>R3</li>
+</ul>
+<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 5 -->
+            <section id="topic-5" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>Resource Allocation Graphs (RAG)</h2>
+                </div>
+                <div id="content-5" class="collapsible-content">
+                    <h3 id="sub-5-1">5.1 RAG Example 2 Deadlock Exists</h3>
+<p>20</p>
+<p>Setup</p>
+<p>Allocations & Requests</p>
+<p>Why Deadlock Occurs</p>
+<p>Circular wait satisfied</p>
+<p>Conclusion</p>
+<p>❌</p>
+<p>DEADLOCK EXISTS: No process can proceed.</p>
+<p>Analysis</p>
+<p>Cycle detected: P₁ → R₂ → P₂ → R₃ → P₃ → R₁ → P₁</p>
+<p>P1</p>
+<p>P2</p>
+<p>P3</p>
+<p>R2</p>
+<ul>
+    <li>Processes: P₁, P₂, P₃</li>
+    <li>Resources: R₁, R₂, R₃ (1 instance each)</li>
+    <li>R₁ → P₁, P₁ → R₂</li>
+    <li>R₂ → P₂, P₂ → R₃</li>
+    <li>R₃ → P₃, P₃ → R₁</li>
+    <li>P₁ holds R₁ → needs R₂</li>
+    <li>P₂ holds R₂ → needs R₃</li>
+    <li>P₃ holds R₃ → needs R₁</li>
+    <li>➡</li>
+    <li>🔁</li>
+    <li>Single instance per resource</li>
+    <li>All processes blocked</li>
+    <li>R1</li>
+    <li></li>
+    <li>R3</li>
+</ul>
+<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
+<h3 id="sub-5-2">5.2 RAG Example 3 Cycle But No Deadlock</h3>
+<p>21</p>
+<p>Setup</p>
+<p>Allocations & Requests</p>
+<p>Safe Execution</p>
+<p>P₃ → P₂ → P₁</p>
+<p>Conclusion</p>
+<p>✅</p>
+<p>NO DEADLOCK (despite cycle)</p>
+<p>🔑</p>
+<p>Key Insight</p>
+<p>With multiple resource instances, a cycle is necessary but not sufficient for deadlock.</p>
+<p>Draw RAG by Yourself</p>
+<p>Analysis</p>
+<p>Cycle exists: P₁ → R₂ → P₂ → R₁ → P₁</p>
+<p>R₁ has multiple instances</p>
+<p>P₃ can release R₁</p>
+<p>Others proceed sequentially</p>
+<p>P1</p>
+<p>P2</p>
+<p>P3</p>
+<p>R2</p>
+<ul>
+    <li>Processes: P₁, P₂, P₃</li>
+    <li>Resources: R₁ (2 instances), R₂ (1 instance)</li>
+    <li>R₁ → P₁, R₁ → P₃</li>
+    <li>P₁ → R₂</li>
+    <li>R₂ → P₂</li>
+    <li>P₂ → R₁</li>
+    <li>P₃ can finish</li>
+    <li>🔁</li>
+    <li>📦</li>
+    <li>✅</li>
+    <li>✅</li>
+    <li></li>
+    <li>R1</li>
+    <li></li>
+</ul>
+<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
+<h3 id="sub-5-3">5.3 RAG Analysis Summary Rules</h3>
+<p>22</p>
+<p>Case 1: No Cycle</p>
+<p>✅</p>
+<p>No Deadlock</p>
+<p>🔹</p>
+<p>Multiple Resource Instances</p>
+<p>⚠</p>
+<p>Deadlock May Exist</p>
+<p>Key Rule</p>
+<p>🔑</p>
+<p>Cycle is necessary for deadlock</p>
+<p>🔑</p>
+<p>Cycle is sufficient only if each resource has one</p>
+<p>instance</p>
+<p>Case 2: Cycle Exists</p>
+<p>🔹</p>
+<p>Single Instance per Resource</p>
+<p>❌</p>
+<p>Deadlock Exists</p>
+<ul>
+    <li>Safe state</li>
+    <li>All processes can finish</li>
+    <li>Further analysis needed</li>
+    <li>Check resource release outside cycle</li>
+    <li>Use Banker’s / detection algorithms</li>
+    <li>All processes in cycle blocked</li>
+</ul>
+<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
+<h3 id="sub-5-4">5.4 Deadlock Example Dining Philosophers</h3>
+<p>23</p>
+<p>Problem Setup</p>
+<p>Deadlock Scenario</p>
+<p>1. All pick up left chopstick</p>
+<p>2. All try to pick up right chopstick</p>
+<p>3. Right chopstick held by neighbor</p>
+<p>4. Everyone waits forever</p>
+<p>➡</p>
+<p>DEADLOCK</p>
+<p>Why Deadlock Occurs (All 4 Conditions)</p>
+<p>Mutual Exclusion: One chopstick → one philosopher</p>
+<p>Hold & Wait: Holding left, waiting for right</p>
+<p>No Preemption: Cannot force release</p>
+<p>Circular Wait: P₁ → P₂ → … → P₅ → P₁</p>
+<p>🔑</p>
+<p>Key Insight</p>
+<p>Dining Philosophers is a classic deadlock illustration showing how all four</p>
+<p>conditions can arise naturally.</p>
+<ul>
+    <li>5 philosophers, circular table</li>
+    <li>5 chopsticks (one between each pair)</li>
+    <li>Each philosopher needs 2 chopsticks</li>
+    <li>Alternates between thinking and eating</li>
+    <li>🔒</li>
+    <li>✋</li>
+    <li>🚫</li>
+    <li>🔁</li>
+</ul>
+<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
+<h3 id="sub-5-5">5.5 Consequences of Deadlocks</h3>
+<p>24</p>
+<p>🧠</p>
+<p>Resource Wastage</p>
+<p>💰</p>
+<p>Economic Costs</p>
+<p>Real-World Impact</p>
+<p>📊</p>
+<p>Databases: 1–5% transactions deadlock</p>
+<p>🖥</p>
+<p>Operating Systems: May freeze completely</p>
+<p>🌐</p>
+<p>Distributed Systems: Hard to detect & resolve</p>
+<p>❌</p>
+<p>Application Failures</p>
+<p>⚙</p>
+<p>System Performance</p>
+<ul>
+    <li>Wasted CPU cycles</li>
+    <li>Memory held unnecessarily</li>
+    <li>Productivity loss</li>
+    <li>Downtime expenses</li>
+    <li>Incomplete transactions</li>
+    <li>Possible data inconsistency</li>
+    <li>Lower throughput</li>
+    <li>Higher response time</li>
+</ul>
+<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 6 -->
+            <section id="topic-6" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-6')">
+                    <div class="topic-number">6</div>
+                    <h2>RAG Analysis Rules</h2>
+                </div>
+                <div id="content-6" class="collapsible-content">
+                    <h3 id="sub-6-1">6.1 Necessary vs Sufficient Conditions</h3>
+<p>25</p>
+<p>All 4 Coffman Conditions are necessary:</p>
+<p>Circular Wait</p>
+<p>➡</p>
+<p>If any one is missing → NO deadlock</p>
+<p>Key Distinction</p>
+<p>❌</p>
+<p>All 4 present ≠ guaranteed deadlock</p>
+<p>✅</p>
+<div class="formula-box">All 4 + single instances + cycle = deadlock</div>
+<p>Practical Insight</p>
+<p>🛑</p>
+<p>Prevent deadlock by breaking at least ONE necessary condition</p>
+<p>Sufficient Conditions</p>
+<p>✔ Presence guarantees deadlock</p>
+<p>Deadlock is certain when:</p>
+<ul>
+    <li>Mutual Exclusion, Hold and Wait, No Preemption and</li>
+    <li>Necessary → “Must have”</li>
+    <li>Sufficient → “Guarantees”</li>
+    <li>All 4 conditions present</li>
+    <li>Each resource has one instance</li>
+    <li>Cycle exists in RAG</li>
+</ul>
+<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
+<h3 id="sub-6-2">6.2 Practice Problems</h3>
+<p>26</p>
+<p>Problem 1: Given:</p>
+<p>Result:</p>
+<p>❌</p>
+<p>No Deadlock</p>
+<p>➡</p>
+<p>No cycle (P3 not waiting)</p>
+<p>P1</p>
+<p>P2</p>
+<p>P3</p>
+<p>R2</p>
+<ul>
+    <li>P1 holds R1 → requests R2</li>
+    <li>P2 holds R2 → requests R3</li>
+    <li>P3 holds R3</li>
+    <li>All resources: 1 instance</li>
+    <li>R1</li>
+    <li></li>
+    <li>R3</li>
+</ul>
+<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
+<h3 id="sub-6-3">6.3 Practice Problems</h3>
+<p>27</p>
+<p>🔑</p>
+<p>Key Tips:</p>
+<p>Problem 2: Given:</p>
+<p>Analysis:</p>
+<p>Result:</p>
+<p>✅</p>
+<p>No Deadlock (Safe State)</p>
+<p>P1</p>
+<p>P2</p>
+<p>P3</p>
+<p>R1</p>
+<p>R2</p>
+<p>P4</p>
+<p>R3</p>
+<ul>
+    <li>No cycle → No deadlock</li>
+    <li>Cycle + single instance → Deadlock</li>
+    <li>Cycle + multiple instances → Analyze further</li>
+    <li>Processes: P1–P4</li>
+    <li>Resources: R1(2), R2(1), R3(3)</li>
+    <li>P1: holds R1 → requests R2</li>
+    <li>P2: holds R2 → requests R3</li>
+    <li>P3: holds 2×R3 → requests R1</li>
+    <li>P4: holds 1×R3</li>
+    <li>Cycle exists</li>
+    <li>Multiple resource instances</li>
+    <li>P4 / P3 can release resources</li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+</ul>
+<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
+<h3 id="sub-6-4">6.4 Key Takeaways</h3>
+<p>28</p>
+<ul>
+    <li>Deadlock Definition</li>
+    <li>Real-World Impact</li>
+    <li>Four Necessary Conditions (Coffman Conditions)</li>
+    <li>Resource Allocation Graphs (RAG)</li>
+    <li>RAG Analysis</li>
+</ul>
+<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
+<h3 id="sub-6-5">6.5 Thank You!</h3>
+<p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
+<p>29</p>
+
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <a href="lecture-17.html" class="btn" style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;">Next Lecture</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for your reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/16.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>

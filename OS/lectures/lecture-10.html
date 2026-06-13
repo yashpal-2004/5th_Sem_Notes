@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Lecture 10 - Process Synchronization I: Critical Section and</title>
+    <meta content="Study notes covering Process Synchronization I: Critical Section and." name="description"/>
+    <link class="favicon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>10</text></svg>" rel="icon"/>
+    <link href="../css/style.css" rel="stylesheet"/>
+</head>
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Operating Systems Foundations</h1>
+            <p>Lecture 10 - Process Synchronization I: Critical Section and</p>
+            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/10.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text"/>
+        </div>
+    </header>
+    <div class="container" style="margin-top: 2rem;">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 6</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li>
+                    <a href="#topic-1">1. Process Synchronization Overview<span class="sub-count">4</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-1-1">1.1 Join the lecture online on your dashboard</a></li>
+                         <li><a href="#sub-1-2">1.2 Today’s Agenda</a></li>
+                         <li><a href="#sub-1-3">1.3 Introduction to Process Synchronization</a></li>
+                         <li><a href="#sub-1-4">1.4 Concurrent vs Parallel Execution</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Concurrency & Parallelism<span class="sub-count">4</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-2-1">2.1 The Critical Section Problem</a></li>
+                         <li><a href="#sub-2-2">2.2 Critical Section Example</a></li>
+                         <li><a href="#sub-2-3">2.3 Race Condition - Concept</a></li>
+                         <li><a href="#sub-2-4">2.4 Race Condition - Classic Example (Bank Account)</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. The Critical Section Problem<span class="sub-count">4</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-3-1">3.1 Race Condition - Execution Scenarios</a></li>
+                         <li><a href="#sub-3-2">3.2 Race Condition - Producer-Consumer Example</a></li>
+                         <li><a href="#sub-3-3">3.3 Why counter++ is Dangerous</a></li>
+                         <li><a href="#sub-3-4">3.4 Requirements - Critical Section Solutions</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Race Conditions & Examples<span class="sub-count">4</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-4-1">4.1 Requirement 1 - Mutual Exclusion</a></li>
+                         <li><a href="#sub-4-2">4.2 Requirement 2 - Progress</a></li>
+                         <li><a href="#sub-4-3">4.3 Requirement 3 - Bounded Waiting</a></li>
+                         <li><a href="#sub-4-4">4.4 Additional Desirable Properties</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Synchronization Solution Requirements<span class="sub-count">4</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-5-1">5.1 Real-World Consequences of Race Conditions</a></li>
+                         <li><a href="#sub-5-2">5.2 Concurrency in Modern Systems</a></li>
+                         <li><a href="#sub-5-3">5.3 Where OS Uses Synchronization</a></li>
+                         <li><a href="#sub-5-4">5.4 Preview of Synchronization Techniques</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-6">6. OS Core Synchronization Areas<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-6-1">6.1 Practice Time! 💪</a></li>
+                         <li><a href="#sub-6-2">6.2 Key Takeaways</a></li>
+                         <li><a href="#sub-6-3">6.3 Thank You!</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Topic 1 -->
+            <section id="topic-1" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>Process Synchronization Overview</h2>
+                </div>
+                <div id="content-1" class="collapsible-content">
+                    <h3 id="sub-1-1">1.1 Join the lecture online on your dashboard</h3>
+<p>2</p>
+<p>0</p>
+
+<h3 id="sub-1-2">1.2 Today’s Agenda</h3>
+<p>01</p>
+<ul>
+    <li>Introduction to Process Synchronization</li>
+    <li>The Critical Section Problem</li>
+    <li>Race Conditions: Examples and Consequences</li>
+    <li>Requirements for Synchronization Solutions</li>
+    <li>Concurrency in Modern Systems</li>
+    <li>Preview of Synchronization Techniques</li>
+</ul>
+
+<h3 id="sub-1-3">1.3 Introduction to Process Synchronization</h3>
+<p>02</p>
+<p>What is Process Synchronization?</p>
+<p>A mechanism that ensures multiple concurrent processes</p>
+<p>or threads can safely share resources and coordinate</p>
+<p>their execution without conflicts.</p>
+<p>Why Do We Need It?</p>
+<p>Real-World Scenario:</p>
+<p>Expected balance: ₹4,000</p>
+<p>Possible actual balance: ₹3,000 or ₹6,000. Without</p>
+<p>proper synchronization, chaos!</p>
+<ul>
+    <li>You check your bank balance: ₹5,000</li>
+    <li>You withdraw ₹2,000 at ATM</li>
+    <li>Your friend deposits ₹1,000 online</li>
+</ul>
+
+<h3 id="sub-1-4">1.4 Concurrent vs Parallel Execution</h3>
+<p>03</p>
+<p>Two Ways to Run Multiple Processes</p>
+<p>Concurrency (Single CPU)</p>
+<p>Process A: ████░░░░████░░░░</p>
+<p>Process B: ░░░░████░░░░████</p>
+<p>Time →</p>
+<p>Interleaving - taking turns rapidly</p>
+<p>Parallelism (Multi-CPU)</p>
+<p>CPU 1: ████████████████</p>
+<p>CPU 2: ████████████████</p>
+<p>Time →</p>
+<p>Truly simultaneous execution</p>
+<p>Both need synchronization!</p>
+
+                    
+                    <div class="topic-nav">
+                        <a href="lecture-09.html" class="btn" style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;">Previous Lecture</a>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 2 -->
+            <section id="topic-2" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>Concurrency & Parallelism</h2>
+                </div>
+                <div id="content-2" class="collapsible-content">
+                    <h3 id="sub-2-1">2.1 The Critical Section Problem</h3>
+<p>04</p>
+<p>What is a Critical Section?</p>
+<p>A critical section is a segment of code where a</p>
+<p>process accesses shared resources (variables, files,</p>
+<p>data structures) that must not be accessed by more</p>
+<p>than one process at a time.</p>
+<p>The Danger Zone ⚠</p>
+<p>// 🚪</p>
+<p>Entry Section - request permission</p>
+<p>// ⚠</p>
+<p>CRITICAL SECTION - danger zone!</p>
+<p>[access shared data]</p>
+<p>// 🚪</p>
+<p>Exit Section - release permission</p>
+<p>// ✅</p>
+<p>Remainder Section - safe zone</p>
+<pre class="code-block"><code>do {
+} while (TRUE);</code></pre>
+
+<h3 id="sub-2-2">2.2 Critical Section Example</h3>
+<p>05</p>
+<p>CRITICAL SECTION - Multiple threads access</p>
+<p>this!</p>
+<div class="formula-box">int balance = read_balance();     // 📖</div>
+<p>Read</p>
+<div class="formula-box">balance = balance - amount;       // 🧮</div>
+<p>Calculate</p>
+<p>write_balance(balance);           // ✍</p>
+<p>Write</p>
+<p>Why is this critical?</p>
+<ul>
+    <li>Multiple users → Same account</li>
+    <li>Simultaneous transactions</li>
+    <li>Shared variable: balance</li>
+</ul>
+
+<h3 id="sub-2-3">2.3 Race Condition - Concept</h3>
+<p>06</p>
+<p>What Is It?</p>
+<p>Outcome depends on execution timing</p>
+<p>Key Characteristics:</p>
+<p>🎲</p>
+<p>Non-deterministic (unpredictable)</p>
+<p>⏱</p>
+<p>Timing-dependent</p>
+<p>🐛</p>
+<p>Hard to reproduce & debug</p>
+<p>💥</p>
+<p>Can corrupt data</p>
+<p>Analogy: Two people editing a Google Doc</p>
+<p>without seeing each other's changes</p>
+<div class="box box-green"><div class="box-title">Analogy</div><p>Analogy: Two people editing a Google Doc</p></div>
+
+<h3 id="sub-2-4">2.4 Race Condition - Classic Example (Bank Account)</h3>
+<p>07</p>
+<p>For Deposit (Process A):</p>
+<div class="formula-box">int balance = read_balance();  // reads 5000</div>
+<div class="formula-box">balance = balance + 1000;       // calculates 6000</div>
+<p>write_balance(balance);         // writes 6000</p>
+<p>For Withdrawal (Process B):</p>
+<div class="formula-box">int balance = read_balance();  // reads 5000</div>
+<div class="formula-box">balance = balance - 2000;       // calculates 3000</div>
+<p>write_balance(balance);         // writes 3000</p>
+<p>Expected Final Balance: 4000 (5000 + 1000 - 2000)</p>
+<p>The Bank Account Problem:</p>
+<p>Consider a shared bank account with balance = 5000 Two processes execute simultaneously:</p>
+<ul>
+    <li>Process A: Deposits 1000</li>
+    <li>Process B: Withdraws 2000</li>
+</ul>
+<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 3 -->
+            <section id="topic-3" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>The Critical Section Problem</h2>
+                </div>
+                <div id="content-3" class="collapsible-content">
+                    <h3 id="sub-3-1">3.1 Race Condition - Execution Scenarios</h3>
+<p>08</p>
+<p>Scenario 1: Sequential Execution (Correct)</p>
+<p>Time    Process A               Process B           Balance</p>
+<p>t1          read(5000)                                  5000</p>
+<p>t2          calc(6000)                                  5000</p>
+<p>t3         write(6000)                                 6000</p>
+<p>t4                                      read(6000)           6000</p>
+<p>t5                                      calc(4000)          6000</p>
+<p>t6                                      write(4000)         4000</p>
+<p>✓ Result: 4000 (Correct)</p>
+<p>Scenario 2: Interleaved Execution (Race Condition)</p>
+<p>Time    Process A               Process B           Balance</p>
+<p>t1         read(5000)                                  5000</p>
+<p>t2                                  read(5000)         5000</p>
+<p>t3         calc(6000)                                  5000</p>
+<p>t4                                         calc(3000)          5000</p>
+<p>t5         write(6000)                                6000</p>
+<p>t6                                         write(3000)         3000</p>
+<p>✗ Result: 3000 (Incorrect! Lost 1000)</p>
+
+<h3 id="sub-3-2">3.2 Race Condition - Producer-Consumer Example</h3>
+<p>09</p>
+<p>Bounded Buffer Problem Setup:</p>
+<p>Shared buffer with counter variable tracking number of</p>
+<p>items.</p>
+<p>Consumer Code:</p>
+<p>while (counter == 0)</p>
+<p>;  // buffer empty, wait</p>
+<p>item = buffer[out];</p>
+<div class="formula-box">out = (out + 1) % BUFFER_SIZE;</div>
+<p>counter--;  // CRITICAL OPERATION</p>
+<p>The Problem: counter++ and counter-- are NOT</p>
+<p>atomic operations!</p>
+<p>Producer Code:</p>
+<p>// produce item</p>
+<p>while (counter == BUFFER_SIZE)</p>
+<p>;  // buffer full, wait</p>
+<p>buffer[in] = item;</p>
+<div class="formula-box">in = (in + 1) % BUFFER_SIZE;</div>
+<p>counter++;  // CRITICAL OPERATION</p>
+<pre class="code-block"><code>while ( true) {
+}
+while (true) {
+}</code></pre>
+<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
+<h3 id="sub-3-3">3.3 Why counter++ is Dangerous</h3>
+<p>10</p>
+<p>Looks Simple, Right?</p>
+<p>counter++;  // Just one line!</p>
+<p>But In Machine Code Assembly</p>
+<p>LOAD    R1, counter      // Step 1: Read</p>
+<p>ADD     R1, R1, 1        // Step 2: Calculate</p>
+<p>STORE   R1, counter      // Step 3: Write</p>
+<p>3 separate instructions = 3 points where</p>
+<p>interruption can occur!</p>
+<p>The Scenario:</p>
+<p>Initial: counter = 5</p>
+<p>Thread 1: counter++  (wants: 6)</p>
+<p>Thread 2: counter++  (wants: 7)</p>
+<p>❌</p>
+<p>Race Condition Execution</p>
+<p>T1: LOAD R1, counter       (R1 = 5)</p>
+<p>T2: LOAD R2, counter       (R2 = 5)</p>
+<p>T1: ADD R1, R1, 1          (R1 = 6)</p>
+<p>T2: ADD R2, R2, 1          (R2 = 6)</p>
+<p>T1: STORE R1, counter      (counter = 6)</p>
+<p>T2: STORE R2, counter      (counter = 6)</p>
+<p>Expected: 7</p>
+<p>Actual: 6</p>
+<p>One increment lost!</p>
+
+<h3 id="sub-3-4">3.4 Requirements - Critical Section Solutions</h3>
+<p>11</p>
+<p>Every Solution MUST Satisfy All Three:</p>
+<p>1⃣ Mutual Exclusion</p>
+<p>> Only ONE process in critical section at a time</p>
+<p>3⃣ Bounded Waiting</p>
+<p>> Everyone gets their turn eventually (no starvation)</p>
+<p>Memory Aid: MPB (Mutual, Progress, Bounded)</p>
+<p>2⃣ Progress</p>
+<p>> If no one's inside, someone waiting MUST get</p>
+<p>in</p>
+
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 4 -->
+            <section id="topic-4" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>Race Conditions & Examples</h2>
+                </div>
+                <div id="content-4" class="collapsible-content">
+                    <h3 id="sub-4-1">4.1 Requirement 1 - Mutual Exclusion</h3>
+<p>12</p>
+<p>The Bathroom Rule 🚻</p>
+<p>Only ONE person inside at a time</p>
+<p>Process P1: [inside critical section]</p>
+<p>Process P2: [must wait] ⏳</p>
+<p>Process P3: [must wait] ⏳</p>
+<p>Why It Matters</p>
+<p>🎯</p>
+<p>What happens if this is violated?</p>
+<p>Answer: Data corruption!</p>
+<ul>
+    <li>Prevents simultaneous access</li>
+    <li>Protects data integrity</li>
+    <li>Most fundamental requirement</li>
+</ul>
+
+<h3 id="sub-4-2">4.2 Requirement 2 - Progress</h3>
+<p>13</p>
+<p>No Artificial Delays</p>
+<p>Bad Scenario:</p>
+<p>Critical Section: [EMPTY]</p>
+<p>Process A: Waiting for Process B</p>
+<p>Process B: In remainder section (not even</p>
+<p>interested!)</p>
+<p>❌</p>
+<p>Violation! Selection postponed indefinitely</p>
+<p>The Rule</p>
+<ul>
+    <li>If Critical Section is free AND processes want to enter</li>
+    <li>Decision MUST be made in finite time</li>
+    <li>Only waiting processes participate in decision</li>
+</ul>
+
+<h3 id="sub-4-3">4.3 Requirement 3 - Bounded Waiting</h3>
+<p>14</p>
+<p>Fairness Guarantee</p>
+<p>Bad Scenario:</p>
+<p>Process A: Requested entry 1,000 times</p>
+<p>Process B: Keeps entering first</p>
+<p>Process A: Still waiting... (STARVATION)</p>
+<p>The Rule</p>
+<p>There exists a limit on how many times others</p>
+<p>can enter before you</p>
+<p>Not Necessarily FIFO, but no infinite waiting!</p>
+
+<h3 id="sub-4-4">4.4 Additional Desirable Properties</h3>
+<p>15</p>
+<p>Beyond the Three Main Requirements</p>
+<p>⚡</p>
+<p>Performance</p>
+<p>⚖</p>
+<p>Fairness</p>
+<p>🧩</p>
+<p>Simplicity</p>
+<p>🌍</p>
+<p>Portability</p>
+<ul>
+    <li>Low overhead</li>
+    <li>Fast entry</li>
+    <li>Scales well</li>
+    <li>No starvation</li>
+    <li>FIFO access</li>
+    <li>No priority inversion</li>
+    <li>Easy to understand</li>
+    <li>Fewer bugs</li>
+    <li>Maintainable</li>
+    <li>Hardware-independent</li>
+    <li>No timing assumptions</li>
+</ul>
+
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 5 -->
+            <section id="topic-5" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>Synchronization Solution Requirements</h2>
+                </div>
+                <div id="content-5" class="collapsible-content">
+                    <h3 id="sub-5-1">5.1 Real-World Consequences of Race Conditions</h3>
+<p>16</p>
+<p>Historical Examples</p>
+<p>⚠</p>
+<p>Therac-25 (1985–87)</p>
+<p>⚠</p>
+<p>Northeast Blackout (2003)</p>
+<p>Modern Examples</p>
+<p>🏦</p>
+<p>Banking → incorrect balances</p>
+<p>🛒</p>
+<p>E-commerce → oversold inventory</p>
+<p>🎮</p>
+<p>Gaming → item duplication glitches</p>
+<p>📱</p>
+<p>Social media → data corruption</p>
+<p>Why These Happen</p>
+<p>🔁</p>
+<p>Concurrent access to shared resources</p>
+<p>⏱</p>
+<p>Timing-dependent behavior</p>
+<p>🧪</p>
+<p>Hard to test & reproduce</p>
+<ul>
+    <li>Control software race condition</li>
+    <li>Lethal radiation overdoses</li>
+    <li>Cost: Human lives</li>
+    <li>Race condition in alarm system</li>
+    <li>50 million people affected</li>
+    <li>Cost: ~$6 billion</li>
+</ul>
+
+<h3 id="sub-5-2">5.2 Concurrency in Modern Systems</h3>
+<p>17</p>
+<p>Multi-Core Processors:</p>
+<p>coherency issues)</p>
+<p>Challenges in Modern Systems:</p>
+<p>Cache coherency: Each core has own cache</p>
+<p>Memory ordering: Instructions can be</p>
+<p>reordered</p>
+<p>Scalability: More cores = more contention</p>
+<p>Synchronization is MORE critical now!</p>
+<ul>
+    <li>Multiple CPU cores execute truly simultaneously</li>
+    <li>Shared memory architecture</li>
+    <li>Each core has own cache (introduces cache</li>
+    <li>Requires sophisticated synchronization</li>
+    <li>🗄</li>
+    <li>🔄</li>
+    <li>⚡</li>
+</ul>
+
+<h3 id="sub-5-3">5.3 Where OS Uses Synchronization</h3>
+<p>18</p>
+<p>Everywhere!</p>
+<p>Process Management</p>
+<p>Memory Management</p>
+<p>File Systems</p>
+<p>Device Management</p>
+<p>Every shared data structure needs protection!</p>
+<ul>
+    <li>Scheduling queues</li>
+    <li>Process tables</li>
+    <li>Page tables</li>
+    <li>Free frame lists</li>
+    <li>Inode tables</li>
+    <li>Directory structures</li>
+    <li>Device status tables</li>
+    <li>I/O request queues</li>
+</ul>
+
+<h3 id="sub-5-4">5.4 Preview of Synchronization Techniques</h3>
+<p>19</p>
+<p>We Know the Problem... Now for Solutions!</p>
+<p>Software Solutions</p>
+<p>Peterson's Algorithm (2 processes)</p>
+<p>Dekker’s Algorithm (n processes)</p>
+<p>Hardware Support</p>
+<p>Test-and-Set</p>
+<p>Compare-and-Swap</p>
+<p>Mutex Locks</p>
+<p>High-Level Constructs</p>
+<p>Semaphores</p>
+<p>Monitors</p>
+<p>Modern Approaches</p>
+<ul>
+    <li>🧩</li>
+    <li>🎟</li>
+    <li>⚛</li>
+    <li>🔄</li>
+    <li>🔒</li>
+    <li>🚦</li>
+    <li>🏛</li>
+    <li>Lock-free structures</li>
+    <li>Transactional memory</li>
+</ul>
+
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 6 -->
+            <section id="topic-6" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-6')">
+                    <div class="topic-number">6</div>
+                    <h2>OS Core Synchronization Areas</h2>
+                </div>
+                <div id="content-6" class="collapsible-content">
+                    <h3 id="sub-6-1">6.1 Practice Time! 💪</h3>
+<p>20</p>
+<p>Problem 1: Identify the Critical Section</p>
+<p>int shared_counter = 0;</p>
+<p>shared_counter++;</p>
+<p>Problem 2: Thread Operations on Counter</p>
+<p>Given:</p>
+<p>Question: What are ALL possible final values?</p>
+<p>Shared Resource: shared_counter</p>
+<p>(global variable)</p>
+<p>Critical Section: The line</p>
+<p>shared_counter++;</p>
+<ul>
+    <li>Two threads execute on shared variable</li>
+    <li>Thread 1: counter++</li>
+    <li>Thread 2: counter--</li>
+    <li>Initial value: counter = 10</li>
+</ul>
+<pre class="code-block"><code>void increment() {
+for ( int i = 0; i < 1000; i++) {
+}
+}</code></pre>
+
+<h3 id="sub-6-2">6.2 Key Takeaways</h3>
+<p>21</p>
+<p>What You Must Remember 🎯</p>
+<p>resources</p>
+<p>(DANGEROUS!)</p>
+<p>○ Mutual Exclusion</p>
+<p>○ Progress</p>
+<p>○ Bounded Waiting</p>
+<p>sophisticated mechanisms</p>
+<p>important</p>
+<ul>
+    <li>Critical sections = code accessing shared</li>
+    <li>Race conditions = timing-dependent bugs</li>
+    <li>Three requirements = MPB (all three!)</li>
+    <li>Simple solutions fail - we need</li>
+    <li>Modern systems make this harder but more</li>
+</ul>
+
+<h3 id="sub-6-3">6.3 Thank You!</h3>
+<p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
+<p>22</p>
+
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <a href="lecture-11.html" class="btn" style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;">Next Lecture</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for your reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/10.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Lecture 22 - Introduction to Nand2Tetris and Jack</title>
+    <meta content="Study notes covering Introduction to Nand2Tetris and Jack." name="description"/>
+    <link class="favicon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>22</text></svg>" rel="icon"/>
+    <link href="../css/style.css" rel="stylesheet"/>
+</head>
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Operating Systems Foundations</h1>
+            <p>Lecture 22 - Introduction to Nand2Tetris and Jack</p>
+            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/22.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text"/>
+        </div>
+    </header>
+    <div class="container" style="margin-top: 2rem;">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 6</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li>
+                    <a href="#topic-1">1. The Hack Computer Platform<span class="sub-count">4</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-1-1">1.1 Today's Agenda</a></li>
+                         <li><a href="#sub-1-2">1.2 The Journey So Far</a></li>
+                         <li><a href="#sub-1-3">1.3 The "Missing Link"</a></li>
+                         <li><a href="#sub-1-4">1.4 The Grand Vision</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. The Software Hierarchy Stack<span class="sub-count">4</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-2-1">2.1 Why Build from Scratch?</a></li>
+                         <li><a href="#sub-2-2">2.2 The Hack Computer Platform</a></li>
+                         <li><a href="#sub-2-3">2.3 The Hack Computer Platform</a></li>
+                         <li><a href="#sub-2-4">2.4 The Software Hierarchy</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Jack Compiler & Language Syntax<span class="sub-count">4</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-3-1">3.1 Machine Language (Layer 0)</a></li>
+                         <li><a href="#sub-3-2">3.2 Assembly Language (Layer 1)</a></li>
+                         <li><a href="#sub-3-3">3.3 Virtual Machine (Layer 4)</a></li>
+                         <li><a href="#sub-3-4">3.4 The Jack Compiler (Layer 5)</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Primitive Types & Scope<span class="sub-count">4</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-4-1">4.1 Jack Language (Layer 6)</a></li>
+                         <li><a href="#sub-4-2">4.2 The Operating System (Layer 6)</a></li>
+                         <li><a href="#sub-4-3">4.3 Translation Example</a></li>
+                         <li><a href="#sub-4-4">4.4 Jack vs Java/C</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Let & Do Statements<span class="sub-count">4</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-5-1">5.1 Jack File Structure</a></li>
+                         <li><a href="#sub-5-2">5.2 Primitive Data Types</a></li>
+                         <li><a href="#sub-5-3">5.3 Variable Types & Scope</a></li>
+                         <li><a href="#sub-5-4">5.4 Memory Management (Jack Style)</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-6">6. Jack Operating System Library<span class="sub-count">7</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-6-1">6.1 Basic Statement: let and do</a></li>
+                         <li><a href="#sub-6-2">6.2 Control Flow: If-Else</a></li>
+                         <li><a href="#sub-6-3">6.3 Control Flow: While</a></li>
+                         <li><a href="#sub-6-4">6.4 Jack Software Suite</a></li>
+                         <li><a href="#sub-6-5">6.5 Steps</a></li>
+                         <li><a href="#sub-6-6">6.6 Some Jack Programs</a></li>
+                         <li><a href="#sub-6-7">6.7 Thank You!</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Topic 1 -->
+            <section id="topic-1" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>The Hack Computer Platform</h2>
+                </div>
+                <div id="content-1" class="collapsible-content">
+                    <h3 id="sub-1-1">1.1 Today's Agenda</h3>
+<p>01</p>
+<ul>
+    <li>The Big Picture</li>
+    <li>The Hack Computer Platform</li>
+    <li>The Software Hierarchy</li>
+    <li>Building from Scratch: The "Why"</li>
+    <li>Jack Language: Syntax & Structure</li>
+    <li>Logic & Constructs in Jack</li>
+</ul>
+
+<h3 id="sub-1-2">1.2 The Journey So Far</h3>
+<p>02</p>
+<p>Processes and scheduling: How the</p>
+<p>conductor manages the orchestra.</p>
+<p>Memory management and paging: How</p>
+<p>the library organizes its books.</p>
+<p>I/O systems and device management: How</p>
+<p>the manager interacts with staff and external</p>
+<p>resources.</p>
+<p>How do these components actually get built</p>
+<p>from the ground up?</p>
+
+<h3 id="sub-1-3">1.3 The "Missing Link"</h3>
+<p>03</p>
+<p>(the blueprints).</p>
+<p>house's function).</p>
+<p>implemented?</p>
+<p>running processes?</p>
+<p>Have you ever wondered what happens</p>
+<p>between writing int main() and the</p>
+<p>CPU executing instructions?</p>
+<ul>
+    <li>We've studied OS concepts abstractly</li>
+    <li>We understand what an OS does (the</li>
+    <li>But: How is an OS actually</li>
+    <li>How do high-level programs become</li>
+</ul>
+
+<h3 id="sub-1-4">1.4 The Grand Vision</h3>
+<p>04</p>
+
+                    
+                    <div class="topic-nav">
+                        <a href="lecture-21.html" class="btn" style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;">Previous Lecture</a>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 2 -->
+            <section id="topic-2" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>The Software Hierarchy Stack</h2>
+                </div>
+                <div id="content-2" class="collapsible-content">
+                    <h3 id="sub-2-1">2.1 Why Build from Scratch?</h3>
+<p>05</p>
+<p>Deep intuition beats abstract knowledge.</p>
+
+<h3 id="sub-2-2">2.2 The Hack Computer Platform</h3>
+<p>06</p>
+<p>16-bit Harvard Architecture. Minimalist design.</p>
+<p>CPU Registers : "A" and "D" Registers.</p>
+<p>The ALU (Arithmetic Logic Unit) : The</p>
+<p>calculator of the system.</p>
+<p>Memory Mapping (The Map): 32K words.</p>
+<p>RAM (0-16K), Screen (16K-24K),</p>
+<p>Keyboard (24K).</p>
+
+<h3 id="sub-2-3">2.3 The Hack Computer Platform</h3>
+<p>07</p>
+<p>Screen Memory: 256 rows x 512</p>
+<p>columns. 1 bit = 1 pixel.</p>
+<p>Keyboard I/O: Reading address</p>
+<p>24576.</p>
+<p>The CPU Emulator</p>
+
+<h3 id="sub-2-4">2.4 The Software Hierarchy</h3>
+<p>08</p>
+<p>The Full Stack: From High-Level</p>
+<p>Jack to Binary.</p>
+<p>English (Jack)</p>
+<p>Simplified Code (VM)</p>
+<p>Symbols (Assembly)</p>
+<p>1s and 0s (Machine).</p>
+<ul>
+    <li>></li>
+    <li>></li>
+    <li>></li>
+</ul>
+
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 3 -->
+            <section id="topic-3" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>Jack Compiler & Language Syntax</h2>
+                </div>
+                <div id="content-3" class="collapsible-content">
+                    <h3 id="sub-3-1">3.1 Machine Language (Layer 0)</h3>
+<p>09</p>
+<p>The "Ground Floor" of software.</p>
+<p>Binary Instructions: 16-bit strings like</p>
+<p>0000000000000010 (A-instruction) or</p>
+<p>1110110000010000 (C-instruction).</p>
+<p>Characteristics: Directly executed by</p>
+<p>hardware; extremely tedious for</p>
+<p>humans; zero abstraction.</p>
+<p>The "DNA" of the computer</p>
+
+<h3 id="sub-3-2">3.2 Assembly Language (Layer 1)</h3>
+<p>10</p>
+<p>Symbolic Representation: @sum instead of @16.</p>
+<p>The Assembler’s Job:</p>
+<p>Like using a contact name (e.g., "Mom") in your</p>
+<p>phone instead of memorizing her 10-digit phone</p>
+<p>number.</p>
+<ul>
+    <li>Translate symbols to addresses.</li>
+    <li>Convert mnemonics (D=M) to binary.</li>
+    <li>Resolve labels and output .hack files.</li>
+</ul>
+
+<h3 id="sub-3-3">3.3 Virtual Machine (Layer 4)</h3>
+<p>11</p>
+<p>Intermediate Abstraction: A stack-based model.</p>
+<p>VM Commands: push constant 5,</p>
+<p>add, pop local 0.</p>
+<p>Why VM?</p>
+<p>Platform Independence: Write</p>
+<p>once, run on any hardware with a</p>
+<p>VM translator.</p>
+<p>Simplifies Compiler: The Jack</p>
+<p>compiler only needs to know how to</p>
+<p>talk to the VM.</p>
+
+<h3 id="sub-3-4">3.4 The Jack Compiler (Layer 5)</h3>
+<p>13</p>
+<p>Compilation Pipeline:</p>
+<p>(keywords, symbols).</p>
+<p>tree).</p>
+<ul>
+    <li>Tokenizer: Breaking text into "words"</li>
+    <li>Parser: Understanding the "grammar" (syntax</li>
+    <li>Code Generator: Emitting the VM instructions.</li>
+</ul>
+
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 4 -->
+            <section id="topic-4" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>Primitive Types & Scope</h2>
+                </div>
+                <div id="content-4" class="collapsible-content">
+                    <h3 id="sub-4-1">4.1 Jack Language (Layer 6)</h3>
+<p>12</p>
+<p>High-level, Object-Oriented.</p>
+<p>Features: Classes, methods, fields, and</p>
+<p>static variables.</p>
+<p>Role: The bridge between human logic and</p>
+<p>the VM translator.</p>
+<p>var int result;</p>
+<p>return result;</p>
+<pre class="code-block"><code>class Main {
+function int addPair(int x, int y) {
+let result = x + y;
+}
+}</code></pre>
+
+<h3 id="sub-4-2">4.2 The Operating System (Layer 6)</h3>
+<p>15</p>
+<p>Jack OS Library: 8 Core Modules.</p>
+<p>Math.jack (Mult/Div), Output.jack (Text),</p>
+<p>Screen.jack (Graphics), Memory.jack</p>
+<p>(Heap), String.jack, Keyboard.jack,</p>
+<p>Sys.jack</p>
+<p>The "Library" Model: In Nand2Tetris, the OS is a</p>
+<p>set of functions called directly by your</p>
+<p>program—no complex kernel/user mode</p>
+<p>separation.</p>
+
+<h3 id="sub-4-3">4.3 Translation Example</h3>
+<p>16</p>
+<p>push constant 3</p>
+<p>add</p>
+<p>pop local 0</p>
+<p>VM Code</p>
+<p>@5</p>
+<p>D=A</p>
+<p>@SP</p>
+<p>A=M</p>
+<p>M=D</p>
+<p>@SP</p>
+<div class="formula-box">M=M+1</div>
+<p>Assembly</p>
+<p>Machine Code</p>
+<p>0000000000000101</p>
+<p>1110110000010000</p>
+<p>0000000000000000</p>
+<p>// ... (binary)</p>
+<pre class="code-block"><code>let x = 5 + 3; push constant 5</code></pre>
+
+<h3 id="sub-4-4">4.4 Jack vs Java/C</h3>
+<p>17</p>
+<p>Similarities: Statically typed, OO</p>
+<p>structure, curly braces.</p>
+<p>Differences: No inheritance, no</p>
+<p>interfaces, very simple memory</p>
+<p>management, no garbage collection</p>
+<p>(in the basic version).</p>
+
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 5 -->
+            <section id="topic-5" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>Let & Do Statements</h2>
+                </div>
+                <div id="content-5" class="collapsible-content">
+                    <h3 id="sub-5-1">5.1 Jack File Structure</h3>
+<p>18</p>
+<p>Rule: One class per file. Filename</p>
+<p>must match ClassName.</p>
+<p>Structure: Class declaration -></p>
+<p>Fields/Statics -> Constructor -></p>
+<p>Subroutines.</p>
+
+<h3 id="sub-5-2">5.2 Primitive Data Types</h3>
+<p>19</p>
+<p>int: 16-bit signed (-32768 to 32767).</p>
+<p>char: ASCII character.</p>
+<p>boolean: true or false.</p>
+<p>Arrays & Strings: Handled as</p>
+<p>objects using Array.new(size)</p>
+<p>and String.new(length).</p>
+
+<h3 id="sub-5-3">5.3 Variable Types & Scope</h3>
+<p>20</p>
+<p>Field: One per object instance</p>
+<p>(State).</p>
+<p>Static: Shared by all instances of a</p>
+<p>class.</p>
+<p>Local: Exists only during</p>
+<p>subroutine execution (Stack).</p>
+
+<h3 id="sub-5-4">5.4 Memory Management (Jack Style)</h3>
+<p>24</p>
+<p>Heap Management: Handled by</p>
+<p>Memory.jack.</p>
+<p>do arr.dispose(); -> Freeing</p>
+<p>the block manually.</p>
+<p>Allocates block.</p>
+<pre class="code-block"><code>let arr = Array.new(10); -></code></pre>
+
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 6 -->
+            <section id="topic-6" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-6')">
+                    <div class="topic-number">6</div>
+                    <h2>Jack Operating System Library</h2>
+                </div>
+                <div id="content-6" class="collapsible-content">
+                    <h3 id="sub-6-1">6.1 Basic Statement: let and do</h3>
+<p>25</p>
+<p>do: Used for subroutine calls when you</p>
+<p>ignore the return value.</p>
+<p>do Screen.drawPixel(x, y);.</p>
+<pre class="code-block"><code>let: Used for assignments. let x = 5;</code></pre>
+
+<h3 id="sub-6-2">6.2 Control Flow: If-Else</h3>
+<p>26</p>
+<p>Conditions must be boolean</p>
+<p>expressions.</p>
+<pre class="code-block"><code>Syntax: if (condition) { ...
+} else { ... }.</code></pre>
+
+<h3 id="sub-6-3">6.3 Control Flow: While</h3>
+<p>27</p>
+<p>The only loop construct in Jack!</p>
+<p>// Display the result</p>
+<p>do Output.printString("Sum of array elements: ");</p>
+<p>do Output.printInt(sum);</p>
+<p>do Output.println();</p>
+<pre class="code-block"><code>Syntax: while (condition) {
+... }.
+let sum = 0;
+let i = 0;
+while (i < length) {
+let sum = sum + arr[i];
+let i = i + 1;
+}</code></pre>
+
+<h3 id="sub-6-4">6.4 Jack Software Suite</h3>
+<p>28</p>
+<p>https://drive.google.com/file/d/1IkIR8Pwq3PY49QgXpUJOkUUVht-TKIET/view</p>
+
+<h3 id="sub-6-5">6.5 Steps</h3>
+<p>29</p>
+<p>○ Run the Jack Compiler script (batch/shell) located in your</p>
+<p>tools folder.</p>
+<p>○ ~/Desktop/nand2tetris/tools/JackCompiler.sh</p>
+<p>○ ~/Desktop/nand2tetris/tools/VMEmulator.sh</p>
+<p>directory containing your new .vm files.</p>
+<p>reloading in the VM Emulator.</p>
+<ul>
+    <li>Create your source files with the .jack extension</li>
+    <li>Translate your high-level Jack code into Virtual Machine language.</li>
+    <li>Open the VMEmulator</li>
+    <li>Select "Load Program" (or Load Folder) and choose the</li>
+    <li>Set animation speed to "Fast" or "No Animation" for complex games.</li>
+    <li>If logic errors occur, revise .jack files and re-compile before</li>
+</ul>
+
+<h3 id="sub-6-6">6.6 Some Jack Programs</h3>
+<p>30</p>
+<p>Sum of array Elements</p>
+<p>Output</p>
+<p>Sum of array elements: 150</p>
+<pre class="code-block"><code>let arr[0] = 10;
+let arr[1] = 20;
+let arr[2] = 30;
+let arr[3] = 40;
+let arr[4] = 50;</code></pre>
+
+<h3 id="sub-6-7">6.7 Thank You!</h3>
+<p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
+<p>30</p>
+
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for your reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/22.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Lecture 11 - Process Synchronization II: Software-Based</title>
+    <meta content="Study notes covering Process Synchronization II: Software-Based." name="description"/>
+    <link class="favicon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>11</text></svg>" rel="icon"/>
+    <link href="../css/style.css" rel="stylesheet"/>
+</head>
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Operating Systems Foundations</h1>
+            <p>Lecture 11 - Process Synchronization II: Software-Based</p>
+            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/11.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text"/>
+        </div>
+    </header>
+    <div class="container" style="margin-top: 2rem;">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 6</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li>
+                    <a href="#topic-1">1. Simple Lock Variable Solution<span class="sub-count">6</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-1-1">1.1 Join the lecture online on your dashboard.</a></li>
+                         <li><a href="#sub-1-2">1.2 Today's Lecture Agenda:</a></li>
+                         <li><a href="#sub-1-3">1.3 Quick Recap - The Critical Section Problem:</a></li>
+                         <li><a href="#sub-1-4">1.4 Review - The Three Sacred Requirements:</a></li>
+                         <li><a href="#sub-1-5">1.5 Review - The Three Sacred Requirements:</a></li>
+                         <li><a href="#sub-1-6">1.6 Solution to Process Synchronization Problems:</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Strict Alternation (Turn Variable)<span class="sub-count">6</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-2-1">2.1 Why Study Software Solutions?</a></li>
+                         <li><a href="#sub-2-2">2.2 The Simple Boolean Lock Variable Solution:</a></li>
+                         <li><a href="#sub-2-3">2.3 The Simple Boolean Lock Variable Solution:</a></li>
+                         <li><a href="#sub-2-4">2.4 The Simple Boolean Lock Variable Solution:</a></li>
+                         <li><a href="#sub-2-5">2.5 Why Simple Lock FAILS - Mutual exclusion VIOLATED:</a></li>
+                         <li><a href="#sub-2-6">2.6 Checking for Progress:</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Interest Variable Deadlocks<span class="sub-count">6</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-3-1">3.1 Checking for Bounded Waiting:</a></li>
+                         <li><a href="#sub-3-2">3.2 Time Process P0 Process P1 Lock</a></li>
+                         <li><a href="#sub-3-3">3.3 Evaluation of The Simple Boolean Lock Variable Solution:</a></li>
+                         <li><a href="#sub-3-4">3.4 . Strict Alternation (Turn Variable) Solution:</a></li>
+                         <li><a href="#sub-3-5">3.5 . Strict Alternation (Turn Variable) Solution:</a></li>
+                         <li><a href="#sub-3-6">3.6 Checking for Progress:</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Dekker's Algorithm (First Complete)<span class="sub-count">6</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-4-1">4.1 Checking for Progress:</a></li>
+                         <li><a href="#sub-4-2">4.2 Checking for Bounded Waiting:</a></li>
+                         <li><a href="#sub-4-3">4.3 Evaluation of Strict Alternation (Turn Variable) Solution:</a></li>
+                         <li><a href="#sub-4-4">4.4 . The Interest Variable (Individual Interest Flags):</a></li>
+                         <li><a href="#sub-4-5">4.5 . The Interest Variable (Individual Interest Flags):</a></li>
+                         <li><a href="#sub-4-6">4.6 . The Interest Variable (Individual Interest Flags):</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Peterson's Algorithm (Simplified Elegance)<span class="sub-count">6</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-5-1">5.1 The ACTUAL Mutual Exclusion /Progress /Bounded Waiting Violation:</a></li>
+                         <li><a href="#sub-5-2">5.2 Evaluation of The Interest Variable (Individual Interest Flags):</a></li>
+                         <li><a href="#sub-5-3">5.3 . Dekker's Algorithm: The First Complete Solution:</a></li>
+                         <li><a href="#sub-5-4">5.4 The Comparison:</a></li>
+                         <li><a href="#sub-5-5">5.5 Evaluation of Dekker's Algorithm:</a></li>
+                         <li><a href="#sub-5-6">5.6 . Peterson's Algorithm - The First Correct Solution:</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-6">6. Software Limitations<span class="sub-count">6</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-6-1">6.1 . Peterson's Algorithm - The First Correct Solution:</a></li>
+                         <li><a href="#sub-6-2">6.2 Checking for Mutual exclusion:</a></li>
+                         <li><a href="#sub-6-3">6.3 Checking for Progress:</a></li>
+                         <li><a href="#sub-6-4">6.4 Checking for Bounded Waiting:</a></li>
+                         <li><a href="#sub-6-5">6.5 Limitations of Software Solutions:</a></li>
+                         <li><a href="#sub-6-6">6.6 Thank You!</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Topic 1 -->
+            <section id="topic-1" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>Simple Lock Variable Solution</h2>
+                </div>
+                <div id="content-1" class="collapsible-content">
+                    <h3 id="sub-1-1">1.1 Join the lecture online on your dashboard.</h3>
+
+<h3 id="sub-1-2">1.2 Today's Lecture Agenda:</h3>
+<p>1. Review of Critical Section Requirements</p>
+<p>2. Simple Lock Variables and Their Failures</p>
+<p>3. Strict Alternation (Turn Variable) Solution</p>
+<p>4. The Interest Variable (Individual Interest Flags)</p>
+<p>5. Peterson's Algorithm - The First Correct Solution</p>
+<p>6. Limitations of Software Solutions</p>
+<p>The Journey: From broken attempts to working solutions, understanding why synchronization</p>
+<p>is fundamentally hard.</p>
+
+<h3 id="sub-1-3">1.3 Quick Recap - The Critical Section Problem:</h3>
+<p>What We Learned in the last lecture:</p>
+<p>The critical section is a code segment where processes access shared resources that require protection.</p>
+<p>The Challenge: How do we implement</p>
+<p>entry and exit sections using only</p>
+<p>software?</p>
+<p>request permission</p>
+<p>release permission</p>
+<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
+<h3 id="sub-1-4">1.4 Review - The Three Sacred Requirements:</h3>
+<p>Real-Life Analogy: A Single-Occupancy Restroom</p>
+<div class="box box-green"><div class="box-title">Analogy</div><p>Real-Life Analogy: A Single-Occupancy Restroom</p></div>
+
+<h3 id="sub-1-5">1.5 Review - The Three Sacred Requirements:</h3>
+<p>Any solution MUST satisfy all three:</p>
+<p>section at a time</p>
+<p>want to enter, one MUST</p>
+<p>eventually get in</p>
+<p>who enters next</p>
+<p>eventually</p>
+<p>Memory Aid: MPB (Mutual, Progress, Bounded)</p>
+<ul>
+    <li>Only ONE process in critical</li>
+    <li>Prevents data corruption</li>
+    <li>If CS is free and processes</li>
+    <li>No indefinite postponement</li>
+    <li>Only waiting processes decide</li>
+    <li>Every process gets its turn</li>
+    <li>No starvation (waiting forever)</li>
+    <li>Fair access to resources</li>
+</ul>
+
+<h3 id="sub-1-6">1.6 Solution to Process Synchronization Problems:</h3>
+<p>Types of Solutions to Critical Section Problem</p>
+<p>Software Based Hardware Based OS Based</p>
+<ul>
+    <li>Lock Variable</li>
+    <li>Strict Alternation</li>
+    <li>The Interest Variable</li>
+    <li>Dekker's Algorithm</li>
+    <li>Peterson's Algorithm</li>
+    <li>Test and Set</li>
+    <li>Swap & Compare</li>
+    <li>Mutex</li>
+    <li>Semaphores</li>
+    <li>Monitors</li>
+</ul>
+
+                    
+                    <div class="topic-nav">
+                        <a href="lecture-10.html" class="btn" style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;">Previous Lecture</a>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 2 -->
+            <section id="topic-2" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>Strict Alternation (Turn Variable)</h2>
+                </div>
+                <div id="content-2" class="collapsible-content">
+                    <h3 id="sub-2-1">2.1 Why Study Software Solutions?</h3>
+<p>Historical Context:</p>
+<p>Needed</p>
+
+<h3 id="sub-2-2">2.2 The Simple Boolean Lock Variable Solution:</h3>
+<p>Analogy: Shared Restroom</p>
+<div class="box box-green"><div class="box-title">Analogy</div><p>Analogy: Shared Restroom</p></div>
+
+<h3 id="sub-2-3">2.3 The Simple Boolean Lock Variable Solution:</h3>
+<p>LOCK = 0: CS FREE LOCK = 1: CS BUSYFor all processes For all processes</p>
+
+<h3 id="sub-2-4">2.4 The Simple Boolean Lock Variable Solution:</h3>
+<p>The most intuitive software attempt uses a single shared boolean lock.</p>
+<p>The Logic:</p>
+<p>Wait</p>
+<ul>
+    <li>If lock == 0, set it to 1 and enter. Set it to 0 on exit .</li>
+    <li>else: wait until  lock == 0</li>
+</ul>
+
+<h3 id="sub-2-5">2.5 Why Simple Lock FAILS - Mutual exclusion VIOLATED:</h3>
+<p>Time Process P0 Process P1 Lock</p>
+<p>Initially Lock = 0 (Free)</p>
+<p>P0 enters Critical Section P1 enters Critical Section</p>
+<p>Both processes in CS! Mutual exclusion VIOLATED</p>
+<p>t2 lock = 1 1</p>
+<p>t3 lock = 1 1</p>
+<p>t4 CRITICAL SECTION CRITICAL SECTION 1</p>
+<pre class="code-block"><code>t0 while(lock!=0) 0
+t1 while(lock!=0) 0</code></pre>
+<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
+<h3 id="sub-2-6">2.6 Checking for Progress:</h3>
+<p>Time Process P0 Process P1 Lock</p>
+<p>t2 lock = 1 1</p>
+<p>t3 lock = 1 1</p>
+<p>t4 CRITICAL SECTION CRITICAL SECTION 1</p>
+<p>Initially Lock = 0 (Free)</p>
+<p>P0 enters Critical Section P1 enters Critical Section</p>
+<p>Both processes in CS! Mutual exclusion VIOLATED</p>
+<p>Technically, Progress assumes</p>
+<p>Mutual Exclusion is already</p>
+<p>satisfied. If multiple processes</p>
+<p>can enter together, the</p>
+<p>"progress" concept becomes</p>
+<p>meaningless because the</p>
+<p>critical section isn't being</p>
+<p>protected at all.</p>
+<p>No Mutual Exclusion               No Progress</p>
+<p>P0 interested</p>
+<p>P1 interested</p>
+<pre class="code-block"><code>t0 while(lock!=0) 0
+t1 while(lock!=0) 0</code></pre>
+<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 3 -->
+            <section id="topic-3" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>Interest Variable Deadlocks</h2>
+                </div>
+                <div id="content-3" class="collapsible-content">
+                    <h3 id="sub-3-1">3.1 Checking for Bounded Waiting:</h3>
+<p>No process should wait indefinitely or unboundedly long while others keep entering.</p>
+
+<h3 id="sub-3-2">3.2 Time Process P0 Process P1 Lock</h3>
+<p>t2 lock=1[P0 wins race!] lock = 1 (too late!)</p>
+<p>← P1 WAITING</p>
+<p>1</p>
+<p>t3 // CRITICAL SECTION ← P1 WAITING 1</p>
+<div class="formula-box">t6  lock = 1 ✓ [P0 RE-ENTERS!] [P1 still checking...]</div>
+<p>lock = 1 (too late!)</p>
+<p>← P1 WAITING</p>
+<p>1</p>
+<p>t7 // CRITICAL SECTION ← P1 WAITING 1</p>
+<p>Why This Violates</p>
+<p>Bounded Waiting:</p>
+<p>P1's Perspective:</p>
+<p>(3 times so far)</p>
+<p>can keep re-entering</p>
+<p>P0 interested</p>
+<p>P1 interested</p>
+<ul>
+    <li>Requested CS at t0</li>
+    <li>P0 entered CS at times: t3, t7, t11</li>
+    <li>P1 still hasn't entered once!</li>
+    <li>No bound on how many times P0</li>
+    <li>●</li>
+    <li>●</li>
+</ul>
+<pre class="code-block"><code>t0 while(lock!=0) [about to set lock...] 0
+t1 while(lock!=0) 0
+while(lock!=0) [TRUE]
+t4 lock = 0[P0 exits] while(lock!=0) [TRUE] 0
+t5 while(lock!=0) while(lock!=0) 0
+while(lock!=0) [TRUE]
+t8 lock = 0[P0 exits] while(lock!=0) [TRUE] 0</code></pre>
+
+<h3 id="sub-3-3">3.3 Evaluation of The Simple Boolean Lock Variable Solution:</h3>
+<p>Requirement Status Actual Reason</p>
+<p>Mutual Exclusion ✗ PRIMARY</p>
+<p>FAILURE</p>
+<p>Race condition allows both processes in CS</p>
+<p>simultaneously</p>
+<p>Progress ✗ Fails (but</p>
+<p>secondary)</p>
+<p>Meaningless when mutual exclusion fails; no</p>
+<p>proper selection mechanism</p>
+<p>Bounded Waiting ✗ FAILS One process can monopolize (enter repeatedly</p>
+<p>before other gets a chance)</p>
+
+<h3 id="sub-3-4">3.4 . Strict Alternation (Turn Variable) Solution:</h3>
+<p>Using a turn variable to force processes to take turns.</p>
+<p>turn = i means "Process i wants to enter the CS".</p>
+<p>The Logic:</p>
+<ul>
+    <li>P0 only enters if turn == 0; P1 only if turn == 1.</li>
+    <li>Success: Guarantees Mutual Exclusion.</li>
+    <li>Failure: Violates Progress</li>
+</ul>
+<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
+<h3 id="sub-3-5">3.5 . Strict Alternation (Turn Variable) Solution:</h3>
+<p>Mutual Exclusion ✅</p>
+<p>can enter the critical section at a time.</p>
+<p>The Logic:</p>
+<p>If turn = 0, only P0 can enter</p>
+<p>The Logic:</p>
+<p>If turn = 1, only P1 can enter</p>
+<ul>
+    <li>Only one process</li>
+</ul>
+
+<h3 id="sub-3-6">3.6 Checking for Progress:</h3>
+<p>The Analogy Connection: Imagine two neighbors sharing one lawnmower. Neighbor A uses it, then must give it to</p>
+<p>Neighbor B. If Neighbor B goes on vacation and doesn't want to mow, Neighbor A can never use the mower again,</p>
+<p>even though it's sitting idle in the garage</p>
+
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 4 -->
+            <section id="topic-4" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>Dekker's Algorithm (First Complete)</h2>
+                </div>
+                <div id="content-4" class="collapsible-content">
+                    <h3 id="sub-4-1">4.1 Checking for Progress:</h3>
+<p>turn = 0, P0 enters CS, exits, sets turn = 1</p>
+<p>P0 wants to enter CS again immediately</p>
+<p>P1 is in remainder section (not interested in CS)</p>
+<p>CS is FREE but P0 cannot enter!</p>
+<p>P0 must wait for P1 to take its turn first</p>
+<p>This violates the Progress!</p>
+<p>Problem: Process in remainder section (not wanting CS) prevents others from</p>
+<p>entering. Violates progress requirement.</p>
+<p>P0 interested</p>
+<p>P1 is NOT interested</p>
+<p>Initially turn = 0</p>
+<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
+<h3 id="sub-4-2">4.2 Checking for Bounded Waiting:</h3>
+<p>P0 waiting forever</p>
+<p>Note:</p>
+<p>Bound = 1? Only if P1 cooperates! If P1</p>
+<p>delays or never comes, no bound exists.</p>
+<p>YES!</p>
+<p>✗ It CAN violate Bounded Waiting</p>
+<div class="box box-blue"><div class="box-title">Important Note</div><p>Make sure to enforce ordering and handle edge conditions to ensure correctness and stability.</p></div>
+
+<h3 id="sub-4-3">4.3 Evaluation of Strict Alternation (Turn Variable) Solution:</h3>
+<p>Requirement Status Actual Reason</p>
+<p>Mutual Exclusion ✓ YES Turn can only be 0 or 1 at any time, allowing only one process</p>
+<p>Progress ✗ FAILS Uninterested process in remainder section can block</p>
+<p>interested process. If turn=1 and P1 is not interested, P0</p>
+<p>cannot enter even though CS is free.</p>
+<p>Bounded Waiting ✗ FAILS Process must wait for other's turn even if other is not</p>
+<p>interested. No bound on waiting time if other process delays or</p>
+<p>never requests CS.</p>
+<pre class="code-block"><code>to pass while(turn!=i) and enter CS.</code></pre>
+
+<h3 id="sub-4-4">4.4 . The Interest Variable (Individual Interest Flags):</h3>
+
+<h3 id="sub-4-5">4.5 . The Interest Variable (Individual Interest Flags):</h3>
+<p>Flag[0] = True: P0 Wants to enter</p>
+<p>while (flag[1]);</p>
+<p>Flag[1] = True: P1 Wants to enter</p>
+<p>while (flag[0]);</p>
+<p>flag[i] = true means "Process i is ready to enter the CS".</p>
+<p>The Logic:</p>
+<p>process's flag is true .</p>
+<p>Flag[0] = True;</p>
+<p>(Local)</p>
+<p>Flag[1] = True;</p>
+<p>(Local)</p>
+<ul>
+    <li>Set my flag to true, then wait while the other</li>
+    <li>The Failure: Deadlock (Progress Violation).</li>
+</ul>
+<pre class="code-block"><code>Instead of a "turn," let each process have its own "interest" flag.</code></pre>
+<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
+<h3 id="sub-4-6">4.6 . The Interest Variable (Individual Interest Flags):</h3>
+<div class="formula-box">Flag[0] = True; // I'm interested</div>
+<div class="formula-box">while (Flag[1] == True); // Wait while P1 interested</div>
+<p>CRITICAL SECTION</p>
+<p>Flag[0] = False;</p>
+<p>Process P0</p>
+<div class="formula-box">Flag[1] = True;              // I'm interested</div>
+<div class="formula-box">while (Flag[0] == True); // Wait while P0 interested</div>
+<p>CRITICAL SECTION</p>
+<p>Flag[1] = False;</p>
+<p>Process P1</p>
+
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 5 -->
+            <section id="topic-5" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>Peterson's Algorithm (Simplified Elegance)</h2>
+                </div>
+                <div id="content-5" class="collapsible-content">
+                    <h3 id="sub-5-1">5.1 The ACTUAL Mutual Exclusion /Progress /Bounded Waiting Violation:</h3>
+<p>This is DEADLOCK:</p>
+<p>Deadlock Scenario (Mutual Exclusion Failure by Deadlock):</p>
+<p>No Mutual Exclusion</p>
+<p>No Progress</p>
+<p>Both processes in CS!</p>
+<p>Progress VIOLATED</p>
+<p>Due to Deadlock</p>
+<p>Bounded Waiting VIOLATED</p>
+<p>Here: Neither process can</p>
+<p>enter CS at all - infinite wait</p>
+<p>time means no bound exists.</p>
+<ul>
+    <li>Neither process enters CS</li>
+    <li>Both wait forever</li>
+    <li>CS remains empty forever</li>
+    <li>This violates the purpose of mutual exclusion (ensuring CS is used)</li>
+</ul>
+<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
+<h3 id="sub-5-2">5.2 Evaluation of The Interest Variable (Individual Interest Flags):</h3>
+<p>Requirement Status Actual Reason</p>
+<p>Mutual Exclusion ✗ FAILS</p>
+<p>Deadlock scenario: Both set flags True, both check and wait</p>
+<p>forever. No one enters CS, but also violates the spirit of mutual</p>
+<p>exclusion as the mechanism fails.</p>
+<p>Progress ✗ FAILS Both interested processes can deadlock. CS is free but neither</p>
+<p>can enter - selection postponed indefinitely.</p>
+<p>Bounded Waiting ✗ FAILS Deadlock causes infinite waiting time - no bound exists.</p>
+<p>Processes wait forever without entering CS.</p>
+<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
+<h3 id="sub-5-3">5.3 . Dekker's Algorithm: The First Complete Solution:</h3>
+<p>The Logic:</p>
+<p>ready to enter the Critical Section (CS).</p>
+<p>to true, check whose turn it is.</p>
+<p>set its own flag to false (withdrawing interest) until the</p>
+<p>turn changes back to them.</p>
+<p>flag or it becomes Process i's turn, Process i re-sets its</p>
+<p>flag and enters the CS.</p>
+<p>Instead of just a "flag" or just a "turn," Dekker’s Algorithm combines both to overcome the deadlock seen in</p>
+<p>the Interest Variable approach. flag[i] = true means "Process  is ready to enter the CS".</p>
+<ul>
+    <li>Set Interest: Process i sets flag[i] = true to indicate it</li>
+    <li>Check Conflict: If the other process also has its flag set</li>
+    <li>Yielding: If it is the other process's turn, Process i will</li>
+    <li>Mutual Exclusion: Once the other process lowers its</li>
+</ul>
+
+<h3 id="sub-5-4">5.4 The Comparison:</h3>
+<p>Interest Variable approach because the turn variable acts as a tie-breaker.</p>
+<p>Alternation" trap, meaning a process doesn't have to wait if the other is not</p>
+<p>interested.</p>
+<ul>
+    <li>Why it succeeds: It overcomes the Deadlock (Progress Violation) of the</li>
+    <li>The Improvement: It ensures Mutual Exclusion without the "Strict</li>
+</ul>
+<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
+<h3 id="sub-5-5">5.5 Evaluation of Dekker's Algorithm:</h3>
+<p>Requirement Status Actual Reason</p>
+<p>Mutual Exclusion ✓ PASS</p>
+<p>The combined check of flag and turn ensures only one process</p>
+<p>enters the Critical Section (CS) at a time.</p>
+<p>Progress ✓ PASS By having a process "withdraw" its interest (setting flag = false)</p>
+<p>when it is not its turn, it prevents the deadlock failure seen in</p>
+<p>the Interest Variable solution.</p>
+<p>Bounded Waiting ✓ PASS The turn variable acts as a tie-breaker, ensuring that if both</p>
+<p>processes are interested, they will eventually take turns, and</p>
+<p>no process is postponed indefinitely.</p>
+
+<h3 id="sub-5-6">5.6 . Peterson's Algorithm - The First Correct Solution:</h3>
+<p>Also called - Simplified Elegance Solution / Humble Solution</p>
+<p>2. Strict Alternation (Turn Variable) Solution + 3. The Interest Variable (Individual Interest Flags)</p>
+<p>Ideology - Combining both:</p>
+<p>Turn:Shared Variable</p>
+<p>Indicates whose turn it is to enter</p>
+<p>its critical section</p>
+<p>Used to indicate if a process is</p>
+<p>ready to enter its critical section</p>
+<p>Flag[0], Flag[1]:Local Variable</p>
+
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 6 -->
+            <section id="topic-6" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-6')">
+                    <div class="topic-number">6</div>
+                    <h2>Software Limitations</h2>
+                </div>
+                <div id="content-6" class="collapsible-content">
+                    <h3 id="sub-6-1">6.1 . Peterson's Algorithm - The First Correct Solution:</h3>
+<p>// Indicate that Process P0 wants to enter the critical section</p>
+<p>Flag[0] = True;</p>
+<p>//Give priority to process P1 in case both want to enter</p>
+<p>Turn = j</p>
+<p>//Busy wait while P1 is interested/ready and it is P1’s turn</p>
+<p>while (Flag[1] == True && Turn == j);</p>
+<p>CRITICAL SECTION</p>
+<p>// Indicate that Process P0 has exited the critical section</p>
+<p>Flag[0] = False;</p>
+<p>Process P0</p>
+<p>// Indicate that Process P1 wants to enter the critical section</p>
+<p>Flag[1] = True;</p>
+<p>//Give priority to process P0 in case both want to enter</p>
+<p>Turn = i</p>
+<p>//Busy wait while P0 is interested/ready and it is P0’s turn</p>
+<p>while (Flag[0] == True && Turn == i);</p>
+<p>CRITICAL SECTION</p>
+<p>// Indicate that Process P1 has exited the critical section</p>
+<p>Flag[1] = False;</p>
+<p>Process P1</p>
+
+<h3 id="sub-6-2">6.2 Checking for Mutual exclusion:</h3>
+<p>The `Turn` variable acts as a **tiebreaker**!</p>
+<p>Mutual exclusion ✓ SATISFIES</p>
+
+<h3 id="sub-6-3">6.3 Checking for Progress:</h3>
+<p>Progress ✓ SATISFIES</p>
+<p>Note:</p>
+<ul>
+    <li>Uninterested processes don't block:** If Flag[j]=False, process i enters immediately</li>
+    <li>When both interested:** Turn variable ensures one enters (no deadlock)</li>
+</ul>
+<div class="box box-blue"><div class="box-title">Important Note</div><p>Make sure to enforce ordering and handle edge conditions to ensure correctness and stability.</p></div>
+
+<h3 id="sub-6-4">6.4 Checking for Bounded Waiting:</h3>
+<p>Bounded waiting ✓ SATISFIES .</p>
+
+<h3 id="sub-6-5">6.5 Limitations of Software Solutions:</h3>
+<ul>
+    <li>Problem 1: Busy Waiting</li>
+    <li>Problem 2: Modern Hardware Complications</li>
+    <li>Problem 3: Cache Coherence & Store Buffer Problems</li>
+    <li>Problem 4: Scalability</li>
+</ul>
+
+<h3 id="sub-6-6">6.6 Thank You!</h3>
+
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <a href="lecture-12.html" class="btn" style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;">Next Lecture</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for your reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/11.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>

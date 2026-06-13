@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Lecture 18 - Deadlocks III: Detection, Recovery, and</title>
+    <meta content="Study notes covering Deadlocks III: Detection, Recovery, and." name="description"/>
+    <link class="favicon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>18</text></svg>" rel="icon"/>
+    <link href="../css/style.css" rel="stylesheet"/>
+</head>
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Operating Systems Foundations</h1>
+            <p>Lecture 18 - Deadlocks III: Detection, Recovery, and</p>
+            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/18.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text"/>
+        </div>
+    </header>
+    <div class="container" style="margin-top: 2rem;">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 5</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li>
+                    <a href="#topic-1">1. Deadlock Detection Algorithm<span class="sub-count">6</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-1-1">1.1 THE STORY SO FAR</a></li>
+                         <li><a href="#sub-1-2">1.2 THE LIMITATION OF AVOIDANCE</a></li>
+                         <li><a href="#sub-1-3">1.3 The Frozen Mac Scenario</a></li>
+                         <li><a href="#sub-1-4">1.4 DETECTION PHILOSOPHY</a></li>
+                         <li><a href="#sub-1-5">1.5 DETECTION ALGORITHM OVERVIEW</a></li>
+                         <li><a href="#sub-1-6">1.6 DATA STRUCTURES</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Wait-For Graphs (WFG)<span class="sub-count">6</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-2-1">2.1 THE PROCESS</a></li>
+                         <li><a href="#sub-2-2">2.2 DETECTION EXAMPLE</a></li>
+                         <li><a href="#sub-2-3">2.3 Detection Understanding Check</a></li>
+                         <li><a href="#sub-2-4">2.4 WAIT-FOR GRAPHS (WFG)</a></li>
+                         <li><a href="#sub-2-5">2.5 WFG EXAMPLE</a></li>
+                         <li><a href="#sub-2-6">2.6 Find the Deadlock!</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Deadlock Recovery & Terminations<span class="sub-count">6</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-3-1">3.1 You Found the Deadlock. Now What?</a></li>
+                         <li><a href="#sub-3-2">3.2 PROCESS TERMINATION</a></li>
+                         <li><a href="#sub-3-3">3.3 VICTIM SELECTION EXAMPLE</a></li>
+                         <li><a href="#sub-3-4">3.4 </a></li>
+                         <li><a href="#sub-3-5">3.5 RESOURCE PREEMPTION</a></li>
+                         <li><a href="#sub-3-6">3.6 The Rollback Mechanism</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Resource Preemption & Checkpoint Rollbacks<span class="sub-count">6</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-4-1">4.1 RECOVERY SIMULATION</a></li>
+                         <li><a href="#sub-4-2">4.2 Recovery Understanding Check</a></li>
+                         <li><a href="#sub-4-3">4.3 DETECTION FREQUENCY</a></li>
+                         <li><a href="#sub-4-4">4.4 DETECTION OVERHEAD CALCULATION</a></li>
+                         <li><a href="#sub-4-5">4.5 Detection Frequency Check</a></li>
+                         <li><a href="#sub-4-6">4.6 THE OSTRICH ALGORITHM</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. The Ostrich Algorithm<span class="sub-count">6</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-5-1">5.1 OSTRICH JUSTIFICATION</a></li>
+                         <li><a href="#sub-5-2">5.2 WHEN OSTRICH FAILS</a></li>
+                         <li><a href="#sub-5-3">5.3 All Deadlock Strategies</a></li>
+                         <li><a href="#sub-5-4">5.4 Key Takeaways</a></li>
+                         <li><a href="#sub-5-5">5.5 Practical Guidelines</a></li>
+                         <li><a href="#sub-5-6">5.6 Thank You!</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Topic 1 -->
+            <section id="topic-1" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>Deadlock Detection Algorithm</h2>
+                </div>
+                <div id="content-1" class="collapsible-content">
+                    <h3 id="sub-1-1">1.1 THE STORY SO FAR</h3>
+<p>01</p>
+<p>The Question: What if we can't</p>
+<p>prevent or avoid deadlocks?</p>
+
+<h3 id="sub-1-2">1.2 THE LIMITATION OF AVOIDANCE</h3>
+<p>02</p>
+<p>Banker's Algorithm Requires:</p>
+<p>Reality Check - Modern Systems:</p>
+<p>❌</p>
+<p>Web servers don't know future memory needs</p>
+<p>❌</p>
+<p>Text editors don't know how many files you'll open</p>
+<p>❌</p>
+<p>Compilers don't know how big your code will get</p>
+<p>❌</p>
+<p>Dynamic process creation/termination</p>
+<p>❌</p>
+<p>Unpredictable user behavior</p>
+<p>The Problem: We can't predict the future!</p>
+<p>Solution: Detection - work with what we HAVE, not what we MIGHT need</p>
+<ul>
+    <li>Processes declare MAXIMUM resource needs in advance</li>
+    <li>Static set of processes</li>
+    <li>Known resource types</li>
+</ul>
+<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
+<h3 id="sub-1-3">1.3 The Frozen Mac Scenario</h3>
+<p>03</p>
+<p>Your Mac has frozen with the spinning beach ball.</p>
+<p>You've waited 5 minutes. Nothing happens.</p>
+<p>What do you do?</p>
+<p>A) Wait longer, hoping it resolves itself</p>
+<p>B) Force quit the application</p>
+<p>C) Restart your Mac entirely</p>
+<p>D) Throw it out the window</p>
+<p>This connects to TODAY's topic: Detection and Recovery!</p>
+
+<h3 id="sub-1-4">1.4 DETECTION PHILOSOPHY</h3>
+<p>04</p>
+<p>Prevention/Avoidance:</p>
+<p>Detection & Recovery:</p>
+<p>The Trade-off:</p>
+<p>✅</p>
+<p>Better resource usage (fewer restrictions)</p>
+<p>✅</p>
+<p>Don't need to predict future</p>
+<p>❌</p>
+<p>Recovery overhead when deadlock occurs</p>
+<p>❌</p>
+<p>Potential data loss during recovery</p>
+<ul>
+    <li>Be overly cautious</li>
+    <li>Restrict behavior to avoid problems</li>
+    <li>Low resource utilization</li>
+    <li>Allow risky behavior</li>
+    <li>Monitor for problems</li>
+    <li>High resource utilization</li>
+    <li>"Let bad things happen, then fix them"</li>
+</ul>
+<pre class="code-block"><code>• "Never let bad things happen"</code></pre>
+
+<h3 id="sub-1-5">1.5 DETECTION ALGORITHM OVERVIEW</h3>
+<p>05</p>
+<p>The Detection Approach:</p>
+<p>1. Let processes run freely (no restrictions)</p>
+<p>2. Periodically check: "Is there a deadlock RIGHT</p>
+<p>NOW?"</p>
+<p>3. If deadlock found: Execute recovery strategy</p>
+<p>4. If no deadlock: Continue normal operation</p>
+<p>Key Insight: We examine CURRENT state, not</p>
+<p>future possibilities</p>
+<p>Detection Algorithm Checks:</p>
+<p>If NO valid execution order exists → DEADLOCK!</p>
+<ul>
+    <li>Who holds which resources? (Allocation)</li>
+    <li>Who is requesting which resources? (Request)</li>
+    <li>What's currently available? (Available)</li>
+    <li>Can we find an execution order where everyone finishes?</li>
+</ul>
+
+<h3 id="sub-1-6">1.6 DATA STRUCTURES</h3>
+<p>06</p>
+<p>Data Structures (Similar to Banker's, but Current State!):</p>
+<p>Available[m]: Resources currently available</p>
+<p>Allocation[n][m]: Resources currently held by each process</p>
+<p>Request[n][m]: Current outstanding resource requests</p>
+<p>Key Difference from Banker's:</p>
+<p>Banker's uses Max needs → Detection uses Current requests</p>
+<ul>
+    <li>m = number of resource types</li>
+    <li>Example: Available = [2, 1, 0] means 2 of R1, 1 of R2, 0 of R3</li>
+    <li>n = number of processes</li>
+    <li>Allocation[n][m] = resources of type m held by process n</li>
+    <li>NOT maximum needs (that's Banker's!)</li>
+    <li>What each process is asking for RIGHT NOW</li>
+</ul>
+
+                    
+                    <div class="topic-nav">
+                        <a href="lecture-17.html" class="btn" style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;">Previous Lecture</a>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 2 -->
+            <section id="topic-2" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>Wait-For Graphs (WFG)</h2>
+                </div>
+                <div id="content-2" class="collapsible-content">
+                    <h3 id="sub-2-1">2.1 THE PROCESS</h3>
+<p>07</p>
+<p>Intuition: Try to find an order where</p>
+<p>processes can finish.</p>
+<p>If we can't finish everyone, remainder is</p>
+<p>deadlocked.</p>
+
+<h3 id="sub-2-2">2.2 DETECTION EXAMPLE</h3>
+<p>08</p>
+<p>Example System:</p>
+<p>Available = [0, 0, 0]</p>
+<p>Question: Is there a deadlock?</p>
+<p>Let's trace through the algorithm...</p>
+<p>Trace: Work = [0,0,0], all Finish = false</p>
+<p>YES. Work = [3,1,3], Finish[2] = true</p>
+<p>Request [0,0,0] ≤ [0,1,0]?</p>
+<p>Request [1,0,0] ≤ [3,1,3]?</p>
+<p>YES. Work = [0,1,0], Finish[0] = true</p>
+<p>YES. Work = [5,2,4], Finish[3] = true</p>
+<p>Request [0,0,0] ≤ [0,0,0]?</p>
+<p>Request [2,0,2] ≤ [5,2,4]?</p>
+<p>YES. Work = [7,2,4], Finish[1] = true</p>
+<p>Request [2,0,2] ≤ [5,2,4]?</p>
+<p>YES. Work = [7,2,4], Finish[1] = true</p>
+<p>Result: All Finish = true</p>
+<p>→ NO DEADLOCK! ✅</p>
+
+<h3 id="sub-2-3">2.3 Detection Understanding Check</h3>
+<p>09</p>
+<p>What if P1's request was [2, 2, 2] instead of [2, 0, 2]?</p>
+<p>Original: P1 requests [2, 0, 2]</p>
+<p>Modified: P1 requests [2, 2, 2]</p>
+<p>Would there be a deadlock?</p>
+<p>A) No, same result</p>
+<p>B) Yes, P1 would be deadlocked</p>
+<p>C) Yes, all processes would be deadlocked</p>
+<p>D) Cannot determine</p>
+<p>ANSWER: A) No, same result</p>
+<p>In Banker’s Algorithm, if P1 requests [2,2,2] and granting it makes the</p>
+<p>system unsafe, the request is simply denied and P1 waits. Since unsafe</p>
+<p>allocation is never allowed, no deadlock occurs.</p>
+
+<h3 id="sub-2-4">2.4 WAIT-FOR GRAPHS (WFG)</h3>
+<p>10</p>
+<p>Problem: Full detection algorithm is complex for simple cases</p>
+<p>Simplification: Wait-For Graph (WFG)</p>
+<p>When to Use:</p>
+<p>✓ Each resource type has only ONE instance</p>
+<p>✓ Common in many systems (mutex locks, files)</p>
+<p>WFG Structure:</p>
+<p>Deadlock Detection:</p>
+<p>Deadlock exists ⟺ Cycle exists in WFG</p>
+<p>Converting RAG to WFG:</p>
+<p>If RAG has: Pi → Rj → Pk</p>
+<p>Then WFG has: Pi → Pk (remove resource node)</p>
+<ul>
+    <li>Nodes: Processes ONLY (no resource nodes!)</li>
+    <li>Edge Pi → Pj: "Pi is waiting for a resource held by Pj"</li>
+</ul>
+<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
+<h3 id="sub-2-5">2.5 WFG EXAMPLE</h3>
+<p>11</p>
+<p>Result: P1 → P2 → P3 → P1 CYCLE DETECTED! ⚠</p>
+<p>DEADLOCK!</p>
+<p>The cycle: All three processes waiting in a circle</p>
+
+<h3 id="sub-2-6">2.6 Find the Deadlock!</h3>
+<p>12</p>
+<p>Given this Wait-For Graph:</p>
+<p>P1 → P2</p>
+<p>P2 → P3</p>
+<p>P3 → P4</p>
+<p>P4 → P2</p>
+<p>P5 → P6</p>
+<p>Tasks:</p>
+<p>1. Identify all cycles in this graph</p>
+<p>2. Which processes are deadlocked?</p>
+<p>3. Which processes are NOT deadlocked?</p>
+<p>4. If you had to terminate ONE process to break the</p>
+<p>deadlock, which would you choose?</p>
+<p>Solution:</p>
+<p>1. Cycle Found: P2 → P3 → P4 → P2</p>
+<p>2. Deadlocked Processes: P2, P3, P4</p>
+<p>These three are stuck in a circular wait!</p>
+<p>3. NOT Deadlocked: P1, P5, P6</p>
+<p>4. Best Process to Terminate:</p>
+<p>ANY of P2, P3, or P4 breaks the cycle!</p>
+<p>Choose based on victim selection criteria (coming next!)</p>
+<ul>
+    <li>P1 is waiting for P2 (but not in the cycle)</li>
+    <li>P5 → P6 is a linear chain (no cycle)</li>
+    <li>Terminating P2: Breaks P2→P3, frees P1</li>
+    <li>Terminating P3: Breaks P3→P4</li>
+    <li>Terminating P4: Breaks P4→P2</li>
+</ul>
+<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 3 -->
+            <section id="topic-3" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>Deadlock Recovery & Terminations</h2>
+                </div>
+                <div id="content-3" class="collapsible-content">
+                    <h3 id="sub-3-1">3.1 You Found the Deadlock. Now What?</h3>
+<p>13</p>
+<p>Once Deadlock is Detected, We Must Break It!</p>
+<p>Two Main Strategies:</p>
+<p>Strategy 1: Process Termination</p>
+<p>Strategy 2: Resource Preemption</p>
+<p>The Victim Selection Problem:</p>
+<p>Which process should suffer?</p>
+<p>This is a policy decision, not a technical one!</p>
+<p>Let's explore both strategies...</p>
+<ul>
+    <li>Kill one or more processes</li>
+    <li>Breaks the circular wait</li>
+    <li>Simple but wasteful (loses work)</li>
+    <li>Forcibly take resources from processes</li>
+    <li>Give them to others</li>
+    <li>Requires checkpointing/rollback</li>
+</ul>
+<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
+<h3 id="sub-3-2">3.2 PROCESS TERMINATION</h3>
+<p>14</p>
+<p>Process Termination Options:</p>
+<p>Option A: Abort ALL Deadlocked Processes</p>
+<p>✅</p>
+<p>Simple - guarantees deadlock resolution</p>
+<p>✅</p>
+<p>No need to select victims</p>
+<p>❌</p>
+<p>Extremely expensive (loses ALL progress)</p>
+<p>❌</p>
+<p>Drastic - like burning down house to kill spider</p>
+<p>Option B: Abort ONE Process at a Time</p>
+<p>✅</p>
+<p>Minimizes loss (kill only what's needed)</p>
+<p>✅</p>
+<p>May only need to kill one</p>
+<p>❌</p>
+<p>Expensive - must re-run detection after each kill</p>
+<p>❌</p>
+<p>Iterative process</p>
+<p>Victim Selection Criteria (Who dies?):</p>
+<p>1. Priority - Kill lower-priority first</p>
+<p>2. Compute time - How much work invested?</p>
+<p>3. Resources held - How many resources freed?</p>
+<p>4. Resources still needed - Close to completion?</p>
+<p>5. Type - Interactive vs batch (batch easier to restart)</p>
+<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
+<h3 id="sub-3-3">3.3 VICTIM SELECTION EXAMPLE</h3>
+<p>15</p>
+<p>Selection Criteria:</p>
+<p>By Priority: Kill P4 (priority = 3, lowest)</p>
+<p>By Compute Time: Kill P2 (only 5 min</p>
+<p>invested)</p>
+<p>By Resources: Kill P4 (frees 6 resources)</p>
+<p>By Completion: Kill P2 (only 10% done, least</p>
+<p>wasted)</p>
+<p>The Dilemma:</p>
+<p>P4 has lowest priority BUT 60 minutes</p>
+<p>invested and 95% done!</p>
+<p>P2 has only 5 minutes invested BUT higher</p>
+<p>priority!</p>
+<p>There's no perfect answer - it's a trade-off!</p>
+
+<h3 id="sub-3-4">3.4 </h3>
+<p>macOS FORCE QUIT</p>
+<p>When your Mac freezes:</p>
+<p>⌘ + ⌥ + Esc → Force Quit Applications</p>
+<p>What's happening?</p>
+<p>1. Detection: You (the user) detected something is wrong</p>
+<p>2. Selection: You choose which app to terminate</p>
+<p>3. Recovery: OS terminates the process</p>
+<p>4. Cleanup: OS reclaims resources</p>
+<p>This is Manual Recovery!</p>
+<p>Modern macOS:</p>
+<ul>
+    <li>User acts as the detection algorithm</li>
+    <li>User applies victim selection criteria</li>
+    <li>OS provides the termination mechanism</li>
+    <li>Watchdog timers for hung processes</li>
+    <li>Automatic responder termination</li>
+    <li>User choice for application termination</li>
+</ul>
+
+<h3 id="sub-3-5">3.5 RESOURCE PREEMPTION</h3>
+<p>17</p>
+<p>Resource Preemption Approach:</p>
+<p>Instead of killing process, take its resources!</p>
+<p>Steps:</p>
+<p>1. Select a Victim - Which process to preempt?</p>
+<p>2. Rollback - Return process to safe earlier state</p>
+<p>3. Reassign - Give resources to waiting process</p>
+<p>4. Resume - Let victim try again later</p>
+<p>Rollback Options:</p>
+<p>Total Rollback:</p>
+<p>Partial Rollback:</p>
+<ul>
+    <li>Abort and restart from beginning</li>
+    <li>Simple but wasteful</li>
+    <li>Like rebooting your computer</li>
+    <li>Return to a saved checkpoint</li>
+    <li>Requires proactive checkpointing</li>
+    <li>Like restoring from a save point in a game</li>
+</ul>
+
+<h3 id="sub-3-6">3.6 The Rollback Mechanism</h3>
+<p>18</p>
+<p>Checkpointing = Saving Process State:</p>
+<p>What to Save:</p>
+<p>When to Checkpoint:</p>
+<p>Challenges:</p>
+<p>Overhead:</p>
+<p>✅</p>
+<p>Storage space (snapshots are large!)</p>
+<p>✅</p>
+<p>Time to save state (pause process)</p>
+<p>✅</p>
+<p>I/O to disk</p>
+<p>Preemption Limitations:</p>
+<p>✅</p>
+<p>Not all resources can be preempted!</p>
+<ul>
+    <li>Memory contents (heap, stack)</li>
+    <li>CPU registers (PC, SP, etc.)</li>
+    <li>Open files and positions</li>
+    <li>Resource allocations</li>
+    <li>Periodically (every N minutes)</li>
+    <li>Before critical operations</li>
+    <li>At transaction boundaries</li>
+    <li>Memory: ✓ Can swap to disk</li>
+    <li>CPU time: ✓ Can reschedule</li>
+    <li>Printer mid-job: ✗ Can't undo printed pages</li>
+    <li>Network connections: ✗ Can't roll back sent data</li>
+</ul>
+
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 4 -->
+            <section id="topic-4" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>Resource Preemption & Checkpoint Rollbacks</h2>
+                </div>
+                <div id="content-4" class="collapsible-content">
+                    <h3 id="sub-4-1">4.1 RECOVERY SIMULATION</h3>
+<p>19</p>
+<p>Deadlock detected among P1, P2, P3, P4:</p>
+<p>Questions:</p>
+<p>1. Using priority-based selection, which terminate?</p>
+<p>2. Using compute-time-based selection, which?</p>
+<p>3. If you need to free maximum resources quickly?</p>
+<p>4. What if P4 is an interactive user's application and P2</p>
+<p>is a batch job?</p>
+<p>5. What's your final recommendation and why?</p>
+<p>Analysis:</p>
+<div class="formula-box">1. Priority-Based: Kill P4 (priority = 3)</div>
+<p>⚠</p>
+<p>But P4 is 95% done with 60 min invested - HUGE waste!</p>
+<p>2. Compute-Time: Kill P2 (only 5 min invested)</p>
+<p>✓ Minimal wasted work</p>
+<p>⚠</p>
+<p>But P2 has higher priority (5 vs 3)</p>
+<p>3. Maximum Resources: Kill P4 (holds 6)</p>
+<p>✓ Frees most resources immediately</p>
+<p>⚠</p>
+<p>Same problem - 95% done, 60 min wasted</p>
+<p>4. Interactive vs Batch: Kill P2 (batch)</p>
+<p>✓ Batch jobs easier to restart</p>
+<p>✓ User experience preserved</p>
+<p>5. Best Choice: Probably P2</p>
+<p>Key Insight: NO PERFECT ANSWER!</p>
+<p>System designers must prioritize what matters: fairness, efficiency,</p>
+<p>user experience?</p>
+<ul>
+    <li>Least work wasted (5 min)</li>
+    <li>Batch job (easy to restart)</li>
+    <li>Only 10% complete</li>
+    <li>Trade-off: Slightly higher priority</li>
+</ul>
+<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
+<h3 id="sub-4-2">4.2 Recovery Understanding Check</h3>
+<p>20</p>
+<p>What does a cycle in a Wait-For Graph indicate?</p>
+<p>A) The system is in a safe state</p>
+<p>B) Deadlock is possible in the future</p>
+<p>C) Deadlock currently exists</p>
+<p>D) Resources are being wasted</p>
+<p>ANSWER: C) Deadlock currently exists</p>
+<p>A cycle in a WFG means processes are</p>
+<p>currently waiting in a circle - deadlock exists</p>
+<p>RIGHT NOW. This is different from</p>
+<p>avoidance (which checks for future</p>
+<p>possibilities) or RAGs with multiple instances</p>
+<p>(where cycles don't always mean deadlock).</p>
+<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
+<h3 id="sub-4-3">4.3 DETECTION FREQUENCY</h3>
+<p>21</p>
+<p>Detection is NOT Free!</p>
+<p>Costs:</p>
+<ul>
+    <li>CPU time to run algorithm: O(m × n²)</li>
+    <li>Memory for data structures</li>
+    <li>System disruption during check</li>
+</ul>
+
+<h3 id="sub-4-4">4.4 DETECTION OVERHEAD CALCULATION</h3>
+<p>22</p>
+<p>Example Calculation:</p>
+<p>Assumptions:</p>
+<p>Strategy A: Detect every 100 requests</p>
+<p>Strategy B: Detect every 1000 requests</p>
+<p>Strategy C: Detect every 60 seconds</p>
+<p>The Balance:</p>
+<p>More frequent = Shorter deadlock duration but higher overhead</p>
+<p>Less frequent = Lower overhead but longer deadlock duration</p>
+<ul>
+    <li>Detection algorithm takes 10ms</li>
+    <li>System handles 10,000 requests/second</li>
+    <li>Detections per second: 10,000 / 100 = 100</li>
+    <li>Overhead: 100 × 10ms = 1000ms = 1 second</li>
+    <li>10% CPU spent on detection! ❌</li>
+    <li>Detections per second: 10,000 / 1000 = 10</li>
+    <li>Overhead: 10 × 10ms = 100ms</li>
+    <li>1% CPU spent on detection ✓</li>
+    <li>Overhead: 10ms / 60 seconds ≈ 0.017% ✓✓</li>
+    <li>But deadlock could last up to 60 seconds! ❌</li>
+</ul>
+
+<h3 id="sub-4-5">4.5 Detection Frequency Check</h3>
+<p>23</p>
+<p>Why is detecting deadlock after every resource request impractical?</p>
+<p>A) It doesn't work correctly</p>
+<p>B) It causes deadlocks itself</p>
+<p>C) The overhead is too high for high-request systems</p>
+<p>D) It's impossible to implement</p>
+<p>ANSWER: C) The overhead is too high for high-request systems</p>
+<p>Running the detection algorithm (O(m×n²)) after every request would</p>
+<p>consume enormous CPU time when systems handle thousands of</p>
+<p>requests per second, making it impractical despite finding deadlocks</p>
+<p>immediately.</p>
+
+<h3 id="sub-4-6">4.6 THE OSTRICH ALGORITHM</h3>
+<p>24</p>
+<p>The Ostrich Algorithm:</p>
+<p>Strategy:</p>
+<p>1. Ignore deadlocks completely</p>
+<p>2. If system hangs → User reboots</p>
+<p>3. Pretend the problem doesn't exist</p>
+<p>Wait, WHAT?! Is this serious?</p>
+<p>YES! Many systems use this approach!</p>
+<p>When Is This Reasonable?</p>
+<p>✓ Deadlocks are extremely rare (once per year)</p>
+<p>✓ Cost of prevention/detection > cost of occasional reboot</p>
+<p>✓ Non-critical systems (personal computers)</p>
+<p>✓ Users know how to reboot</p>
+<p>Real-World Usage:</p>
+<p>Philosophy: "Stick your head in the sand"</p>
+<ul>
+    <li>UNIX/Linux: Historically for user-level deadlocks</li>
+    <li>Early Windows: Relied on user reboots</li>
+    <li>macOS: Hybrid - some detection, but users often force quit</li>
+</ul>
+<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 5 -->
+            <section id="topic-5" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>The Ostrich Algorithm</h2>
+                </div>
+                <div id="content-5" class="collapsible-content">
+                    <h3 id="sub-5-1">5.1 OSTRICH JUSTIFICATION</h3>
+<p>25</p>
+
+<h3 id="sub-5-2">5.2 WHEN OSTRICH FAILS</h3>
+<p>26</p>
+<p>Unacceptable for Ostrich:</p>
+<p>❌</p>
+<p>Safety-Critical Systems</p>
+<p>❌</p>
+<p>Mission-Critical Systems</p>
+<p>❌</p>
+<p>High-Value Work</p>
+<p>The Consequences:</p>
+<p>These systems MUST use prevention/avoidance/detection!</p>
+<ul>
+    <li>Medical devices (pacemakers, surgery robots)</li>
+    <li>Aircraft control systems</li>
+    <li>Nuclear power plants</li>
+    <li>Automotive systems (self-driving cars)</li>
+    <li>Financial trading systems (lost money!)</li>
+    <li>Air traffic control</li>
+    <li>Emergency services (911 dispatch)</li>
+    <li>Data centers (cloud services)</li>
+    <li>Video editing (hours of unsaved work)</li>
+    <li>Software development (lost code)</li>
+    <li>Scientific simulations (days of computation)</li>
+    <li>Data loss → Unacceptable</li>
+    <li>Safety risk → Catastrophic</li>
+    <li>Financial loss → Expensive</li>
+    <li>User trust → Damaged</li>
+</ul>
+
+<h3 id="sub-5-3">5.3 All Deadlock Strategies</h3>
+<p>27</p>
+<p>Real-World Hybrid Approaches:</p>
+<p>macOS Strategy:</p>
+<p>✓ Resource ordering for kernel locks</p>
+<p>(prevention)</p>
+<p>✓ Timeouts and watchdogs (pseudo-detection)</p>
+<p>✓ User force quit (manual recovery)</p>
+<p>✓ Grand Central Dispatch avoids many</p>
+<p>deadlocks (design)</p>
+<p>Database Systems:</p>
+<p>✓ Timeout-based detection</p>
+<p>✓ Transaction rollback (recovery via preemption)</p>
+<p>✓ Two-phase locking (prevention)</p>
+<p>Embedded/Real-Time:</p>
+<p>✓ Prevention (resource ordering, no</p>
+<p>hold-and-wait)</p>
+<p>✓ Cannot afford detection or recovery</p>
+<p>complexity</p>
+<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
+<h3 id="sub-5-4">5.4 Key Takeaways</h3>
+<p>28</p>
+<p>What We've Learned:</p>
+<p>1. Detection Finds Current Deadlocks</p>
+<p>→ Use RAG/WFG analysis and cycle detection</p>
+<p>→ Check: "Can all processes finish with current resources?"</p>
+<p>2. Recovery Requires Hard Choices</p>
+<p>→ Terminate processes (simple but wasteful)</p>
+<p>→ Preempt resources (needs checkpointing)</p>
+<p>→ Victim selection is policy, not algorithm</p>
+<p>3. Frequency Matters</p>
+<p>→ Trade-off: overhead vs deadlock duration</p>
+<p>→ Most systems use timeouts/heuristics</p>
+<p>4. Ostrich is Sometimes Right</p>
+<p>→ Ignoring rare problems saves resources</p>
+<p>→ Acceptable for non-critical consumer systems</p>
+<p>5. Real Systems Use Hybrid Approaches</p>
+<p>→ Mix prevention, detection, and ignorance</p>
+<p>→ Context determines strategy</p>
+<p>The Engineer's Question:</p>
+<p>"How often do deadlocks occur, and what's the</p>
+<p>cost if they do?"</p>
+<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
+<h3 id="sub-5-5">5.5 Practical Guidelines</h3>
+<p>29</p>
+<p>Special Cases:</p>
+<p>The Reality Check:</p>
+<p>Most modern systems use a MIX:</p>
+<ul>
+    <li>Known max needs + static processes → Avoidance (Banker's)</li>
+    <li>High-performance systems → Prevention (lowest overhead)</li>
+    <li>User-facing applications → Timeouts + manual recovery</li>
+    <li>Prevention for kernel resources</li>
+    <li>Detection/timeout for user resources</li>
+    <li>Ostrich for rare edge cases</li>
+</ul>
+
+<h3 id="sub-5-6">5.6 Thank You!</h3>
+<p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
+<p>30</p>
+
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <a href="lecture-19.html" class="btn" style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;">Next Lecture</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for your reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/18.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>

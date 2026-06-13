@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Lecture 21 - Memory Management III: TLB and I/O</title>
+    <meta content="Study notes covering Memory Management III: TLB and I/O." name="description"/>
+    <link class="favicon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>21</text></svg>" rel="icon"/>
+    <link href="../css/style.css" rel="stylesheet"/>
+</head>
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Operating Systems Foundations</h1>
+            <p>Lecture 21 - Memory Management III: TLB and I/O</p>
+            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/21.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text"/>
+        </div>
+    </header>
+    <div class="container" style="margin-top: 2rem;">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 6</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li>
+                    <a href="#topic-1">1. Address Translation Performance Issues<span class="sub-count">6</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-1-1">1.1 Join the lecture online on your dashboard</a></li>
+                         <li><a href="#sub-1-2">1.2 Today’s Agenda</a></li>
+                         <li><a href="#sub-1-3">1.3 Review - Why Paging?</a></li>
+                         <li><a href="#sub-1-4">1.4 Review - Address Translation in Paging</a></li>
+                         <li><a href="#sub-1-5">1.5 Review - Page Table Structure</a></li>
+                         <li><a href="#sub-1-6">1.6 The Performance Problem</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Translation Lookaside Buffer (TLB)<span class="sub-count">6</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-2-1">2.1 Translation Lookaside Buffer (TLB)</a></li>
+                         <li><a href="#sub-2-2">2.2 Translation Lookaside Buffer (TLB)</a></li>
+                         <li><a href="#sub-2-3">2.3 TLB Hit and Miss Scenarios</a></li>
+                         <li><a href="#sub-2-4">2.4 TLB Performance Metrics</a></li>
+                         <li><a href="#sub-2-5">2.5 TLB Performance Example</a></li>
+                         <li><a href="#sub-2-6">2.6 Practice Problems</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. TLB Hit & Miss Performance<span class="sub-count">6</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-3-1">3.1 Why TLB Works - Locality of Reference</a></li>
+                         <li><a href="#sub-3-2">3.2 TLB Management Issues</a></li>
+                         <li><a href="#sub-3-3">3.3 TLB Replacement Policies</a></li>
+                         <li><a href="#sub-3-4">3.4 Introduction to I/O Management</a></li>
+                         <li><a href="#sub-3-5">3.5 I/O Communication Methods</a></li>
+                         <li><a href="#sub-3-6">3.6 Polling (Programmed I/O)</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Context Switches & ASID<span class="sub-count">6</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-4-1">4.1 Polling - Advantages and Disadvantages</a></li>
+                         <li><a href="#sub-4-2">4.2 Interrupt-Driven I/O</a></li>
+                         <li><a href="#sub-4-3">4.3 Interrupt Processing Steps</a></li>
+                         <li><a href="#sub-4-4">4.4 Interrupt Vector Table</a></li>
+                         <li><a href="#sub-4-5">4.5 Interrupt Types and Priorities</a></li>
+                         <li><a href="#sub-4-6">4.6 Interrupt-Driven I/O - Advantages and Disadvantages</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. I/O Management (Polling vs. Interrupts)<span class="sub-count">6</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-5-1">5.1 Problem with Interrupt-Driven I/O</a></li>
+                         <li><a href="#sub-5-2">5.2 Direct Memory Access (DMA)</a></li>
+                         <li><a href="#sub-5-3">5.3 DMA Operation Steps</a></li>
+                         <li><a href="#sub-5-4">5.4 DMA Transfer Modes</a></li>
+                         <li><a href="#sub-5-5">5.5 DMA vs CPU Transfer - Performance</a></li>
+                         <li><a href="#sub-5-6">5.6 DMA Advantages and Disadvantages</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-6">6. Direct Memory Access (DMA) & Cache Coherency<span class="sub-count">6</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-6-1">6.1 Practice Problems</a></li>
+                         <li><a href="#sub-6-2">6.2 Cache Coherency Problem with DMA</a></li>
+                         <li><a href="#sub-6-3">6.3 Comparison Summary - Polling vs Interrupts vs DMA</a></li>
+                         <li><a href="#sub-6-4">6.4 Modern I/O Trends</a></li>
+                         <li><a href="#sub-6-5">6.5 Key Takeaways</a></li>
+                         <li><a href="#sub-6-6">6.6 Thank You!</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Topic 1 -->
+            <section id="topic-1" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>Address Translation Performance Issues</h2>
+                </div>
+                <div id="content-1" class="collapsible-content">
+                    <h3 id="sub-1-1">1.1 Join the lecture online on your dashboard</h3>
+<p>2</p>
+<p>0</p>
+
+<h3 id="sub-1-2">1.2 Today’s Agenda</h3>
+<p>01</p>
+<ul>
+    <li>Review of Paging and Translation</li>
+    <li>Translation Lookaside Buffer (TLB)</li>
+    <li>TLB Performance and Management</li>
+    <li>Introduction to I/O Management</li>
+    <li>Polling vs Interrupts</li>
+    <li>Direct Memory Access (DMA)</li>
+</ul>
+
+<h3 id="sub-1-3">1.3 Review - Why Paging?</h3>
+<p>02</p>
+<p>❌</p>
+<p>Problems with Contiguous Allocation</p>
+<p>✅</p>
+<p>Paging: The Solution</p>
+<p>🚀</p>
+<p>Why Paging Works</p>
+<p>🔑</p>
+<p>Key Advantage</p>
+<p>Logical and physical memory are separated</p>
+<p>enabling modern virtual memory systems.</p>
+<ul>
+    <li>External fragmentation wastes memory</li>
+    <li>Large processes need contiguous space</li>
+    <li>Compaction is costly and disruptive</li>
+    <li>Physical memory → fixed-size frames (e.g., 4KB)</li>
+    <li>Logical memory → fixed-size pages</li>
+    <li>Any page → any free frame</li>
+    <li>No external fragmentation</li>
+    <li>Simple, flexible allocation</li>
+    <li>Supports non-contiguous memory</li>
+    <li>Efficient memory utilization</li>
+</ul>
+
+<h3 id="sub-1-4">1.4 Review - Address Translation in Paging</h3>
+<p>03</p>
+<p>🧠</p>
+<p>Virtual → Physical Address</p>
+<p>Virtual Address Format:</p>
+<p>[ Page Number (p) | Offset (d) ]</p>
+<p>🔄</p>
+<p>Translation Steps</p>
+<p>1. CPU generates virtual address (p, d)</p>
+<p>2. p indexes the Page Table</p>
+<p>3. Page Table gives Frame number (f)</p>
+<p>4. Physical Address = (f, d)</p>
+<p>📊</p>
+<p>Example</p>
+<p>Virtual Address = 10876</p>
+<p>If Page 2 → Frame 5</p>
+<p>🔑</p>
+<p>Key Takeaway</p>
+<p>Paging translates addresses by table lookup + offset,</p>
+<p>enabling flexible, non-contiguous memory allocation.</p>
+<ul>
+    <li>Page size = 4KB (4096 bytes)</li>
+    <li>Offset bits = 12</li>
+    <li>Page = 10876 / 4096 = 2</li>
+    <li>Offset = 10876 % 4096 = 2684</li>
+    <li>Physical Address = (5 × 4096) + 2684 = 23164</li>
+</ul>
+
+<h3 id="sub-1-5">1.5 Review - Page Table Structure</h3>
+<p>04</p>
+<p>📄</p>
+<p>Page Table Entry (PTE)</p>
+<p>Each virtual page has one PTE describing its state.</p>
+<p>Typical Fields</p>
+<p>🧠</p>
+<p>Why These Fields Matter</p>
+<p>caching control</p>
+<p>📍</p>
+<p>Where the Page Table Lives</p>
+<p>Register).</p>
+<ul>
+    <li>Correctness: Valid + protection bits</li>
+    <li>Performance: Reference bit (replacement),</li>
+    <li>Consistency: Dirty bit (write-back decisions)</li>
+    <li>Stored in main memory</li>
+    <li>Base address held in PTBR (Page Table Base</li>
+</ul>
+
+<h3 id="sub-1-6">1.6 The Performance Problem</h3>
+<p>05</p>
+<p>🐌</p>
+<p>Why Paging Seems Slow</p>
+<p>For every memory access, paging needs:</p>
+<p>➡</p>
+<p>Two memory accesses per instruction</p>
+<p>⏱</p>
+<p>Example</p>
+<p>Effective Access Time: 100 ns (page table) +</p>
+<p>100 ns (data) = 200 ns</p>
+<p>➡</p>
+<p>100% slowdown ❌</p>
+<p>⚠</p>
+<p>Impact</p>
+<p>🔑</p>
+<p>Conclusion</p>
+<p>Paging needs a faster address translation</p>
+<p>mechanism to be practical.</p>
+<ul>
+    <li>1⃣ Access Page Table</li>
+    <li>2⃣ Access Actual Data</li>
+    <li>Memory access time = 100 ns</li>
+    <li>High latency</li>
+    <li>Poor CPU utilization</li>
+    <li>Unacceptable for modern systems</li>
+</ul>
+
+                    
+                    <div class="topic-nav">
+                        <a href="lecture-20.html" class="btn" style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;">Previous Lecture</a>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 2 -->
+            <section id="topic-2" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>Translation Lookaside Buffer (TLB)</h2>
+                </div>
+                <div id="content-2" class="collapsible-content">
+                    <h3 id="sub-2-1">2.1 Translation Lookaside Buffer (TLB)</h3>
+<p>06</p>
+<p>🧠</p>
+<p>What Is a TLB?</p>
+<p>⚙</p>
+<p>Key Features</p>
+<p>🚀</p>
+<p>Why TLB Matters</p>
+<ul>
+    <li>A small, very fast cache for page table entries</li>
+    <li>Also called Address Translation Cache</li>
+    <li>Located inside the MMU</li>
+    <li>Stores recent page → frame mappings</li>
+    <li>Fully / Set associative (parallel search)</li>
+    <li>1 CPU cycle access (< 1 ns)</li>
+    <li>Small size (~64–256 entries)</li>
+    <li>Avoids frequent page table memory access</li>
+    <li>Reduces address translation from 2 accesses → 1</li>
+    <li>Dramatically improves paging performance</li>
+</ul>
+
+<h3 id="sub-2-2">2.2 Translation Lookaside Buffer (TLB)</h3>
+<p>07</p>
+<p>🧩</p>
+<p>TLB Entry (What It Stores)</p>
+<p>🎯</p>
+<p>Purpose</p>
+<p>Speed up address translation by caching the</p>
+<p>most-used page table entries.</p>
+<ul>
+    <li>Valid bit – entry usable or not</li>
+    <li>Tag (Page #) – virtual page number</li>
+    <li>Frame # – physical frame</li>
+    <li>Protection bits – R / W / X</li>
+    <li>Dirty bit – page modified?</li>
+    <li>Reference bit – recently used?</li>
+</ul>
+
+<h3 id="sub-2-3">2.3 TLB Hit and Miss Scenarios</h3>
+<p>08</p>
+<p>⚡</p>
+<p>Scenario 1: TLB Hit (Fast Path)</p>
+<p>⏱</p>
+<p>Time: ~1 ns</p>
+<p>🔑</p>
+<p>Key Takeaway</p>
+<p>System performance depends heavily on TLB hit</p>
+<p>rate—hits are fast, misses are expensive.</p>
+<p>🐢</p>
+<p>Scenario 2: TLB Miss (Slow Path)</p>
+<p>No TLB match</p>
+<p>⏱</p>
+<p>Time: ~100+ ns (first access)</p>
+<ul>
+    <li>CPU generates virtual address (Page P, Offset)</li>
+    <li>TLB searched in parallel</li>
+    <li>✔ Match found → Frame F</li>
+    <li>Physical Address = (F, Offset)</li>
+    <li>Memory accessed directly</li>
+    <li>CPU generates virtual address (Page P, Offset)</li>
+    <li>❌</li>
+    <li>Access Page Table in memory (via PTBR)</li>
+    <li>Get Frame F</li>
+    <li>Update TLB (may replace old entry)</li>
+    <li>Access memory with physical address</li>
+</ul>
+
+<h3 id="sub-2-4">2.4 TLB Performance Metrics</h3>
+<p>09</p>
+<p>📊</p>
+<p>Key Terms</p>
+<p>🧮</p>
+<p>Effective Access Time (EAT)</p>
+<p>General Formula:</p>
+<div class="formula-box">EAT = ε + α·m + (1 − α)·(m + m)</div>
+<p>⚡</p>
+<p>What It Means</p>
+<p>📈</p>
+<p>Example Insight</p>
+<p>🔑</p>
+<p>Key Takeaway</p>
+<p>High TLB hit ratio is crucial—it keeps paging</p>
+<p>performance close to raw memory speed.</p>
+<ul>
+    <li>Hit Ratio (α): Fraction of accesses found in TLB</li>
+    <li>Miss Ratio: 1 − α</li>
+    <li>TLB Access Time (ε): ~1 ns</li>
+    <li>Memory Access Time (m): ~100 ns</li>
+    <li>TLB Hit: 1 memory access</li>
+    <li>TLB Miss: 2 memory accesses (page table + data)</li>
+    <li>Higher α → EAT approaches m</li>
+    <li>α = 0.99 → EAT ≈ 1.01·m (near optimal)</li>
+    <li>Small drops in α cause big slowdowns</li>
+</ul>
+
+<h3 id="sub-2-5">2.5 TLB Performance Example</h3>
+<p>10</p>
+<p>Given: TLB access (ε) ≈ 0, Memory access (m) = 100 ns</p>
+<p>and Hit ratio (α) = 0.98</p>
+<p>🧮</p>
+<p>EAT Calculation</p>
+<div class="formula-box">EAT = α·m + (1 − α)·2m</div>
+<div class="formula-box">= 0.98·100 + 0.02·200 = 98 + 4 = 102 ns</div>
+<p>⚡</p>
+<p>Performance Impact</p>
+<p>📈</p>
+<p>Hit Ratio Sensitivity</p>
+<p>🔑</p>
+<p>Key Takeaway</p>
+<p>Even a small drop in TLB hit ratio causes</p>
+<p>a big performance hit—high α is critical.</p>
+<ul>
+    <li>Without TLB: 200 ns</li>
+    <li>With TLB (98%): 102 ns</li>
+    <li>Speedup: ~1.96×</li>
+    <li>99% → 101 ns</li>
+    <li>95% → 105 ns</li>
+    <li>80% → 120 ns</li>
+</ul>
+
+<h3 id="sub-2-6">2.6 Practice Problems</h3>
+<p>Problem 2: TLB Performance:</p>
+<p>A system uses a Translation Lookaside Buffer</p>
+<p>(TLB) to speed up address translation. The</p>
+<p>following parameters are given:</p>
+<p>Assume that:</p>
+<p>twice (once for page table lookup and</p>
+<p>once for data).</p>
+<p>Calculate the Effective Access Time (EAT) of</p>
+<p>the system.</p>
+<p>11</p>
+<p>Calculation:</p>
+<div class="formula-box">EAT=2+(0.96×80)+(0.04×160</div>
+<div class="formula-box">EAT=2+76.8+6.4</div>
+<div class="formula-box">EAT=85.2 ns</div>
+<p>Explanation:</p>
+<p>Most memory accesses are served directly from</p>
+<p>the TLB, so the average access time stays</p>
+<p>close to a single memory access.</p>
+<ul>
+    <li>TLB hit ratio (α): 96% (0.96)</li>
+    <li>TLB access time (ε): 2 ns</li>
+    <li>Main memory access time (m): 80 ns</li>
+    <li>On a TLB hit, memory is accessed once.</li>
+    <li>On a TLB miss, memory is accessed</li>
+</ul>
+
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 3 -->
+            <section id="topic-3" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>TLB Hit & Miss Performance</h2>
+                </div>
+                <div id="content-3" class="collapsible-content">
+                    <h3 id="sub-3-1">3.1 Why TLB Works - Locality of Reference</h3>
+<p>12</p>
+<p>🧠</p>
+<p>Core Idea</p>
+<p>TLB is effective because programs show locality of</p>
+<p>reference.</p>
+<p>📍</p>
+<p>Spatial Locality</p>
+<p>➡</p>
+<p>One TLB entry covers many accesses</p>
+<p>⏱</p>
+<p>Temporal Locality</p>
+<p>🧩</p>
+<p>Working Set</p>
+<p>📊</p>
+<p>Example</p>
+<p>🔑</p>
+<p>Key Takeaway</p>
+<div class="formula-box">High locality + small working set = TLB hits most of</div>
+<p>the time, making paging fast.</p>
+<ul>
+    <li>Nearby memory locations accessed together</li>
+    <li>Examples: sequential code, array traversal</li>
+    <li>Many accesses fall within the same page</li>
+    <li>Recently used pages are reused soon</li>
+    <li>Examples: loops, frequently called functions</li>
+    <li>TLB keeps recent translations</li>
+    <li>Program uses a small active set of pages</li>
+    <li>Working set usually fits in the TLB</li>
+    <li>Typical hit ratios: 95–99%</li>
+    <li>Loop: array[0] … array[999]</li>
+    <li>Page size = 4KB ≈ 1024 integers</li>
+    <li>1 TLB miss → 999 hits</li>
+</ul>
+
+<h3 id="sub-3-2">3.2 TLB Management Issues</h3>
+<p>13</p>
+<p>🔄</p>
+<p>Context Switching Problem</p>
+<p>Using them → wrong physical memory access</p>
+<p>🧹</p>
+<p>Solution 1: Flush TLB</p>
+<p>✔ Simple</p>
+<p>✖ Cold start → many TLB misses</p>
+<p>🏷</p>
+<p>Solution 2: ASID (Address Space ID)</p>
+<p>✔ No flush needed</p>
+<p>✔ Faster context switches</p>
+<ul>
+    <li>Each process has its own page table</li>
+    <li>On context switch, TLB may contain old process entries</li>
+    <li>❌</li>
+    <li>Invalidate all TLB entries on switch</li>
+    <li>New process starts with empty TLB</li>
+    <li>Tag each TLB entry with Process ID</li>
+    <li>Format: | ASID | Page # | Frame # |</li>
+    <li>Multiple processes coexist in TLB</li>
+</ul>
+
+<h3 id="sub-3-3">3.3 TLB Replacement Policies</h3>
+<p>14</p>
+<p>🧠</p>
+<p>When TLB Is Full</p>
+<p>A new entry must replace an existing one — which to evict?</p>
+<p>🔁</p>
+<p>Common Policies</p>
+<p>⏳</p>
+<p>LRU (Least Recently Used)</p>
+<p>🔄</p>
+<p>NMRU (Not Most Recently Used)</p>
+<p>📦</p>
+<p>FIFO (First In First Out)</p>
+<p>🎲</p>
+<p>Random</p>
+<p>🔑</p>
+<p>Key Takeaway</p>
+<p>Hardware favors simple, fast policies—Random and</p>
+<p>NMRU are common, while true LRU is rare.</p>
+<ul>
+    <li>✔ Best performance (uses locality)</li>
+    <li>✖ High hardware cost</li>
+    <li>✔ Near-LRU performance</li>
+    <li>✔ Lower complexity than LRU</li>
+    <li>✖ May remove frequently used entries</li>
+    <li>Evict a random entry</li>
+    <li>✔ Very simple, low overhead</li>
+</ul>
+
+<h3 id="sub-3-4">3.4 Introduction to I/O Management</h3>
+<p>15</p>
+<p>🧠</p>
+<p>What Is I/O Management?</p>
+<p>applications</p>
+<p>⚙</p>
+<p>Why It’s Complex</p>
+<p>🎯</p>
+<p>OS Goals for I/O</p>
+<p>devices</p>
+<p>throughput</p>
+<ul>
+    <li>Controls & coordinates input/output devices</li>
+    <li>Acts as a bridge between hardware and</li>
+    <li>One of the most complex OS subsystems</li>
+    <li>Huge variety of devices</li>
+    <li>Wide range of speeds (bytes/sec → GB/sec)</li>
+    <li>Different protocols & data formats</li>
+    <li>Real-time constraints</li>
+    <li>Error handling & recovery</li>
+    <li>Device independence – same API for all</li>
+    <li>Uniform naming – consistent access</li>
+    <li>Efficiency – low CPU overhead, high</li>
+    <li>Reliability – handle errors transparently</li>
+    <li>Protection – restrict direct device access</li>
+</ul>
+
+<h3 id="sub-3-5">3.5 I/O Communication Methods</h3>
+<p>16</p>
+<p>Key Takeaway</p>
+<p>Polling is simple, interrupts are efficient, DMA is</p>
+<p>optimal—modern systems rely heavily on interrupts and DMA.</p>
+
+<h3 id="sub-3-6">3.6 Polling (Programmed I/O)</h3>
+<p>17</p>
+<p>🧠</p>
+<p>What It Is</p>
+<p>CPU continuously checks device status until it’s ready.</p>
+<p>🔄</p>
+<p>How It Works</p>
+<p>1. CPU sends command to device</p>
+<p>2. Busy-wait loop checks status</p>
+<p>3. Device becomes ready</p>
+<p>4. CPU reads data and processes it</p>
+<p>💻</p>
+<p>Simple Example</p>
+<p>// busy wait</p>
+<p>data = read_keyboard();</p>
+<p>⚙</p>
+<p>Characteristics</p>
+<p>Wastes CPU cycles</p>
+<p>Poor efficiency</p>
+<ul>
+    <li>✔ Very simple</li>
+    <li>✔ No special hardware</li>
+    <li>❌</li>
+    <li>❌</li>
+</ul>
+<pre class="code-block"><code>while (keyboard_status != READY) {
+}</code></pre>
+
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 4 -->
+            <section id="topic-4" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>Context Switches & ASID</h2>
+                </div>
+                <div id="content-4" class="collapsible-content">
+                    <h3 id="sub-4-1">4.1 Polling - Advantages and Disadvantages</h3>
+<p>18</p>
+<p>🧩</p>
+<p>When to Use Polling</p>
+<ul>
+    <li>High-speed devices (negligible wait)</li>
+    <li>Real-time systems with strict timing</li>
+    <li>Small embedded systems (no interrupts)</li>
+    <li>Acceptable if combined with sleep/yield</li>
+</ul>
+
+<h3 id="sub-4-2">4.2 Interrupt-Driven I/O</h3>
+<p>19</p>
+<p>🔔</p>
+<p>Device Signals CPU When Ready</p>
+<p>⚙</p>
+<p>How It Works</p>
+<p>1. CPU starts I/O</p>
+<p>○ Sends command to device</p>
+<p>○ Continues executing other tasks</p>
+<p>2. Device works independently</p>
+<p>○ Performs I/O operation</p>
+<p>3. Interrupt raised</p>
+<p>○ Device signals CPU on completion</p>
+<p>4. CPU handles interrupt</p>
+<p>○ Saves context (PC, registers)</p>
+<p>○ Runs ISR to read data</p>
+<p>○ Restores context and resumes work</p>
+<p>✅</p>
+<p>Key Advantage</p>
+<ul>
+    <li>No busy waiting</li>
+    <li>CPU remains productive while I/O runs.</li>
+</ul>
+
+<h3 id="sub-4-3">4.3 Interrupt Processing Steps</h3>
+<p>20</p>
+<p>🧭</p>
+<p>How an Interrupt Is Handled (Step-by-Step)</p>
+<p>1. Device Ready</p>
+<p>○ Device controller raises an interrupt signal</p>
+<p>2. Interrupt Detection</p>
+<p>○ CPU detects interrupt at end of instruction cycle</p>
+<p>3. Interrupt Acknowledgment</p>
+<p>○ CPU sends ACK</p>
+<p>○ Device places interrupt number on bus</p>
+<p>4. Context Save</p>
+<p>○ Save PC, registers, flags</p>
+<p>○ Switch to kernel mode</p>
+<p>5. Interrupt Vector Lookup</p>
+<p>○ Use interrupt number to index Interrupt Vector</p>
+<p>Table (IVT)</p>
+<p>○ Fetch ISR address</p>
+<p>6. Execute ISR</p>
+<p>○ Run device-specific handler</p>
+<p>○ Read data / update buffers</p>
+<p>7. Context Restore</p>
+<p>○ Restore saved state</p>
+<p>○ Resume interrupted process</p>
+
+<h3 id="sub-4-4">4.4 Interrupt Vector Table</h3>
+<p>21</p>
+<p>🧩</p>
+<p>What is IVT?</p>
+<p>A table that maps interrupt numbers to their Interrupt</p>
+<p>Service Routine (ISR) addresses.</p>
+<p>⚙</p>
+<p>How It Works</p>
+<p>1. Device raises interrupt with interrupt number</p>
+<p>2. CPU uses number as index into IVT</p>
+<p>3. Fetches ISR address</p>
+<p>4. Direct jump to correct handler</p>
+<p>🗂</p>
+<p>IVT Structure</p>
+<p>⭐</p>
+<p>Key Points</p>
+<ul>
+    <li>One entry per interrupt</li>
+    <li>Enables fast ISR dispatch</li>
+    <li>Set up by OS at boot time</li>
+    <li>Core to interrupt-driven I/O</li>
+</ul>
+
+<h3 id="sub-4-5">4.5 Interrupt Types and Priorities</h3>
+<p>22</p>
+<p>🔌</p>
+<p>By Source</p>
+<p>Hardware Interrupts</p>
+<p>Software Interrupts</p>
+<p>Exceptions / Traps</p>
+<p>🚦</p>
+<p>By Priority</p>
+<p>Non-Maskable Interrupts (NMI)</p>
+<p>Maskable Interrupts</p>
+<p>When multiple interrupts occur: ➡</p>
+<p>Higher priority is handled first.</p>
+<ul>
+    <li>From I/O devices (keyboard, disk, timer)</li>
+    <li>Asynchronous</li>
+    <li>Signal external events</li>
+    <li>Triggered by instructions (e.g., system calls)</li>
+    <li>Synchronous</li>
+    <li>OS service requests</li>
+    <li>Program-generated errors</li>
+    <li>Divide by zero, page fault, breakpoints</li>
+    <li>Cannot be disabled</li>
+    <li>Critical events (hardware failure, power loss)</li>
+    <li>Can be enabled/disabled</li>
+    <li>Normal I/O devices</li>
+</ul>
+
+<h3 id="sub-4-6">4.6 Interrupt-Driven I/O - Advantages and Disadvantages</h3>
+<p>23</p>
+<p>⏱</p>
+<p>Typical Overhead</p>
+<ul>
+    <li>Context save/restore: ~100 cycles</li>
+    <li>ISR execution: minimal</li>
+    <li>Total: ~1–10 µs per interrupt</li>
+</ul>
+
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 5 -->
+            <section id="topic-5" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>I/O Management (Polling vs. Interrupts)</h2>
+                </div>
+                <div id="content-5" class="collapsible-content">
+                    <h3 id="sub-5-1">5.1 Problem with Interrupt-Driven I/O</h3>
+<p>24</p>
+<p>🚧</p>
+<p>The Data Transfer Bottleneck</p>
+<p>📌</p>
+<p>Scenario: Read 1MB from Disk</p>
+<p>interrupts</p>
+<p>❌</p>
+<p>Why This Is a Problem</p>
+<p>🔑</p>
+<p>Key Insight</p>
+<p>Interrupt-driven I/O works well for small or infrequent</p>
+<p>data, but becomes inefficient for large transfers.</p>
+<ul>
+    <li>Disk transfers 4 bytes at a time</li>
+    <li>Each transfer triggers an interrupt</li>
+    <li>Total interrupts: 1MB / 4 bytes = 262,144</li>
+    <li>CPU involved in every tiny transfer</li>
+    <li>Massive context switching</li>
+    <li>Wasted memory bandwidth</li>
+    <li>CPU can’t do useful work</li>
+    <li>Poor scalability for large I/O</li>
+</ul>
+
+<h3 id="sub-5-2">5.2 Direct Memory Access (DMA)</h3>
+<p>25</p>
+<p>🧠</p>
+<p>What is DMA?</p>
+<p>○ ✅</p>
+<p>Start transfer</p>
+<p>○ ✅</p>
+<p>Completion interrupt</p>
+<p>⚙</p>
+<p>How DMA Works</p>
+<p>1. CPU sets up DMA (buffer address, size, direction)</p>
+<p>2. DMA controller takes control of the system bus</p>
+<p>3. Data moves Device ⇄ Memory directly</p>
+<p>4. DMA raises an interrupt when done</p>
+<p>⭐</p>
+<p>Key Idea</p>
+<p>🔑</p>
+<p>One-Line Takeaway</p>
+<div class="formula-box">DMA = High-speed data transfer with minimal CPU involvement</div>
+<ul>
+    <li>Uses a DMA Controller (special hardware)</li>
+    <li>Transfers data directly between device and memory</li>
+    <li>CPU involved only twice:</li>
+    <li>DMA controller acts as a bus master</li>
+    <li>CPU is free to do other work during transfer</li>
+</ul>
+
+<h3 id="sub-5-3">5.3 DMA Operation Steps</h3>
+<p>26</p>
+<p>🔄</p>
+<p>How a DMA Transfer Works</p>
+<p>1⃣ CPU Setup</p>
+<p>○ Source address</p>
+<p>○ Destination address</p>
+<p>○ Transfer size</p>
+<p>○ Mode (read/write)</p>
+<p>CPU resumes other work</p>
+<p>2⃣ DMA Takes Control</p>
+<p>DMA becomes bus master</p>
+<p>3⃣ Data Transfer</p>
+<p>No CPU involvement</p>
+<p>4⃣ Completion</p>
+<p>Interrupt sent to CPU</p>
+<ul>
+    <li>CPU programs DMA with:</li>
+    <li>✅</li>
+    <li>DMA requests system bus</li>
+    <li>CPU grants bus</li>
+    <li>🔁</li>
+    <li>DMA moves data Device ⇄ Memory</li>
+    <li>Repeats until count = 0</li>
+    <li>🚫</li>
+    <li>DMA releases bus</li>
+    <li>🔔</li>
+    <li>CPU handles completion in ISR</li>
+</ul>
+
+<h3 id="sub-5-4">5.4 DMA Transfer Modes</h3>
+<p>27</p>
+
+<h3 id="sub-5-5">5.5 DMA vs CPU Transfer - Performance</h3>
+<p>28</p>
+<p>📦</p>
+<p>Scenario: Transfer 1MB from disk → memory</p>
+<p>🐌</p>
+<p>1. CPU Programmed I/O (Polling)</p>
+<p>~500 ms</p>
+<p>CPU usage: ~100%</p>
+<p>Extremely inefficient</p>
+<p>🔔</p>
+<p>2. Interrupt-Driven I/O</p>
+<p>~2 μs per interrupt</p>
+<p>~500 ms interrupt overhead</p>
+<p>CPU partially blocked by interrupts</p>
+<p>🚀</p>
+<p>3. Direct Memory Access (DMA)</p>
+<p>CPU involvement: ~12 μs total</p>
+<p>CPU ~99.9% free</p>
+<p>🏆</p>
+<p>Bottom Line</p>
+<ul>
+    <li>CPU moves 4 bytes at a time</li>
+    <li>262,144 iterations</li>
+    <li>⏱</li>
+    <li>🔥</li>
+    <li>❌</li>
+    <li>262,144 interrupts</li>
+    <li>⏱</li>
+    <li>⏱</li>
+    <li>⚠</li>
+    <li>CPU setup: ~10 μs</li>
+    <li>DMA transfer: ~10 ms (100 MB/s)</li>
+    <li>Completion interrupt: ~2 μs</li>
+    <li>🧠</li>
+    <li>✅</li>
+    <li>DMA reduces CPU overhead by ~40,000×</li>
+    <li>Best choice for large data transfers</li>
+    <li>Polling & interrupts don’t scale 🚫</li>
+</ul>
+
+<h3 id="sub-5-6">5.6 DMA Advantages and Disadvantages</h3>
+<p>29</p>
+<p>🎯</p>
+<p>Best Use Cases</p>
+<p>👉</p>
+<p>Key Takeaway:</p>
+<p>DMA = maximum performance for large data,</p>
+<p>minimal CPU cost.</p>
+<ul>
+    <li>Disk I/O, network packets</li>
+    <li>Video/audio streaming</li>
+    <li>Bulk transfers > 1KB</li>
+    <li>High-bandwidth peripherals</li>
+</ul>
+
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 6 -->
+            <section id="topic-6" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-6')">
+                    <div class="topic-number">6</div>
+                    <h2>Direct Memory Access (DMA) & Cache Coherency</h2>
+                </div>
+                <div id="content-6" class="collapsible-content">
+                    <h3 id="sub-6-1">6.1 Practice Problems</h3>
+<p>30</p>
+<p>Problem 4: DMA vs Interrupts:</p>
+<p>A system transfers 10 MB of data from disk to</p>
+<p>memory. The disk operates at a speed of 100</p>
+<p>MB/s. Compare the CPU time consumed in the</p>
+<p>following two I/O methods:</p>
+<p>(A) Interrupt-driven I/O</p>
+<p>bytes transferred</p>
+<p>(B) Direct Memory Access (DMA)</p>
+<p>Calculate the total CPU time consumed in each</p>
+<p>case and determine which method is more</p>
+<p>efficient.</p>
+<p>(B) DMA</p>
+<p>DMA setup time: 5 μs</p>
+<p>Completion interrupt: 3 μs</p>
+<div class="formula-box">Total CPU time: 5+3=8 μs</div>
+<p>Explanation:</p>
+<p>DMA transfers data without CPU involvement,</p>
+<p>making it vastly more efficient than</p>
+<p>interrupt-based transfers.</p>
+<p>(A) Interrupt-Driven I/O</p>
+<p>Interrupt frequency:</p>
+<p>1 interrupt per 512 bytes</p>
+<p>Total interrupts:</p>
+<p>10 MB=10×1024×1024=10,485,760 bytes</p>
+<div class="formula-box">Interrupts=10,485,760/512=20,480</div>
+<p>CPU time per interrupt: 3 μs</p>
+<p>Total CPU time: 20,480×3 μs=61,440 μs=61.44 ms</p>
+<ul>
+    <li>One interrupt is generated for every 512</li>
+    <li>CPU time per interrupt = 3 μs</li>
+    <li>DMA setup time = 5 μs</li>
+    <li>CPU time for completion interrupt = 3 μs</li>
+</ul>
+
+<h3 id="sub-6-2">6.2 Cache Coherency Problem with DMA</h3>
+<p>31</p>
+<p>Keeping CPU Cache & Main Memory Consistent</p>
+<p>⚠</p>
+<p>The Problem</p>
+<p>DMA accesses main memory directly, bypassing CPU cache.</p>
+<p>DMA Write (Device → Memory)</p>
+<p>CPU reads stale cached data</p>
+<p>DMA Read (Memory → Device)</p>
+<p>DMA reads stale memory data</p>
+<p>🛠</p>
+<p>Solutions</p>
+<p>Flush cache before DMA read</p>
+<p>Invalidate cache after DMA write</p>
+<p>Use uncached memory for DMA buffers</p>
+<p>Hardware cache coherence</p>
+<p>✅</p>
+<p>Key Takeaway</p>
+<p>DMA is fast but unsafe without cache management.</p>
+<p>Proper cache control is essential for correct and consistent data.</p>
+<ul>
+    <li>DMA updates memory</li>
+    <li>CPU cache still holds old value</li>
+    <li>❌</li>
+    <li>CPU updates cache only</li>
+    <li>Memory not updated yet</li>
+    <li>❌</li>
+    <li>🔄</li>
+    <li>❌</li>
+    <li>🚫</li>
+    <li>🧩</li>
+</ul>
+
+<h3 id="sub-6-3">6.3 Comparison Summary - Polling vs Interrupts vs DMA</h3>
+<p>32</p>
+<p>🧠</p>
+<p>Key Takeaway</p>
+<p>As data size and device speed increase,</p>
+<p>move from Polling → Interrupts → DMA for</p>
+<p>better performance and CPU efficiency.</p>
+
+<h3 id="sub-6-4">6.4 Modern I/O Trends</h3>
+<p>33</p>
+<p>🔑</p>
+<p>Key Takeaway</p>
+<p>Modern I/O focuses on parallelism, low latency,</p>
+<p>minimal CPU involvement, and high throughput</p>
+<p>to match today’s high-speed hardware.</p>
+
+<h3 id="sub-6-5">6.5 Key Takeaways</h3>
+<p>34</p>
+<ul>
+    <li>Paging & Address Translation</li>
+    <li>Translation Lookaside Buffer (TLB)</li>
+    <li>Page Tables</li>
+    <li>Polling I/O</li>
+    <li>Interrupt-Driven I/O</li>
+    <li>Direct Memory Access (DMA)</li>
+    <li>Cache Coherency</li>
+    <li>I/O Performance Comparison</li>
+    <li>Modern I/O Optimizations</li>
+</ul>
+
+<h3 id="sub-6-6">6.6 Thank You!</h3>
+<p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
+<p>35</p>
+
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <a href="lecture-22.html" class="btn" style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;">Next Lecture</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for your reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/21.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>

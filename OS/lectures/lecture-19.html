@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Lecture 19 - Memory Management I: Hierarchy and</title>
+    <meta content="Study notes covering Memory Management I: Hierarchy and." name="description"/>
+    <link class="favicon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>19</text></svg>" rel="icon"/>
+    <link href="../css/style.css" rel="stylesheet"/>
+</head>
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Operating Systems Foundations</h1>
+            <p>Lecture 19 - Memory Management I: Hierarchy and</p>
+            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/19.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text"/>
+        </div>
+    </header>
+    <div class="container" style="margin-top: 2rem;">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 7</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li>
+                    <a href="#topic-1">1. Memory Management Concepts<span class="sub-count">6</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-1-1">1.1 Join the lecture online on your dashboard</a></li>
+                         <li><a href="#sub-1-2">1.2 Today’s Agenda</a></li>
+                         <li><a href="#sub-1-3">1.3 Introduction to Memory Management</a></li>
+                         <li><a href="#sub-1-4">1.4 Objectives of Memory Management</a></li>
+                         <li><a href="#sub-1-5">1.5 The Memory Hierarchy</a></li>
+                         <li><a href="#sub-1-6">1.6 Memory Hierarchy Characteristics</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Memory Hierarchy & Access<span class="sub-count">6</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-2-1">2.1 Main Memory Organization</a></li>
+                         <li><a href="#sub-2-2">2.2 Main Memory Organization</a></li>
+                         <li><a href="#sub-2-3">2.3 Address Binding</a></li>
+                         <li><a href="#sub-2-4">2.4 Address Binding</a></li>
+                         <li><a href="#sub-2-5">2.5 Protection in Contiguous Allocation</a></li>
+                         <li><a href="#sub-2-6">2.6 Protection in Contiguous Allocation</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Protection Base & Limit Registers<span class="sub-count">6</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-3-1">3.1 Contiguous Memory Allocation</a></li>
+                         <li><a href="#sub-3-2">3.2 Fixed Partitioning - Concept</a></li>
+                         <li><a href="#sub-3-3">3.3 Fixed Partitioning - Concept</a></li>
+                         <li><a href="#sub-3-4">3.4 Fixed Partitioning - Placement Strategies</a></li>
+                         <li><a href="#sub-3-5">3.5 Dynamic Partitioning - Concept</a></li>
+                         <li><a href="#sub-3-6">3.6 Dynamic Partitioning - Concept</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Contiguous Allocation & Fixed Partitions<span class="sub-count">6</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-4-1">4.1 First Fit Allocation Algorithm</a></li>
+                         <li><a href="#sub-4-2">4.2 First Fit Allocation Algorithm</a></li>
+                         <li><a href="#sub-4-3">4.3 First Fit Allocation Algorithm</a></li>
+                         <li><a href="#sub-4-4">4.4 Practice Problem 1</a></li>
+                         <li><a href="#sub-4-5">4.5 Best Fit Allocation Algorithm</a></li>
+                         <li><a href="#sub-4-6">4.6 Best Fit Allocation Algorithm</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Dynamic Partitioning Algorithms<span class="sub-count">6</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-5-1">5.1 Best Fit Allocation Algorithm</a></li>
+                         <li><a href="#sub-5-2">5.2 Worst Fit Allocation Algorithm</a></li>
+                         <li><a href="#sub-5-3">5.3 Worst Fit Allocation Algorithm</a></li>
+                         <li><a href="#sub-5-4">5.4 Worst Fit Allocation Algorithm</a></li>
+                         <li><a href="#sub-5-5">5.5 Comparison of Allocation Algorithms</a></li>
+                         <li><a href="#sub-5-6">5.6 Practice Problem 2</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-6">6. Fragmentation, Compaction & Coalescing<span class="sub-count">6</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-6-1">6.1 Memory Fragmentation</a></li>
+                         <li><a href="#sub-6-2">6.2 Solutions to Fragmentation - Compaction</a></li>
+                         <li><a href="#sub-6-3">6.3 Solutions to Fragmentation - Compaction</a></li>
+                         <li><a href="#sub-6-4">6.4 Solutions to Fragmentation - Coalescing</a></li>
+                         <li><a href="#sub-6-5">6.5 Solutions to Fragmentation - Coalescing</a></li>
+                         <li><a href="#sub-6-6">6.6 Practice Problem 3</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-7">7. Swapping & Overlays<span class="sub-count">8</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-7-1">7.1 Swapping in Memory Management</a></li>
+                         <li><a href="#sub-7-2">7.2 Implementing Swapping</a></li>
+                         <li><a href="#sub-7-3">7.3 Overlay Technique</a></li>
+                         <li><a href="#sub-7-4">7.4 Overlay Technique</a></li>
+                         <li><a href="#sub-7-5">7.5 Partitioning - Pros and Cons</a></li>
+                         <li><a href="#sub-7-6">7.6 Contiguous Allocation - Pros and Cons</a></li>
+                         <li><a href="#sub-7-7">7.7 Key Takeaways</a></li>
+                         <li><a href="#sub-7-8">7.8 Thank You!</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Topic 1 -->
+            <section id="topic-1" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>Memory Management Concepts</h2>
+                </div>
+                <div id="content-1" class="collapsible-content">
+                    <h3 id="sub-1-1">1.1 Join the lecture online on your dashboard</h3>
+<p>2</p>
+<p>0</p>
+
+<h3 id="sub-1-2">1.2 Today’s Agenda</h3>
+<p>01</p>
+<ul>
+    <li>Introduction to Memory Management</li>
+    <li>Memory Hierarchy and Characteristics</li>
+    <li>Contiguous Allocation: Fixed Partitions</li>
+    <li>Dynamic Partitioning Algorithms</li>
+    <li>Fragmentation and Solutions</li>
+    <li>Swapping and Overlays</li>
+</ul>
+
+<h3 id="sub-1-3">1.3 Introduction to Memory Management</h3>
+<p>02</p>
+<p>🧠</p>
+<p>Definition</p>
+<p>Memory management is how the OS controls and</p>
+<p>optimizes main memory for running processes.</p>
+<p>⚙</p>
+<p>Core Responsibilities</p>
+<p>Track used vs free memory</p>
+<p>Allocate memory to processes</p>
+<p>Free memory when done</p>
+<p>Protect process memory</p>
+<p>Optimize performance</p>
+<p>❓</p>
+<p>Why It Matters</p>
+<p>Physical memory is limited</p>
+<p>Multiple processes compete</p>
+<p>Need isolation & safety</p>
+<p>Faster memory = better performance</p>
+<p>Efficient use of available RAM</p>
+<p>🎯</p>
+<p>Key Challenge</p>
+<p>How can limited physical memory be shared</p>
+<p>efficiently and safely among many processes?</p>
+<ul>
+    <li>📊</li>
+    <li>➕</li>
+    <li>➖</li>
+    <li>🔐</li>
+    <li>🚀</li>
+    <li>🧱</li>
+    <li>👥</li>
+    <li>🔒</li>
+    <li>⏱</li>
+    <li>♻</li>
+</ul>
+
+<h3 id="sub-1-4">1.4 Objectives of Memory Management</h3>
+<p>03</p>
+<p>Relocation</p>
+<p>Load programs anywhere in memory;</p>
+<p>support dynamic execution</p>
+<p>Protection</p>
+<p>Isolate processes; protect OS/kernel memory</p>
+<p>Sharing</p>
+<p>Controlled memory sharing (libraries, IPC)</p>
+<p>Logical Organization</p>
+<p>Support modules, separate compile & link</p>
+<p>Physical Organization</p>
+<p>Move data between RAM ↔ storage,</p>
+<p>transparent to user</p>
+<p>Efficiency</p>
+<p>Minimize waste, faster access, better CPU use</p>
+<p>Key Takeaway</p>
+<p>Memory management balances safety, flexibility, and performance while using limited RAM efficiently.</p>
+<ul>
+    <li>🔄</li>
+    <li>🔐</li>
+    <li>🤝</li>
+    <li>🧩</li>
+    <li>💾</li>
+    <li>⚡</li>
+</ul>
+
+<h3 id="sub-1-5">1.5 The Memory Hierarchy</h3>
+<p>04</p>
+<p>🧠</p>
+<p>Core Idea</p>
+<p>Memory is organized in layers based on speed, cost, and</p>
+<p>capacity</p>
+<p>➡</p>
+<p>Faster = Smaller & Costlier</p>
+<p>➡</p>
+<p>Slower = Larger & Cheaper</p>
+<p>🎯</p>
+<p>Key Takeaway</p>
+<p>Systems trade speed for size and cost—fast memory is small, slow memory is large.</p>
+<p>🏎</p>
+<p>Hierarchy (Top → Bottom)</p>
+<p>CPU Registers</p>
+<p>Bytes | < 1 ns | Fastest, most expensive</p>
+<p>Cache (L1 / L2 / L3)</p>
+<p>KB–MB | 1–10 ns | Very fast</p>
+<p>Main Memory (RAM)</p>
+<p>GB | 50–100 ns | Moderate speed & cost</p>
+<p>Secondary Storage (SSD/HDD)</p>
+<p>TB | µs–ms | Slow, cheap</p>
+<p>Tertiary Storage (Tape/Cloud)</p>
+<p>Very large | seconds+ | Slowest, cheapest</p>
+<ul>
+    <li>⚡</li>
+    <li>🚀</li>
+    <li>💾</li>
+    <li>📀</li>
+    <li>☁</li>
+</ul>
+
+<h3 id="sub-1-6">1.6 Memory Hierarchy Characteristics</h3>
+<p>05</p>
+<p>📌</p>
+<p>Core Principles</p>
+<p>Locality of Reference</p>
+<p>○ Temporal: recent data used again soon</p>
+<p>○ Spatial: nearby data used next</p>
+<p>Caching Strategy</p>
+<p>○ Keep frequently used data in fast</p>
+<p>memory</p>
+<p>○ Move rarely used data to slower</p>
+<p>memory</p>
+<p>Hierarchical Access</p>
+<p>○ CPU checks fastest level first</p>
+<p>○ On miss → check next level</p>
+<p>○ Bring data up the hierarchy</p>
+<p>📊</p>
+<p>Performance Impact</p>
+<p>Key Takeaway</p>
+<div class="formula-box">High locality + good caching = faster memory access and better performance.</div>
+<ul>
+    <li>🔁</li>
+    <li>⚡</li>
+    <li>🧭</li>
+    <li>Hit Rate: % found in fast memory</li>
+    <li>Effective Access Time: Hit Rate × Fast Access + Miss Rate × Slow Access</li>
+</ul>
+
+                    
+                    <div class="topic-nav">
+                        <a href="lecture-18.html" class="btn" style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;">Previous Lecture</a>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 2 -->
+            <section id="topic-2" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>Memory Hierarchy & Access</h2>
+                </div>
+                <div id="content-2" class="collapsible-content">
+                    <h3 id="sub-2-1">2.1 Main Memory Organization</h3>
+<p>06</p>
+<p>🧠</p>
+<p>Memory Basics</p>
+<p>🔁</p>
+<p>Access Flow</p>
+<p>CPU → Logical Addr → Translation → Physical Addr → Memory</p>
+<p>🔄</p>
+<p>Memory Operations</p>
+<p>🧭</p>
+<p>Address Spaces</p>
+<p>○ Real RAM address</p>
+<p>○ Generated by CPU/process</p>
+<p>○ Translated to physical address</p>
+<ul>
+    <li>Main memory = array of bytes/words</li>
+    <li>Each location has a unique address</li>
+    <li>Address range: 0 → MAX (e.g., 2³² − 1)</li>
+    <li>LOAD: Memory → CPU register</li>
+    <li>STORE: CPU register → Memory</li>
+    <li>Physical Address</li>
+    <li>Logical / Virtual Address</li>
+</ul>
+
+<h3 id="sub-2-2">2.2 Main Memory Organization</h3>
+<p>07</p>
+<p>🔐</p>
+<p>Memory Protection</p>
+<p>Limit</p>
+<p>Key Takeaway</p>
+<p>Programs use virtual addresses; hardware</p>
+<p>safely maps them to physical memory.</p>
+<ul>
+    <li>Base Register: start of process memory</li>
+    <li>Limit Register: size of process memory</li>
+    <li>Check: Base ≤ Address < Base +</li>
+</ul>
+
+<h3 id="sub-2-3">2.3 Address Binding</h3>
+<p>08</p>
+<p>🧩</p>
+<p>What is Address Binding?</p>
+<p>Mapping program addresses to actual memory locations</p>
+<p>Execution-Time (Dynamic)</p>
+<p>○ Bound during execution</p>
+<p>○ Process can move in memory</p>
+<p>○ ✔ Maximum flexibility | ❌</p>
+<p>Translation overhead</p>
+<p>○ Used in modern OS</p>
+<p>Load-Time</p>
+<p>○ Relocatable code</p>
+<p>○ Bound when loaded</p>
+<p>○ ✔ More flexible | ❌</p>
+<p>Can’t move while running</p>
+<p>🕒</p>
+<p>Types of Binding</p>
+<p>Compile-Time</p>
+<p>○ Fixed (absolute) addresses</p>
+<p>○ Load at one location only</p>
+<p>○ ✔ Fast | ❌</p>
+<p>No flexibility</p>
+<p>○ Example: old DOS programs</p>
+<ul>
+    <li>🔄</li>
+    <li>📦</li>
+    <li>🧱</li>
+</ul>
+
+<h3 id="sub-2-4">2.4 Address Binding</h3>
+<p>09</p>
+<p>⚙</p>
+<p>Address Translation</p>
+<p>Logical Address + Relocation Register →</p>
+<p>Physical Address</p>
+<p>Handled by MMU (hardware)</p>
+<p>Key Takeaway</p>
+<p>Later binding = more flexibility; modern systems use</p>
+<p>execution-time binding for safety and efficiency.</p>
+
+<h3 id="sub-2-5">2.5 Protection in Contiguous Allocation</h3>
+<p>10</p>
+<p>🔐</p>
+<p>Why Protection Is Needed</p>
+<p>⚙</p>
+<p>Hardware Support: Base & Limit Registers</p>
+<p>Check on every access:</p>
+<div class="formula-box">Physical Address = Base + A</div>
+<p>📊</p>
+<p>Example</p>
+<ul>
+    <li>Prevent process → process memory access</li>
+    <li>Protect OS from user programs</li>
+    <li>Catch invalid memory references</li>
+    <li>Ensure stability & security</li>
+    <li>Base Register: Start address of process</li>
+    <li>Limit Register: Size of process memory</li>
+    <li>If A < 0 or A ≥ Limit → TRAP</li>
+    <li>Else → Access allowed</li>
+    <li>Base = 300KB, Limit = 120KB</li>
+    <li>Valid range: 300–420KB</li>
+</ul>
+
+<h3 id="sub-2-6">2.6 Protection in Contiguous Allocation</h3>
+<p>11</p>
+<p>🧠</p>
+<p>Where It’s Used</p>
+<p>○ Base = partition start</p>
+<p>○ Limit = partition size</p>
+<p>○ Base & limit set per allocation</p>
+<p>󰳕</p>
+<p>Privilege Levels</p>
+<p>○ Access all memory</p>
+<p>○ Can change base/limit</p>
+<p>○ Restricted to its memory only</p>
+<p>🚨</p>
+<p>What Protection Catches</p>
+<p>➡</p>
+<p>OS raises exception and terminates process</p>
+<p>Key Takeaway</p>
+<p>Base & limit registers provide simple, fast, hardware-level</p>
+<p>memory protection in contiguous allocation systems.</p>
+<ul>
+    <li>Fixed Partitions:</li>
+    <li>Dynamic Partitions:</li>
+    <li>Kernel Mode:</li>
+    <li>User Mode:</li>
+    <li>Buffer overflows</li>
+    <li>Invalid pointers</li>
+    <li>Out-of-bounds array access</li>
+</ul>
+
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 3 -->
+            <section id="topic-3" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>Protection Base & Limit Registers</h2>
+                </div>
+                <div id="content-3" class="collapsible-content">
+                    <h3 id="sub-3-1">3.1 Contiguous Memory Allocation</h3>
+<p>12</p>
+<p>🧠</p>
+<p>Definition</p>
+<p>Each process occupies one continuous block of</p>
+<p>physical memory.</p>
+<p>📦</p>
+<p>Core Idea</p>
+<p>✅</p>
+<p>Advantages</p>
+<p>overhead</p>
+<p>❌</p>
+<p>Disadvantages</p>
+<p>process size</p>
+<p>Key Takeaway</p>
+<p>Contiguous allocation is fast and simple, but</p>
+<p>wastes memory and lacks flexibility.🗂</p>
+<p>Simple Memory Layout</p>
+<p>🔀</p>
+<p>Two Approaches</p>
+<p>Fixed Partitioning</p>
+<p>Predefined, fixed-size partitions</p>
+<p>Dynamic Partitioning</p>
+<p>Partitions created based on process size</p>
+<ul>
+    <li>Process uses consecutive addresses</li>
+    <li>No gaps inside a process</li>
+    <li>Entire process loaded as one block</li>
+    <li>Simple design, Fast access and Low</li>
+    <li>Fragmentation, Poor flexibility and Limits</li>
+    <li>OS in resident memory</li>
+    <li>User processes placed one after another</li>
+    <li>Remaining space = free memory</li>
+    <li>🧱</li>
+    <li>📐</li>
+</ul>
+
+<h3 id="sub-3-2">3.2 Fixed Partitioning - Concept</h3>
+<p>13</p>
+<p>🧠</p>
+<p>Definition</p>
+<p>Memory is split into fixed-size partitions at system</p>
+<p>startup.</p>
+<p>➡</p>
+<p>One process per partition</p>
+<p>⚙</p>
+<p>Key Characteristics</p>
+<p>🔀</p>
+<p>Variants</p>
+<p>Equal-Size Partitions</p>
+<p>Same size; simple; causes more waste</p>
+<p>Unequal-Size Partitions</p>
+<p>Different sizes; better fit for varied processes</p>
+<ul>
+    <li>Partition sizes decided before boot</li>
+    <li>Sizes do not change during execution</li>
+    <li>Process must fit entirely in a partition</li>
+    <li>🟦</li>
+    <li>🟩</li>
+</ul>
+
+<h3 id="sub-3-3">3.3 Fixed Partitioning - Concept</h3>
+<p>14</p>
+<p>📦</p>
+<p>Example (Equal Size: 5 MB)</p>
+<p>➡</p>
+<p>Internal Fragmentation</p>
+<p>✅</p>
+<p>Advantages</p>
+<p>❌</p>
+<p>Disadvantages</p>
+<p>Key Takeaway</p>
+<p>Fixed partitioning is easy to manage but wastes memory due to internal fragmentation.</p>
+<ul>
+    <li>P1 (3 MB) → 2 MB wasted</li>
+    <li>P2 (1 MB) → 4 MB wasted</li>
+    <li>P3 (4 MB) → 1 MB wasted</li>
+    <li>Simple & predictable</li>
+    <li>Easy allocation</li>
+    <li>Internal fragmentation</li>
+    <li>Fixed process limit</li>
+    <li>Poor fit for large/variable processes</li>
+</ul>
+
+<h3 id="sub-3-4">3.4 Fixed Partitioning - Placement Strategies</h3>
+<p>15</p>
+<p>✅</p>
+<p>Best Practices</p>
+<p>Key Takeaway</p>
+<p>Placement choice trades flexibility for</p>
+<p>simplicity. Internal fragmentation is unavoidable</p>
+<p>in fixed partitioning.</p>
+<ul>
+    <li>Prefer unequal partitions</li>
+    <li>Match sizes to workload</li>
+    <li>Review & adjust over time</li>
+</ul>
+
+<h3 id="sub-3-5">3.5 Dynamic Partitioning - Concept</h3>
+<p>16</p>
+<p>🧠</p>
+<p>Definition</p>
+<p>Memory partitions are created on demand, sized</p>
+<p>exactly to the process.</p>
+<p>⚙</p>
+<p>Key Features</p>
+<p>No internal fragmentation</p>
+<p>📊</p>
+<p>How Memory Changes</p>
+<ul>
+    <li>No fixed partition sizes</li>
+    <li>Partition = process size</li>
+    <li>Created on load, removed on exit</li>
+    <li>❌</li>
+    <li>Start: OS + large free block</li>
+    <li>Load processes → memory splits dynamically</li>
+    <li>Free space shrinks and shifts over time</li>
+</ul>
+
+<h3 id="sub-3-6">3.6 Dynamic Partitioning - Concept</h3>
+<p>17</p>
+<p>✅</p>
+<p>Advantages</p>
+<p>❌</p>
+<p>Disadvantages</p>
+<p>Key Takeaway</p>
+<p>Dynamic partitioning fits processes perfectly but</p>
+<p>suffers from external fragmentation over time.</p>
+<ul>
+    <li>No internal waste</li>
+    <li>Flexible for varied process sizes</li>
+    <li>Better initial memory use</li>
+    <li>External fragmentation develops</li>
+    <li>More complex allocation logic</li>
+    <li>Overhead tracking free blocks</li>
+</ul>
+
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 4 -->
+            <section id="topic-4" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>Contiguous Allocation & Fixed Partitions</h2>
+                </div>
+                <div id="content-4" class="collapsible-content">
+                    <h3 id="sub-4-1">4.1 First Fit Allocation Algorithm</h3>
+<p>18</p>
+<p>🧠</p>
+<p>Idea</p>
+<p>Allocate the first free block that is large</p>
+<p>enough for the process.</p>
+<p>⚙</p>
+<p>How It Works</p>
+<p>1⃣ Scan free memory from the start</p>
+<p>2⃣ Pick the first hole ≥ process size</p>
+<p>3⃣ Allocate memory</p>
+<p>4⃣ Split hole if needed</p>
+<p>5⃣ Stop searching</p>
+<p>📌</p>
+<p>Example</p>
+<p>Free Holes: 50KB | 200KB | 100KB | 300KB</p>
+<p>Process: 80KB</p>
+<p>➡</p>
+<p>Chosen: 200KB (first fit)</p>
+<p>➡</p>
+<p>Remaining hole: 120KB</p>
+
+<h3 id="sub-4-2">4.2 First Fit Allocation Algorithm</h3>
+<p>19</p>
+<p>✅</p>
+<p>Pros</p>
+<p>❌</p>
+<p>Cons</p>
+<p>⏱</p>
+<p>Performance</p>
+<p>Key Takeaway</p>
+<p>First Fit is quick and simple, but may</p>
+<p>cause fragmentation over time.</p>
+<ul>
+    <li>Fast & simple</li>
+    <li>Low overhead</li>
+    <li>Works well in practice</li>
+    <li>Small holes accumulate at start</li>
+    <li>Not always optimal</li>
+    <li>Fragmentation near beginning</li>
+    <li>Time: O(n) (scan free list)</li>
+</ul>
+
+<h3 id="sub-4-3">4.3 First Fit Allocation Algorithm</h3>
+<p>20</p>
+
+<h3 id="sub-4-4">4.4 Practice Problem 1</h3>
+<p>21</p>
+<p>A system uses fixed partition memory management with the following</p>
+<p>partitions: 100KB, 500KB, 200KB, 300KB, 600KB</p>
+<p>The following processes arrive in order: P1 = 212KB, P2 = 417KB, P3 =</p>
+<p>112KB, P4 = 426KB.</p>
+<p>Allocate the processes using the First Fit algorithm. Show clearly which</p>
+<p>partition each process is allocated to. Identify any process that cannot be</p>
+<p>allocated. Calculate the total internal fragmentation.</p>
+<p>Allocation (First Fit):</p>
+<p>no partition fits → waiting</p>
+<p>Answers:</p>
+<p>Explanation: In fixed partitioning, process must fit entirely in one partition. Unused space inside partitions</p>
+<p>causes internal fragmentation.</p>
+<ul>
+    <li>P1 (212KB) → 500KB partition → waste = 288KB</li>
+    <li>P2 (417KB) → 600KB partition → waste = 183KB</li>
+    <li>P3 (112KB) → 200KB partition → waste = 88KB</li>
+    <li>P4 (426KB) → ❌</li>
+    <li>Allocated: P1, P2, P3</li>
+    <li>Waiting: P4 (1 process)</li>
+    <li>Total Internal Fragmentation: 288 + 183 + 88 = 559KB</li>
+</ul>
+
+<h3 id="sub-4-5">4.5 Best Fit Allocation Algorithm</h3>
+<p>22</p>
+<p>🧠</p>
+<p>Idea</p>
+<p>Allocate the smallest free block that can fit</p>
+<p>the process</p>
+<p>➡</p>
+<p>Leaves minimum leftover space</p>
+<p>⚙</p>
+<p>How It Works</p>
+<p>1⃣ Scan entire free list</p>
+<p>2⃣ Choose smallest hole ≥ process size</p>
+<p>3⃣ Allocate & split remainder</p>
+<p>📌</p>
+<p>Example</p>
+<p>Free Holes: 50KB | 200KB | 100KB | 300KB</p>
+<p>Process: 80KB</p>
+<p>➡</p>
+<p>Chosen: 100KB (waste = 20KB)</p>
+
+<h3 id="sub-4-6">4.6 Best Fit Allocation Algorithm</h3>
+<p>23</p>
+<p>✅</p>
+<p>Pros</p>
+<p>❌</p>
+<p>Cons</p>
+<p>⏱</p>
+<p>Performance</p>
+<p>Key Takeaway</p>
+<p>Best Fit reduces immediate waste but increases</p>
+<p>fragmentation and overhead over time.</p>
+<ul>
+    <li>Minimizes waste per allocation</li>
+    <li>Saves large holes for big processes</li>
+    <li>Good utilization (in theory)</li>
+    <li>Slower (full scan)</li>
+    <li>Creates many tiny holes</li>
+    <li>Often worse than First Fit in practice</li>
+    <li>Time: O(n) (checks all holes)</li>
+</ul>
+
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 5 -->
+            <section id="topic-5" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>Dynamic Partitioning Algorithms</h2>
+                </div>
+                <div id="content-5" class="collapsible-content">
+                    <h3 id="sub-5-1">5.1 Best Fit Allocation Algorithm</h3>
+<p>24</p>
+
+<h3 id="sub-5-2">5.2 Worst Fit Allocation Algorithm</h3>
+<p>25</p>
+<p>🧠</p>
+<p>Idea</p>
+<p>Allocate the largest available hole</p>
+<p>➡</p>
+<p>Leave a big leftover that might still be useful</p>
+<p>⚙</p>
+<p>How It Works</p>
+<p>1⃣ Scan entire free list</p>
+<p>2⃣ Pick largest hole ≥ process size</p>
+<p>3⃣ Allocate & keep large remainder</p>
+<p>📌</p>
+<p>Example</p>
+<p>Free Holes: 15KB | 25KB | 40KB | 50KB</p>
+<p>Process: 30KB</p>
+<p>➡</p>
+<p>Chosen: 100KB</p>
+<p>➡</p>
+<p>Remaining: 70KB</p>
+
+<h3 id="sub-5-3">5.3 Worst Fit Allocation Algorithm</h3>
+<p>26</p>
+<p>✅</p>
+<p>Pros</p>
+<p>❌</p>
+<p>Cons</p>
+<p>⏱</p>
+<p>Performance</p>
+<p>Key Takeaway</p>
+<p>Worst Fit tries to preserve usable space, but</p>
+<p>usually causes poor overall memory utilization.</p>
+<ul>
+    <li>Leftover space stays large</li>
+    <li>Fewer tiny holes (initially)</li>
+    <li>Slow (full scan)</li>
+    <li>Breaks large holes quickly</li>
+    <li>Often worst performer</li>
+    <li>Time: O(n)</li>
+</ul>
+
+<h3 id="sub-5-4">5.4 Worst Fit Allocation Algorithm</h3>
+<p>27</p>
+
+<h3 id="sub-5-5">5.5 Comparison of Allocation Algorithms</h3>
+<p>28</p>
+<p>Practical Findings</p>
+<p>First Fit → Best overall (speed + space)</p>
+<p>Best Fit → Slightly better space, slower</p>
+<p>Worst Fit → Poorest performance</p>
+<p>✅</p>
+<p>Recommendation</p>
+<p>First Fit is preferred in practice: simple, fast, and efficient.</p>
+<ul>
+    <li>🥇</li>
+    <li>🥈</li>
+    <li>🥉</li>
+</ul>
+
+<h3 id="sub-5-6">5.6 Practice Problem 2</h3>
+<p>A system uses fixed partition memory management with</p>
+<p>the following partitions: 100KB | 200KB | 50KB | 300KB</p>
+<p>The processes arrive in the following order: P1 = 70KB, P2 =</p>
+<p>110KB, P3 = 40KB</p>
+<p>1. Allocate the processes using: (a) First Fit (b) Best</p>
+<p>Fit (c) Worst Fit</p>
+<p>2. Show clearly which partition each process is</p>
+<p>allocated to under each algorithm.</p>
+<p>3. Identify any unallocated process (if any).</p>
+<p>4. Calculate the total internal fragmentation for each</p>
+<p>algorithm.</p>
+<p>29</p>
+<p>✅</p>
+<p>Worst Fit</p>
+<div class="formula-box">Total Internal Fragmentation = 230 + 90 + 60 = 380KB</div>
+<p>Unused partition: 50KB✅</p>
+<p>Best Fit</p>
+<p>Total Internal Fragmentation = 130KB</p>
+<p>Unused partition: 300KB</p>
+<p>✅</p>
+<p>First Fit</p>
+<div class="formula-box">Total Internal Fragmentation = 30 + 90 + 10 = 130KB</div>
+<p>Unused partition: 300KB</p>
+<p>Explanation:</p>
+<ul>
+    <li>P1 (70) → 300 → 230KB internal</li>
+    <li>P2 (110) → 200 → 90KB internal</li>
+    <li>P3 (40) → 100 → 60KB internal</li>
+    <li>P1 (70) → 100 → 30KB internal</li>
+    <li>P2 (110) → 200 → 90KB internal</li>
+    <li>P3 (40) → 50 → 10KB internal</li>
+    <li>P1 (70) → 100 → 30KB internal</li>
+    <li>P2 (110) → 200 → 90KB internal</li>
+    <li>P3 (40) → 50 → 10KB internal</li>
+    <li>First Fit: Fast, practical</li>
+    <li>Best Fit: Less waste per allocation, many tiny holes</li>
+    <li>Worst Fit: Leaves big holes but performs worst overall</li>
+</ul>
+
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 6 -->
+            <section id="topic-6" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-6')">
+                    <div class="topic-number">6</div>
+                    <h2>Fragmentation, Compaction & Coalescing</h2>
+                </div>
+                <div id="content-6" class="collapsible-content">
+                    <h3 id="sub-6-1">6.1 Memory Fragmentation</h3>
+<p>30</p>
+<p>🧠</p>
+<p>Definition</p>
+<p>Fragmentation = wasted memory that cannot be</p>
+<p>effectively used.</p>
+<p>🔹</p>
+<p>1. Internal Fragmentation</p>
+<p>Example:</p>
+<p>100KB partition − 70KB process = 30KB wasted</p>
+<p>Formula:</p>
+<p>Internal = Partition Size − Process Size</p>
+<p>🔸</p>
+<p>2. External Fragmentation</p>
+<p>Key Problem:</p>
+<p>Enough total free memory, but no single large block</p>
+<ul>
+    <li>Waste inside allocated memory</li>
+    <li>Happens in Fixed Partitioning</li>
+    <li>Allocated > Needed</li>
+    <li>Waste between processes</li>
+    <li>Happens in Dynamic Partitioning</li>
+    <li>Free memory exists but not contiguous</li>
+</ul>
+<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
+<h3 id="sub-6-2">6.2 Solutions to Fragmentation - Compaction</h3>
+<p>31</p>
+<p>🧠</p>
+<p>What It Is</p>
+<p>Rearrange memory so all free space</p>
+<p>becomes one large block.</p>
+<p>🔄</p>
+<p>How It Works</p>
+<p>📊</p>
+<p>Effect</p>
+<p>⚙</p>
+<p>Requirements</p>
+<p>Processes movable at runtime</p>
+<ul>
+    <li>Move all processes to one end</li>
+    <li>Merge scattered holes</li>
+    <li>Update process addresses</li>
+    <li>Before: Many small holes (fragmented)</li>
+    <li>After: One big free block (contiguous)</li>
+    <li>Dynamic relocation</li>
+    <li>Hardware support (MMU)</li>
+</ul>
+
+<h3 id="sub-6-3">6.3 Solutions to Fragmentation - Compaction</h3>
+<p>32</p>
+<p>✅</p>
+<p>Pros</p>
+<p>❌</p>
+<p>Cons</p>
+<p>⏱</p>
+<p>When to Use</p>
+<p>Key Takeaway</p>
+<p>Compaction fixes fragmentation but is costly—used sparingly in real systems.</p>
+<ul>
+    <li>Eliminates external fragmentation</li>
+    <li>Improves memory utilization</li>
+    <li>Enables large allocations</li>
+    <li>Very expensive (memory copying)</li>
+    <li>System pause required</li>
+    <li>Address updates needed</li>
+    <li>Time ≈ O(memory size)</li>
+    <li>Allocation fails despite enough total free memory</li>
+    <li>Low system activity</li>
+    <li>Fragmentation crosses threshold</li>
+</ul>
+
+<h3 id="sub-6-4">6.4 Solutions to Fragmentation - Coalescing</h3>
+<p>33</p>
+<p>🧠</p>
+<p>What Is Coalescing?</p>
+<p>Automatically merge adjacent free blocks</p>
+<p>when memory is released.</p>
+<p>🔄</p>
+<p>How It Works</p>
+<p>○ Mark block as free</p>
+<p>○ Check left & right neighbors</p>
+<p>○ Merge if they’re free</p>
+<p>📊</p>
+<p>Effect</p>
+<p>Without coalescing: many small holes</p>
+<p>With coalescing: one larger hole</p>
+<ul>
+    <li>On process termination:</li>
+    <li>Update free list</li>
+    <li>❌</li>
+    <li>✅</li>
+</ul>
+
+<h3 id="sub-6-5">6.5 Solutions to Fragmentation - Coalescing</h3>
+<p>34</p>
+<p>⚙</p>
+<p>Implementation</p>
+<p>Boundary Tags</p>
+<p>○ Size/status at both ends</p>
+<p>○ O(1) neighbor checks</p>
+<p>Doubly Linked Free List</p>
+<p>○ Easy merge with neighbors</p>
+<p>Key Takeaway</p>
+<p>Coalescing keeps free memory blocks large by merging</p>
+<p>neighbors—cheap, fast, and essential for dynamic allocation.</p>
+<p>✅</p>
+<p>Pros</p>
+<p>❌</p>
+<p>Cons</p>
+<ul>
+    <li>🏷</li>
+    <li>🔗</li>
+    <li>Prevents fragmentation from worsening</li>
+    <li>Fast (O(1))</li>
+    <li>No process relocation</li>
+    <li>Automatic</li>
+    <li>Doesn’t remove existing fragmentation</li>
+    <li>Extra bookkeeping</li>
+</ul>
+
+<h3 id="sub-6-6">6.6 Practice Problem 3</h3>
+<p>35</p>
+<p>📊</p>
+<p>(a) Memory Utilization</p>
+<p>754/1024×100≈73.6%</p>
+<p>✔ Utilization ≈ 74%</p>
+<p>📊</p>
+<p>(b) External Fragmentation</p>
+<p>Total Free = 270 MB</p>
+<p>Largest Hole = 90 MB</p>
+<p>Memory is scattered into 4 separate holes → External</p>
+<p>Fragmentation exists</p>
+<p>(c) Can a 120MB Process Be Allocated?</p>
+<p>Required = 120 MB</p>
+<p>Largest hole = 90 MB</p>
+<p>Even though total free = 270 MB, ❌</p>
+<p>Cannot allocate (no</p>
+<p>contiguous 120 MB block)</p>
+<p>🧩</p>
+<p>After Compaction (if OS Rearranges Memory)</p>
+<p>| OS | P1 | P2 | P3 | P4 | Free 270 |</p>
+<p>Now: ✔ 120MB process can be allocated</p>
+<p>Remaining free = 150 MB</p>
+<p>A system has a total main memory of 1024 MB. The operating system</p>
+<p>occupies 124 MB of memory. Four processes are currently loaded into</p>
+<p>memory: P1 = 200 MB, P2 = 150 MB, P3 = 100 MB, P4 = 180 MB</p>
+<p>After allocation, the remaining free memory is scattered into the following</p>
+<p>holes: 60 MB, 40 MB, 90 MB, and 80 MB</p>
+<p>| OS 124 | P1 200 | Hole 60 | P2 150 | Hole 40 |</p>
+<p>| P3 100 | Hole 90 | P4 180 | Hole 80 |</p>
+<p>1. Calculate the total memory and free memory..</p>
+<p>2. Compute the memory utilization percentage.</p>
+<p>3. Determine the total external fragmentation.</p>
+<p>4. Identify the largest available hole.</p>
+<p>5. Determine whether a new process of 120 MB can be allocated.</p>
+<p>Justify your answer. Is this possible after compaction?</p>
+<p>Calculate Used Memory</p>
+<div class="formula-box">Processes: 200+150+100+180=630 MB. Total Used: 124+630=754 MB</div>
+<p>Free Memory: 1024−754=270 MB free</p>
+<p>🎨</p>
+<p>Scattered Holes</p>
+<p>Holes: 60 MB, 40 MB, 90 MB, 80 MB</p>
+<div class="formula-box">Total free: 60+40+90+80=270 MB</div>
+
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-7').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 7 -->
+            <section id="topic-7" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-7')">
+                    <div class="topic-number">7</div>
+                    <h2>Swapping & Overlays</h2>
+                </div>
+                <div id="content-7" class="collapsible-content">
+                    <h3 id="sub-7-1">7.1 Swapping in Memory Management</h3>
+<p>36</p>
+<p>🧠</p>
+<p>What is Swapping?</p>
+<p>Moving entire processes between RAM and disk to</p>
+<p>free memory.</p>
+<p>🎯</p>
+<p>Why Swapping?</p>
+<p>⚠</p>
+<p>Key Points</p>
+<p>Key Takeaway</p>
+<p>Swapping extends memory capacity but is</p>
+<p>costly—used carefully in real systems.</p>
+<p>🔄</p>
+<p>How It Works</p>
+<p>⏱</p>
+<p>Cost</p>
+<p>Swap Time</p>
+<div class="formula-box">= Process Size / Disk Transfer Rate</div>
+<div class="formula-box">Example: 100MB ÷ 50MB/s → 2s out + 2s in = 4s</div>
+<ul>
+    <li>Increase multiprogramming</li>
+    <li>Free memory for high-priority processes</li>
+    <li>Needs backing store (disk)</li>
+    <li>Requires contiguous memory (with swapping)</li>
+    <li>Excessive swapping → thrashing</li>
+    <li>Swap Out: RAM → Disk</li>
+    <li>Swap In: Disk → RAM</li>
+    <li>Very expensive (disk I/O)</li>
+    <li>Much slower than context switch</li>
+</ul>
+
+<h3 id="sub-7-2">7.2 Implementing Swapping</h3>
+<p>37</p>
+<p>⚙</p>
+<p>Core Requirements</p>
+<p>Backing Store: Fast disk space for swapped</p>
+<p>processes</p>
+<p>Dynamic Relocation: Process may return to</p>
+<p>different memory location</p>
+<p>Roll Out / Roll In:</p>
+<p>○ Low priority → swapped out</p>
+<p>○ High priority → swapped in</p>
+<p>🧠</p>
+<p>Swapping Policies</p>
+<p>When to Swap Out</p>
+<p>Which Process</p>
+<p>⏱</p>
+<p>What Affects Swap Time</p>
+<p>Process Size → larger = slower</p>
+<p>Disk Speed → SSD ≫ HDD</p>
+<p>Memory Load → may need extra swaps</p>
+<ul>
+    <li>💽</li>
+    <li>🔁</li>
+    <li>🔄</li>
+    <li>Low free memory, Long I/O wait and Lower priority process</li>
+    <li>Lowest priority, Longest blocked and Largest memory user</li>
+    <li>📦</li>
+    <li>💾</li>
+    <li>🧠</li>
+</ul>
+
+<h3 id="sub-7-3">7.3 Overlay Technique</h3>
+<p>38</p>
+<p>🧠</p>
+<p>What Is It?</p>
+<p>Run programs larger than RAM by loading only needed</p>
+<p>code/data at a time.</p>
+<p>📜</p>
+<p>Background</p>
+<p>⚙</p>
+<p>How It Works</p>
+<p>area</p>
+<p>📊</p>
+<p>Why It Helps</p>
+<p>○ Program = 500KB</p>
+<div class="formula-box">○ RAM needed = Main (100KB) + Largest</div>
+<p>Overlay (150KB) = 250KB</p>
+<p>On a time</p>
+<ul>
+    <li>Used before virtual memory</li>
+    <li>Manual (programmer-managed)</li>
+    <li>Common in early / low-memory systems</li>
+    <li>Program split into main module + overlays</li>
+    <li>Main module stays in memory</li>
+    <li>One overlay at a time loaded on demand</li>
+    <li>Overlays replace each other in the same memory</li>
+    <li>Example:</li>
+</ul>
+
+<h3 id="sub-7-4">7.4 Overlay Technique</h3>
+<p>39</p>
+<p>✅</p>
+<p>Pros</p>
+<p>❌</p>
+<p>Cons</p>
+<p>⚖</p>
+<p>Overlay vs Virtual Memory</p>
+<p>Key Takeaway</p>
+<p>Overlays were an early workaround for limited memory—powerful</p>
+<p>but painful compared to modern virtual memory.</p>
+<ul>
+    <li>Run large programs on small memory</li>
+    <li>No special hardware</li>
+    <li>Predictable memory usage</li>
+    <li>Complex & error-prone</li>
+    <li>Programmer burden</li>
+    <li>Hard to maintain</li>
+    <li>Overlay: Manual, programmer-controlled</li>
+    <li>Virtual Memory: Automatic, OS-managed</li>
+</ul>
+
+<h3 id="sub-7-5">7.5 Partitioning - Pros and Cons</h3>
+<p>40</p>
+<p>🧱</p>
+<p>Fixed Partitioning</p>
+<p>👍</p>
+<p>Pros</p>
+<p>👎</p>
+<p>Cons</p>
+<p>🔁</p>
+<p>Dynamic Partitioning</p>
+<p>👍</p>
+<p>Pros</p>
+<p>👎</p>
+<p>Cons</p>
+<ul>
+    <li>Simple & predictable</li>
+    <li>Low management overhead</li>
+    <li>Easy protection</li>
+    <li>No external fragmentation</li>
+    <li>Internal fragmentation (waste)</li>
+    <li>Fixed number of processes</li>
+    <li>Inflexible sizes</li>
+    <li>Large jobs may not fit</li>
+    <li>No internal fragmentation</li>
+    <li>Flexible sizes</li>
+    <li>Better initial utilization</li>
+    <li>Fits varied processes</li>
+    <li>External fragmentation</li>
+    <li>Complex allocation</li>
+    <li>Compaction is costly</li>
+    <li>Variable allocation time</li>
+</ul>
+
+<h3 id="sub-7-6">7.6 Contiguous Allocation - Pros and Cons</h3>
+<p>41</p>
+<p>⚙</p>
+<p>Overall (Contiguous Allocation)</p>
+<p>👍</p>
+<p>Strengths</p>
+<p>👎</p>
+<p>Limitations</p>
+<p>🚀</p>
+<p>Modern Alternatives</p>
+<p>Key Takeaway:</p>
+<p>Contiguous allocation is fast and simple—but</p>
+<p>fragmentation limits scalability in modern systems.</p>
+<ul>
+    <li>Fast access</li>
+    <li>Simple address translation</li>
+    <li>Minimal hardware</li>
+    <li>Good locality</li>
+    <li>Fragmentation issues</li>
+    <li>Whole process must fit</li>
+    <li>Limited sharing</li>
+    <li>Size bound by largest hole</li>
+    <li>Paging: Removes external fragmentation</li>
+    <li>Segmentation: Logical program view</li>
+    <li>Virtual Memory: Beyond physical limits</li>
+    <li>Hybrid: Paging + Segmentation</li>
+</ul>
+
+<h3 id="sub-7-7">7.7 Key Takeaways</h3>
+<p>42</p>
+<ul>
+    <li>Memory Hierarchy</li>
+    <li>Contiguous Allocation</li>
+    <li>Protection</li>
+    <li>Fixed Partitioning</li>
+    <li>Dynamic Partitioning</li>
+    <li>Allocation Algorithms</li>
+    <li>Fragmentation</li>
+    <li>Swapping</li>
+    <li>Overlays</li>
+</ul>
+
+<h3 id="sub-7-8">7.8 Thank You!</h3>
+<p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
+<p>43</p>
+
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Previous Topic</button>
+                        <a href="lecture-20.html" class="btn" style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;">Next Lecture</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for your reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-7').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/19.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>
