@@ -418,18 +418,23 @@ M=M+D</code></pre>
 <h3 id="sub-6-3">6.3 Control Flow: While</h3>
 
 <p>The only loop construct in Jack!</p>
-<p>// Display the result</p>
-<p>do Output.printString("Sum of array elements: ");</p>
-<p>do Output.printInt(sum);</p>
-<p>do Output.println();</p>
-<pre class="code-block"><code>Syntax: while (condition) {
-... }.
+<pre class="code-block"><code>// Syntax:
+while (condition) {
+    ...
+}
+
+// Example:
 let sum = 0;
 let i = 0;
-while (i < length) {
-let sum = sum + arr[i];
-let i = i + 1;
-}</code></pre>
+while (i &lt; length) {
+    let sum = sum + arr[i];
+    let i = i + 1;
+}
+
+// Display the result
+do Output.printString("Sum of array elements: ");
+do Output.printInt(sum);
+do Output.println();</code></pre>
 
 <h3 id="sub-6-4">6.4 Jack Software Suite</h3>
 
