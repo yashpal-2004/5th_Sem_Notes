@@ -178,17 +178,29 @@
 
 <h3 id="sub-2-4">2.4 The Software Hierarchy</h3>
 
-<p>The Full Stack: From High-Level</p>
-<p>Jack to Binary.</p>
-<p>English (Jack)</p>
-<p>Simplified Code (VM)</p>
-<p>Symbols (Assembly)</p>
-<p>1s and 0s (Machine).</p>
-<ul>
-    <li>></li>
-    <li>></li>
-    <li>></li>
-</ul>
+<p>The Full Stack: Compilation and translation flow from high-level Jack code down to binary machine execution:</p>
+
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin: 2rem 0; background: var(--bg-mint); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border-light); flex-wrap: wrap;">
+    <div style="text-align: center; flex: 1; min-width: 120px;">
+        <strong style="display: block; font-size: 1.1rem; color: var(--text-dark);">English (Jack)</strong>
+        <span style="font-size: 0.85rem; color: var(--text-muted);">High-Level Language</span>
+    </div>
+    <div style="color: var(--text-muted); font-weight: bold; font-size: 1.5rem; text-align: center;">➔</div>
+    <div style="text-align: center; flex: 1; min-width: 120px;">
+        <strong style="display: block; font-size: 1.1rem; color: var(--text-dark);">Simplified Code (VM)</strong>
+        <span style="font-size: 0.85rem; color: var(--text-muted);">Intermediate VM Stack</span>
+    </div>
+    <div style="color: var(--text-muted); font-weight: bold; font-size: 1.5rem; text-align: center;">➔</div>
+    <div style="text-align: center; flex: 1; min-width: 120px;">
+        <strong style="display: block; font-size: 1.1rem; color: var(--text-dark);">Symbols (Assembly)</strong>
+        <span style="font-size: 0.85rem; color: var(--text-muted);">Hack Assembly Mnemonics</span>
+    </div>
+    <div style="color: var(--text-muted); font-weight: bold; font-size: 1.5rem; text-align: center;">➔</div>
+    <div style="text-align: center; flex: 1; min-width: 120px;">
+        <strong style="display: block; font-size: 1.1rem; color: var(--text-dark);">1s &amp; 0s (Machine)</strong>
+        <span style="font-size: 0.85rem; color: var(--text-muted);">Binary Machine Code</span>
+    </div>
+</div>
 
                     
                     <div class="topic-nav">
