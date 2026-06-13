@@ -28,55 +28,55 @@
                 <h3>Table of Contents</h3>
                 <div class="topic-count">Total Topics: 6</div>
             </div>
-            <ul class="index-list" id="indexList">
+            <ul>
                 <li>
                     <a href="#topic-1">1. Contiguous Allocation Drawbacks<span class="sub-count">3</span></a>
                     <ul class="sub-index">
                          <li><a href="#sub-1-1">1.1 Join the lecture online on your dashboard</a></li>
                          <li><a href="#sub-1-2">1.2 Today’s Agenda</a></li>
                          <li><a href="#sub-1-3">1.3 Problems with Contiguous Allocation</a></li>
-                    </ul>
+                    > class="index-list" id="indexList"</ul>
                 </li>
                 <li>
                     <a href="#topic-2">2. Paging Fundamentals<span class="sub-count">3</span></a>
-                    <ul class="sub-index">
+                    <ul>
                          <li><a href="#sub-2-1">2.1 Introduction to Paging</a></li>
                          <li><a href="#sub-2-2">2.2 Paging - Visual Representation</a></li>
                          <li><a href="#sub-2-3">2.3 Frame Table & Page Table</a></li>
-                    </ul>
+                    > class="sub-index"</ul>
                 </li>
                 <li>
                     <a href="#topic-3">3. Page Table & Entry Structure<span class="sub-count">3</span></a>
-                    <ul class="sub-index">
+                    <ul>
                          <li><a href="#sub-3-1">3.1 Page Table Entry (PTE) Structure</a></li>
                          <li><a href="#sub-3-2">3.2 Address Translation - The Big Picture</a></li>
                          <li><a href="#sub-3-3">3.3 Address Translation - Step by Step</a></li>
-                    </ul>
+                    > class="sub-index"</ul>
                 </li>
                 <li>
                     <a href="#topic-4">4. Address Translation Mechanics<span class="sub-count">3</span></a>
-                    <ul class="sub-index">
+                    <ul>
                          <li><a href="#sub-4-1">4.1 Address Translation Example</a></li>
                          <li><a href="#sub-4-2">4.2 Advantages of Paging</a></li>
                          <li><a href="#sub-4-3">4.3 Disadvantages of Paging</a></li>
-                    </ul>
+                    > class="sub-index"</ul>
                 </li>
                 <li>
                     <a href="#topic-5">5. Advantages vs. Disadvantages<span class="sub-count">3</span></a>
-                    <ul class="sub-index">
+                    <ul>
                          <li><a href="#sub-5-1">5.1 Page Table Storage Problem</a></li>
                          <li><a href="#sub-5-2">5.2 Multi-Level Paging - Concept</a></li>
                          <li><a href="#sub-5-3">5.3 Two-Level Paging Example</a></li>
-                    </ul>
+                    > class="sub-index"</ul>
                 </li>
                 <li>
                     <a href="#topic-6">6. Multi-Level Paging<span class="sub-count">4</span></a>
-                    <ul class="sub-index">
+                    <ul>
                          <li><a href="#sub-6-1">6.1 Shared Pages</a></li>
                          <li><a href="#sub-6-2">6.2 Page Size Selection</a></li>
                          <li><a href="#sub-6-3">6.3 Key Takeaways</a></li>
                          <li><a href="#sub-6-4">6.4 Thank You!</a></li>
-                    </ul>
+                    > class="sub-index"</ul>
                 </li>
                 <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
             </ul>
@@ -90,8 +90,10 @@
                     <h2>Contiguous Allocation Drawbacks</h2>
                 </div>
                 <div id="content-1" class="collapsible-content">
-                    <h3 id="sub-1-1">1.1 Join the lecture online on your dashboard</h3>
-
+                    <h3 id="sub-1-1">1.1 Join the lecture online on your dashboard</h3>
+
+
+
 <h3 id="sub-1-2">1.2 Today’s Agenda</h3>
 
 <ul>
@@ -245,7 +247,11 @@
 <p>Big Flow CPU Logical Address (p, d) ↓ Page Table Lookup (p → f) ↓ Physical Address (f, d)</p>
 <p>Step-by-Step Translation 1. Extract Page Number (p)</p>
 <div class="formula-box">○ p = Logical Address bits - d</div>
-<p>2. Extract Offset (d) ○ d = log₂(Page Size) 3. Page Table Lookup ○ Use p to index page table ○ Check Valid bit ■ Invalid → Page Fault (OS intervention) ■ Valid → Get frame number f 4. Form Physical Address</p>
+<ol>
+    <li>Extract Offset (d) ○ d = log₂(Page Size)</li>
+    <li>Page Table Lookup ○ Use p to index page table ○ Check Valid bit ■ Invalid → Page Fault (OS intervention) ■ Valid → Get frame number f</li>
+    <li>Form Physical Address</li>
+</ol>
 <div class="formula-box">○ Physical Address = (f × Page Size) + d</div>
 <p>5. Access Memory ○ CPU reads/writes at computed physical address</p>
 
@@ -282,10 +288,14 @@
     <li>Pages: 32 / 8 = 4 pages. Frames: 128 / 8 = 16 frames. Page bits: 2 bits. Offset bits: 3 bits. Frame bits: 4 bits</li>
 </ul>
 
-<h3 id="sub-4-2">4.2 Advantages of Paging</h3>
-
-<h3 id="sub-4-3">4.3 Disadvantages of Paging</h3>
-
+<h3 id="sub-4-2">4.2 Advantages of Paging</h3>
+
+
+
+<h3 id="sub-4-3">4.3 Disadvantages of Paging</h3>
+
+
+
                     
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
@@ -345,7 +355,12 @@
 
 <p>Configuration: Logical address: 32 bits. Page size: 4 KB (2¹²). PTE size: 4 bytes</p>
 <p>Address Breakdown ┌──────────┬──────────┬──────────┐ │ P1 (10b) │ P2 (10b) │ d (12b)  │ └──────────┴──────────┴──────────┘ Page Dir     Page Table   Offset</p>
-<p>Translation Steps 1. Index P1 → Outer Page Table ○ Get base address of inner page table 2. Index P2 → Inner Page Table ○ Get frame number 3. Frame + Offset ○ Form physical address</p>
+<p>Translation Steps</p>
+<ol>
+    <li>Index P1 → Outer Page Table ○ Get base address of inner page table</li>
+    <li>Index P2 → Inner Page Table ○ Get frame number</li>
+    <li>Frame + Offset ○ Form physical address</li>
+</ol>
 <p>Memory Savings ○ Always 4 MB per process ○ Outer table: 4 KB ○ Inner tables: 10 × 4 KB = 40 KB ○ Total = 44 KB</p>
 <p>~99% memory saved</p>
 <ul>
@@ -404,8 +419,10 @@
 <p>Trade-offs</p>
 
 <h3 id="sub-6-4">6.4 Thank You!</h3>
-<p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
-
+<p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
+
+
+
                     
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>

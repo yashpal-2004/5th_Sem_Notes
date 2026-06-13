@@ -28,7 +28,7 @@
                 <h3>Table of Contents</h3>
                 <div class="topic-count">Total Topics: 5</div>
             </div>
-            <ul class="index-list" id="indexList">
+            <ul>
                 <li>
                     <a href="#topic-1">1. Deadlock Prevention (Coffman Conditions)<span class="sub-count">5</span></a>
                     <ul class="sub-index">
@@ -37,41 +37,41 @@
                          <li><a href="#sub-1-3">1.3 TODAY'S JOURNEY</a></li>
                          <li><a href="#sub-1-4">1.4 PREVENTION STRATEGY 1</a></li>
                          <li><a href="#sub-1-5">1.5 PREVENTION STRATEGY 2</a></li>
-                    </ul>
+                    > class="index-list" id="indexList"</ul>
                 </li>
                 <li>
                     <a href="#topic-2">2. Deadlock Avoidance Concepts<span class="sub-count">5</span></a>
-                    <ul class="sub-index">
+                    <ul>
                          <li><a href="#sub-2-1">2.1 Hold and Wait Reality Check</a></li>
                          <li><a href="#sub-2-2">2.2 PREVENTION STRATEGY 3</a></li>
                          <li><a href="#sub-2-3">2.3 PREVENTION STRATEGY 4</a></li>
                          <li><a href="#sub-2-4">2.4 PREVENTION TRADE-OFFS SUMMARY</a></li>
                          <li><a href="#sub-2-5">2.5 WHEN PREVENTION MAKES SENSE</a></li>
-                    </ul>
+                    > class="sub-index"</ul>
                 </li>
                 <li>
                     <a href="#topic-3">3. Safe vs. Unsafe States<span class="sub-count">5</span></a>
-                    <ul class="sub-index">
+                    <ul>
                          <li><a href="#sub-3-1">3.1 THE PHILOSOPHY SHIFT - AVOIDANCE</a></li>
                          <li><a href="#sub-3-2">3.2 SAFE VS UNSAFE STATES</a></li>
                          <li><a href="#sub-3-3">3.3 Is This Safe?</a></li>
                          <li><a href="#sub-3-4">3.4 Testing Safety Understanding</a></li>
                          <li><a href="#sub-3-5">3.5 INTRODUCING BANKER'S ALGORITHM</a></li>
-                    </ul>
+                    > class="sub-index"</ul>
                 </li>
                 <li>
                     <a href="#topic-4">4. Banker's Algorithm & Ledger<span class="sub-count">5</span></a>
-                    <ul class="sub-index">
+                    <ul>
                          <li><a href="#sub-4-1">4.1 </a></li>
                          <li><a href="#sub-4-2">4.2 Can Everyone Be Satisfied?</a></li>
                          <li><a href="#sub-4-3">4.3 RESOURCE REQUEST ALGORITHM</a></li>
                          <li><a href="#sub-4-4">4.4 BANKER'S ALGORITHM SIMULATION</a></li>
                          <li><a href="#sub-4-5">4.5 Banker's Understanding Check</a></li>
-                    </ul>
+                    > class="sub-index"</ul>
                 </li>
                 <li>
                     <a href="#topic-5">5. Resource Request Algorithm & Safety check<span class="sub-count">8</span></a>
-                    <ul class="sub-index">
+                    <ul>
                          <li><a href="#sub-5-1">5.1 Detection Frequency Check</a></li>
                          <li><a href="#sub-5-2">5.2 BANKER'S VS PREVENTION</a></li>
                          <li><a href="#sub-5-3">5.3 WHY BANKER'S FAILS IN PRACTICE</a></li>
@@ -80,7 +80,7 @@
                          <li><a href="#sub-5-6">5.6 Practical Guidelines</a></li>
                          <li><a href="#sub-5-7">5.7 Final Understanding Check</a></li>
                          <li><a href="#sub-5-8">5.8 Thank You!</a></li>
-                    </ul>
+                    > class="sub-index"</ul>
                 </li>
                 <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
             </ul>
@@ -112,8 +112,10 @@
     <li>Which is your OS superpower choice?</li>
 </ul>
 
-<h3 id="sub-1-3">1.3 TODAY'S JOURNEY</h3>
-
+<h3 id="sub-1-3">1.3 TODAY'S JOURNEY</h3>
+
+
+
 <h3 id="sub-1-4">1.4 PREVENTION STRATEGY 1</h3>
 
 <p>Strategy: Make resources shareable when possible Examples That Work:</p>
@@ -156,7 +158,13 @@
                     <h3 id="sub-2-1">2.1 Hold and Wait Reality Check</h3>
 
 <p>Why might a text editor have difficulty using the "request all resources at once" strategy?</p>
-<p>A) Text editors are too simple B) It doesn't know in advance which files the user will open C) Text editors don't use resources D) The strategy only works for database systems ANSWER: B) It doesn't know in advance which files the user will open The text editor can't predict user behavior - which files you'll open, when you'll open them, or how many you'll need. This unpredictability makes "request all at once" impractical for interactive applications.</p>
+<ul>
+    <li><strong>A)</strong> Text editors are too simple</li>
+    <li><strong>B)</strong> It doesn't know in advance which files the user will open</li>
+    <li><strong>C)</strong> Text editors don't use resources</li>
+    <li><strong>D)</strong> The strategy only works for database systems ANSWER:</li>
+    <li><strong>B)</strong> It doesn't know in advance which files the user will open The text editor can't predict user behavior - which files you'll open, when you'll open them, or how many you'll need. This unpredictability makes "request all at once" impractical for interactive applications.</li>
+</ul>
 
 <h3 id="sub-2-2">2.2 PREVENTION STRATEGY 3</h3>
 
@@ -264,8 +272,10 @@
     <li>Risky territory</li>
     <li>Deadlock has already occurred</li>
     <li>Special case of unsafe state</li>
-</ul>
-
+</ul>
+
+
+
 <h3 id="sub-3-3">3.3 Is This Safe?</h3>
 
 <p>Scenario: System has 12 tape drives Three processes with maximum needs:</p>
@@ -301,7 +311,12 @@
 
 <p>Same scenario, but we grant P2 one more drive:</p>
 <p>Is the system still SAFE?</p>
-<p>A) Yes, same safe sequence works B) No, system is now unsafe C) System is deadlocked D) Cannot determine without more information ANSWER: Let's check together:</p>
+<ul>
+    <li><strong>A)</strong> Yes, same safe sequence works</li>
+    <li><strong>B)</strong> No, system is now unsafe</li>
+    <li><strong>C)</strong> System is deadlocked</li>
+    <li><strong>D)</strong> Cannot determine without more information ANSWER: Let's check together:</li>
+</ul>
 <p>Result: UNSAFE! No safe sequence exists.</p>
 <ul>
     <li>Available: 3 → 2 drives</li>
@@ -318,7 +333,11 @@
 <p>The Promise:</p>
 <p>If we follow Banker's Algorithm, deadlock is IMPOSSIBLE!</p>
 <p>Requirements:</p>
-<p>1. Each process declares maximum resource needs 2. Processes request incrementally (not all at once) 3. System checks safety before every grant</p>
+<ol>
+    <li>Each process declares maximum resource needs</li>
+    <li>Processes request incrementally (not all at once)</li>
+    <li>System checks safety before every grant</li>
+</ol>
 <ul>
     <li>Bank has limited cash (resources)</li>
     <li>Customers have credit limits (max needs)</li>
@@ -365,8 +384,10 @@
     <li>How much MORE each process might need</li>
 </ul>
 
-<h3 id="sub-4-2">4.2 Can Everyone Be Satisfied?</h3>
-
+<h3 id="sub-4-2">4.2 Can Everyone Be Satisfied?</h3>
+
+
+
 <h3 id="sub-4-3">4.3 RESOURCE REQUEST ALGORITHM</h3>
 
 <p>When Process Pi Requests Resources:</p>
@@ -387,7 +408,11 @@
 
 <p>Scenario: 3 processes (P0, P1, P2), 3 resource types (A, B, C) Given: Available = [3, 3, 2] Tasks:</p>
 <div class="formula-box">1. Calculate the Need matrix (Need = Max - Allocation)</div>
-<p>2. Determine if current state is SAFE 3. If safe, find a safe sequence 4. If unsafe, explain why Step 1: Calculate Need Matrix</p>
+<ol>
+    <li>Determine if current state is SAFE</li>
+    <li>If safe, find a safe sequence</li>
+    <li>If unsafe, explain why Step 1: Calculate Need Matrix</li>
+</ol>
 <div class="formula-box">Need = Max - Allocation</div>
 <p>Now let's check if this state is safe...</p>
 <p>Initial: Work = [3, 3, 2], all Finish = false Round 1: Check each process</p>
@@ -406,7 +431,13 @@
 
 <p>What if Available was [3, 3, 3] instead of [3, 3, 2]?</p>
 <p>Would the state be SAFE?</p>
-<p>A) Yes, safe sequence exists B) No, still unsafe C) System is deadlocked D) Need more information ANSWER: B) No, still unsafe</p>
+<ul>
+    <li><strong>A)</strong> Yes, safe sequence exists</li>
+    <li><strong>B)</strong> No, still unsafe</li>
+    <li><strong>C)</strong> System is deadlocked</li>
+    <li><strong>D)</strong> Need more information ANSWER:</li>
+    <li><strong>B)</strong> No, still unsafe</li>
+</ul>
 <div class="formula-box">Trace: P1 finishes (Work = [5,3,3]), then P0 needs [7,4,3], we have [5,3,3] - still NO.</div>
 <p>But P2 needs [6,0,0] ≤ [5,3,3]? NO (6>5). Still stuck! Actually still UNSAFE.</p>
 
@@ -427,7 +458,13 @@
                     <h3 id="sub-5-1">5.1 Detection Frequency Check</h3>
 
 <p>In Banker's Algorithm, the Need matrix represents:</p>
-<p>A) Total resources each process will ever use B) Resources currently allocated to each process C) Remaining resources each process may still request D) Resources available in the system ANSWER: C) Remaining resources each process may still request</p>
+<ul>
+    <li><strong>A)</strong> Total resources each process will ever use</li>
+    <li><strong>B)</strong> Resources currently allocated to each process</li>
+    <li><strong>C)</strong> Remaining resources each process may still request</li>
+    <li><strong>D)</strong> Resources available in the system ANSWER:</li>
+    <li><strong>C)</strong> Remaining resources each process may still request</li>
+</ul>
 <div class="formula-box">Need = Max - Allocation, showing how much MORE each process might</div>
 <p>need to complete. It's not the max (that's Max matrix), not current (that's Allocation), and not available (that's Available vector).</p>
 
@@ -452,9 +489,14 @@
 
 <p>Given state with 3 resource types (A, B, C):</p>
 <p>Available = [2, 1, 0] Tasks:</p>
-<p>1. Verify the Need matrix is correct 2. Is this state SAFE?</p>
-<p>3. If safe, provide a safe sequence 4. If unsafe, explain why Solution:</p>
-<p>1. Need matrix verification:  Correct (Max - Allocation) 2. Safety Check:</p>
+<ol>
+    <li>Verify the Need matrix is correct</li>
+    <li>Is this state SAFE?</li>
+    <li>If safe, provide a safe sequence</li>
+    <li>If unsafe, explain why Solution:</li>
+    <li>Need matrix verification:  Correct (Max - Allocation)</li>
+    <li>Safety Check:</li>
+</ol>
 <p>Work = [2, 1, 0], all Finish = false Round 1:</p>
 <p>STUCK! Cannot finish anyone!</p>
 <p>3. Verdict: UNSAFE! </p>
@@ -469,7 +511,12 @@
 <h3 id="sub-5-5">5.5 Key Takeaways</h3>
 
 <p>What We've Learned:</p>
-<p>1. Prevention: Break ONE of Four Conditions 2. Resource Ordering is the Winner 3. Avoidance: The Smart Approach 4. Banker's is Beautiful but Impractical</p>
+<ol>
+    <li>Prevention: Break ONE of Four Conditions</li>
+    <li>Resource Ordering is the Winner</li>
+    <li>Avoidance: The Smart Approach</li>
+    <li>Banker's is Beautiful but Impractical</li>
+</ol>
 <ul>
     <li>Mutual Exclusion - Rarely feasible</li>
     <li>Hold and Wait - Impractical for dynamic systems</li>
@@ -489,16 +536,30 @@
 <h3 id="sub-5-6">5.6 Practical Guidelines</h3>
 
 <p>Modern Best Practices:</p>
-<p>1. Resource ordering for kernel locks 2. Lock-free data structures when possible 3. Design patterns that avoid hold-and-wait (GCD!) 4. Timeouts and watchdogs 5. User-initiated recovery (force quit)</p>
+<ol>
+    <li>Resource ordering for kernel locks</li>
+    <li>Lock-free data structures when possible</li>
+    <li>Design patterns that avoid hold-and-wait (GCD!)</li>
+    <li>Timeouts and watchdogs</li>
+    <li>User-initiated recovery (force quit)</li>
+</ol>
 
 <h3 id="sub-5-7">5.7 Final Understanding Check</h3>
 
 <p>What key information must be known in advance for deadlock avoidance to work?</p>
-<p>A) Current CPU utilization B) Maximum future resource needs of each process C) Priority levels of all processes D) Execution time of each process ANSWER: B) Maximum future resource needs of each process Avoidance (Banker's Algorithm) requires the Max matrix - each process must declare its maximum resource needs before execution. This lets the algorithm predict worst-case scenarios and maintain safe states.</p>
+<ul>
+    <li><strong>A)</strong> Current CPU utilization</li>
+    <li><strong>B)</strong> Maximum future resource needs of each process</li>
+    <li><strong>C)</strong> Priority levels of all processes</li>
+    <li><strong>D)</strong> Execution time of each process ANSWER:</li>
+    <li><strong>B)</strong> Maximum future resource needs of each process Avoidance (Banker's Algorithm) requires the Max matrix - each process must declare its maximum resource needs before execution. This lets the algorithm predict worst-case scenarios and maintain safe states.</li>
+</ul>
 
 <h3 id="sub-5-8">5.8 Thank You!</h3>
-<p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
-
+<p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
+
+
+
                     
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>

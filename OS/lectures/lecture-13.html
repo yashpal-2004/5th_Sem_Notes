@@ -28,7 +28,7 @@
                 <h3>Table of Contents</h3>
                 <div class="topic-count">Total Topics: 6</div>
             </div>
-            <ul class="index-list" id="indexList">
+            <ul>
                 <li>
                     <a href="#topic-1">1. Semaphores Definition<span class="sub-count">4</span></a>
                     <ul class="sub-index">
@@ -36,47 +36,47 @@
                          <li><a href="#sub-1-2">1.2 Recap: The Synchronization Hierarchy</a></li>
                          <li><a href="#sub-1-3">1.3 The Problem with Mutexes</a></li>
                          <li><a href="#sub-1-4">1.4 Enter the Semaphore</a></li>
-                    </ul>
+                    > class="index-list" id="indexList"</ul>
                 </li>
                 <li>
                     <a href="#topic-2">2. Binary vs. Counting Semaphores<span class="sub-count">4</span></a>
-                    <ul class="sub-index">
+                    <ul>
                          <li><a href="#sub-2-1">2.1 The Semaphore Abstract Data Type</a></li>
                          <li><a href="#sub-2-2">2.2 Binary Semaphore</a></li>
                          <li><a href="#sub-2-3">2.3 Counting Semaphore</a></li>
                          <li><a href="#sub-2-4">2.4 Visualizing the Difference</a></li>
-                    </ul>
+                    > class="sub-index"</ul>
                 </li>
                 <li>
                     <a href="#topic-3">3. Wait & Signal Operations<span class="sub-count">4</span></a>
-                    <ul class="sub-index">
+                    <ul>
                          <li><a href="#sub-3-1">3.1 The Two Atomic Operations</a></li>
                          <li><a href="#sub-3-2">3.2 Signal : Pseudo Code</a></li>
                          <li><a href="#sub-3-3">3.3 Simulation Trace</a></li>
                          <li><a href="#sub-3-4">3.4 Busy Waiting (The Spinlock Approach)</a></li>
-                    </ul>
+                    > class="sub-index"</ul>
                 </li>
                 <li>
                     <a href="#topic-4">4. OS Kernel Implementation<span class="sub-count">4</span></a>
-                    <ul class="sub-index">
+                    <ul>
                          <li><a href="#sub-4-1">4.1 Blocking (Semaphore)</a></li>
                          <li><a href="#sub-4-2">4.2 Inside the OS Kernel: The Data Structure</a></li>
                          <li><a href="#sub-4-3">4.3 The Atomicity Challenge</a></li>
                          <li><a href="#sub-4-4">4.4 The "Spinlock Inside" (Implementation Irony)</a></li>
-                    </ul>
+                    > class="sub-index"</ul>
                 </li>
                 <li>
                     <a href="#topic-5">5. POSIX Semaphore API<span class="sub-count">4</span></a>
-                    <ul class="sub-index">
+                    <ul>
                          <li><a href="#sub-5-1">5.1 Modern Optimization: The "Two-Phase" Wait</a></li>
                          <li><a href="#sub-5-2">5.2 Queue Policies & Fairness</a></li>
                          <li><a href="#sub-5-3">5.3 The Standard API (POSIX)</a></li>
                          <li><a href="#sub-5-4">5.4 The Binary Mutex Pattern</a></li>
-                    </ul>
+                    > class="sub-index"</ul>
                 </li>
                 <li>
                     <a href="#topic-6">6. Deadlock & Starvation Pitfalls<span class="sub-count">7</span></a>
-                    <ul class="sub-index">
+                    <ul>
                          <li><a href="#sub-6-1">6.1 Pattern: The Resource Pool</a></li>
                          <li><a href="#sub-6-2">6.2 Deep Dive: Mutex vs. Semaphore</a></li>
                          <li><a href="#sub-6-3">6.3 Pitfall 1: Deadlock (The Deadly Embrace)</a></li>
@@ -84,7 +84,7 @@
                          <li><a href="#sub-6-5">6.5 Common Coding Bugs (Logic Errors)</a></li>
                          <li><a href="#sub-6-6">6.6 Best Practices Checklist</a></li>
                          <li><a href="#sub-6-7">6.7 Thank You!</a></li>
-                    </ul>
+                    > class="sub-index"</ul>
                 </li>
                 <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
             </ul>
@@ -131,8 +131,10 @@ signal() (V).</code></pre>
 <p>The Limitation:</p>
 <p>A Mutex is binary: It is either locked or unlocked.</p>
 <p>It cannot count "5 available slots." If you have 3 printers and 10 threads, how do you coordinate access using only mutexes?</p>
-<p>Answer: It requires messy counters and multiple locks. We need a better abstraction.</p>
-
+<p>Answer: It requires messy counters and multiple locks. We need a better abstraction.</p>
+
+
+
 <h3 id="sub-1-4">1.4 Enter the Semaphore</h3>
 
 <p>Definition: A synchronization primitive introduced by Edsger Dijkstra (1965).</p>
@@ -330,8 +332,10 @@ the entire if (count < 0) { ... }</code></pre>
 <ul>
     <li>Phase 1 (Spin): Spin for a tiny limit (e.g., 50</li>
     <li>Phase 2 (Block): If still unavailable, then yield the</li>
-</ul>
-
+</ul>
+
+
+
 <h3 id="sub-5-2">5.2 Queue Policies & Fairness</h3>
 
 <p>Strict FIFO (First-In-First-Out): wakes up first. no starvation.</p>
@@ -366,8 +370,10 @@ sem_init(&mutex, 0, 1)
 sem_wait(&mutex);  // Lock
 sem_post(&mutex);  // Unlock
 sem_init(&mutex, 0, 0);
-sem_wait(&mutex);  // Blocks immediately!</code></pre>
-
+sem_wait(&mutex);  // Blocks immediately!</code></pre>
+
+
+
                     
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
@@ -410,15 +416,19 @@ someone calls sem_post.</code></pre>
 <p>The Code of Doom:</p>
 <p>The "Context Switch" Trigger: T1 gets A, T2 gets B. Both block. Game over.</p>
 <pre class="code-block"><code>● Thread 1: wait(A); wait(B);
-● Thread 2: wait(B); wait(A);</code></pre>
-
+● Thread 2: wait(B); wait(A);</code></pre>
+
+
+
 <h3 id="sub-6-4">6.4 Pitfall 2: Starvation & Fairness</h3>
 
 <p>Definition: The system is making progress, but one specific thread is stuck waiting forever.</p>
 <p>Cause: "Weak" Semaphore implementation or aggressive High-Priority threads.</p>
 <p>The "Polite" Problem: If the semaphore queue is LIFO (Last-In-First-Out), a steady stream of new threads could keep an old thread buried at the bottom of the stack.</p>
-<p>A busy intersection where the traffic light stays green for the main road forever, and the car on the small side street never gets a turn.</p>
-
+<p>A busy intersection where the traffic light stays green for the main road forever, and the car on the small side street never gets a turn.</p>
+
+
+
 <h3 id="sub-6-5">6.5 Common Coding Bugs (Logic Errors)</h3>
 
 <p>Bug 1: Unbalanced Signal: Calling post() one too many times.</p>
@@ -435,8 +445,10 @@ someone calls sem_post.</code></pre>
 <pre class="code-block"><code>(in Go/Swift) to ensure signal() is always</code></pre>
 
 <h3 id="sub-6-7">6.7 Thank You!</h3>
-<p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
-
+<p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
+
+
+
                     
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>

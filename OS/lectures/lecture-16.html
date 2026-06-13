@@ -28,7 +28,7 @@
                 <h3>Table of Contents</h3>
                 <div class="topic-count">Total Topics: 6</div>
             </div>
-            <ul class="index-list" id="indexList">
+            <ul>
                 <li>
                     <a href="#topic-1">1. Deadlocks Introduction<span class="sub-count">5</span></a>
                     <ul class="sub-index">
@@ -37,57 +37,57 @@
                          <li><a href="#sub-1-3">1.3 Let's Start with a Challenge!</a></li>
                          <li><a href="#sub-1-4">1.4 What is a Deadlock?</a></li>
                          <li><a href="#sub-1-5">1.5 Deadlock vs Other Blocking States</a></li>
-                    </ul>
+                    > class="index-list" id="indexList"</ul>
                 </li>
                 <li>
                     <a href="#topic-2">2. Starvation vs. Livelock vs. Deadlock<span class="sub-count">5</span></a>
-                    <ul class="sub-index">
+                    <ul>
                          <li><a href="#sub-2-1">2.1 System Model Resources</a></li>
                          <li><a href="#sub-2-2">2.2 Process-Resource Interaction</a></li>
                          <li><a href="#sub-2-3">2.3 Deadlock Characterization</a></li>
                          <li><a href="#sub-2-4">2.4 Necessary Conditions (Coffman Conditions)</a></li>
                          <li><a href="#sub-2-5">2.5 Condition 1 Mutual Exclusion</a></li>
-                    </ul>
+                    > class="sub-index"</ul>
                 </li>
                 <li>
                     <a href="#topic-3">3. System Resource Models<span class="sub-count">5</span></a>
-                    <ul class="sub-index">
+                    <ul>
                          <li><a href="#sub-3-1">3.1 Code Example - Mutual Exclusion with Mutex</a></li>
                          <li><a href="#sub-3-2">3.2 Condition 2 Hold and Wait</a></li>
                          <li><a href="#sub-3-3">3.3 Code Example - Hold and Wait Pattern</a></li>
                          <li><a href="#sub-3-4">3.4 Condition 3 No Preemption</a></li>
                          <li><a href="#sub-3-5">3.5 Code Example - Non-Preemptible Mutex</a></li>
-                    </ul>
+                    > class="sub-index"</ul>
                 </li>
                 <li>
                     <a href="#topic-4">4. The Four Necessary Coffman Conditions<span class="sub-count">5</span></a>
-                    <ul class="sub-index">
+                    <ul>
                          <li><a href="#sub-4-1">4.1 Condition 4 Circular Wait</a></li>
                          <li><a href="#sub-4-2">4.2 Code Example - Three-Process Circular Wait</a></li>
                          <li><a href="#sub-4-3">4.3 Resource Allocation Graph (RAG) Introduction</a></li>
                          <li><a href="#sub-4-4">4.4 RAG Notation and Symbols</a></li>
                          <li><a href="#sub-4-5">4.5 RAG Example 1 No Deadlock</a></li>
-                    </ul>
+                    > class="sub-index"</ul>
                 </li>
                 <li>
                     <a href="#topic-5">5. Resource Allocation Graphs (RAG)<span class="sub-count">5</span></a>
-                    <ul class="sub-index">
+                    <ul>
                          <li><a href="#sub-5-1">5.1 RAG Example 2 Deadlock Exists</a></li>
                          <li><a href="#sub-5-2">5.2 RAG Example 3 Cycle But No Deadlock</a></li>
                          <li><a href="#sub-5-3">5.3 RAG Analysis Summary Rules</a></li>
                          <li><a href="#sub-5-4">5.4 Deadlock Example Dining Philosophers</a></li>
                          <li><a href="#sub-5-5">5.5 Consequences of Deadlocks</a></li>
-                    </ul>
+                    > class="sub-index"</ul>
                 </li>
                 <li>
                     <a href="#topic-6">6. RAG Analysis Rules<span class="sub-count">5</span></a>
-                    <ul class="sub-index">
+                    <ul>
                          <li><a href="#sub-6-1">6.1 Necessary vs Sufficient Conditions</a></li>
                          <li><a href="#sub-6-2">6.2 Practice Problems</a></li>
                          <li><a href="#sub-6-3">6.3 Practice Problems</a></li>
                          <li><a href="#sub-6-4">6.4 Key Takeaways</a></li>
                          <li><a href="#sub-6-5">6.5 Thank You!</a></li>
-                    </ul>
+                    > class="sub-index"</ul>
                 </li>
                 <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
             </ul>
@@ -101,8 +101,10 @@
                     <h2>Deadlocks Introduction</h2>
                 </div>
                 <div id="content-1" class="collapsible-content">
-                    <h3 id="sub-1-1">1.1 Join the lecture online on your dashboard</h3>
-
+                    <h3 id="sub-1-1">1.1 Join the lecture online on your dashboard</h3>
+
+
+
 <h3 id="sub-1-2">1.2 Today’s Agenda</h3>
 
 <p>Part I — Foundation</p>
@@ -147,8 +149,10 @@
     <li></li>
     <li>Each process waits for another</li>
     <li>Circular wait exists:</li>
-</ul>
-
+</ul>
+
+
+
 <h3 id="sub-1-5">1.5 Deadlock vs Other Blocking States</h3>
 
 <p>Starvation vs Livelock vs Deadlock</p>
@@ -168,8 +172,10 @@
     <li>State keeps changing</li>
     <li>No real progress</li>
     <li>Overreaction loop</li>
-</ul>
-
+</ul>
+
+
+
                     
                     <div class="topic-nav">
                         <a href="lecture-15.html" class="btn" style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;">Previous Lecture</a>
@@ -231,8 +237,10 @@ Release: close(), free(), signal()</code></pre>
     <li></li>
     <li></li>
     <li></li>
-</ul>
-
+</ul>
+
+
+
 <h3 id="sub-2-4">2.4 Necessary Conditions (Coffman Conditions)</h3>
 
 <p>Deadlock occurs if all four hold simultaneously</p>
@@ -249,8 +257,10 @@ Release: close(), free(), signal()</code></pre>
     <li>Released voluntarily</li>
     <li>Holding one resource</li>
     <li>Waiting for another</li>
-</ul>
-
+</ul>
+
+
+
 <h3 id="sub-2-5">2.5 Condition 1 Mutual Exclusion</h3>
 
 <p>Definition Only one process can use a resource at a time. Others must wait until it’s released.</p>
@@ -317,8 +327,10 @@ Release: close(), free(), signal()</code></pre>
     <li></li>
     <li></li>
     <li></li>
-</ul>
-
+</ul>
+
+
+
 <h3 id="sub-3-4">3.4 Condition 3 No Preemption</h3>
 
 <p>Definition Resources cannot be forcibly taken. They are released only voluntarily by the holding process.</p>
@@ -374,8 +386,10 @@ Release: close(), free(), signal()</code></pre>
     <li>P1 holds R1, waits for R2</li>
     <li>P2 holds R2, waits for R3</li>
     <li>P3 holds R3, waits for R1</li>
-</ul>
-
+</ul>
+
+
+
 <h3 id="sub-4-2">4.2 Code Example - Three-Process Circular Wait</h3>
 
 <p>Three-Process Circular Wait Circular wait chain:</p>
@@ -443,8 +457,10 @@ Release: close(), free(), signal()</code></pre>
     <li></li>
     <li></li>
     <li>R3</li>
-</ul>
-
+</ul>
+
+
+
                     
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
@@ -480,8 +496,10 @@ Release: close(), free(), signal()</code></pre>
     <li>R1</li>
     <li></li>
     <li>R3</li>
-</ul>
-
+</ul>
+
+
+
 <h3 id="sub-5-2">5.2 RAG Example 3 Cycle But No Deadlock</h3>
 
 <p>Setup Allocations & Requests Safe Execution P₃ → P₂ → P₁ Conclusion</p>
@@ -503,8 +521,10 @@ Release: close(), free(), signal()</code></pre>
     <li></li>
     <li>R1</li>
     <li></li>
-</ul>
-
+</ul>
+
+
+
 <h3 id="sub-5-3">5.3 RAG Analysis Summary Rules</h3>
 
 <p>Case 1: No Cycle</p>
@@ -522,11 +542,19 @@ Release: close(), free(), signal()</code></pre>
     <li>Check resource release outside cycle</li>
     <li>Use Banker’s / detection algorithms</li>
     <li>All processes in cycle blocked</li>
-</ul>
-
+</ul>
+
+
+
 <h3 id="sub-5-4">5.4 Deadlock Example Dining Philosophers</h3>
 
-<p>Problem Setup Deadlock Scenario 1. All pick up left chopstick 2. All try to pick up right chopstick 3. Right chopstick held by neighbor 4. Everyone waits forever</p>
+<p>Problem Setup Deadlock Scenario</p>
+<ol>
+    <li>All pick up left chopstick</li>
+    <li>All try to pick up right chopstick</li>
+    <li>Right chopstick held by neighbor</li>
+    <li>Everyone waits forever</li>
+</ol>
 <p>DEADLOCK Why Deadlock Occurs (All 4 Conditions) Mutual Exclusion: One chopstick → one philosopher Hold & Wait: Holding left, waiting for right No Preemption: Cannot force release Circular Wait: P₁ → P₂ → … → P₅ → P₁</p>
 <p>Key Insight Dining Philosophers is a classic deadlock illustration showing how all four conditions can arise naturally.</p>
 <ul>
@@ -538,8 +566,10 @@ Release: close(), free(), signal()</code></pre>
     <li></li>
     <li></li>
     <li></li>
-</ul>
-
+</ul>
+
+
+
 <h3 id="sub-5-5">5.5 Consequences of Deadlocks</h3>
 
 <p>Resource Wastage</p>
@@ -558,8 +588,10 @@ Release: close(), free(), signal()</code></pre>
     <li>Possible data inconsistency</li>
     <li>Lower throughput</li>
     <li>Higher response time</li>
-</ul>
-
+</ul>
+
+
+
                     
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
@@ -590,8 +622,10 @@ Release: close(), free(), signal()</code></pre>
     <li>All 4 conditions present</li>
     <li>Each resource has one instance</li>
     <li>Cycle exists in RAG</li>
-</ul>
-
+</ul>
+
+
+
 <h3 id="sub-6-2">6.2 Practice Problems</h3>
 
 <p>Problem 1: Given:</p>
@@ -606,8 +640,10 @@ Release: close(), free(), signal()</code></pre>
     <li>R1</li>
     <li></li>
     <li>R3</li>
-</ul>
-
+</ul>
+
+
+
 <h3 id="sub-6-3">6.3 Practice Problems</h3>
 
 <p>Key Tips:</p>
@@ -634,8 +670,10 @@ Release: close(), free(), signal()</code></pre>
     <li></li>
     <li></li>
     <li></li>
-</ul>
-
+</ul>
+
+
+
 <h3 id="sub-6-4">6.4 Key Takeaways</h3>
 
 <ul>
@@ -644,11 +682,15 @@ Release: close(), free(), signal()</code></pre>
     <li>Four Necessary Conditions (Coffman Conditions)</li>
     <li>Resource Allocation Graphs (RAG)</li>
     <li>RAG Analysis</li>
-</ul>
-
+</ul>
+
+
+
 <h3 id="sub-6-5">6.5 Thank You!</h3>
-<p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
-
+<p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
+
+
+
                     
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>

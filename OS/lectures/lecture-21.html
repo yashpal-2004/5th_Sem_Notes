@@ -28,7 +28,7 @@
                 <h3>Table of Contents</h3>
                 <div class="topic-count">Total Topics: 6</div>
             </div>
-            <ul class="index-list" id="indexList">
+            <ul>
                 <li>
                     <a href="#topic-1">1. Address Translation Performance Issues<span class="sub-count">6</span></a>
                     <ul class="sub-index">
@@ -38,62 +38,62 @@
                          <li><a href="#sub-1-4">1.4 Review - Address Translation in Paging</a></li>
                          <li><a href="#sub-1-5">1.5 Review - Page Table Structure</a></li>
                          <li><a href="#sub-1-6">1.6 The Performance Problem</a></li>
-                    </ul>
+                    > class="index-list" id="indexList"</ul>
                 </li>
                 <li>
                     <a href="#topic-2">2. Translation Lookaside Buffer (TLB)<span class="sub-count">6</span></a>
-                    <ul class="sub-index">
+                    <ul>
                          <li><a href="#sub-2-1">2.1 Translation Lookaside Buffer (TLB)</a></li>
                          <li><a href="#sub-2-2">2.2 Translation Lookaside Buffer (TLB)</a></li>
                          <li><a href="#sub-2-3">2.3 TLB Hit and Miss Scenarios</a></li>
                          <li><a href="#sub-2-4">2.4 TLB Performance Metrics</a></li>
                          <li><a href="#sub-2-5">2.5 TLB Performance Example</a></li>
                          <li><a href="#sub-2-6">2.6 Practice Problems</a></li>
-                    </ul>
+                    > class="sub-index"</ul>
                 </li>
                 <li>
                     <a href="#topic-3">3. TLB Hit & Miss Performance<span class="sub-count">6</span></a>
-                    <ul class="sub-index">
+                    <ul>
                          <li><a href="#sub-3-1">3.1 Why TLB Works - Locality of Reference</a></li>
                          <li><a href="#sub-3-2">3.2 TLB Management Issues</a></li>
                          <li><a href="#sub-3-3">3.3 TLB Replacement Policies</a></li>
                          <li><a href="#sub-3-4">3.4 Introduction to I/O Management</a></li>
                          <li><a href="#sub-3-5">3.5 I/O Communication Methods</a></li>
                          <li><a href="#sub-3-6">3.6 Polling (Programmed I/O)</a></li>
-                    </ul>
+                    > class="sub-index"</ul>
                 </li>
                 <li>
                     <a href="#topic-4">4. Context Switches & ASID<span class="sub-count">6</span></a>
-                    <ul class="sub-index">
+                    <ul>
                          <li><a href="#sub-4-1">4.1 Polling - Advantages and Disadvantages</a></li>
                          <li><a href="#sub-4-2">4.2 Interrupt-Driven I/O</a></li>
                          <li><a href="#sub-4-3">4.3 Interrupt Processing Steps</a></li>
                          <li><a href="#sub-4-4">4.4 Interrupt Vector Table</a></li>
                          <li><a href="#sub-4-5">4.5 Interrupt Types and Priorities</a></li>
                          <li><a href="#sub-4-6">4.6 Interrupt-Driven I/O - Advantages and Disadvantages</a></li>
-                    </ul>
+                    > class="sub-index"</ul>
                 </li>
                 <li>
                     <a href="#topic-5">5. I/O Management (Polling vs. Interrupts)<span class="sub-count">6</span></a>
-                    <ul class="sub-index">
+                    <ul>
                          <li><a href="#sub-5-1">5.1 Problem with Interrupt-Driven I/O</a></li>
                          <li><a href="#sub-5-2">5.2 Direct Memory Access (DMA)</a></li>
                          <li><a href="#sub-5-3">5.3 DMA Operation Steps</a></li>
                          <li><a href="#sub-5-4">5.4 DMA Transfer Modes</a></li>
                          <li><a href="#sub-5-5">5.5 DMA vs CPU Transfer - Performance</a></li>
                          <li><a href="#sub-5-6">5.6 DMA Advantages and Disadvantages</a></li>
-                    </ul>
+                    > class="sub-index"</ul>
                 </li>
                 <li>
                     <a href="#topic-6">6. Direct Memory Access (DMA) & Cache Coherency<span class="sub-count">6</span></a>
-                    <ul class="sub-index">
+                    <ul>
                          <li><a href="#sub-6-1">6.1 Practice Problems</a></li>
                          <li><a href="#sub-6-2">6.2 Cache Coherency Problem with DMA</a></li>
                          <li><a href="#sub-6-3">6.3 Comparison Summary - Polling vs Interrupts vs DMA</a></li>
                          <li><a href="#sub-6-4">6.4 Modern I/O Trends</a></li>
                          <li><a href="#sub-6-5">6.5 Key Takeaways</a></li>
                          <li><a href="#sub-6-6">6.6 Thank You!</a></li>
-                    </ul>
+                    > class="sub-index"</ul>
                 </li>
                 <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
             </ul>
@@ -107,8 +107,10 @@
                     <h2>Address Translation Performance Issues</h2>
                 </div>
                 <div id="content-1" class="collapsible-content">
-                    <h3 id="sub-1-1">1.1 Join the lecture online on your dashboard</h3>
-
+                    <h3 id="sub-1-1">1.1 Join the lecture online on your dashboard</h3>
+
+
+
 <h3 id="sub-1-2">1.2 Today’s Agenda</h3>
 
 <ul>
@@ -143,7 +145,13 @@
 
 <p>Virtual → Physical Address Virtual Address Format:</p>
 <p>[ Page Number (p) | Offset (d) ]</p>
-<p>Translation Steps 1. CPU generates virtual address (p, d) 2. p indexes the Page Table 3. Page Table gives Frame number (f) 4. Physical Address = (f, d)</p>
+<p>Translation Steps</p>
+<ol>
+    <li>CPU generates virtual address (p, d)</li>
+    <li>p indexes the Page Table</li>
+    <li>Page Table gives Frame number (f)</li>
+    <li>Physical Address = (f, d)</li>
+</ol>
 <p>Example Virtual Address = 10876 If Page 2 → Frame 5</p>
 <p>Key Takeaway Paging translates addresses by table lookup + offset, enabling flexible, non-contiguous memory allocation.</p>
 <ul>
@@ -412,7 +420,13 @@
 <h3 id="sub-3-6">3.6 Polling (Programmed I/O)</h3>
 
 <p>What It Is CPU continuously checks device status until it’s ready.</p>
-<p>How It Works 1. CPU sends command to device 2. Busy-wait loop checks status 3. Device becomes ready 4. CPU reads data and processes it</p>
+<p>How It Works</p>
+<ol>
+    <li>CPU sends command to device</li>
+    <li>Busy-wait loop checks status</li>
+    <li>Device becomes ready</li>
+    <li>CPU reads data and processes it</li>
+</ol>
 <p>Simple Example // busy wait data = read_keyboard();</p>
 <p>Characteristics Wastes CPU cycles Poor efficiency</p>
 <ul>
@@ -451,7 +465,13 @@
 <h3 id="sub-4-2">4.2 Interrupt-Driven I/O</h3>
 
 <p>Device Signals CPU When Ready</p>
-<p>How It Works 1. CPU starts I/O ○ Sends command to device ○ Continues executing other tasks 2. Device works independently ○ Performs I/O operation 3. Interrupt raised ○ Device signals CPU on completion 4. CPU handles interrupt ○ Saves context (PC, registers) ○ Runs ISR to read data ○ Restores context and resumes work</p>
+<p>How It Works</p>
+<ol>
+    <li>CPU starts I/O ○ Sends command to device ○ Continues executing other tasks</li>
+    <li>Device works independently ○ Performs I/O operation</li>
+    <li>Interrupt raised ○ Device signals CPU on completion</li>
+    <li>CPU handles interrupt ○ Saves context (PC, registers) ○ Runs ISR to read data ○ Restores context and resumes work</li>
+</ol>
 <p>Key Advantage</p>
 <ul>
     <li>No busy waiting</li>
@@ -460,13 +480,28 @@
 
 <h3 id="sub-4-3">4.3 Interrupt Processing Steps</h3>
 
-<p>How an Interrupt Is Handled (Step-by-Step) 1. Device Ready ○ Device controller raises an interrupt signal 2. Interrupt Detection ○ CPU detects interrupt at end of instruction cycle 3. Interrupt Acknowledgment ○ CPU sends ACK ○ Device places interrupt number on bus 4. Context Save ○ Save PC, registers, flags ○ Switch to kernel mode 5. Interrupt Vector Lookup ○ Use interrupt number to index Interrupt Vector Table (IVT) ○ Fetch ISR address 6. Execute ISR ○ Run device-specific handler ○ Read data / update buffers 7. Context Restore ○ Restore saved state ○ Resume interrupted process</p>
+<p>How an Interrupt Is Handled (Step-by-Step)</p>
+<ol>
+    <li>Device Ready ○ Device controller raises an interrupt signal</li>
+    <li>Interrupt Detection ○ CPU detects interrupt at end of instruction cycle</li>
+    <li>Interrupt Acknowledgment ○ CPU sends ACK ○ Device places interrupt number on bus</li>
+    <li>Context Save ○ Save PC, registers, flags ○ Switch to kernel mode</li>
+    <li>Interrupt Vector Lookup ○ Use interrupt number to index Interrupt Vector Table (IVT) ○ Fetch ISR address</li>
+    <li>Execute ISR ○ Run device-specific handler ○ Read data / update buffers</li>
+    <li>Context Restore ○ Restore saved state ○ Resume interrupted process</li>
+</ol>
 
 <h3 id="sub-4-4">4.4 Interrupt Vector Table</h3>
 
 <p>What is IVT?</p>
 <p>A table that maps interrupt numbers to their Interrupt Service Routine (ISR) addresses.</p>
-<p>How It Works 1. Device raises interrupt with interrupt number 2. CPU uses number as index into IVT 3. Fetches ISR address 4. Direct jump to correct handler</p>
+<p>How It Works</p>
+<ol>
+    <li>Device raises interrupt with interrupt number</li>
+    <li>CPU uses number as index into IVT</li>
+    <li>Fetches ISR address</li>
+    <li>Direct jump to correct handler</li>
+</ol>
 <p>IVT Structure</p>
 <p>Key Points</p>
 <ul>
@@ -540,7 +575,13 @@
 
 <p>What is DMA?</p>
 <p>○ Start transfer ○ Completion interrupt</p>
-<p>How DMA Works 1. CPU sets up DMA (buffer address, size, direction) 2. DMA controller takes control of the system bus 3. Data moves Device ⇄ Memory directly 4. DMA raises an interrupt when done</p>
+<p>How DMA Works</p>
+<ol>
+    <li>CPU sets up DMA (buffer address, size, direction)</li>
+    <li>DMA controller takes control of the system bus</li>
+    <li>Data moves Device ⇄ Memory directly</li>
+    <li>DMA raises an interrupt when done</li>
+</ol>
 <p>Key Idea</p>
 <p>One-Line Takeaway</p>
 <div class="formula-box">DMA = High-speed data transfer with minimal CPU involvement</div>
@@ -569,8 +610,10 @@
     <li>CPU handles completion in ISR</li>
 </ul>
 
-<h3 id="sub-5-4">5.4 DMA Transfer Modes</h3>
-
+<h3 id="sub-5-4">5.4 DMA Transfer Modes</h3>
+
+
+
 <h3 id="sub-5-5">5.5 DMA vs CPU Transfer - Performance</h3>
 
 <p>Scenario: Transfer 1MB from disk → memory</p>
@@ -628,7 +671,11 @@
 
 <p>Problem 4: DMA vs Interrupts:</p>
 <p>A system transfers 10 MB of data from disk to memory. The disk operates at a speed of 100 MB/s. Compare the CPU time consumed in the following two I/O methods:</p>
-<p>(A) Interrupt-driven I/O bytes transferred (B) Direct Memory Access (DMA) Calculate the total CPU time consumed in each case and determine which method is more efficient.</p>
+<p>(</p>
+<ul>
+    <li><strong>A)</strong> Interrupt-driven I/O bytes transferred (</li>
+    <li><strong>B)</strong> Direct Memory Access (DMA) Calculate the total CPU time consumed in each case and determine which method is more efficient.</li>
+</ul>
 <p>(B) DMA DMA setup time: 5 μs Completion interrupt: 3 μs</p>
 <div class="formula-box">Total CPU time: 5+3=8 μs</div>
 <p>Explanation:</p>
@@ -689,8 +736,10 @@
 </ul>
 
 <h3 id="sub-6-6">6.6 Thank You!</h3>
-<p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
-
+<p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
+
+
+
                     
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>

@@ -28,7 +28,7 @@
                 <h3>Table of Contents</h3>
                 <div class="topic-count">Total Topics: 6</div>
             </div>
-            <ul class="index-list" id="indexList">
+            <ul>
                 <li>
                     <a href="#topic-1">1. CPU Scheduling Evaluation<span class="sub-count">6</span></a>
                     <ul class="sub-index">
@@ -38,55 +38,55 @@
                          <li><a href="#sub-1-4">1.4 ALGORITHM QUICK RECAP</a></li>
                          <li><a href="#sub-1-5">1.5 ALGORITHM CHAMPIONSHIP</a></li>
                          <li><a href="#sub-1-6">1.6 WORKLOAD CHARACTERISTICS</a></li>
-                    </ul>
+                    > class="index-list" id="indexList"</ul>
                 </li>
                 <li>
                     <a href="#topic-2">2. Workload Characteristics & Real-World Scenarios<span class="sub-count">6</span></a>
-                    <ul class="sub-index">
+                    <ul>
                          <li><a href="#sub-2-1">2.1 REAL-WORLD SCENARIO</a></li>
                          <li><a href="#sub-2-2">2.2 COMPREHENSIVE EXAMPLE SETUP</a></li>
                          <li><a href="#sub-2-3">2.3 COMPREHENSIVE EXAMPLE SETUP</a></li>
                          <li><a href="#sub-2-4">2.4 COMPREHENSIVE EXAMPLE SETUP</a></li>
                          <li><a href="#sub-2-5">2.5 COMPREHENSIVE EXAMPLE SETUP</a></li>
                          <li><a href="#sub-2-6">2.6 THE VERDICT</a></li>
-                    </ul>
+                    > class="sub-index"</ul>
                 </li>
                 <li>
                     <a href="#topic-3">3. Multi-Level Feedback Queues (MLFQ)<span class="sub-count">6</span></a>
-                    <ul class="sub-index">
+                    <ul>
                          <li><a href="#sub-3-1">3.1 Test Your Understanding</a></li>
                          <li><a href="#sub-3-2">3.2 What If We Use Them ALL?</a></li>
                          <li><a href="#sub-3-3">3.3 FIXED MULTI-LEVEL QUEUES</a></li>
                          <li><a href="#sub-3-4">3.4 THE BIG PROBLEM</a></li>
                          <li><a href="#sub-3-5">3.5 MLFQ - THE ADAPTIVE GENIUS</a></li>
                          <li><a href="#sub-3-6">3.6 MLFQ STRUCTURE</a></li>
-                    </ul>
+                    > class="sub-index"</ul>
                 </li>
                 <li>
                     <a href="#topic-4">4. Linux Completely Fair Scheduler (CFS)<span class="sub-count">6</span></a>
-                    <ul class="sub-index">
+                    <ul>
                          <li><a href="#sub-4-1">4.1 Process Scheduling Timeline: P1 and P2</a></li>
                          <li><a href="#sub-4-2">4.2 MLFQ Understanding Check</a></li>
                          <li><a href="#sub-4-3">4.3 GAMING THE SYSTEM</a></li>
                          <li><a href="#sub-4-4">4.4 MLFQ - THE MODERN STANDARD</a></li>
                          <li><a href="#sub-4-5">4.5 The Completely Fair Scheduler</a></li>
                          <li><a href="#sub-4-6">4.6 CFS - THE NICE SYSTEM</a></li>
-                    </ul>
+                    > class="sub-index"</ul>
                 </li>
                 <li>
                     <a href="#topic-5">5. Multi-Processor Scheduling<span class="sub-count">6</span></a>
-                    <ul class="sub-index">
+                    <ul>
                          <li><a href="#sub-5-1">5.1 CFS Understanding Check</a></li>
                          <li><a href="#sub-5-2">5.2 WINDOWS PRIORITY SCHEDULING</a></li>
                          <li><a href="#sub-5-3">5.3 MULTI-PROCESSOR REVOLUTION</a></li>
                          <li><a href="#sub-5-4">5.4 LOAD BALANCING</a></li>
                          <li><a href="#sub-5-5">5.5 CPU AFFINITY - THE CACHE STORY</a></li>
                          <li><a href="#sub-5-6">5.6 Multi-Processor Check</a></li>
-                    </ul>
+                    > class="sub-index"</ul>
                 </li>
                 <li>
                     <a href="#topic-6">6. Trade-Offs & Key Takeaways<span class="sub-count">7</span></a>
-                    <ul class="sub-index">
+                    <ul>
                          <li><a href="#sub-6-1">6.1 REAL-WORLD SCHEDULER SELECTION</a></li>
                          <li><a href="#sub-6-2">6.2 Best Algorithm Check</a></li>
                          <li><a href="#sub-6-3">6.3 THE TRADE-OFF TRIANGLE</a></li>
@@ -94,7 +94,7 @@
                          <li><a href="#sub-6-5">6.5 EVOLUTION OF SCHEDULING</a></li>
                          <li><a href="#sub-6-6">6.6 Key Takeaways</a></li>
                          <li><a href="#sub-6-7">6.7 Thank You!</a></li>
-                    </ul>
+                    > class="sub-index"</ul>
                 </li>
                 <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
             </ul>
@@ -124,13 +124,26 @@
 
 <p>ANSWER: C) Round Robin - ensures fairness and good response time for all students. In a shared system, preventing any student from monopolizing CPU is crucial.</p>
 <p>If you had to choose ONE algorithm for a university's time-sharing system with 100 students, which would you pick and why?</p>
-<p>A) FCFS B) SJF C) Round Robin D) Priority</p>
+<ul>
+    <li><strong>A)</strong> FCFS</li>
+    <li><strong>B)</strong> SJF</li>
+    <li><strong>C)</strong> Round Robin</li>
+    <li><strong>D)</strong> Priority</li>
+</ul>
 
 <h3 id="sub-1-3">1.3 THE EVALUATION FRAMEWORK</h3>
 
 <p>8 Critical Metrics:</p>
-<p>1. CPU Utilization - Keep the engine running (40-90%) 2. Throughput - How many jobs completed per time unit?</p>
-<p>3. Turnaround Time - Start to finish duration 4. Waiting Time - Frustration in the ready queue 5. Response Time - Time to first acknowledgment (UX critical!) 6. Fairness - Everyone gets a turn 7. Predictability - Consistent performance 8. Overhead - Cost of context switches and management</p>
+<ol>
+    <li>CPU Utilization - Keep the engine running (40-90%)</li>
+    <li>Throughput - How many jobs completed per time unit?</li>
+    <li>Turnaround Time - Start to finish duration</li>
+    <li>Waiting Time - Frustration in the ready queue</li>
+    <li>Response Time - Time to first acknowledgment (UX critical!)</li>
+    <li>Fairness - Everyone gets a turn</li>
+    <li>Predictability - Consistent performance</li>
+    <li>Overhead - Cost of context switches and management</li>
+</ol>
 
 <h3 id="sub-1-4">1.4 ALGORITHM QUICK RECAP</h3>
 
@@ -141,7 +154,7 @@
             <li>Simple, non-preemptive</li>
             <li>Convoy effect problem</li>
             <li>Low overhead, predictable</li>
-        </ul>
+        ></ul>
     </li>
     <li>
         <strong>SJF/SRTF (Shortest Job First)</strong>
@@ -149,7 +162,7 @@
             <li>Optimal average waiting time</li>
             <li>Requires burst time prediction</li>
             <li>Starvation risk for long jobs</li>
-        </ul>
+        ></ul>
     </li>
     <li>
         <strong>Round Robin</strong>
@@ -157,7 +170,7 @@
             <li>Time quantum-based fairness</li>
             <li>Excellent response time</li>
             <li>Context switch overhead</li>
-        </ul>
+        ></ul>
     </li>
     <li>
         <strong>Priority Scheduling</strong>
@@ -165,7 +178,7 @@
             <li>Importance-based allocation</li>
             <li>Starvation risk (solved by aging)</li>
             <li>Good for real-time requirements</li>
-        </ul>
+        ></ul>
     </li>
 </ul>
 
@@ -285,7 +298,13 @@
                     <h3 id="sub-3-1">3.1 Test Your Understanding</h3>
 
 <p>Which scheduling algorithm provides optimal average waiting time?</p>
-<p>A) FCFS B) SJF C) Round Robin D) Priority ANSWER: B) SJF This is mathematically proven - always run the shortest job next minimizes average waiting time.</p>
+<ul>
+    <li><strong>A)</strong> FCFS</li>
+    <li><strong>B)</strong> SJF</li>
+    <li><strong>C)</strong> Round Robin</li>
+    <li><strong>D)</strong> Priority ANSWER:</li>
+    <li><strong>B)</strong> SJF This is mathematically proven - always run the shortest job next minimizes average waiting time.</li>
+</ul>
 
 <h3 id="sub-3-2">3.2 What If We Use Them ALL?</h3>
 
@@ -294,7 +313,11 @@
 <h3 id="sub-3-3">3.3 FIXED MULTI-LEVEL QUEUES</h3>
 
 <p>How It Works:</p>
-<p>1. Classify processes on arrival (system/interactive/batch) 2. Each queue has its own algorithm 3. Higher priority queues run first Example Timeline:</p>
+<ol>
+    <li>Classify processes on arrival (system/interactive/batch)</li>
+    <li>Each queue has its own algorithm</li>
+    <li>Higher priority queues run first Example Timeline:</li>
+</ol>
 <p>The Problem:</p>
 <p>Once classified, processes are stuck forever!</p>
 <p>What if P4 becomes interactive?</p>
@@ -362,7 +385,13 @@
 <h3 id="sub-4-2">4.2 MLFQ Understanding Check</h3>
 
 <p>What is the main advantage of MLFQ over fixed multi-level queues?</p>
-<p>A) Lower overhead B) Simpler implementation C) Dynamic priority adjustment based on behavior D) Guaranteed optimal waiting time ANSWER: C) Dynamic priority adjustment based on behavior MLFQ automatically moves processes between queues based on their actual CPU usage patterns, adapting to changing behavior.</p>
+<ul>
+    <li><strong>A)</strong> Lower overhead</li>
+    <li><strong>B)</strong> Simpler implementation</li>
+    <li><strong>C)</strong> Dynamic priority adjustment based on behavior</li>
+    <li><strong>D)</strong> Guaranteed optimal waiting time ANSWER:</li>
+    <li><strong>C)</strong> Dynamic priority adjustment based on behavior MLFQ automatically moves processes between queues based on their actual CPU usage patterns, adapting to changing behavior.</li>
+</ul>
 
 <h3 id="sub-4-3">4.3 GAMING THE SYSTEM</h3>
 
@@ -442,7 +471,13 @@ yield_cpu();  <span class="code-comment">// Give up just before demotion!</span>
                     <h3 id="sub-5-1">5.1 CFS Understanding Check</h3>
 
 <p>Linux CFS aims for:</p>
-<p>A) Strict priority enforcement B) Fair CPU share based on weights C) Shortest job first optimization D) Round robin only ANSWER: B) Fair CPU share based on weights CFS ensures each process gets its fair share of CPU time proportional to its weight (determined by nice values).</p>
+<ul>
+    <li><strong>A)</strong> Strict priority enforcement</li>
+    <li><strong>B)</strong> Fair CPU share based on weights</li>
+    <li><strong>C)</strong> Shortest job first optimization</li>
+    <li><strong>D)</strong> Round robin only ANSWER:</li>
+    <li><strong>B)</strong> Fair CPU share based on weights CFS ensures each process gets its fair share of CPU time proportional to its weight (determined by nice values).</li>
+</ul>
 
 <h3 id="sub-5-2">5.2 WINDOWS PRIORITY SCHEDULING</h3>
 
@@ -492,7 +527,13 @@ yield_cpu();  <span class="code-comment">// Give up just before demotion!</span>
 <h3 id="sub-5-6">5.6 Multi-Processor Check</h3>
 
 <p>In multi-processor systems, CPU affinity reduces:</p>
-<p>A) Cache misses by keeping process on same CPU B) Load balancing effectiveness C) Preemption frequency D) Starvation risk ANSWER: A) Cache misses by keeping process on same CPU Affinity keeps the CPU cache "warm" with the process's data, avoiding the performance penalty of reloading data from main memory.</p>
+<ul>
+    <li><strong>A)</strong> Cache misses by keeping process on same CPU</li>
+    <li><strong>B)</strong> Load balancing effectiveness</li>
+    <li><strong>C)</strong> Preemption frequency</li>
+    <li><strong>D)</strong> Starvation risk ANSWER:</li>
+    <li><strong>A)</strong> Cache misses by keeping process on same CPU Affinity keeps the CPU cache "warm" with the process's data, avoiding the performance penalty of reloading data from main memory.</li>
+</ul>
 
                     
                     <div class="topic-nav">
@@ -533,7 +574,13 @@ yield_cpu();  <span class="code-comment">// Give up just before demotion!</span>
 <h3 id="sub-6-2">6.2 Best Algorithm Check</h3>
 
 <p>What is the best algorithm for hard real-time systems?</p>
-<p>A) FCFS B) Priority scheduling with guarantees C) Round Robin D) SJF ANSWER: B) Priority scheduling with guarantees Real-time systems need predictable, priority-based scheduling with guaranteed timing constraints.</p>
+<ul>
+    <li><strong>A)</strong> FCFS</li>
+    <li><strong>B)</strong> Priority scheduling with guarantees</li>
+    <li><strong>C)</strong> Round Robin</li>
+    <li><strong>D)</strong> SJF ANSWER:</li>
+    <li><strong>B)</strong> Priority scheduling with guarantees Real-time systems need predictable, priority-based scheduling with guaranteed timing constraints.</li>
+</ul>
 <p>Missing a deadline could be catastrophic.</p>
 
 <h3 id="sub-6-3">6.3 THE TRADE-OFF TRIANGLE</h3>
@@ -549,7 +596,13 @@ yield_cpu();  <span class="code-comment">// Give up just before demotion!</span>
 <h3 id="sub-6-4">6.4 Overhead Understanding</h3>
 
 <p>Which algorithm has the HIGHEST overhead?</p>
-<p>A) FCFS B) SRTF C) Non-preemptive priority D) Multi-level queues ANSWER: B) SRTF (frequent preemption) SRTF requires frequent context switches as shorter jobs arrive, causing high overhead from saving/restoring process state.</p>
+<ul>
+    <li><strong>A)</strong> FCFS</li>
+    <li><strong>B)</strong> SRTF</li>
+    <li><strong>C)</strong> Non-preemptive priority</li>
+    <li><strong>D)</strong> Multi-level queues ANSWER:</li>
+    <li><strong>B)</strong> SRTF (frequent preemption) SRTF requires frequent context switches as shorter jobs arrive, causing high overhead from saving/restoring process state.</li>
+</ul>
 
 <h3 id="sub-6-5">6.5 EVOLUTION OF SCHEDULING</h3>
 
@@ -565,12 +618,21 @@ yield_cpu();  <span class="code-comment">// Give up just before demotion!</span>
 
 <h3 id="sub-6-6">6.6 Key Takeaways</h3>
 
-<p>1. Context is King → No universal best algorithm 2. Measure What Matters → Different metrics for different goals 3. Behavior Over Identity → MLFQ learns by watching 4. Fair ≠ Equal → CFS gives proportional fairness 5. Location Matters → Cache aware scheduling 6. Adapt or Stagnate → Static policies can't handle dynamic workloads The Engineer's Question:</p>
+<ol>
+    <li>Context is King → No universal best algorithm</li>
+    <li>Measure What Matters → Different metrics for different goals</li>
+    <li>Behavior Over Identity → MLFQ learns by watching</li>
+    <li>Fair ≠ Equal → CFS gives proportional fairness</li>
+    <li>Location Matters → Cache aware scheduling</li>
+    <li>Adapt or Stagnate → Static policies can't handle dynamic workloads The Engineer's Question:</li>
+</ol>
 <p>"What am I optimizing for?" determines "Which scheduler should I use?"</p>
 
 <h3 id="sub-6-7">6.7 Thank You!</h3>
-<p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
-
+<p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
+
+
+
                     
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>

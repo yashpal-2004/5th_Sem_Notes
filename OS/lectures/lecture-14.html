@@ -28,7 +28,7 @@
                 <h3>Table of Contents</h3>
                 <div class="topic-count">Total Topics: 6</div>
             </div>
-            <ul class="index-list" id="indexList">
+            <ul>
                 <li>
                     <a href="#topic-1">1. Classic Synchronization Problems<span class="sub-count">4</span></a>
                     <ul class="sub-index">
@@ -36,47 +36,47 @@
                          <li><a href="#sub-1-2">1.2 Today’s Agenda</a></li>
                          <li><a href="#sub-1-3">1.3 Introduction to Synchronization</a></li>
                          <li><a href="#sub-1-4">1.4 Review of Semaphores - Basics</a></li>
-                    </ul>
+                    > class="index-list" id="indexList"</ul>
                 </li>
                 <li>
                     <a href="#topic-2">2. Producer-Consumer Problem Setup<span class="sub-count">4</span></a>
-                    <ul class="sub-index">
+                    <ul>
                          <li><a href="#sub-2-1">2.1 Semaphore Operations</a></li>
                          <li><a href="#sub-2-2">2.2 Producer-Consumer Problem - Introduction</a></li>
                          <li><a href="#sub-2-3">2.3 Problem Statement</a></li>
                          <li><a href="#sub-2-4">2.4 Synchronization Requirements</a></li>
-                    </ul>
+                    > class="sub-index"</ul>
                 </li>
                 <li>
                     <a href="#topic-3">3. Shared Resources & Synchronization Requirements<span class="sub-count">4</span></a>
-                    <ul class="sub-index">
+                    <ul>
                          <li><a href="#sub-3-1">3.1 Identifying Shared Resources</a></li>
                          <li><a href="#sub-3-2">3.2 Semaphore-Based Solution - Overview</a></li>
                          <li><a href="#sub-3-3">3.3 Producer Process - Code</a></li>
                          <li><a href="#sub-3-4">3.4 Producer Code - Step-by-Step Analysis</a></li>
-                    </ul>
+                    > class="sub-index"</ul>
                 </li>
                 <li>
                     <a href="#topic-4">4. Semaphore-Based Solution<span class="sub-count">4</span></a>
-                    <ul class="sub-index">
+                    <ul>
                          <li><a href="#sub-4-1">4.1 Consumer Process - Code</a></li>
                          <li><a href="#sub-4-2">4.2 Consumer Code - Step-by-Step Analysis</a></li>
                          <li><a href="#sub-4-3">4.3 </a></li>
                          <li><a href="#sub-4-4">4.4 Meme Break</a></li>
-                    </ul>
+                    > class="sub-index"</ul>
                 </li>
                 <li>
                     <a href="#topic-5">5. Common Code Pitfalls & Wrong Ordering<span class="sub-count">4</span></a>
-                    <ul class="sub-index">
+                    <ul>
                          <li><a href="#sub-5-1">5.1 Common Mistake - Wrong Semaphore Order</a></li>
                          <li><a href="#sub-5-2">5.2 Variations - Multiple Producers/Consumers</a></li>
                          <li><a href="#sub-5-3">5.3 Variation - Unbounded Buffer</a></li>
                          <li><a href="#sub-5-4">5.4 Variation - Single Producer, Single Consumer</a></li>
-                    </ul>
+                    > class="sub-index"</ul>
                 </li>
                 <li>
                     <a href="#topic-6">6. Variations & Extensions<span class="sub-count">7</span></a>
-                    <ul class="sub-index">
+                    <ul>
                          <li><a href="#sub-6-1">6.1 Performance Considerations</a></li>
                          <li><a href="#sub-6-2">6.2 Real-World Applications</a></li>
                          <li><a href="#sub-6-3">6.3 Common Pitfalls and Debugging</a></li>
@@ -84,7 +84,7 @@
                          <li><a href="#sub-6-5">6.5 Practice Problems</a></li>
                          <li><a href="#sub-6-6">6.6 Key Takeaways</a></li>
                          <li><a href="#sub-6-7">6.7 Thank You!</a></li>
-                    </ul>
+                    > class="sub-index"</ul>
                 </li>
                 <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
             </ul>
@@ -98,8 +98,10 @@
                     <h2>Classic Synchronization Problems</h2>
                 </div>
                 <div id="content-1" class="collapsible-content">
-                    <h3 id="sub-1-1">1.1 Join the lecture online on your dashboard</h3>
-
+                    <h3 id="sub-1-1">1.1 Join the lecture online on your dashboard</h3>
+
+
+
 <h3 id="sub-1-2">1.2 Today’s Agenda</h3>
 
 <ul>
@@ -301,8 +303,10 @@ wait(empty) → ensures buffer is not full
 wait(mutex) → mutual exclusion
 signal(full) → notifies consumer</code></pre>
 
-<h3 id="sub-3-4">3.4 Producer Code - Step-by-Step Analysis</h3>
-
+<h3 id="sub-3-4">3.4 Producer Code - Step-by-Step Analysis</h3>
+
+
+
                     
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
@@ -342,8 +346,10 @@ wait(full) → ensures buffer is not empty
 wait(mutex) → exclusive buffer access
 signal(empty) → notifies producer</code></pre>
 
-<h3 id="sub-4-2">4.2 Consumer Code - Step-by-Step Analysis</h3>
-
+<h3 id="sub-4-2">4.2 Consumer Code - Step-by-Step Analysis</h3>
+
+
+
 <h3 id="sub-4-3">4.3 </h3>
 <p>1. Mutual Exclusion</p>
 <p>2. Bounded Buffer</p>
@@ -369,8 +375,10 @@ signal(empty) → notifies producer</code></pre>
 <pre class="code-block"><code>● signal() wakes waiting processes</code></pre>
 <div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
 
-<h3 id="sub-4-4">4.4 Meme Break</h3>
-
+<h3 id="sub-4-4">4.4 Meme Break</h3>
+
+
+
                     
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
@@ -406,8 +414,10 @@ signal(mutex);
 signal(full);
 }
 ● Buffer is full → blocks on wait(empty)
-● Consumer cannot execute signal(empty)</code></pre>
-
+● Consumer cannot execute signal(empty)</code></pre>
+
+
+
 <h3 id="sub-5-2">5.2 Variations - Multiple Producers/Consumers</h3>
 
 <p>Multiple Producers item = produce_item(); buffer[in] = item;</p>
@@ -563,8 +573,10 @@ wait(mutex);
 signal(mutex) missing → permanent lock
 3⃣ Mismatched wait() / signal()
 wait(empty);
-signal(full);  // </code></pre>
-
+signal(full);  // </code></pre>
+
+
+
 <h3 id="sub-6-4">6.4 Practice Problems</h3>
 <p>Given (Buggy?) Producer Code int item; item = produce_item(); buffer[in] = item;</p>
 <div class="formula-box">in = (in + 1) % 10;</div>
@@ -593,8 +605,10 @@ signal(full);
 ● wait(mutex) is called before wait(empty)
 ○ Producer blocks at wait(empty)
 wait(empty);   //  Check resource first
-wait(mutex);   //  Then enter critical section</code></pre>
-
+wait(mutex);   //  Then enter critical section</code></pre>
+
+
+
 <h3 id="sub-6-5">6.5 Practice Problems</h3>
 
 <p>Task: Fill in the missing semaphore operations in the consumer code. int item;</p>
@@ -644,8 +658,10 @@ signal(mutex) → signal(empty)
 ●  Every wait() must have a matching signal()</code></pre>
 
 <h3 id="sub-6-7">6.7 Thank You!</h3>
-<p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
-
+<p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
+
+
+
                     
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
