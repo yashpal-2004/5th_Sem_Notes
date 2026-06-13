@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lecture 11 - Process Synchronization II: Software-Based</title>
-    <meta content="Study notes covering Process Synchronization II: Software-Based." name="description"/>
-    <link class="favicon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>11</text></svg>" rel="icon"/>
-    <link href="../css/style.css" rel="stylesheet"/>
+    <meta name="description" content="Study notes for Operating Systems Foundations, Lecture 11.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>11</text></svg>">
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
     <header>
@@ -18,7 +18,7 @@
             <a href="../pdfs/11.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
         </div>
         <div class="search-container">
-            <input id="searchInput" placeholder="Search notes..." type="text"/>
+            <input id="searchInput" placeholder="Search notes..." type="text">
         </div>
     </header>
     <div class="container" style="margin-top: 2rem;">
@@ -257,12 +257,12 @@ t1 while(lock!=0) 0</code></pre>
 <h3 id="sub-3-2">3.2 Time Process P0 Process P1 Lock</h3>
 <p>t2 lock=1[P0 wins race!] lock = 1 (too late!)</p>
 <p>← P1 WAITING</p>
-<p>1</p>
+
 <p>t3 // CRITICAL SECTION ← P1 WAITING 1</p>
-<div class="formula-box">t6  lock = 1 ✓ [P0 RE-ENTERS!] [P1 still checking...]</div>
+<div class="formula-box">t6  lock = 1  [P0 RE-ENTERS!] [P1 still checking...]</div>
 <p>lock = 1 (too late!)</p>
 <p>← P1 WAITING</p>
-<p>1</p>
+
 <p>t7 // CRITICAL SECTION ← P1 WAITING 1</p>
 <p>Why This Violates</p>
 <p>Bounded Waiting:</p>
@@ -289,15 +289,15 @@ t8 lock = 0[P0 exits] while(lock!=0) [TRUE] 0</code></pre>
 
 <h3 id="sub-3-3">3.3 Evaluation of The Simple Boolean Lock Variable Solution:</h3>
 <p>Requirement Status Actual Reason</p>
-<p>Mutual Exclusion ✗ PRIMARY</p>
+<p>Mutual Exclusion  PRIMARY</p>
 <p>FAILURE</p>
 <p>Race condition allows both processes in CS</p>
 <p>simultaneously</p>
-<p>Progress ✗ Fails (but</p>
+<p>Progress  Fails (but</p>
 <p>secondary)</p>
 <p>Meaningless when mutual exclusion fails; no</p>
 <p>proper selection mechanism</p>
-<p>Bounded Waiting ✗ FAILS One process can monopolize (enter repeatedly</p>
+<p>Bounded Waiting  FAILS One process can monopolize (enter repeatedly</p>
 <p>before other gets a chance)</p>
 
 <h3 id="sub-3-4">3.4 . Strict Alternation (Turn Variable) Solution:</h3>
@@ -312,7 +312,7 @@ t8 lock = 0[P0 exits] while(lock!=0) [TRUE] 0</code></pre>
 <div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
 
 <h3 id="sub-3-5">3.5 . Strict Alternation (Turn Variable) Solution:</h3>
-<p>Mutual Exclusion ✅</p>
+<p>Mutual Exclusion </p>
 <p>can enter the critical section at a time.</p>
 <p>The Logic:</p>
 <p>If turn = 0, only P0 can enter</p>
@@ -361,16 +361,16 @@ t8 lock = 0[P0 exits] while(lock!=0) [TRUE] 0</code></pre>
 <p>Bound = 1? Only if P1 cooperates! If P1</p>
 <p>delays or never comes, no bound exists.</p>
 <p>YES!</p>
-<p>✗ It CAN violate Bounded Waiting</p>
+<p> It CAN violate Bounded Waiting</p>
 <div class="box box-blue"><div class="box-title">Important Note</div><p>Make sure to enforce ordering and handle edge conditions to ensure correctness and stability.</p></div>
 
 <h3 id="sub-4-3">4.3 Evaluation of Strict Alternation (Turn Variable) Solution:</h3>
 <p>Requirement Status Actual Reason</p>
-<p>Mutual Exclusion ✓ YES Turn can only be 0 or 1 at any time, allowing only one process</p>
-<p>Progress ✗ FAILS Uninterested process in remainder section can block</p>
+<p>Mutual Exclusion  YES Turn can only be 0 or 1 at any time, allowing only one process</p>
+<p>Progress  FAILS Uninterested process in remainder section can block</p>
 <p>interested process. If turn=1 and P1 is not interested, P0</p>
 <p>cannot enter even though CS is free.</p>
-<p>Bounded Waiting ✗ FAILS Process must wait for other's turn even if other is not</p>
+<p>Bounded Waiting  FAILS Process must wait for other's turn even if other is not</p>
 <p>interested. No bound on waiting time if other process delays or</p>
 <p>never requests CS.</p>
 <pre class="code-block"><code>to pass while(turn!=i) and enter CS.</code></pre>
@@ -444,13 +444,13 @@ t8 lock = 0[P0 exits] while(lock!=0) [TRUE] 0</code></pre>
 
 <h3 id="sub-5-2">5.2 Evaluation of The Interest Variable (Individual Interest Flags):</h3>
 <p>Requirement Status Actual Reason</p>
-<p>Mutual Exclusion ✗ FAILS</p>
+<p>Mutual Exclusion  FAILS</p>
 <p>Deadlock scenario: Both set flags True, both check and wait</p>
 <p>forever. No one enters CS, but also violates the spirit of mutual</p>
 <p>exclusion as the mechanism fails.</p>
-<p>Progress ✗ FAILS Both interested processes can deadlock. CS is free but neither</p>
+<p>Progress  FAILS Both interested processes can deadlock. CS is free but neither</p>
 <p>can enter - selection postponed indefinitely.</p>
-<p>Bounded Waiting ✗ FAILS Deadlock causes infinite waiting time - no bound exists.</p>
+<p>Bounded Waiting  FAILS Deadlock causes infinite waiting time - no bound exists.</p>
 <p>Processes wait forever without entering CS.</p>
 <div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
 
@@ -483,13 +483,13 @@ t8 lock = 0[P0 exits] while(lock!=0) [TRUE] 0</code></pre>
 
 <h3 id="sub-5-5">5.5 Evaluation of Dekker's Algorithm:</h3>
 <p>Requirement Status Actual Reason</p>
-<p>Mutual Exclusion ✓ PASS</p>
+<p>Mutual Exclusion  PASS</p>
 <p>The combined check of flag and turn ensures only one process</p>
 <p>enters the Critical Section (CS) at a time.</p>
-<p>Progress ✓ PASS By having a process "withdraw" its interest (setting flag = false)</p>
+<p>Progress  PASS By having a process "withdraw" its interest (setting flag = false)</p>
 <p>when it is not its turn, it prevents the deadlock failure seen in</p>
 <p>the Interest Variable solution.</p>
-<p>Bounded Waiting ✓ PASS The turn variable acts as a tie-breaker, ensuring that if both</p>
+<p>Bounded Waiting  PASS The turn variable acts as a tie-breaker, ensuring that if both</p>
 <p>processes are interested, they will eventually take turns, and</p>
 <p>no process is postponed indefinitely.</p>
 
@@ -541,20 +541,20 @@ t8 lock = 0[P0 exits] while(lock!=0) [TRUE] 0</code></pre>
 <p>Process P1</p>
 
 <h3 id="sub-6-2">6.2 Checking for Mutual exclusion:</h3>
-<p>The `Turn` variable acts as a **tiebreaker**!</p>
-<p>Mutual exclusion ✓ SATISFIES</p>
+<p>The `Turn` variable acts as a <strong>tiebreaker</strong>!</p>
+<p>Mutual exclusion  SATISFIES</p>
 
 <h3 id="sub-6-3">6.3 Checking for Progress:</h3>
-<p>Progress ✓ SATISFIES</p>
+<p>Progress  SATISFIES</p>
 <p>Note:</p>
 <ul>
-    <li>Uninterested processes don't block:** If Flag[j]=False, process i enters immediately</li>
-    <li>When both interested:** Turn variable ensures one enters (no deadlock)</li>
+    <li>Uninterested processes don't block:<strong> If Flag[j]=False, process i enters immediately</li>
+    <li>When both interested:</strong> Turn variable ensures one enters (no deadlock)</li>
 </ul>
 <div class="box box-blue"><div class="box-title">Important Note</div><p>Make sure to enforce ordering and handle edge conditions to ensure correctness and stability.</p></div>
 
 <h3 id="sub-6-4">6.4 Checking for Bounded Waiting:</h3>
-<p>Bounded waiting ✓ SATISFIES .</p>
+<p>Bounded waiting  SATISFIES .</p>
 
 <h3 id="sub-6-5">6.5 Limitations of Software Solutions:</h3>
 <ul>

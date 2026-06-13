@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lecture 14 - Classic Synchronization Problems I:</title>
-    <meta content="Study notes covering Classic Synchronization Problems I:." name="description"/>
-    <link class="favicon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>14</text></svg>" rel="icon"/>
-    <link href="../css/style.css" rel="stylesheet"/>
+    <meta name="description" content="Study notes for Operating Systems Foundations, Lecture 14.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>14</text></svg>">
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
     <header>
@@ -18,7 +18,7 @@
             <a href="../pdfs/14.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
         </div>
         <div class="search-container">
-            <input id="searchInput" placeholder="Search notes..." type="text"/>
+            <input id="searchInput" placeholder="Search notes..." type="text">
         </div>
     </header>
     <div class="container" style="margin-top: 2rem;">
@@ -61,7 +61,7 @@
                     <ul class="sub-index">
                          <li><a href="#sub-4-1">4.1 Consumer Process - Code</a></li>
                          <li><a href="#sub-4-2">4.2 Consumer Code - Step-by-Step Analysis</a></li>
-                         <li><a href="#sub-4-3">4.3 🔒</a></li>
+                         <li><a href="#sub-4-3">4.3 </a></li>
                          <li><a href="#sub-4-4">4.4 Meme Break</a></li>
                     </ul>
                 </li>
@@ -99,11 +99,11 @@
                 </div>
                 <div id="content-1" class="collapsible-content">
                     <h3 id="sub-1-1">1.1 Join the lecture online on your dashboard</h3>
-<p>2</p>
-<p>0</p>
+
+
 
 <h3 id="sub-1-2">1.2 Today’s Agenda</h3>
-<p>01</p>
+
 <ul>
     <li>Review of Semaphores</li>
     <li>Producer-Consumer Problem Statement</li>
@@ -114,7 +114,7 @@
 </ul>
 
 <h3 id="sub-1-3">1.3 Introduction to Synchronization</h3>
-<p>02</p>
+
 <p>What is Process Synchronization?</p>
 <p>processes/threads</p>
 <p>Why Do We Need Synchronization?</p>
@@ -123,7 +123,7 @@
 <p>structures)</p>
 <p>Race conditions due to timing issues</p>
 <p>Data integrity must be preserved</p>
-<p>🌍</p>
+<p></p>
 <p>Real-World Analogy</p>
 <p>Joint bank account</p>
 <p>Without synchronization → incorrect balance</p>
@@ -131,22 +131,22 @@
     <li>Mechanism to safely coordinate multiple</li>
     <li>Ensures correct access to shared resources</li>
     <li>Prevents race conditions and data inconsistency</li>
-    <li>⚙</li>
-    <li>📦</li>
-    <li>⚠</li>
-    <li>✅</li>
-    <li>🏦</li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
     <li>Two people withdraw money at the same time</li>
-    <li>❌</li>
-    <li>✔ Synchronization ensures one update at a time</li>
+    <li></li>
+    <li> Synchronization ensures one update at a time</li>
 </ul>
 
 <h3 id="sub-1-4">1.4 Review of Semaphores - Basics</h3>
-<p>03</p>
+
 <p>What is a Semaphore?</p>
-<p>○ ⏸</p>
-<p>○ 🔔</p>
-<p>🧰</p>
+<p>○ </p>
+<p>○ </p>
+<p></p>
 <p>Types of Semaphores</p>
 <ul>
     <li>A synchronization primitive</li>
@@ -171,26 +171,26 @@ signal() (V / up)</code></pre>
                 </div>
                 <div id="content-2" class="collapsible-content">
                     <h3 id="sub-2-1">2.1 Semaphore Operations</h3>
-<p>04</p>
+
 <p>Atomic Operations:</p>
 <p>while ( S <= 0)</p>
 <p>;  // busy wait</p>
 <p>S--;</p>
 <p>S++;</p>
-<p>⭐</p>
+<p></p>
 <p>Key Properties</p>
 <p>Atomicity – executes as one indivisible step</p>
 <p>No interruption during operation</p>
 <p>Mutual exclusion for shared resources</p>
-<p>⚠</p>
+<p></p>
 <p>Important Note</p>
 <p>Busy waiting wastes CPU</p>
 <ul>
-    <li>🔒</li>
-    <li>🚫</li>
-    <li>👤</li>
-    <li>❌</li>
-    <li>✔ Real systems use blocking (sleep & wakeup)</li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li> Real systems use blocking (sleep & wakeup)</li>
 </ul>
 <pre class="code-block"><code>wait(S) or P(S):
 wait(S) {
@@ -201,15 +201,15 @@ signal(S) {
 <div class="box box-blue"><div class="box-title">Important Note</div><p>Make sure to enforce ordering and handle edge conditions to ensure correctness and stability.</p></div>
 
 <h3 id="sub-2-2">2.2 Producer-Consumer Problem - Introduction</h3>
-<p>05</p>
+
 <p>What is the Producer–Consumer Problem?</p>
-<p>○ 🟢</p>
+<p>○ </p>
 <p>Producer → creates data, puts into</p>
 <p>buffer</p>
-<p>○ 🔵</p>
+<p>○ </p>
 <p>Consumer → removes data, processes</p>
 <p>it</p>
-<p>🌍</p>
+<p></p>
 <p>Real-World Examples</p>
 <p>Print Spooler: Apps produce jobs → Printer</p>
 <p>consumes</p>
@@ -217,74 +217,74 @@ signal(S) {
 <p>consumes</p>
 <p>Assembly Line: Production → Packaging</p>
 <p>Message Queue: Sender → Receiver</p>
-<p>🎯</p>
+<p></p>
 <p>Key Idea</p>
 <p>conditions</p>
 <ul>
     <li>Also called the Bounded Buffer Problem</li>
     <li>A classic synchronization problem</li>
     <li>Involves two types of processes:</li>
-    <li>🖨</li>
-    <li>🌐</li>
-    <li>🏭</li>
-    <li>✉</li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
     <li>Shared buffer requires synchronization</li>
     <li>Prevents: Buffer overflow. Buffer underflow. Race</li>
 </ul>
 
 <h3 id="sub-2-3">2.3 Problem Statement</h3>
-<p>06</p>
-<p>🧩</p>
+
+<p></p>
 <p>Bounded Buffer Scenario</p>
 <p>Buffer: Fixed-size array with N slots</p>
 <p>Producers: Generate data items</p>
 <p>Consumers: Consume data items</p>
-<p>🔄</p>
+<p></p>
 <p>Operations</p>
 <p>Producer inserts item at in</p>
 <p>Consumer removes item from out</p>
 <p>Buffer works as a circular (ring) buffer</p>
-<p>👁</p>
+<p></p>
 <p>Conceptual View</p>
 <p>Producer → [ I1 ][ I2 ][ I3 ][  _ ][  _ ] → Consumer</p>
-<p>🎯</p>
+<p></p>
 <p>Key Points</p>
-<p>Overflow (buffer full). ❌</p>
+<p>Overflow (buffer full). </p>
 <p>Underflow (buffer empty)</p>
 <ul>
-    <li>📦</li>
-    <li>🟢</li>
-    <li>🔵</li>
-    <li>➕</li>
-    <li>➖</li>
-    <li>🔁</li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
     <li>Buffer size is limited</li>
     <li>Requires synchronization</li>
-    <li>Prevents: ❌</li>
+    <li>Prevents: </li>
 </ul>
 
 <h3 id="sub-2-4">2.4 Synchronization Requirements</h3>
-<p>07</p>
+
 <p>1⃣ Mutual Exclusion</p>
 <p>Only one process accesses buffer at a time</p>
 <p>2⃣ Producer Must Wait</p>
 <p>Buffer is FULL</p>
 <p>3⃣ Consumer Must Wait</p>
 <p>Buffer is EMPTY</p>
-<p>⚠</p>
+<p></p>
 <p>Additional Consideration</p>
 <p>Avoid holding resources unnecessarily</p>
 <ul>
-    <li>👤</li>
+    <li></li>
     <li>Prevents race conditions</li>
     <li>Protects buffer state (in, out, data)</li>
-    <li>⛔</li>
+    <li></li>
     <li>No empty slots available</li>
     <li>Prevents buffer overflow</li>
-    <li>⛔</li>
+    <li></li>
     <li>No items to consume</li>
     <li>Prevents buffer underflow</li>
-    <li>🚫</li>
+    <li></li>
     <li>Prevents deadlock</li>
 </ul>
 
@@ -303,16 +303,16 @@ signal(S) {
                 </div>
                 <div id="content-3" class="collapsible-content">
                     <h3 id="sub-3-1">3.1 Identifying Shared Resources</h3>
-<p>08</p>
-<p>📦</p>
+
+<p></p>
 <p>What Needs to be Synchronized?</p>
-<p>🔗</p>
+<p></p>
 <p>Shared Variables</p>
-<p>🔒</p>
+<p></p>
 <p>Critical Sections</p>
 <p>Producer adding item to buffer</p>
 <p>Consumer removing item from buffer</p>
-<p>⚠</p>
+<p></p>
 <p>Race Condition (Without Sync)</p>
 <p>Context switch occurs</p>
 <p>First producer resumes → overwrites data</p>
@@ -320,23 +320,23 @@ signal(S) {
     <li>buffer[N] → Shared data array</li>
     <li>in → Write pointer (producer index)</li>
     <li>out → Read pointer (consumer index)</li>
-    <li>🟢</li>
-    <li>🔵</li>
+    <li></li>
+    <li></li>
     <li>Must be executed mutually exclusively</li>
     <li>Producer reads in = 5</li>
-    <li>⏸</li>
+    <li></li>
     <li>Another producer writes at in = 5</li>
     <li>▶</li>
 </ul>
 
 <h3 id="sub-3-2">3.2 Semaphore-Based Solution - Overview</h3>
-<p>09</p>
-<p>🧰</p>
+
+<p></p>
 <p>Semaphores Required</p>
 <p>1⃣ mutex (Binary Semaphore)</p>
 <p>2⃣ empty (Counting Semaphore)</p>
 <p>3⃣ full (Counting Semaphore)</p>
-<p>🎯</p>
+<p></p>
 <p>Key Insight</p>
 <ul>
     <li>Counting semaphores → track resource availability (empty, full)</li>
@@ -345,21 +345,21 @@ signal(S) {
 </ul>
 
 <h3 id="sub-3-3">3.3 Producer Process - Code</h3>
-<p>10</p>
-<p>🔄</p>
+
+<p></p>
 <p>Producer Algorithm</p>
 <p>int item;</p>
 <div class="formula-box">item = produce_item();   // Produce item (outside CS)</div>
 <div class="formula-box">buffer[in] = item;       // Insert item</div>
 <div class="formula-box">in = (in + 1) % N;       // Circular buffer update</div>
-<p>🔐</p>
+<p></p>
 <p>Key Points</p>
 <p>Circular buffer using (in + 1) % N</p>
 <ul>
-    <li>⏳</li>
-    <li>🔒</li>
-    <li>🔁</li>
-    <li>🔔</li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
 </ul>
 <pre class="code-block"><code>void producer() {
 while (TRUE) {
@@ -374,7 +374,7 @@ wait(mutex) → mutual exclusion
 signal(full) → notifies consumer</code></pre>
 
 <h3 id="sub-3-4">3.4 Producer Code - Step-by-Step Analysis</h3>
-<p>11</p>
+
 
                     
                     <div class="topic-nav">
@@ -391,21 +391,21 @@ signal(full) → notifies consumer</code></pre>
                 </div>
                 <div id="content-4" class="collapsible-content">
                     <h3 id="sub-4-1">4.1 Consumer Process - Code</h3>
-<p>12</p>
-<p>🔄</p>
+
+<p></p>
 <p>Consumer Algorithm</p>
 <p>int item;</p>
 <div class="formula-box">item = buffer[out];     // Remove item</div>
 <div class="formula-box">out = (out + 1) % N;    // Circular buffer update</div>
 <p>consume_item(item);     // Consume item (outside CS)</p>
-<p>🔐</p>
+<p></p>
 <p>Key Points</p>
 <p>Circular buffer using (out + 1) % N</p>
 <ul>
-    <li>⏳</li>
-    <li>🔒</li>
-    <li>🔁</li>
-    <li>🔔</li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
 </ul>
 <pre class="code-block"><code>void consumer() {
 while (TRUE) {
@@ -420,20 +420,20 @@ wait(mutex) → exclusive buffer access
 signal(empty) → notifies producer</code></pre>
 
 <h3 id="sub-4-2">4.2 Consumer Code - Step-by-Step Analysis</h3>
-<p>13</p>
 
-<h3 id="sub-4-3">4.3 🔒</h3>
+
+<h3 id="sub-4-3">4.3 </h3>
 <p>1. Mutual Exclusion</p>
-<p>📦</p>
+<p></p>
 <p>2. Bounded Buffer</p>
-<p>🚫</p>
+<p></p>
 <p>3. No Deadlock</p>
-<p>🔁</p>
+<p></p>
 <p>4. Progress</p>
-<p>⚖</p>
+<p></p>
 <p>5. Bounded Waiting</p>
 <p>Why This Solution Works</p>
-<p>14</p>
+
 <ul>
     <li>mutex ensures one process at a time</li>
     <li>Prevents simultaneous buffer access</li>
@@ -453,7 +453,7 @@ signal(empty) → notifies producer</code></pre>
 <div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
 
 <h3 id="sub-4-4">4.4 Meme Break</h3>
-<p>15</p>
+
 
                     
                     <div class="topic-nav">
@@ -470,23 +470,23 @@ signal(empty) → notifies producer</code></pre>
                 </div>
                 <div id="content-5" class="collapsible-content">
                     <h3 id="sub-5-1">5.1 Common Mistake - Wrong Semaphore Order</h3>
-<p>16</p>
-<p>❌</p>
+
+<p></p>
 <p>Incorrect Producer Code</p>
 <p>item = produce_item();</p>
 <p>buffer[in] = item;</p>
 <div class="formula-box">in = (in + 1) % N;</div>
-<p>💥</p>
+<p></p>
 <p>Why This Causes Deadlock</p>
 <p>Deadlock: both wait forever</p>
-<p>🚫</p>
+<p></p>
 <p>Root Cause</p>
-<p>✅</p>
+<p></p>
 <p>Correct Rule: Wait for resources first. Then acquire mutex. Release mutex before signaling</p>
 <ul>
     <li>Producer locks mutex</li>
     <li>Consumer cannot acquire mutex</li>
-    <li>❌</li>
+    <li></li>
     <li>Holding mutex while waiting for resources</li>
     <li>Violates proper semaphore ordering</li>
 </ul>
@@ -501,29 +501,29 @@ signal(full);
 <div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
 
 <h3 id="sub-5-2">5.2 Variations - Multiple Producers/Consumers</h3>
-<p>17</p>
-<p>🟢</p>
+
+<p></p>
 <p>Multiple Producers</p>
 <p>item = produce_item();</p>
 <p>buffer[in] = item;</p>
 <div class="formula-box">in = (in + 1) % N;</div>
-<p>🔵</p>
+<p></p>
 <p>Multiple Consumers</p>
 <p>item = buffer[out];</p>
 <div class="formula-box">out = (out + 1) % N;</div>
 <p>consume_item(item);</p>
 <p>Same Solution Applies: Works for 1 or many producers. Works for 1 or many consumers. No code changes required.</p>
-<p>✅</p>
+<p></p>
 <p>Why It Works</p>
 <p>Semaphores manage waiting queues</p>
 <p>Multiple processes can block on same semaphore</p>
 <p>FIFO ordering ensures fairness</p>
 <p>No race conditions or deadlock</p>
 <ul>
-    <li>🔐</li>
-    <li>👥</li>
-    <li>⚖</li>
-    <li>🚫</li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
 </ul>
 <pre class="code-block"><code>void producer_i() {
 while ( TRUE) {
@@ -543,34 +543,34 @@ signal(empty);
 }</code></pre>
 
 <h3 id="sub-5-3">5.3 Variation - Unbounded Buffer</h3>
-<p>18</p>
-<p>🔧</p>
+
+<p></p>
 <p>Semaphores Used</p>
 <div class="formula-box">semaphore mutex = 1;   // Mutual exclusion</div>
 <div class="formula-box">semaphore full  = 0;  // Items available</div>
-<p>// ❌</p>
+<p>// </p>
 <p>No 'empty' semaphore</p>
-<p>🟢</p>
+<p></p>
 <p>Producer</p>
 <p>item = produce_item();</p>
 <p>append_to_buffer(item);</p>
-<p>🔵</p>
+<p></p>
 <p>Consumer</p>
 <p>item = remove_from_buffer();</p>
 <p>consume_item(item);</p>
-<p>🔑</p>
+<p></p>
 <p>Key Differences (vs Bounded Buffer)</p>
 <p>No empty semaphore</p>
 <p>Producer never blocks (infinite space)</p>
 <p>Consumer blocks only when buffer is empty</p>
 <p>mutex still required for safety</p>
-<p>🧠</p>
+<p></p>
 <p>When Buffer Has No Size Limit: Buffer has infinite capacity. No overflow possible. Synchronization becomes simpler.</p>
 <ul>
-    <li>❌</li>
-    <li>🟢</li>
-    <li>🔵</li>
-    <li>🔒</li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
 </ul>
 <pre class="code-block"><code>void producer() {
 while ( TRUE) {
@@ -588,36 +588,36 @@ signal(mutex);
 }</code></pre>
 
 <h3 id="sub-5-4">5.4 Variation - Single Producer, Single Consumer</h3>
-<p>19</p>
-<p>🔧</p>
+
+<p></p>
 <p>Simplified Semaphores</p>
 <p>No mutex needed</p>
-<p>🟢</p>
+<p></p>
 <p>Producer</p>
 <p>item = produce_item();</p>
 <p>buffer[in] = item;</p>
 <div class="formula-box">in = (in + 1) % N;</div>
-<p>🔵</p>
+<p></p>
 <p>Consumer</p>
 <p>item = buffer[out];</p>
 <div class="formula-box">out = (out + 1) % N;</div>
 <p>consume_item(item);</p>
-<p>✅</p>
+<p></p>
 <p>Why Mutex Is NOT Needed</p>
 <p>in updated only by producer</p>
 <p>out updated only by consumer</p>
 <p>No shared-variable conflict</p>
 <p>No race condition</p>
-<p>🧠</p>
+<p></p>
 <p>Scenario: Only 1 Producer. Only 1 Consumer. Shared buffer with size N.</p>
 <ul>
     <li>semaphore empty = N;   // Empty slots</li>
     <li>semaphore full  = 0;   // Filled slots</li>
-    <li>// ❌</li>
-    <li>🟢</li>
-    <li>🔵</li>
-    <li>❌</li>
-    <li>❌</li>
+    <li>// </li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
 </ul>
 <pre class="code-block"><code>void producer() {
 while ( TRUE) {
@@ -647,12 +647,12 @@ signal(empty);
                 </div>
                 <div id="content-6" class="collapsible-content">
                     <h3 id="sub-6-1">6.1 Performance Considerations</h3>
-<p>📊</p>
+<p></p>
 <p>Key Performance Metrics</p>
 <p>Throughput → items processed per second</p>
 <p>Latency → time from produce to consume</p>
 <p>CPU Utilization → useful work vs waiting 20</p>
-<p>🚀</p>
+<p></p>
 <p>Optimizing the Solution</p>
 <p>1⃣ Minimize Critical Section</p>
 <p>Keep only buffer access inside lock</p>
@@ -669,23 +669,23 @@ signal(empty);
 <p>Fine-grained locks → more concurrency, complex</p>
 <p>design</p>
 <ul>
-    <li>⚡</li>
-    <li>⏳</li>
-    <li>🖥</li>
-    <li>🔒</li>
-    <li>⏱</li>
-    <li>💤</li>
-    <li>❌</li>
-    <li>📈</li>
-    <li>📉</li>
-    <li>⚖</li>
-    <li>🔹</li>
-    <li>🔸</li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
 </ul>
 
 <h3 id="sub-6-2">6.2 Real-World Applications</h3>
-<p>21</p>
-<p>🎯</p>
+
+<p></p>
 <p>Key Takeaway</p>
 <ul>
     <li>Producer–Consumer is a core design pattern</li>
@@ -693,53 +693,53 @@ signal(empty);
 </ul>
 
 <h3 id="sub-6-3">6.3 Common Pitfalls and Debugging</h3>
-<p>22</p>
-<p>⚠</p>
+
+<p></p>
 <p>Frequent Mistakes</p>
 <p>1⃣ Wrong Semaphore Order</p>
 <p>Wrong</p>
 <p>Blocks while holding mutex</p>
 <p>buffer[in] = item;</p>
-<p>// ❌</p>
+<p>// </p>
 <p>// ...</p>
 <p>Wrong pairing</p>
 <p>Breaks resource accounting</p>
-<p>🔍</p>
+<p></p>
 <p>Debugging Techniques</p>
 <p>Trace execution (log semaphore values)</p>
 <div class="formula-box">Check invariants: empty + full = N</div>
 <p>Deadlock detection (circular wait)</p>
 <ul>
-    <li>🧾</li>
-    <li>📏</li>
-    <li>🔁</li>
+    <li></li>
+    <li></li>
+    <li></li>
 </ul>
-<pre class="code-block"><code>wait(mutex);   // ❌
+<pre class="code-block"><code>wait(mutex);   // 
 wait(empty);   // Deadlock risk
 2⃣ Missing signal()
 wait(mutex);
 signal(mutex) missing → permanent lock
 3⃣ Mismatched wait() / signal()
 wait(empty);
-signal(full);  // ❌</code></pre>
+signal(full);  // </code></pre>
 <div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
 
 <h3 id="sub-6-4">6.4 Practice Problems</h3>
-<p>🧾</p>
+<p></p>
 <p>Given (Buggy?) Producer Code</p>
 <p>int item;</p>
 <p>item = produce_item();</p>
 <p>buffer[in] = item;</p>
 <div class="formula-box">in = (in + 1) % 10;</div>
 <p>Question</p>
-<p>23</p>
-<p>❌</p>
+
+<p></p>
 <p>Bug Identified</p>
-<p>💥</p>
+<p></p>
 <p>Why This Is a Problem</p>
 <p>○ While holding mutex</p>
 <p>Deadlock occurs</p>
-<p>✅</p>
+<p></p>
 <p>Correct Fix (Swap Order)</p>
 <ul>
     <li>What is the bug?</li>
@@ -748,7 +748,7 @@ signal(full);  // ❌</code></pre>
     <li>Wrong semaphore order</li>
     <li>If buffer is full (empty = 0):</li>
     <li>Consumer cannot acquire mutex</li>
-    <li>❌</li>
+    <li></li>
 </ul>
 <pre class="code-block"><code>void producer() {
 while ( 1) {
@@ -760,12 +760,12 @@ signal(full);
 }
 ● wait(mutex) is called before wait(empty)
 ○ Producer blocks at wait(empty)
-wait(empty);   // ✔ Check resource first
-wait(mutex);   // ✔ Then enter critical section</code></pre>
+wait(empty);   //  Check resource first
+wait(mutex);   //  Then enter critical section</code></pre>
 <div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
 
 <h3 id="sub-6-5">6.5 Practice Problems</h3>
-<p>24</p>
+
 <p>Task: Fill in the missing semaphore operations in the</p>
 <p>consumer code.</p>
 <p>int item;</p>
@@ -780,13 +780,13 @@ wait(mutex);   // ✔ Then enter critical section</code></pre>
 <p>// Line 4: Signal empty slot</p>
 <p>___________________</p>
 <p>consume_item(item);</p>
-<p>✅</p>
+<p></p>
 <p>Expected Answer</p>
 <p>int item;</p>
 <p>item = buffer[out];</p>
 <div class="formula-box">out = (out + 1) % 10;</div>
 <p>consume_item(item);</p>
-<p>🎯</p>
+<p></p>
 <p>Key Rule (Remember!)</p>
 <ul>
     <li>Unlock before signaling</li>
@@ -808,30 +808,30 @@ signal(empty);      // Line 4
 ● Then lock buffer (wait(mutex))</code></pre>
 
 <h3 id="sub-6-6">6.6 Key Takeaways</h3>
-<p>25</p>
-<p>🔐</p>
+
+<p></p>
 <p>Core Semaphores</p>
-<p>🔄</p>
+<p></p>
 <p>Correct Semaphore Order</p>
-<p>⚠</p>
+<p></p>
 <p>Golden Rules</p>
 <ul>
     <li>mutex = 1 → Mutual exclusion</li>
     <li>empty = N → Empty buffer slots</li>
     <li>full = 0 → Filled buffer slots</li>
-    <li>✔ Wait for resources before mutex</li>
-    <li>✔ Keep critical sections small</li>
-    <li>✔ Always test with multiple producers & consumers</li>
+    <li> Wait for resources before mutex</li>
+    <li> Keep critical sections small</li>
+    <li> Always test with multiple producers & consumers</li>
 </ul>
 <pre class="code-block"><code>● Producer: wait(empty) → wait(mutex) →
 signal(mutex) → signal(full)
 ● Consumer: wait(full) → wait(mutex) →
 signal(mutex) → signal(empty)
-● ✔ Every wait() must have a matching signal()</code></pre>
+●  Every wait() must have a matching signal()</code></pre>
 
 <h3 id="sub-6-7">6.7 Thank You!</h3>
 <p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
-<p>26</p>
+
 
                     
                     <div class="topic-nav">

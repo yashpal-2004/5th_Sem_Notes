@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lecture 10 - Process Synchronization I: Critical Section and</title>
-    <meta content="Study notes covering Process Synchronization I: Critical Section and." name="description"/>
-    <link class="favicon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>10</text></svg>" rel="icon"/>
-    <link href="../css/style.css" rel="stylesheet"/>
+    <meta name="description" content="Study notes for Operating Systems Foundations, Lecture 10.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>10</text></svg>">
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
     <header>
@@ -18,7 +18,7 @@
             <a href="../pdfs/10.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
         </div>
         <div class="search-container">
-            <input id="searchInput" placeholder="Search notes..." type="text"/>
+            <input id="searchInput" placeholder="Search notes..." type="text">
         </div>
     </header>
     <div class="container" style="margin-top: 2rem;">
@@ -77,7 +77,7 @@
                 <li>
                     <a href="#topic-6">6. OS Core Synchronization Areas<span class="sub-count">3</span></a>
                     <ul class="sub-index">
-                         <li><a href="#sub-6-1">6.1 Practice Time! 💪</a></li>
+                         <li><a href="#sub-6-1">6.1 Practice Time! </a></li>
                          <li><a href="#sub-6-2">6.2 Key Takeaways</a></li>
                          <li><a href="#sub-6-3">6.3 Thank You!</a></li>
                     </ul>
@@ -95,11 +95,11 @@
                 </div>
                 <div id="content-1" class="collapsible-content">
                     <h3 id="sub-1-1">1.1 Join the lecture online on your dashboard</h3>
-<p>2</p>
-<p>0</p>
+
+
 
 <h3 id="sub-1-2">1.2 Today’s Agenda</h3>
-<p>01</p>
+
 <ul>
     <li>Introduction to Process Synchronization</li>
     <li>The Critical Section Problem</li>
@@ -110,7 +110,7 @@
 </ul>
 
 <h3 id="sub-1-3">1.3 Introduction to Process Synchronization</h3>
-<p>02</p>
+
 <p>What is Process Synchronization?</p>
 <p>A mechanism that ensures multiple concurrent processes</p>
 <p>or threads can safely share resources and coordinate</p>
@@ -127,7 +127,7 @@
 </ul>
 
 <h3 id="sub-1-4">1.4 Concurrent vs Parallel Execution</h3>
-<p>03</p>
+
 <p>Two Ways to Run Multiple Processes</p>
 <p>Concurrency (Single CPU)</p>
 <p>Process A: ████░░░░████░░░░</p>
@@ -156,34 +156,34 @@
                 </div>
                 <div id="content-2" class="collapsible-content">
                     <h3 id="sub-2-1">2.1 The Critical Section Problem</h3>
-<p>04</p>
+
 <p>What is a Critical Section?</p>
 <p>A critical section is a segment of code where a</p>
 <p>process accesses shared resources (variables, files,</p>
 <p>data structures) that must not be accessed by more</p>
 <p>than one process at a time.</p>
-<p>The Danger Zone ⚠</p>
-<p>// 🚪</p>
+<p>The Danger Zone </p>
+<p>// </p>
 <p>Entry Section - request permission</p>
-<p>// ⚠</p>
+<p>// </p>
 <p>CRITICAL SECTION - danger zone!</p>
 <p>[access shared data]</p>
-<p>// 🚪</p>
+<p>// </p>
 <p>Exit Section - release permission</p>
-<p>// ✅</p>
+<p>// </p>
 <p>Remainder Section - safe zone</p>
 <pre class="code-block"><code>do {
 } while (TRUE);</code></pre>
 
 <h3 id="sub-2-2">2.2 Critical Section Example</h3>
-<p>05</p>
+
 <p>CRITICAL SECTION - Multiple threads access</p>
 <p>this!</p>
-<div class="formula-box">int balance = read_balance();     // 📖</div>
+<div class="formula-box">int balance = read_balance();     // </div>
 <p>Read</p>
-<div class="formula-box">balance = balance - amount;       // 🧮</div>
+<div class="formula-box">balance = balance - amount;       // </div>
 <p>Calculate</p>
-<p>write_balance(balance);           // ✍</p>
+<p>write_balance(balance);           // </p>
 <p>Write</p>
 <p>Why is this critical?</p>
 <ul>
@@ -193,24 +193,24 @@
 </ul>
 
 <h3 id="sub-2-3">2.3 Race Condition - Concept</h3>
-<p>06</p>
+
 <p>What Is It?</p>
 <p>Outcome depends on execution timing</p>
 <p>Key Characteristics:</p>
-<p>🎲</p>
+<p></p>
 <p>Non-deterministic (unpredictable)</p>
-<p>⏱</p>
+<p></p>
 <p>Timing-dependent</p>
-<p>🐛</p>
+<p></p>
 <p>Hard to reproduce & debug</p>
-<p>💥</p>
+<p></p>
 <p>Can corrupt data</p>
 <p>Analogy: Two people editing a Google Doc</p>
 <p>without seeing each other's changes</p>
 <div class="box box-green"><div class="box-title">Analogy</div><p>Analogy: Two people editing a Google Doc</p></div>
 
 <h3 id="sub-2-4">2.4 Race Condition - Classic Example (Bank Account)</h3>
-<p>07</p>
+
 <p>For Deposit (Process A):</p>
 <div class="formula-box">int balance = read_balance();  // reads 5000</div>
 <div class="formula-box">balance = balance + 1000;       // calculates 6000</div>
@@ -243,7 +243,7 @@
                 </div>
                 <div id="content-3" class="collapsible-content">
                     <h3 id="sub-3-1">3.1 Race Condition - Execution Scenarios</h3>
-<p>08</p>
+
 <p>Scenario 1: Sequential Execution (Correct)</p>
 <p>Time    Process A               Process B           Balance</p>
 <p>t1          read(5000)                                  5000</p>
@@ -252,7 +252,7 @@
 <p>t4                                      read(6000)           6000</p>
 <p>t5                                      calc(4000)          6000</p>
 <p>t6                                      write(4000)         4000</p>
-<p>✓ Result: 4000 (Correct)</p>
+<p> Result: 4000 (Correct)</p>
 <p>Scenario 2: Interleaved Execution (Race Condition)</p>
 <p>Time    Process A               Process B           Balance</p>
 <p>t1         read(5000)                                  5000</p>
@@ -261,10 +261,10 @@
 <p>t4                                         calc(3000)          5000</p>
 <p>t5         write(6000)                                6000</p>
 <p>t6                                         write(3000)         3000</p>
-<p>✗ Result: 3000 (Incorrect! Lost 1000)</p>
+<p> Result: 3000 (Incorrect! Lost 1000)</p>
 
 <h3 id="sub-3-2">3.2 Race Condition - Producer-Consumer Example</h3>
-<p>09</p>
+
 <p>Bounded Buffer Problem Setup:</p>
 <p>Shared buffer with counter variable tracking number of</p>
 <p>items.</p>
@@ -290,7 +290,7 @@ while (true) {
 <div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
 
 <h3 id="sub-3-3">3.3 Why counter++ is Dangerous</h3>
-<p>10</p>
+
 <p>Looks Simple, Right?</p>
 <p>counter++;  // Just one line!</p>
 <p>But In Machine Code Assembly</p>
@@ -303,7 +303,7 @@ while (true) {
 <p>Initial: counter = 5</p>
 <p>Thread 1: counter++  (wants: 6)</p>
 <p>Thread 2: counter++  (wants: 7)</p>
-<p>❌</p>
+<p></p>
 <p>Race Condition Execution</p>
 <p>T1: LOAD R1, counter       (R1 = 5)</p>
 <p>T2: LOAD R2, counter       (R2 = 5)</p>
@@ -316,7 +316,7 @@ while (true) {
 <p>One increment lost!</p>
 
 <h3 id="sub-3-4">3.4 Requirements - Critical Section Solutions</h3>
-<p>11</p>
+
 <p>Every Solution MUST Satisfy All Three:</p>
 <p>1⃣ Mutual Exclusion</p>
 <p>> Only ONE process in critical section at a time</p>
@@ -342,14 +342,14 @@ while (true) {
                 </div>
                 <div id="content-4" class="collapsible-content">
                     <h3 id="sub-4-1">4.1 Requirement 1 - Mutual Exclusion</h3>
-<p>12</p>
-<p>The Bathroom Rule 🚻</p>
+
+<p>The Bathroom Rule </p>
 <p>Only ONE person inside at a time</p>
 <p>Process P1: [inside critical section]</p>
-<p>Process P2: [must wait] ⏳</p>
-<p>Process P3: [must wait] ⏳</p>
+<p>Process P2: [must wait] </p>
+<p>Process P3: [must wait] </p>
 <p>Why It Matters</p>
-<p>🎯</p>
+<p></p>
 <p>What happens if this is violated?</p>
 <p>Answer: Data corruption!</p>
 <ul>
@@ -359,14 +359,14 @@ while (true) {
 </ul>
 
 <h3 id="sub-4-2">4.2 Requirement 2 - Progress</h3>
-<p>13</p>
+
 <p>No Artificial Delays</p>
 <p>Bad Scenario:</p>
 <p>Critical Section: [EMPTY]</p>
 <p>Process A: Waiting for Process B</p>
 <p>Process B: In remainder section (not even</p>
 <p>interested!)</p>
-<p>❌</p>
+<p></p>
 <p>Violation! Selection postponed indefinitely</p>
 <p>The Rule</p>
 <ul>
@@ -376,7 +376,7 @@ while (true) {
 </ul>
 
 <h3 id="sub-4-3">4.3 Requirement 3 - Bounded Waiting</h3>
-<p>14</p>
+
 <p>Fairness Guarantee</p>
 <p>Bad Scenario:</p>
 <p>Process A: Requested entry 1,000 times</p>
@@ -388,15 +388,15 @@ while (true) {
 <p>Not Necessarily FIFO, but no infinite waiting!</p>
 
 <h3 id="sub-4-4">4.4 Additional Desirable Properties</h3>
-<p>15</p>
+
 <p>Beyond the Three Main Requirements</p>
-<p>⚡</p>
+<p></p>
 <p>Performance</p>
-<p>⚖</p>
+<p></p>
 <p>Fairness</p>
-<p>🧩</p>
+<p></p>
 <p>Simplicity</p>
-<p>🌍</p>
+<p></p>
 <p>Portability</p>
 <ul>
     <li>Low overhead</li>
@@ -427,27 +427,27 @@ while (true) {
                 </div>
                 <div id="content-5" class="collapsible-content">
                     <h3 id="sub-5-1">5.1 Real-World Consequences of Race Conditions</h3>
-<p>16</p>
+
 <p>Historical Examples</p>
-<p>⚠</p>
+<p></p>
 <p>Therac-25 (1985–87)</p>
-<p>⚠</p>
+<p></p>
 <p>Northeast Blackout (2003)</p>
 <p>Modern Examples</p>
-<p>🏦</p>
+<p></p>
 <p>Banking → incorrect balances</p>
-<p>🛒</p>
+<p></p>
 <p>E-commerce → oversold inventory</p>
-<p>🎮</p>
+<p></p>
 <p>Gaming → item duplication glitches</p>
-<p>📱</p>
+<p></p>
 <p>Social media → data corruption</p>
 <p>Why These Happen</p>
-<p>🔁</p>
+<p></p>
 <p>Concurrent access to shared resources</p>
-<p>⏱</p>
+<p></p>
 <p>Timing-dependent behavior</p>
-<p>🧪</p>
+<p></p>
 <p>Hard to test & reproduce</p>
 <ul>
     <li>Control software race condition</li>
@@ -459,7 +459,7 @@ while (true) {
 </ul>
 
 <h3 id="sub-5-2">5.2 Concurrency in Modern Systems</h3>
-<p>17</p>
+
 <p>Multi-Core Processors:</p>
 <p>coherency issues)</p>
 <p>Challenges in Modern Systems:</p>
@@ -473,13 +473,13 @@ while (true) {
     <li>Shared memory architecture</li>
     <li>Each core has own cache (introduces cache</li>
     <li>Requires sophisticated synchronization</li>
-    <li>🗄</li>
-    <li>🔄</li>
-    <li>⚡</li>
+    <li></li>
+    <li></li>
+    <li></li>
 </ul>
 
 <h3 id="sub-5-3">5.3 Where OS Uses Synchronization</h3>
-<p>18</p>
+
 <p>Everywhere!</p>
 <p>Process Management</p>
 <p>Memory Management</p>
@@ -498,7 +498,7 @@ while (true) {
 </ul>
 
 <h3 id="sub-5-4">5.4 Preview of Synchronization Techniques</h3>
-<p>19</p>
+
 <p>We Know the Problem... Now for Solutions!</p>
 <p>Software Solutions</p>
 <p>Peterson's Algorithm (2 processes)</p>
@@ -512,13 +512,13 @@ while (true) {
 <p>Monitors</p>
 <p>Modern Approaches</p>
 <ul>
-    <li>🧩</li>
-    <li>🎟</li>
-    <li>⚛</li>
-    <li>🔄</li>
-    <li>🔒</li>
-    <li>🚦</li>
-    <li>🏛</li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
     <li>Lock-free structures</li>
     <li>Transactional memory</li>
 </ul>
@@ -537,8 +537,8 @@ while (true) {
                     <h2>OS Core Synchronization Areas</h2>
                 </div>
                 <div id="content-6" class="collapsible-content">
-                    <h3 id="sub-6-1">6.1 Practice Time! 💪</h3>
-<p>20</p>
+                    <h3 id="sub-6-1">6.1 Practice Time! </h3>
+
 <p>Problem 1: Identify the Critical Section</p>
 <p>int shared_counter = 0;</p>
 <p>shared_counter++;</p>
@@ -561,8 +561,8 @@ for ( int i = 0; i < 1000; i++) {
 }</code></pre>
 
 <h3 id="sub-6-2">6.2 Key Takeaways</h3>
-<p>21</p>
-<p>What You Must Remember 🎯</p>
+
+<p>What You Must Remember </p>
 <p>resources</p>
 <p>(DANGEROUS!)</p>
 <p>○ Mutual Exclusion</p>
@@ -580,7 +580,7 @@ for ( int i = 0; i < 1000; i++) {
 
 <h3 id="sub-6-3">6.3 Thank You!</h3>
 <p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
-<p>22</p>
+
 
                     
                     <div class="topic-nav">

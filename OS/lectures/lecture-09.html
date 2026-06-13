@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lecture 09 - CPU Scheduling Evaluation & Advanced Topics</title>
-    <meta content="Study notes covering CPU Scheduling Evaluation & Advanced Topics." name="description"/>
-    <link class="favicon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>09</text></svg>" rel="icon"/>
-    <link href="../css/style.css" rel="stylesheet"/>
+    <meta name="description" content="Study notes for Operating Systems Foundations, Lecture 09.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>09</text></svg>">
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
     <header>
@@ -18,7 +18,7 @@
             <a href="../pdfs/9.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
         </div>
         <div class="search-container">
-            <input id="searchInput" placeholder="Search notes..." type="text"/>
+            <input id="searchInput" placeholder="Search notes..." type="text">
         </div>
     </header>
     <div class="container" style="margin-top: 2rem;">
@@ -109,7 +109,7 @@
                 </div>
                 <div id="content-1" class="collapsible-content">
                     <h3 id="sub-1-1">1.1 The Scheduler's Dilemma</h3>
-<p>01</p>
+
 <p>You're the OS scheduler. Five processes arrive:</p>
 <p>Question: Which runs first? Can one algorithm rule</p>
 <p>them all?</p>
@@ -122,7 +122,7 @@
 </ul>
 
 <h3 id="sub-1-2">1.2 Quick Check - Algorithm Selection</h3>
-<p>02</p>
+
 <p>ANSWER: C) Round Robin - ensures fairness and</p>
 <p>good response time for all students. In a shared</p>
 <p>system, preventing any student from monopolizing</p>
@@ -135,7 +135,7 @@
 <p>D) Priority</p>
 
 <h3 id="sub-1-3">1.3 THE EVALUATION FRAMEWORK</h3>
-<p>03</p>
+
 <p>8 Critical Metrics:</p>
 <p>1. CPU Utilization - Keep the engine running (40-90%)</p>
 <p>2. Throughput - How many jobs completed per time unit?</p>
@@ -147,7 +147,7 @@
 <p>8. Overhead - Cost of context switches and management</p>
 
 <h3 id="sub-1-4">1.4 ALGORITHM QUICK RECAP</h3>
-<p>04</p>
+
 <p>FCFS (First-Come, First-Served)</p>
 <p>SJF/SRTF (Shortest Job First)</p>
 <p>Round Robin</p>
@@ -168,10 +168,10 @@
 </ul>
 
 <h3 id="sub-1-5">1.5 ALGORITHM CHAMPIONSHIP</h3>
-<p>05Key Insight: There's no clear winner! Each algorithm is like a specialized tool.</p>
+<p>Key Insight: There's no clear winner! Each algorithm is like a specialized tool.</p>
 
 <h3 id="sub-1-6">1.6 WORKLOAD CHARACTERISTICS</h3>
-<p>06</p>
+
 <p>CPU-Bound Processes:</p>
 <p>encoding, 3D rendering</p>
 <p>efficiency</p>
@@ -206,7 +206,7 @@
                 </div>
                 <div id="content-2" class="collapsible-content">
                     <h3 id="sub-2-1">2.1 REAL-WORLD SCENARIO</h3>
-<p>07</p>
+
 <p>The Situation: You're on a Zoom call while Netflix buffers in the background</p>
 <p>CPU-Bound Process (Netflix decoder):</p>
 <p>Wrong Choice: Zoom waits 10 seconds for its</p>
@@ -222,7 +222,7 @@
 </ul>
 
 <h3 id="sub-2-2">2.2 COMPREHENSIVE EXAMPLE SETUP</h3>
-<p>08</p>
+
 <p>The Challenge -</p>
 <p>Same Workload, Different Stories:</p>
 <p>Process Arrival Burst Priority</p>
@@ -245,7 +245,7 @@
 </ul>
 
 <h3 id="sub-2-3">2.3 COMPREHENSIVE EXAMPLE SETUP</h3>
-<p>09</p>
+
 <p>The Challenge -</p>
 <p>Same Workload, Different Stories:</p>
 <p>Process Arrival Burst Priority</p>
@@ -261,13 +261,13 @@
 <p>The Insight: Mathematically proven optimal for average</p>
 <p>waiting time!</p>
 <ul>
-    <li>Avg Waiting: 7.2 seconds ✓ (Better than FCFS!)</li>
+    <li>Avg Waiting: 7.2 seconds  (Better than FCFS!)</li>
     <li>But P1 still suffers (no preemption)</li>
     <li>Short jobs (P2, P4) get relief</li>
 </ul>
 
 <h3 id="sub-2-4">2.4 COMPREHENSIVE EXAMPLE SETUP</h3>
-<p>10</p>
+
 <p>The Challenge -</p>
 <p>Same Workload, Different Stories:</p>
 <p>Process Arrival Burst Priority</p>
@@ -286,13 +286,13 @@
 <p>P1 P2 P3 P4 P1 P5 P1 P5 P1 P5 P1</p>
 <p>0-2 2-3 3-5 5-6 6-8 8-10 10-12 12-14 14-16 16-17 17-19</p>
 <ul>
-    <li>Avg Response Time: 3.4 seconds 🏆</li>
-    <li>Avg Waiting: 6.4 seconds 🏆</li>
+    <li>Avg Response Time: 3.4 seconds </li>
+    <li>Avg Waiting: 6.4 seconds </li>
     <li>Cost: 8 context switches (vs 0 for FCFS)</li>
 </ul>
 
 <h3 id="sub-2-5">2.5 COMPREHENSIVE EXAMPLE SETUP</h3>
-<p>11</p>
+
 <p>The Challenge -</p>
 <p>Same Workload, Different Stories:</p>
 <p>Process Arrival Burst Priority</p>
@@ -309,12 +309,12 @@
 <ul>
     <li>P2 (Priority 1) immediately preempts P1 at t=1!</li>
     <li>P3 (Priority 2) preempts P1 at t=2!</li>
-    <li>P4 (Priority 4) waits 15 seconds for 1-second job! 😢</li>
+    <li>P4 (Priority 4) waits 15 seconds for 1-second job! </li>
     <li>Avg Waiting: 5.6 seconds (lowest, but unfair)</li>
 </ul>
 
 <h3 id="sub-2-6">2.6 THE VERDICT</h3>
-<p>12</p>
+
 <p>The Truth: NO SINGLE WINNER! Context matters.</p>
 <p>Key Insight: The "best"</p>
 <p>algorithm depends entirely</p>
@@ -336,7 +336,7 @@
                 </div>
                 <div id="content-3" class="collapsible-content">
                     <h3 id="sub-3-1">3.1 Test Your Understanding</h3>
-<p>13</p>
+
 <p>Which scheduling algorithm provides optimal average waiting time?</p>
 <p>A) FCFS</p>
 <p>B) SJF</p>
@@ -347,22 +347,22 @@
 <p>shortest job next minimizes average waiting time.</p>
 
 <h3 id="sub-3-2">3.2 What If We Use Them ALL?</h3>
-<p>14</p>
+
 <p>The Idea: Use different algorithms for different process types!</p>
 
 <h3 id="sub-3-3">3.3 FIXED MULTI-LEVEL QUEUES</h3>
-<p>15</p>
+
 <p>How It Works:</p>
 <p>1. Classify processes on arrival (system/interactive/batch)</p>
 <p>2. Each queue has its own algorithm</p>
 <p>3. Higher priority queues run first</p>
 <p>Example Timeline:</p>
 <p>The Problem:</p>
-<p>❌</p>
+<p></p>
 <p>Once classified, processes are stuck forever!</p>
-<p>❌</p>
+<p></p>
 <p>What if P4 becomes interactive?</p>
-<p>❌</p>
+<p></p>
 <p>Batch queue may starve!</p>
 <ul>
     <li>Time 0-2: System queue (P1) runs</li>
@@ -372,7 +372,7 @@
 <div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
 
 <h3 id="sub-3-4">3.4 THE BIG PROBLEM</h3>
-<p>16</p>
+
 <p>How Do We Know What a Process Needs?</p>
 <p>The Classification Challenge:</p>
 <p>When firefox.exe starts, is it:</p>
@@ -386,28 +386,28 @@
 </ul>
 
 <h3 id="sub-3-5">3.5 MLFQ - THE ADAPTIVE GENIUS</h3>
-<p>17</p>
+
 <p>The Revolutionary Idea:</p>
-<p>🎯</p>
+<p></p>
 <p>Start ALL processes at highest priority</p>
-<p>🎯</p>
+<p></p>
 <p>If you use your full quantum → demoted (CPU-bound</p>
 <p>behavior)</p>
-<p>🎯</p>
+<p></p>
 <p>If you yield before quantum → stay high (I/O-bound</p>
 <p>behavior)</p>
-<p>🎯</p>
+<p></p>
 <p>Processes move dynamically based on actual</p>
 <p>behavior</p>
 <p>The Self-Organizing System:</p>
-<p>✓ CPU-bound processes naturally sink to lower</p>
+<p> CPU-bound processes naturally sink to lower</p>
 <p>queues</p>
-<p>✓ I/O-bound processes naturally float to top</p>
+<p> I/O-bound processes naturally float to top</p>
 <p>This is brilliant! The system learns automatically!</p>
-<pre class="code-block"><code>✓ NO need to predict - let behavior decide!</code></pre>
+<pre class="code-block"><code> NO need to predict - let behavior decide!</code></pre>
 
 <h3 id="sub-3-6">3.6 MLFQ STRUCTURE</h3>
-<p>18</p>
+
 <p>Notice:</p>
 <ul>
     <li>Quantum increases as you go down</li>
@@ -447,17 +447,17 @@
 <p>quantum) → demoted to</p>
 <p>Q1</p>
 <p>Time 0-8</p>
-<p>19</p>
+
 <p>MLFQ IN ACTION</p>
 <p>The System Learned:</p>
-<p>✓ P2 is I/O-bound (didn't use full quantum) → keeps high</p>
+<p> P2 is I/O-bound (didn't use full quantum) → keeps high</p>
 <p>priority</p>
-<p>✓ P1 is CPU-bound (uses full quantum) → moves to lower</p>
+<p> P1 is CPU-bound (uses full quantum) → moves to lower</p>
 <p>priority</p>
 <p>No programmer hints needed!</p>
 
 <h3 id="sub-4-2">4.2 MLFQ Understanding Check</h3>
-<p>20</p>
+
 <p>What is the main advantage of MLFQ over fixed multi-level queues?</p>
 <p>A) Lower overhead</p>
 <p>B) Simpler implementation</p>
@@ -468,7 +468,7 @@
 <p>their actual CPU usage patterns, adapting to changing behavior.</p>
 
 <h3 id="sub-4-3">4.3 GAMING THE SYSTEM</h3>
-<p>21</p>
+
 <p>The Problem - Smart Processes Try to Cheat:</p>
 <p>// Gaming attempt:</p>
 <p>do_work_for(quantum - 1ms);</p>
@@ -488,19 +488,19 @@
 }</code></pre>
 
 <h3 id="sub-4-4">4.4 MLFQ - THE MODERN STANDARD</h3>
-<p>22</p>
+
 <p>The Superpowers:</p>
-<p>✅</p>
+<p></p>
 <p>No prediction needed - learns from behavior</p>
-<p>✅</p>
+<p></p>
 <p>Excellent response for interactive apps</p>
-<p>✅</p>
+<p></p>
 <p>High throughput for CPU-bound apps</p>
-<p>✅</p>
+<p></p>
 <p>Prevents starvation with priority boost</p>
-<p>✅</p>
+<p></p>
 <p>Fair over the long term</p>
-<p>✅</p>
+<p></p>
 <p>Adapts to changing process behavior</p>
 <p>Real-World Usage:</p>
 <p>The Verdict: As close as we've come to a "universal" scheduler!</p>
@@ -512,7 +512,7 @@
 </ul>
 
 <h3 id="sub-4-5">4.5 The Completely Fair Scheduler</h3>
-<p>23</p>
+
 <p>The Philosophy Shift: What if we track FAIRNESS instead of queues?</p>
 <p>Key Concept - Virtual Runtime (vruntime)</p>
 <p>Every process tracks: vruntime (virtual runtime)</p>
@@ -528,7 +528,7 @@
 </ul>
 
 <h3 id="sub-4-6">4.6 CFS - THE NICE SYSTEM</h3>
-<p>24</p>
+
 <p>Nice Values Control CPU Share:</p>
 <p>Range: -20 (highest priority) to +19 (lowest)</p>
 <p>Default: 0</p>
@@ -560,7 +560,7 @@
                 </div>
                 <div id="content-5" class="collapsible-content">
                     <h3 id="sub-5-1">5.1 CFS Understanding Check</h3>
-<p>25</p>
+
 <p>Linux CFS aims for:</p>
 <p>A) Strict priority enforcement</p>
 <p>B) Fair CPU share based on weights</p>
@@ -572,24 +572,24 @@
 <p>by nice values).</p>
 
 <h3 id="sub-5-2">5.2 WINDOWS PRIORITY SCHEDULING</h3>
-<p>26</p>
+
 <p>Priority Structure:</p>
 <p>Level 31-16: Real-time (fixed, never change)</p>
 <p>Level 15-1: Variable priority (dynamic)</p>
 <p>Level 0: System idle (reserved)</p>
 <p>Dynamic Adjustments:</p>
-<p>📈</p>
+<p></p>
 <p>I/O completion → Temporary priority boost</p>
-<p>📈</p>
+<p></p>
 <p>Foreground window → Priority boost</p>
-<p>📉</p>
+<p></p>
 <p>CPU-bound → Gradual priority decay back to base</p>
 <p>Philosophy: Responsiveness for user-facing tasks,</p>
 <p>throughput for background</p>
 <p>Windows uses explicit priorities with dynamic adjustments!</p>
 
 <h3 id="sub-5-3">5.3 MULTI-PROCESSOR REVOLUTION</h3>
-<p>27</p>
+
 <p>The New Challenge:</p>
 <p>New Questions:</p>
 <p>1. How to distribute load across CPUs evenly?</p>
@@ -602,7 +602,7 @@
 <p>Multi-CPU: Who runs WHERE?</p>
 
 <h3 id="sub-5-4">5.4 LOAD BALANCING</h3>
-<p>28</p>
+
 <p>Two Strategies:</p>
 <p>Push Migration: Overloaded CPU pushes tasks away</p>
 <p>Pull Migration: Idle CPU pulls tasks from busy ones</p>
@@ -614,7 +614,7 @@
 </ul>
 
 <h3 id="sub-5-5">5.5 CPU AFFINITY - THE CACHE STORY</h3>
-<p>29</p>
+
 <p>The Cache Scenario:</p>
 <p>P1 runs on CPU 0:</p>
 <p>P1 migrated to CPU 1:</p>
@@ -624,14 +624,14 @@
 <p>Trade-off: Load balancing vs cache performance</p>
 <ul>
     <li>Loads 10 MB of data into CPU 0's cache</li>
-    <li>Runs efficiently (cache hits) ✓</li>
+    <li>Runs efficiently (cache hits) </li>
     <li>CPU 1's cache is COLD (doesn't have P1's data)</li>
     <li>Must reload 10 MB from RAM</li>
-    <li>Performance penalty: 100× slower initially! ❌</li>
+    <li>Performance penalty: 100× slower initially! </li>
 </ul>
 
 <h3 id="sub-5-6">5.6 Multi-Processor Check</h3>
-<p>30</p>
+
 <p>In multi-processor systems, CPU affinity reduces:</p>
 <p>A) Cache misses by keeping process on same CPU</p>
 <p>B) Load balancing effectiveness</p>
@@ -657,7 +657,7 @@
                 </div>
                 <div id="content-6" class="collapsible-content">
                     <h3 id="sub-6-1">6.1 REAL-WORLD SCHEDULER SELECTION</h3>
-<p>31</p>
+
 <p>System Type → Best Scheduler:</p>
 <p>Web Server:</p>
 <p>Scientific Cluster:</p>
@@ -679,7 +679,7 @@
 </ul>
 
 <h3 id="sub-6-2">6.2 Best Algorithm Check</h3>
-<p>32</p>
+
 <p>What is the best algorithm for hard real-time</p>
 <p>systems?</p>
 <p>A) FCFS</p>
@@ -692,7 +692,7 @@
 <p>Missing a deadline could be catastrophic.</p>
 
 <h3 id="sub-6-3">6.3 THE TRADE-OFF TRIANGLE</h3>
-<p>33</p>
+
 <p>The Reality: Every scheduler makes trade-offs!</p>
 <ul>
     <li>FCFS: Simple + Fast, but unfair</li>
@@ -702,7 +702,7 @@
 </ul>
 
 <h3 id="sub-6-4">6.4 Overhead Understanding</h3>
-<p>34</p>
+
 <p>Which algorithm has the HIGHEST overhead?</p>
 <p>A) FCFS</p>
 <p>B) SRTF</p>
@@ -714,7 +714,7 @@
 <p>saving/restoring process state.</p>
 
 <h3 id="sub-6-5">6.5 EVOLUTION OF SCHEDULING</h3>
-<p>35</p>
+
 <p>Scheduling Through the Decades:</p>
 <p>1960s - Batch Systems:</p>
 <p>FCFS, SJF → Maximize throughput</p>
@@ -732,7 +732,7 @@
 <p>Container-aware, ML-predicted → Dynamic optimization</p>
 
 <h3 id="sub-6-6">6.6 Key Takeaways</h3>
-<p>36</p>
+
 <p>1. Context is King</p>
 <p>→ No universal best algorithm</p>
 <p>2. Measure What Matters</p>
@@ -750,7 +750,7 @@
 
 <h3 id="sub-6-7">6.7 Thank You!</h3>
 <p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
-<p>37</p>
+
 
                     
                     <div class="topic-nav">

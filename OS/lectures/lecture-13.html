@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lecture 13 - Process Synchronization IV: Semaphores</title>
-    <meta content="Study notes covering Process Synchronization IV: Semaphores." name="description"/>
-    <link class="favicon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>13</text></svg>" rel="icon"/>
-    <link href="../css/style.css" rel="stylesheet"/>
+    <meta name="description" content="Study notes for Operating Systems Foundations, Lecture 13.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>13</text></svg>">
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
     <header>
@@ -18,7 +18,7 @@
             <a href="../pdfs/13.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
         </div>
         <div class="search-container">
-            <input id="searchInput" placeholder="Search notes..." type="text"/>
+            <input id="searchInput" placeholder="Search notes..." type="text">
         </div>
     </header>
     <div class="container" style="margin-top: 2rem;">
@@ -99,7 +99,7 @@
                 </div>
                 <div id="content-1" class="collapsible-content">
                     <h3 id="sub-1-1">1.1 Today's Agenda</h3>
-<p>01</p>
+
 <p>(Dijkstra).</p>
 <p>Blocking.</p>
 <p>Priority Inversion.</p>
@@ -114,7 +114,7 @@ signal() (V).</code></pre>
 <div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
 
 <h3 id="sub-1-2">1.2 Recap: The Synchronization Hierarchy</h3>
-<p>02</p>
+
 <p>Mutexes:</p>
 <p>Hardware (TAS/CAS):</p>
 <p>program directly.</p>
@@ -140,10 +140,10 @@ signal() (V).</code></pre>
 <p>Answer: It requires messy counters and</p>
 <p>multiple locks. We need a better</p>
 <p>abstraction.</p>
-<p>03</p>
+
 
 <h3 id="sub-1-4">1.4 Enter the Semaphore</h3>
-<p>04</p>
+
 <p>Definition: A synchronization primitive introduced</p>
 <p>by Edsger Dijkstra (1965).</p>
 <p>Concept: An integer variable accessed only</p>
@@ -172,7 +172,7 @@ signal() (V).</code></pre>
                 </div>
                 <div id="content-2" class="collapsible-content">
                     <h3 id="sub-2-1">2.1 The Semaphore Abstract Data Type</h3>
-<p>05</p>
+
 <p>It is not just an integer.</p>
 <p>int value;           // Counter</p>
 <p>(available resources)</p>
@@ -182,7 +182,7 @@ signal() (V).</code></pre>
 } semaphore;</code></pre>
 
 <h3 id="sub-2-2">2.2 Binary Semaphore</h3>
-<p>06</p>
+
 <p>Value Range: 0 or 1.</p>
 <p>Behavior: Acts like a Mutex.</p>
 <p>Use Case: Protecting a Critical Section.</p>
@@ -192,7 +192,7 @@ signal() (V).</code></pre>
 </ul>
 
 <h3 id="sub-2-3">2.3 Counting Semaphore</h3>
-<p>07</p>
+
 <p>Value Range: 0 to N.</p>
 <p>Initial Value: Total resources (e.g., N=5</p>
 <p>connections).</p>
@@ -204,7 +204,7 @@ signal() (V).</code></pre>
 </ul>
 
 <h3 id="sub-2-4">2.4 Visualizing the Difference</h3>
-<p>08</p>
+
 <p>Binary:</p>
 <p>[1] → [0] (Lock) → [1] (Unlock)</p>
 <p>Counting (Init 3):</p>
@@ -230,7 +230,7 @@ signal() (V).</code></pre>
                 </div>
                 <div id="content-3" class="collapsible-content">
                     <h3 id="sub-3-1">3.1 The Two Atomic Operations</h3>
-<p>09</p>
+
 <p>Signal() (V, up, release):</p>
 <p>Wait() (P, down, acquire):</p>
 <p>unavailable.</p>
@@ -250,7 +250,7 @@ if (S->value < 0) {
 } Crucial Insight: This yields the CPU. No busy waiting.</code></pre>
 
 <h3 id="sub-3-2">3.2 Signal : Pseudo Code</h3>
-<p>10</p>
+
 <p>Crucial Insight:If value was negative, it</p>
 <p>means someone was waiting.</p>
 <p>S->value++;</p>
@@ -271,7 +271,7 @@ if (S->value <= 0) {
 }</code></pre>
 
 <h3 id="sub-3-3">3.3 Simulation Trace</h3>
-<p>11</p>
+
 <p>Scenario: Init = 3 (Printers). 5 Threads request</p>
 <p>access.</p>
 <p>Trace:</p>
@@ -282,7 +282,7 @@ if (S->value <= 0) {
 <div class="formula-box">Time 6 (A signals): Val = -1. D wakes up.</div>
 
 <h3 id="sub-3-4">3.4 Busy Waiting (The Spinlock Approach)</h3>
-<p>12</p>
+
 <p>Mechanism: Thread loops constantly</p>
 <p>CPU: High impact. Core locked at 100% usage doing</p>
 <p>"useless" checks.</p>
@@ -306,7 +306,7 @@ if (S->value <= 0) {
                 </div>
                 <div id="content-4" class="collapsible-content">
                     <h3 id="sub-4-1">4.1 Blocking (Semaphore)</h3>
-<p>13</p>
+
 <p>Mechanism: Thread yields CPU (block()),</p>
 <p>moving to the Waiting state.</p>
 <p>CPU: Zero usage. OS schedules other work.</p>
@@ -316,7 +316,7 @@ if (S->value <= 0) {
 <p>contention.</p>
 
 <h3 id="sub-4-2">4.2 Inside the OS Kernel: The Data Structure</h3>
-<p>14</p>
+
 <p>The "Black Box" Revealed: A semaphore isn't</p>
 <p>just a number; it's a kernel object.</p>
 <p>Kernel Struct Components:</p>
@@ -332,7 +332,7 @@ if (S->value <= 0) {
 <p>the Scheduler, which is a privileged OS operation.</p>
 
 <h3 id="sub-4-3">4.3 The Atomicity Challenge</h3>
-<p>15</p>
+
 <p>same nanosecond on different cores, they</p>
 <p>might both read the same count value</p>
 <p>before updating it.</p>
@@ -345,7 +345,7 @@ and Thread B calls signal() at the exact
 the entire if (count < 0) { ... }</code></pre>
 
 <h3 id="sub-4-4">4.4 The "Spinlock Inside" (Implementation Irony)</h3>
-<p>16</p>
+
 <p>The Paradox: "I thought Semaphores were</p>
 <p>used to avoid spinlocks?"</p>
 <p>The Reality: We use a Spinlock inside the</p>
@@ -377,7 +377,7 @@ the entire if (count < 0) { ... }</code></pre>
                 </div>
                 <div id="content-5" class="collapsible-content">
                     <h3 id="sub-5-1">5.1 Modern Optimization: The "Two-Phase" Wait</h3>
-<p>17</p>
+
 <p>The Problem: Putting a thread to sleep (Context</p>
 <p>Switch) is "expensive" (~5-10 microseconds). If the</p>
 <p>resource frees up in 1 microsecond, we wasted time</p>
@@ -395,7 +395,7 @@ the entire if (count < 0) { ... }</code></pre>
 <div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
 
 <h3 id="sub-5-2">5.2 Queue Policies & Fairness</h3>
-<p>18</p>
+
 <p>Strict FIFO (First-In-First-Out):</p>
 <p>wakes up first.</p>
 <p>no starvation.</p>
@@ -412,7 +412,7 @@ the entire if (count < 0) { ... }</code></pre>
 </ul>
 
 <h3 id="sub-5-3">5.3 The Standard API (POSIX)</h3>
-<p>19</p>
+
 <p>Library: <semaphore.h> (Standard on Linux/Unix).</p>
 <p>The "Big 4" Functions:</p>
 <p>count. pshared=0 for threads.</p>
@@ -425,7 +425,7 @@ sem_post(&s): The signaling "Up" operation.
 sem_destroy(&s): Clean up kernel resources.</code></pre>
 
 <h3 id="sub-5-4">5.4 The Binary Mutex Pattern</h3>
-<p>20</p>
+
 <p>Objective: Protect a shared counter from race</p>
 <p>conditions.</p>
 <p>Implementation:</p>
@@ -458,7 +458,7 @@ sem_wait(&mutex);  // Blocks immediately!</code></pre>
                 </div>
                 <div id="content-6" class="collapsible-content">
                     <h3 id="sub-6-1">6.1 Pattern: The Resource Pool</h3>
-<p>21</p>
+
 <p>Scenario: Managing N Database</p>
 <p>Connections.</p>
 <p>Logic:</p>
@@ -474,7 +474,7 @@ sem_wait(&mutex);  // Blocks immediately!</code></pre>
 someone calls sem_post.</code></pre>
 
 <h3 id="sub-6-2">6.2 Deep Dive: Mutex vs. Semaphore</h3>
-<p>22</p>
+
 <p>Semaphore: "Someone needs to wait, someone</p>
 <p>needs to signal." (No ownership).</p>
 <p>Mutex: "I locked it, so only I can unlock it." (Good</p>
@@ -489,7 +489,7 @@ someone calls sem_post.</code></pre>
 <pre class="code-block"><code>semaphore it never wait()ed on. This is</code></pre>
 
 <h3 id="sub-6-3">6.3 Pitfall 1: Deadlock (The Deadly Embrace)</h3>
-<p>23</p>
+
 <p>Definition: A circular chain of waiting threads. T1</p>
 <p>waits for T2, T2 waits for T1.</p>
 <p>The Code of Doom:</p>
@@ -500,7 +500,7 @@ someone calls sem_post.</code></pre>
 <div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
 
 <h3 id="sub-6-4">6.4 Pitfall 2: Starvation & Fairness</h3>
-<p>24</p>
+
 <p>Definition: The system is making</p>
 <p>progress, but one specific thread is stuck</p>
 <p>waiting forever.</p>
@@ -518,7 +518,7 @@ someone calls sem_post.</code></pre>
 <div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
 
 <h3 id="sub-6-5">6.5 Common Coding Bugs (Logic Errors)</h3>
-<p>25</p>
+
 <p>Bug 1: Unbalanced Signal: Calling post() one</p>
 <p>too many times.</p>
 <p>Result: count exceeds N. Two threads enter a</p>
@@ -534,7 +534,7 @@ someone calls sem_post.</code></pre>
 <p>halts).</p>
 
 <h3 id="sub-6-6">6.6 Best Practices Checklist</h3>
-<p>26</p>
+
 <p>Lock Ordering: Always acquire Mutex A</p>
 <p>before Mutex B.</p>
 <p>RAII (Resource Acquisition Is</p>
@@ -547,7 +547,7 @@ someone calls sem_post.</code></pre>
 
 <h3 id="sub-6-7">6.7 Thank You!</h3>
 <p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
-<p>27</p>
+
 
                     
                     <div class="topic-nav">
