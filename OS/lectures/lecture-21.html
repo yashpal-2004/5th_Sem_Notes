@@ -107,10 +107,8 @@
                     <h2>Address Translation Performance Issues</h2>
                 </div>
                 <div id="content-1" class="collapsible-content">
-                    <h3 id="sub-1-1">1.1 Join the lecture online on your dashboard</h3>
-
-
-
+                    <h3 id="sub-1-1">1.1 Join the lecture online on your dashboard</h3>
+
 <h3 id="sub-1-2">1.2 Today’s Agenda</h3>
 
 <ul>
@@ -124,16 +122,10 @@
 
 <h3 id="sub-1-3">1.3 Review - Why Paging?</h3>
 
-<p></p>
 <p>Problems with Contiguous Allocation</p>
-<p></p>
 <p>Paging: The Solution</p>
-<p></p>
 <p>Why Paging Works</p>
-<p></p>
-<p>Key Advantage</p>
-<p>Logical and physical memory are separated</p>
-<p>enabling modern virtual memory systems.</p>
+<p>Key Advantage Logical and physical memory are separated enabling modern virtual memory systems.</p>
 <ul>
     <li>External fragmentation wastes memory</li>
     <li>Large processes need contiguous space</li>
@@ -149,24 +141,11 @@
 
 <h3 id="sub-1-4">1.4 Review - Address Translation in Paging</h3>
 
-<p></p>
-<p>Virtual → Physical Address</p>
-<p>Virtual Address Format:</p>
+<p>Virtual → Physical Address Virtual Address Format:</p>
 <p>[ Page Number (p) | Offset (d) ]</p>
-<p></p>
-<p>Translation Steps</p>
-<p>1. CPU generates virtual address (p, d)</p>
-<p>2. p indexes the Page Table</p>
-<p>3. Page Table gives Frame number (f)</p>
-<p>4. Physical Address = (f, d)</p>
-<p></p>
-<p>Example</p>
-<p>Virtual Address = 10876</p>
-<p>If Page 2 → Frame 5</p>
-<p></p>
-<p>Key Takeaway</p>
-<p>Paging translates addresses by table lookup + offset,</p>
-<p>enabling flexible, non-contiguous memory allocation.</p>
+<p>Translation Steps 1. CPU generates virtual address (p, d) 2. p indexes the Page Table 3. Page Table gives Frame number (f) 4. Physical Address = (f, d)</p>
+<p>Example Virtual Address = 10876 If Page 2 → Frame 5</p>
+<p>Key Takeaway Paging translates addresses by table lookup + offset, enabling flexible, non-contiguous memory allocation.</p>
 <ul>
     <li>Page size = 4KB (4096 bytes)</li>
     <li>Offset bits = 12</li>
@@ -177,16 +156,10 @@
 
 <h3 id="sub-1-5">1.5 Review - Page Table Structure</h3>
 
-<p></p>
-<p>Page Table Entry (PTE)</p>
-<p>Each virtual page has one PTE describing its state.</p>
+<p>Page Table Entry (PTE) Each virtual page has one PTE describing its state.</p>
 <p>Typical Fields</p>
-<p></p>
-<p>Why These Fields Matter</p>
-<p>caching control</p>
-<p></p>
-<p>Where the Page Table Lives</p>
-<p>Register).</p>
+<p>Why These Fields Matter caching control</p>
+<p>Where the Page Table Lives Register).</p>
 <ul>
     <li>Correctness: Valid + protection bits</li>
     <li>Performance: Reference bit (replacement),</li>
@@ -197,23 +170,12 @@
 
 <h3 id="sub-1-6">1.6 The Performance Problem</h3>
 
-<p></p>
-<p>Why Paging Seems Slow</p>
-<p>For every memory access, paging needs:</p>
-<p></p>
+<p>Why Paging Seems Slow For every memory access, paging needs:</p>
 <p>Two memory accesses per instruction</p>
-<p></p>
-<p>Example</p>
-<p>Effective Access Time: 100 ns (page table) +</p>
-<p>100 ns (data) = 200 ns</p>
-<p></p>
+<p>Example Effective Access Time: 100 ns (page table) + 100 ns (data) = 200 ns</p>
 <p>100% slowdown </p>
-<p></p>
 <p>Impact</p>
-<p></p>
-<p>Conclusion</p>
-<p>Paging needs a faster address translation</p>
-<p>mechanism to be practical.</p>
+<p>Conclusion Paging needs a faster address translation mechanism to be practical.</p>
 <ul>
     <li>1⃣ Access Page Table</li>
     <li>2⃣ Access Actual Data</li>
@@ -239,11 +201,8 @@
                 <div id="content-2" class="collapsible-content">
                     <h3 id="sub-2-1">2.1 Translation Lookaside Buffer (TLB)</h3>
 
-<p></p>
 <p>What Is a TLB?</p>
-<p></p>
 <p>Key Features</p>
-<p></p>
 <p>Why TLB Matters</p>
 <ul>
     <li>A small, very fast cache for page table entries</li>
@@ -260,12 +219,8 @@
 
 <h3 id="sub-2-2">2.2 Translation Lookaside Buffer (TLB)</h3>
 
-<p></p>
 <p>TLB Entry (What It Stores)</p>
-<p></p>
-<p>Purpose</p>
-<p>Speed up address translation by caching the</p>
-<p>most-used page table entries.</p>
+<p>Purpose Speed up address translation by caching the most-used page table entries.</p>
 <ul>
     <li>Valid bit – entry usable or not</li>
     <li>Tag (Page #) – virtual page number</li>
@@ -277,18 +232,10 @@
 
 <h3 id="sub-2-3">2.3 TLB Hit and Miss Scenarios</h3>
 
-<p></p>
 <p>Scenario 1: TLB Hit (Fast Path)</p>
-<p></p>
 <p>Time: ~1 ns</p>
-<p></p>
-<p>Key Takeaway</p>
-<p>System performance depends heavily on TLB hit</p>
-<p>rate—hits are fast, misses are expensive.</p>
-<p></p>
-<p>Scenario 2: TLB Miss (Slow Path)</p>
-<p>No TLB match</p>
-<p></p>
+<p>Key Takeaway System performance depends heavily on TLB hit rate—hits are fast, misses are expensive.</p>
+<p>Scenario 2: TLB Miss (Slow Path) No TLB match</p>
 <p>Time: ~100+ ns (first access)</p>
 <ul>
     <li>CPU generates virtual address (Page P, Offset)</li>
@@ -306,20 +253,12 @@
 
 <h3 id="sub-2-4">2.4 TLB Performance Metrics</h3>
 
-<p></p>
 <p>Key Terms</p>
-<p></p>
-<p>Effective Access Time (EAT)</p>
-<p>General Formula:</p>
+<p>Effective Access Time (EAT) General Formula:</p>
 <div class="formula-box">EAT = ε + α·m + (1 − α)·(m + m)</div>
-<p></p>
 <p>What It Means</p>
-<p></p>
 <p>Example Insight</p>
-<p></p>
-<p>Key Takeaway</p>
-<p>High TLB hit ratio is crucial—it keeps paging</p>
-<p>performance close to raw memory speed.</p>
+<p>Key Takeaway High TLB hit ratio is crucial—it keeps paging performance close to raw memory speed.</p>
 <ul>
     <li>Hit Ratio (α): Fraction of accesses found in TLB</li>
     <li>Miss Ratio: 1 − α</li>
@@ -334,20 +273,13 @@
 
 <h3 id="sub-2-5">2.5 TLB Performance Example</h3>
 
-<p>Given: TLB access (ε) ≈ 0, Memory access (m) = 100 ns</p>
-<p>and Hit ratio (α) = 0.98</p>
-<p></p>
+<p>Given: TLB access (ε) ≈ 0, Memory access (m) = 100 ns and Hit ratio (α) = 0.98</p>
 <p>EAT Calculation</p>
 <div class="formula-box">EAT = α·m + (1 − α)·2m</div>
 <div class="formula-box">= 0.98·100 + 0.02·200 = 98 + 4 = 102 ns</div>
-<p></p>
 <p>Performance Impact</p>
-<p></p>
 <p>Hit Ratio Sensitivity</p>
-<p></p>
-<p>Key Takeaway</p>
-<p>Even a small drop in TLB hit ratio causes</p>
-<p>a big performance hit—high α is critical.</p>
+<p>Key Takeaway Even a small drop in TLB hit ratio causes a big performance hit—high α is critical.</p>
 <ul>
     <li>Without TLB: 200 ns</li>
     <li>With TLB (98%): 102 ns</li>
@@ -359,23 +291,16 @@
 
 <h3 id="sub-2-6">2.6 Practice Problems</h3>
 <p>Problem 2: TLB Performance:</p>
-<p>A system uses a Translation Lookaside Buffer</p>
-<p>(TLB) to speed up address translation. The</p>
-<p>following parameters are given:</p>
-<p>Assume that:</p>
-<p>twice (once for page table lookup and</p>
-<p>once for data).</p>
-<p>Calculate the Effective Access Time (EAT) of</p>
-<p>the system.</p>
+<p>A system uses a Translation Lookaside Buffer (TLB) to speed up address translation. The following parameters are given:</p>
+<p>Assume that: twice (once for page table lookup and once for data).</p>
+<p>Calculate the Effective Access Time (EAT) of the system.</p>
 
 <p>Calculation:</p>
 <div class="formula-box">EAT=2+(0.96×80)+(0.04×160</div>
 <div class="formula-box">EAT=2+76.8+6.4</div>
 <div class="formula-box">EAT=85.2 ns</div>
 <p>Explanation:</p>
-<p>Most memory accesses are served directly from</p>
-<p>the TLB, so the average access time stays</p>
-<p>close to a single memory access.</p>
+<p>Most memory accesses are served directly from the TLB, so the average access time stays close to a single memory access.</p>
 <ul>
     <li>TLB hit ratio (α): 96% (0.96)</li>
     <li>TLB access time (ε): 2 ns</li>
@@ -400,21 +325,12 @@
                 <div id="content-3" class="collapsible-content">
                     <h3 id="sub-3-1">3.1 Why TLB Works - Locality of Reference</h3>
 
-<p></p>
-<p>Core Idea</p>
-<p>TLB is effective because programs show locality of</p>
-<p>reference.</p>
-<p></p>
+<p>Core Idea TLB is effective because programs show locality of reference.</p>
 <p>Spatial Locality</p>
-<p></p>
 <p>One TLB entry covers many accesses</p>
-<p></p>
 <p>Temporal Locality</p>
-<p></p>
 <p>Working Set</p>
-<p></p>
 <p>Example</p>
-<p></p>
 <p>Key Takeaway</p>
 <div class="formula-box">High locality + small working set = TLB hits most of</div>
 <p>the time, making paging fast.</p>
@@ -435,17 +351,9 @@
 
 <h3 id="sub-3-2">3.2 TLB Management Issues</h3>
 
-<p></p>
-<p>Context Switching Problem</p>
-<p>Using them → wrong physical memory access</p>
-<p></p>
-<p>Solution 1: Flush TLB</p>
-<p> Simple</p>
-<p> Cold start → many TLB misses</p>
-<p></p>
-<p>Solution 2: ASID (Address Space ID)</p>
-<p> No flush needed</p>
-<p> Faster context switches</p>
+<p>Context Switching Problem Using them → wrong physical memory access</p>
+<p>Solution 1: Flush TLB Simple Cold start → many TLB misses</p>
+<p>Solution 2: ASID (Address Space ID) No flush needed Faster context switches</p>
 <ul>
     <li>Each process has its own page table</li>
     <li>On context switch, TLB may contain old process entries</li>
@@ -459,23 +367,13 @@
 
 <h3 id="sub-3-3">3.3 TLB Replacement Policies</h3>
 
-<p></p>
-<p>When TLB Is Full</p>
-<p>A new entry must replace an existing one — which to evict?</p>
-<p></p>
+<p>When TLB Is Full A new entry must replace an existing one — which to evict?</p>
 <p>Common Policies</p>
-<p></p>
 <p>LRU (Least Recently Used)</p>
-<p></p>
 <p>NMRU (Not Most Recently Used)</p>
-<p></p>
 <p>FIFO (First In First Out)</p>
-<p></p>
 <p>Random</p>
-<p></p>
-<p>Key Takeaway</p>
-<p>Hardware favors simple, fast policies—Random and</p>
-<p>NMRU are common, while true LRU is rare.</p>
+<p>Key Takeaway Hardware favors simple, fast policies—Random and NMRU are common, while true LRU is rare.</p>
 <ul>
     <li> Best performance (uses locality)</li>
     <li> High hardware cost</li>
@@ -488,15 +386,9 @@
 
 <h3 id="sub-3-4">3.4 Introduction to I/O Management</h3>
 
-<p></p>
-<p>What Is I/O Management?</p>
-<p>applications</p>
-<p></p>
+<p>What Is I/O Management? applications</p>
 <p>Why It’s Complex</p>
-<p></p>
-<p>OS Goals for I/O</p>
-<p>devices</p>
-<p>throughput</p>
+<p>OS Goals for I/O devices throughput</p>
 <ul>
     <li>Controls & coordinates input/output devices</li>
     <li>Acts as a bridge between hardware and</li>
@@ -515,29 +407,14 @@
 
 <h3 id="sub-3-5">3.5 I/O Communication Methods</h3>
 
-<p>Key Takeaway</p>
-<p>Polling is simple, interrupts are efficient, DMA is</p>
-<p>optimal—modern systems rely heavily on interrupts and DMA.</p>
+<p>Key Takeaway Polling is simple, interrupts are efficient, DMA is optimal—modern systems rely heavily on interrupts and DMA.</p>
 
 <h3 id="sub-3-6">3.6 Polling (Programmed I/O)</h3>
 
-<p></p>
-<p>What It Is</p>
-<p>CPU continuously checks device status until it’s ready.</p>
-<p></p>
-<p>How It Works</p>
-<p>1. CPU sends command to device</p>
-<p>2. Busy-wait loop checks status</p>
-<p>3. Device becomes ready</p>
-<p>4. CPU reads data and processes it</p>
-<p></p>
-<p>Simple Example</p>
-<p>// busy wait</p>
-<p>data = read_keyboard();</p>
-<p></p>
-<p>Characteristics</p>
-<p>Wastes CPU cycles</p>
-<p>Poor efficiency</p>
+<p>What It Is CPU continuously checks device status until it’s ready.</p>
+<p>How It Works 1. CPU sends command to device 2. Busy-wait loop checks status 3. Device becomes ready 4. CPU reads data and processes it</p>
+<p>Simple Example // busy wait data = read_keyboard();</p>
+<p>Characteristics Wastes CPU cycles Poor efficiency</p>
 <ul>
     <li> Very simple</li>
     <li> No special hardware</li>
@@ -563,7 +440,6 @@
                 <div id="content-4" class="collapsible-content">
                     <h3 id="sub-4-1">4.1 Polling - Advantages and Disadvantages</h3>
 
-<p></p>
 <p>When to Use Polling</p>
 <ul>
     <li>High-speed devices (negligible wait)</li>
@@ -574,22 +450,8 @@
 
 <h3 id="sub-4-2">4.2 Interrupt-Driven I/O</h3>
 
-<p></p>
 <p>Device Signals CPU When Ready</p>
-<p></p>
-<p>How It Works</p>
-<p>1. CPU starts I/O</p>
-<p>○ Sends command to device</p>
-<p>○ Continues executing other tasks</p>
-<p>2. Device works independently</p>
-<p>○ Performs I/O operation</p>
-<p>3. Interrupt raised</p>
-<p>○ Device signals CPU on completion</p>
-<p>4. CPU handles interrupt</p>
-<p>○ Saves context (PC, registers)</p>
-<p>○ Runs ISR to read data</p>
-<p>○ Restores context and resumes work</p>
-<p></p>
+<p>How It Works 1. CPU starts I/O ○ Sends command to device ○ Continues executing other tasks 2. Device works independently ○ Performs I/O operation 3. Interrupt raised ○ Device signals CPU on completion 4. CPU handles interrupt ○ Saves context (PC, registers) ○ Runs ISR to read data ○ Restores context and resumes work</p>
 <p>Key Advantage</p>
 <ul>
     <li>No busy waiting</li>
@@ -598,44 +460,14 @@
 
 <h3 id="sub-4-3">4.3 Interrupt Processing Steps</h3>
 
-<p></p>
-<p>How an Interrupt Is Handled (Step-by-Step)</p>
-<p>1. Device Ready</p>
-<p>○ Device controller raises an interrupt signal</p>
-<p>2. Interrupt Detection</p>
-<p>○ CPU detects interrupt at end of instruction cycle</p>
-<p>3. Interrupt Acknowledgment</p>
-<p>○ CPU sends ACK</p>
-<p>○ Device places interrupt number on bus</p>
-<p>4. Context Save</p>
-<p>○ Save PC, registers, flags</p>
-<p>○ Switch to kernel mode</p>
-<p>5. Interrupt Vector Lookup</p>
-<p>○ Use interrupt number to index Interrupt Vector</p>
-<p>Table (IVT)</p>
-<p>○ Fetch ISR address</p>
-<p>6. Execute ISR</p>
-<p>○ Run device-specific handler</p>
-<p>○ Read data / update buffers</p>
-<p>7. Context Restore</p>
-<p>○ Restore saved state</p>
-<p>○ Resume interrupted process</p>
+<p>How an Interrupt Is Handled (Step-by-Step) 1. Device Ready ○ Device controller raises an interrupt signal 2. Interrupt Detection ○ CPU detects interrupt at end of instruction cycle 3. Interrupt Acknowledgment ○ CPU sends ACK ○ Device places interrupt number on bus 4. Context Save ○ Save PC, registers, flags ○ Switch to kernel mode 5. Interrupt Vector Lookup ○ Use interrupt number to index Interrupt Vector Table (IVT) ○ Fetch ISR address 6. Execute ISR ○ Run device-specific handler ○ Read data / update buffers 7. Context Restore ○ Restore saved state ○ Resume interrupted process</p>
 
 <h3 id="sub-4-4">4.4 Interrupt Vector Table</h3>
 
-<p></p>
 <p>What is IVT?</p>
-<p>A table that maps interrupt numbers to their Interrupt</p>
-<p>Service Routine (ISR) addresses.</p>
-<p></p>
-<p>How It Works</p>
-<p>1. Device raises interrupt with interrupt number</p>
-<p>2. CPU uses number as index into IVT</p>
-<p>3. Fetches ISR address</p>
-<p>4. Direct jump to correct handler</p>
-<p></p>
+<p>A table that maps interrupt numbers to their Interrupt Service Routine (ISR) addresses.</p>
+<p>How It Works 1. Device raises interrupt with interrupt number 2. CPU uses number as index into IVT 3. Fetches ISR address 4. Direct jump to correct handler</p>
 <p>IVT Structure</p>
-<p></p>
 <p>Key Points</p>
 <ul>
     <li>One entry per interrupt</li>
@@ -646,16 +478,8 @@
 
 <h3 id="sub-4-5">4.5 Interrupt Types and Priorities</h3>
 
-<p></p>
-<p>By Source</p>
-<p>Hardware Interrupts</p>
-<p>Software Interrupts</p>
-<p>Exceptions / Traps</p>
-<p></p>
-<p>By Priority</p>
-<p>Non-Maskable Interrupts (NMI)</p>
-<p>Maskable Interrupts</p>
-<p>When multiple interrupts occur: </p>
+<p>By Source Hardware Interrupts Software Interrupts Exceptions / Traps</p>
+<p>By Priority Non-Maskable Interrupts (NMI) Maskable Interrupts When multiple interrupts occur:</p>
 <p>Higher priority is handled first.</p>
 <ul>
     <li>From I/O devices (keyboard, disk, timer)</li>
@@ -674,7 +498,6 @@
 
 <h3 id="sub-4-6">4.6 Interrupt-Driven I/O - Advantages and Disadvantages</h3>
 
-<p></p>
 <p>Typical Overhead</p>
 <ul>
     <li>Context save/restore: ~100 cycles</li>
@@ -698,17 +521,10 @@
                 <div id="content-5" class="collapsible-content">
                     <h3 id="sub-5-1">5.1 Problem with Interrupt-Driven I/O</h3>
 
-<p></p>
 <p>The Data Transfer Bottleneck</p>
-<p></p>
-<p>Scenario: Read 1MB from Disk</p>
-<p>interrupts</p>
-<p></p>
+<p>Scenario: Read 1MB from Disk interrupts</p>
 <p>Why This Is a Problem</p>
-<p></p>
-<p>Key Insight</p>
-<p>Interrupt-driven I/O works well for small or infrequent</p>
-<p>data, but becomes inefficient for large transfers.</p>
+<p>Key Insight Interrupt-driven I/O works well for small or infrequent data, but becomes inefficient for large transfers.</p>
 <ul>
     <li>Disk transfers 4 bytes at a time</li>
     <li>Each transfer triggers an interrupt</li>
@@ -722,21 +538,10 @@
 
 <h3 id="sub-5-2">5.2 Direct Memory Access (DMA)</h3>
 
-<p></p>
 <p>What is DMA?</p>
-<p>○ </p>
-<p>Start transfer</p>
-<p>○ </p>
-<p>Completion interrupt</p>
-<p></p>
-<p>How DMA Works</p>
-<p>1. CPU sets up DMA (buffer address, size, direction)</p>
-<p>2. DMA controller takes control of the system bus</p>
-<p>3. Data moves Device ⇄ Memory directly</p>
-<p>4. DMA raises an interrupt when done</p>
-<p></p>
+<p>○ Start transfer ○ Completion interrupt</p>
+<p>How DMA Works 1. CPU sets up DMA (buffer address, size, direction) 2. DMA controller takes control of the system bus 3. Data moves Device ⇄ Memory directly 4. DMA raises an interrupt when done</p>
 <p>Key Idea</p>
-<p></p>
 <p>One-Line Takeaway</p>
 <div class="formula-box">DMA = High-speed data transfer with minimal CPU involvement</div>
 <ul>
@@ -749,20 +554,7 @@
 
 <h3 id="sub-5-3">5.3 DMA Operation Steps</h3>
 
-<p></p>
-<p>How a DMA Transfer Works</p>
-<p>1⃣ CPU Setup</p>
-<p>○ Source address</p>
-<p>○ Destination address</p>
-<p>○ Transfer size</p>
-<p>○ Mode (read/write)</p>
-<p>CPU resumes other work</p>
-<p>2⃣ DMA Takes Control</p>
-<p>DMA becomes bus master</p>
-<p>3⃣ Data Transfer</p>
-<p>No CPU involvement</p>
-<p>4⃣ Completion</p>
-<p>Interrupt sent to CPU</p>
+<p>How a DMA Transfer Works 1⃣ CPU Setup ○ Source address ○ Destination address ○ Transfer size ○ Mode (read/write) CPU resumes other work 2⃣ DMA Takes Control DMA becomes bus master 3⃣ Data Transfer No CPU involvement 4⃣ Completion Interrupt sent to CPU</p>
 <ul>
     <li>CPU programs DMA with:</li>
     <li></li>
@@ -777,28 +569,14 @@
     <li>CPU handles completion in ISR</li>
 </ul>
 
-<h3 id="sub-5-4">5.4 DMA Transfer Modes</h3>
-
-
+<h3 id="sub-5-4">5.4 DMA Transfer Modes</h3>
+
 <h3 id="sub-5-5">5.5 DMA vs CPU Transfer - Performance</h3>
 
-<p></p>
 <p>Scenario: Transfer 1MB from disk → memory</p>
-<p></p>
-<p>1. CPU Programmed I/O (Polling)</p>
-<p>~500 ms</p>
-<p>CPU usage: ~100%</p>
-<p>Extremely inefficient</p>
-<p></p>
-<p>2. Interrupt-Driven I/O</p>
-<p>~2 μs per interrupt</p>
-<p>~500 ms interrupt overhead</p>
-<p>CPU partially blocked by interrupts</p>
-<p></p>
-<p>3. Direct Memory Access (DMA)</p>
-<p>CPU involvement: ~12 μs total</p>
-<p>CPU ~99.9% free</p>
-<p></p>
+<p>1. CPU Programmed I/O (Polling) ~500 ms CPU usage: ~100% Extremely inefficient</p>
+<p>2. Interrupt-Driven I/O ~2 μs per interrupt ~500 ms interrupt overhead CPU partially blocked by interrupts</p>
+<p>3. Direct Memory Access (DMA) CPU involvement: ~12 μs total CPU ~99.9% free</p>
 <p>Bottom Line</p>
 <ul>
     <li>CPU moves 4 bytes at a time</li>
@@ -822,12 +600,9 @@
 
 <h3 id="sub-5-6">5.6 DMA Advantages and Disadvantages</h3>
 
-<p></p>
 <p>Best Use Cases</p>
-<p></p>
 <p>Key Takeaway:</p>
-<p>DMA = maximum performance for large data,</p>
-<p>minimal CPU cost.</p>
+<p>DMA = maximum performance for large data, minimal CPU cost.</p>
 <ul>
     <li>Disk I/O, network packets</li>
     <li>Video/audio streaming</li>
@@ -852,32 +627,17 @@
                     <h3 id="sub-6-1">6.1 Practice Problems</h3>
 
 <p>Problem 4: DMA vs Interrupts:</p>
-<p>A system transfers 10 MB of data from disk to</p>
-<p>memory. The disk operates at a speed of 100</p>
-<p>MB/s. Compare the CPU time consumed in the</p>
-<p>following two I/O methods:</p>
-<p>(A) Interrupt-driven I/O</p>
-<p>bytes transferred</p>
-<p>(B) Direct Memory Access (DMA)</p>
-<p>Calculate the total CPU time consumed in each</p>
-<p>case and determine which method is more</p>
-<p>efficient.</p>
-<p>(B) DMA</p>
-<p>DMA setup time: 5 μs</p>
-<p>Completion interrupt: 3 μs</p>
+<p>A system transfers 10 MB of data from disk to memory. The disk operates at a speed of 100 MB/s. Compare the CPU time consumed in the following two I/O methods:</p>
+<p>(A) Interrupt-driven I/O bytes transferred (B) Direct Memory Access (DMA) Calculate the total CPU time consumed in each case and determine which method is more efficient.</p>
+<p>(B) DMA DMA setup time: 5 μs Completion interrupt: 3 μs</p>
 <div class="formula-box">Total CPU time: 5+3=8 μs</div>
 <p>Explanation:</p>
-<p>DMA transfers data without CPU involvement,</p>
-<p>making it vastly more efficient than</p>
-<p>interrupt-based transfers.</p>
-<p>(A) Interrupt-Driven I/O</p>
-<p>Interrupt frequency:</p>
-<p>1 interrupt per 512 bytes</p>
-<p>Total interrupts:</p>
+<p>DMA transfers data without CPU involvement, making it vastly more efficient than interrupt-based transfers.</p>
+<p>(A) Interrupt-Driven I/O Interrupt frequency:</p>
+<p>1 interrupt per 512 bytes Total interrupts:</p>
 <p>10 MB=10×1024×1024=10,485,760 bytes</p>
 <div class="formula-box">Interrupts=10,485,760/512=20,480</div>
-<p>CPU time per interrupt: 3 μs</p>
-<p>Total CPU time: 20,480×3 μs=61,440 μs=61.44 ms</p>
+<p>CPU time per interrupt: 3 μs Total CPU time: 20,480×3 μs=61,440 μs=61.44 ms</p>
 <ul>
     <li>One interrupt is generated for every 512</li>
     <li>CPU time per interrupt = 3 μs</li>
@@ -888,22 +648,10 @@
 <h3 id="sub-6-2">6.2 Cache Coherency Problem with DMA</h3>
 
 <p>Keeping CPU Cache & Main Memory Consistent</p>
-<p></p>
-<p>The Problem</p>
-<p>DMA accesses main memory directly, bypassing CPU cache.</p>
-<p>DMA Write (Device → Memory)</p>
-<p>CPU reads stale cached data</p>
-<p>DMA Read (Memory → Device)</p>
-<p>DMA reads stale memory data</p>
-<p></p>
-<p>Solutions</p>
-<p>Flush cache before DMA read</p>
-<p>Invalidate cache after DMA write</p>
-<p>Use uncached memory for DMA buffers</p>
-<p>Hardware cache coherence</p>
-<p></p>
-<p>Key Takeaway</p>
-<p>DMA is fast but unsafe without cache management.</p>
+<p>The Problem DMA accesses main memory directly, bypassing CPU cache.</p>
+<p>DMA Write (Device → Memory) CPU reads stale cached data DMA Read (Memory → Device) DMA reads stale memory data</p>
+<p>Solutions Flush cache before DMA read Invalidate cache after DMA write Use uncached memory for DMA buffers Hardware cache coherence</p>
+<p>Key Takeaway DMA is fast but unsafe without cache management.</p>
 <p>Proper cache control is essential for correct and consistent data.</p>
 <ul>
     <li>DMA updates memory</li>
@@ -920,19 +668,11 @@
 
 <h3 id="sub-6-3">6.3 Comparison Summary - Polling vs Interrupts vs DMA</h3>
 
-<p></p>
-<p>Key Takeaway</p>
-<p>As data size and device speed increase,</p>
-<p>move from Polling → Interrupts → DMA for</p>
-<p>better performance and CPU efficiency.</p>
+<p>Key Takeaway As data size and device speed increase, move from Polling → Interrupts → DMA for better performance and CPU efficiency.</p>
 
 <h3 id="sub-6-4">6.4 Modern I/O Trends</h3>
 
-<p></p>
-<p>Key Takeaway</p>
-<p>Modern I/O focuses on parallelism, low latency,</p>
-<p>minimal CPU involvement, and high throughput</p>
-<p>to match today’s high-speed hardware.</p>
+<p>Key Takeaway Modern I/O focuses on parallelism, low latency, minimal CPU involvement, and high throughput to match today’s high-speed hardware.</p>
 
 <h3 id="sub-6-5">6.5 Key Takeaways</h3>
 
@@ -949,9 +689,8 @@
 </ul>
 
 <h3 id="sub-6-6">6.6 Thank You!</h3>
-<p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
-
-
+<p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
+
                     
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>

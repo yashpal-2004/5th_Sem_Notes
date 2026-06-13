@@ -98,24 +98,17 @@
                 <div id="content-1" class="collapsible-content">
                     <h3 id="sub-1-1">1.1 THE STORY SO FAR</h3>
 
-<p>The Question: What if we can't</p>
-<p>prevent or avoid deadlocks?</p>
+<p>The Question: What if we can't prevent or avoid deadlocks?</p>
 
 <h3 id="sub-1-2">1.2 THE LIMITATION OF AVOIDANCE</h3>
 
 <p>Banker's Algorithm Requires:</p>
 <p>Reality Check - Modern Systems:</p>
-<p></p>
 <p>Web servers don't know future memory needs</p>
-<p></p>
 <p>Text editors don't know how many files you'll open</p>
-<p></p>
 <p>Compilers don't know how big your code will get</p>
-<p></p>
 <p>Dynamic process creation/termination</p>
-<p></p>
-<p>Unpredictable user behavior</p>
-<p>The Problem: We can't predict the future!</p>
+<p>Unpredictable user behavior The Problem: We can't predict the future!</p>
 <p>Solution: Detection - work with what we HAVE, not what we MIGHT need</p>
 <ul>
     <li>Processes declare MAXIMUM resource needs in advance</li>
@@ -129,24 +122,16 @@
 <p>Your Mac has frozen with the spinning beach ball.</p>
 <p>You've waited 5 minutes. Nothing happens.</p>
 <p>What do you do?</p>
-<p>A) Wait longer, hoping it resolves itself</p>
-<p>B) Force quit the application</p>
-<p>C) Restart your Mac entirely</p>
-<p>D) Throw it out the window</p>
-<p>This connects to TODAY's topic: Detection and Recovery!</p>
+<p>A) Wait longer, hoping it resolves itself B) Force quit the application C) Restart your Mac entirely D) Throw it out the window This connects to TODAY's topic: Detection and Recovery!</p>
 
 <h3 id="sub-1-4">1.4 DETECTION PHILOSOPHY</h3>
 
 <p>Prevention/Avoidance:</p>
 <p>Detection & Recovery:</p>
 <p>The Trade-off:</p>
-<p></p>
 <p>Better resource usage (fewer restrictions)</p>
-<p></p>
 <p>Don't need to predict future</p>
-<p></p>
 <p>Recovery overhead when deadlock occurs</p>
-<p></p>
 <p>Potential data loss during recovery</p>
 <ul>
     <li>Be overly cautious</li>
@@ -162,14 +147,7 @@
 <h3 id="sub-1-5">1.5 DETECTION ALGORITHM OVERVIEW</h3>
 
 <p>The Detection Approach:</p>
-<p>1. Let processes run freely (no restrictions)</p>
-<p>2. Periodically check: "Is there a deadlock RIGHT</p>
-<p>NOW?"</p>
-<p>3. If deadlock found: Execute recovery strategy</p>
-<p>4. If no deadlock: Continue normal operation</p>
-<p>Key Insight: We examine CURRENT state, not</p>
-<p>future possibilities</p>
-<p>Detection Algorithm Checks:</p>
+<p>1. Let processes run freely (no restrictions) 2. Periodically check: "Is there a deadlock RIGHT NOW?" 3. If deadlock found: Execute recovery strategy 4. If no deadlock: Continue normal operation Key Insight: We examine CURRENT state, not future possibilities Detection Algorithm Checks:</p>
 <p>If NO valid execution order exists → DEADLOCK!</p>
 <ul>
     <li>Who holds which resources? (Allocation)</li>
@@ -181,10 +159,7 @@
 <h3 id="sub-1-6">1.6 DATA STRUCTURES</h3>
 
 <p>Data Structures (Similar to Banker's, but Current State!):</p>
-<p>Available[m]: Resources currently available</p>
-<p>Allocation[n][m]: Resources currently held by each process</p>
-<p>Request[n][m]: Current outstanding resource requests</p>
-<p>Key Difference from Banker's:</p>
+<p>Available[m]: Resources currently available Allocation[n][m]: Resources currently held by each process Request[n][m]: Current outstanding resource requests Key Difference from Banker's:</p>
 <p>Banker's uses Max needs → Detection uses Current requests</p>
 <ul>
     <li>m = number of resource types</li>
@@ -211,65 +186,39 @@
                 <div id="content-2" class="collapsible-content">
                     <h3 id="sub-2-1">2.1 THE PROCESS</h3>
 
-<p>Intuition: Try to find an order where</p>
-<p>processes can finish.</p>
-<p>If we can't finish everyone, remainder is</p>
-<p>deadlocked.</p>
+<p>Intuition: Try to find an order where processes can finish.</p>
+<p>If we can't finish everyone, remainder is deadlocked.</p>
 
 <h3 id="sub-2-2">2.2 DETECTION EXAMPLE</h3>
 
 <p>Example System:</p>
-<p>Available = [0, 0, 0]</p>
-<p>Question: Is there a deadlock?</p>
+<p>Available = [0, 0, 0] Question: Is there a deadlock?</p>
 <p>Let's trace through the algorithm...</p>
-<p>Trace: Work = [0,0,0], all Finish = false</p>
-<p>YES. Work = [3,1,3], Finish[2] = true</p>
-<p>Request [0,0,0] ≤ [0,1,0]?</p>
+<p>Trace: Work = [0,0,0], all Finish = false YES. Work = [3,1,3], Finish[2] = true Request [0,0,0] ≤ [0,1,0]?</p>
 <p>Request [1,0,0] ≤ [3,1,3]?</p>
-<p>YES. Work = [0,1,0], Finish[0] = true</p>
-<p>YES. Work = [5,2,4], Finish[3] = true</p>
-<p>Request [0,0,0] ≤ [0,0,0]?</p>
+<p>YES. Work = [0,1,0], Finish[0] = true YES. Work = [5,2,4], Finish[3] = true Request [0,0,0] ≤ [0,0,0]?</p>
 <p>Request [2,0,2] ≤ [5,2,4]?</p>
-<p>YES. Work = [7,2,4], Finish[1] = true</p>
-<p>Request [2,0,2] ≤ [5,2,4]?</p>
-<p>YES. Work = [7,2,4], Finish[1] = true</p>
-<p>Result: All Finish = true</p>
-<p>→ NO DEADLOCK! </p>
+<p>YES. Work = [7,2,4], Finish[1] = true Request [2,0,2] ≤ [5,2,4]?</p>
+<p>YES. Work = [7,2,4], Finish[1] = true Result: All Finish = true → NO DEADLOCK!</p>
 
 <h3 id="sub-2-3">2.3 Detection Understanding Check</h3>
 
 <p>What if P1's request was [2, 2, 2] instead of [2, 0, 2]?</p>
-<p>Original: P1 requests [2, 0, 2]</p>
-<p>Modified: P1 requests [2, 2, 2]</p>
-<p>Would there be a deadlock?</p>
-<p>A) No, same result</p>
-<p>B) Yes, P1 would be deadlocked</p>
-<p>C) Yes, all processes would be deadlocked</p>
-<p>D) Cannot determine</p>
-<p>ANSWER: A) No, same result</p>
-<p>In Banker’s Algorithm, if P1 requests [2,2,2] and granting it makes the</p>
-<p>system unsafe, the request is simply denied and P1 waits. Since unsafe</p>
-<p>allocation is never allowed, no deadlock occurs.</p>
+<p>Original: P1 requests [2, 0, 2] Modified: P1 requests [2, 2, 2] Would there be a deadlock?</p>
+<p>A) No, same result B) Yes, P1 would be deadlocked C) Yes, all processes would be deadlocked D) Cannot determine ANSWER: A) No, same result In Banker’s Algorithm, if P1 requests [2,2,2] and granting it makes the system unsafe, the request is simply denied and P1 waits. Since unsafe allocation is never allowed, no deadlock occurs.</p>
 
 <h3 id="sub-2-4">2.4 WAIT-FOR GRAPHS (WFG)</h3>
 
-<p>Problem: Full detection algorithm is complex for simple cases</p>
-<p>Simplification: Wait-For Graph (WFG)</p>
-<p>When to Use:</p>
-<p> Each resource type has only ONE instance</p>
-<p> Common in many systems (mutex locks, files)</p>
-<p>WFG Structure:</p>
+<p>Problem: Full detection algorithm is complex for simple cases Simplification: Wait-For Graph (WFG) When to Use:</p>
+<p>Each resource type has only ONE instance Common in many systems (mutex locks, files) WFG Structure:</p>
 <p>Deadlock Detection:</p>
-<p>Deadlock exists ⟺ Cycle exists in WFG</p>
-<p>Converting RAG to WFG:</p>
-<p>If RAG has: Pi → Rj → Pk</p>
-<p>Then WFG has: Pi → Pk (remove resource node)</p>
+<p>Deadlock exists ⟺ Cycle exists in WFG Converting RAG to WFG:</p>
+<p>If RAG has: Pi → Rj → Pk Then WFG has: Pi → Pk (remove resource node)</p>
 <ul>
     <li>Nodes: Processes ONLY (no resource nodes!)</li>
     <li>Edge Pi → Pj: "Pi is waiting for a resource held by Pj"</li>
-</ul>
-
-
+</ul>
+
 <h3 id="sub-2-5">2.5 WFG EXAMPLE</h3>
 
 <p>Result: P1 → P2 → P3 → P1 CYCLE DETECTED! </p>
@@ -279,23 +228,13 @@
 <h3 id="sub-2-6">2.6 Find the Deadlock!</h3>
 
 <p>Given this Wait-For Graph:</p>
-<p>P1 → P2</p>
-<p>P2 → P3</p>
-<p>P3 → P4</p>
-<p>P4 → P2</p>
-<p>P5 → P6</p>
-<p>Tasks:</p>
-<p>1. Identify all cycles in this graph</p>
-<p>2. Which processes are deadlocked?</p>
+<p>P1 → P2 P2 → P3 P3 → P4 P4 → P2 P5 → P6 Tasks:</p>
+<p>1. Identify all cycles in this graph 2. Which processes are deadlocked?</p>
 <p>3. Which processes are NOT deadlocked?</p>
-<p>4. If you had to terminate ONE process to break the</p>
-<p>deadlock, which would you choose?</p>
+<p>4. If you had to terminate ONE process to break the deadlock, which would you choose?</p>
 <p>Solution:</p>
-<p>1. Cycle Found: P2 → P3 → P4 → P2</p>
-<p>2. Deadlocked Processes: P2, P3, P4</p>
-<p>These three are stuck in a circular wait!</p>
-<p>3. NOT Deadlocked: P1, P5, P6</p>
-<p>4. Best Process to Terminate:</p>
+<p>1. Cycle Found: P2 → P3 → P4 → P2 2. Deadlocked Processes: P2, P3, P4 These three are stuck in a circular wait!</p>
+<p>3. NOT Deadlocked: P1, P5, P6 4. Best Process to Terminate:</p>
 <p>ANY of P2, P3, or P4 breaks the cycle!</p>
 <p>Choose based on victim selection criteria (coming next!)</p>
 <ul>
@@ -304,9 +243,8 @@
     <li>Terminating P2: Breaks P2→P3, frees P1</li>
     <li>Terminating P3: Breaks P3→P4</li>
     <li>Terminating P4: Breaks P4→P2</li>
-</ul>
-
-
+</ul>
+
                     
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
@@ -325,9 +263,7 @@
 
 <p>Once Deadlock is Detected, We Must Break It!</p>
 <p>Two Main Strategies:</p>
-<p>Strategy 1: Process Termination</p>
-<p>Strategy 2: Resource Preemption</p>
-<p>The Victim Selection Problem:</p>
+<p>Strategy 1: Process Termination Strategy 2: Resource Preemption The Victim Selection Problem:</p>
 <p>Which process should suffer?</p>
 <p>This is a policy decision, not a technical one!</p>
 <p>Let's explore both strategies...</p>
@@ -338,64 +274,37 @@
     <li>Forcibly take resources from processes</li>
     <li>Give them to others</li>
     <li>Requires checkpointing/rollback</li>
-</ul>
-
-
+</ul>
+
 <h3 id="sub-3-2">3.2 PROCESS TERMINATION</h3>
 
 <p>Process Termination Options:</p>
 <p>Option A: Abort ALL Deadlocked Processes</p>
-<p></p>
 <p>Simple - guarantees deadlock resolution</p>
-<p></p>
 <p>No need to select victims</p>
-<p></p>
 <p>Extremely expensive (loses ALL progress)</p>
-<p></p>
-<p>Drastic - like burning down house to kill spider</p>
-<p>Option B: Abort ONE Process at a Time</p>
-<p></p>
+<p>Drastic - like burning down house to kill spider Option B: Abort ONE Process at a Time</p>
 <p>Minimizes loss (kill only what's needed)</p>
-<p></p>
 <p>May only need to kill one</p>
-<p></p>
 <p>Expensive - must re-run detection after each kill</p>
-<p></p>
-<p>Iterative process</p>
-<p>Victim Selection Criteria (Who dies?):</p>
-<p>1. Priority - Kill lower-priority first</p>
-<p>2. Compute time - How much work invested?</p>
+<p>Iterative process Victim Selection Criteria (Who dies?):</p>
+<p>1. Priority - Kill lower-priority first 2. Compute time - How much work invested?</p>
 <p>3. Resources held - How many resources freed?</p>
 <p>4. Resources still needed - Close to completion?</p>
-<p>5. Type - Interactive vs batch (batch easier to restart)</p>
-
-
+<p>5. Type - Interactive vs batch (batch easier to restart)</p>
+
 <h3 id="sub-3-3">3.3 VICTIM SELECTION EXAMPLE</h3>
 
 <p>Selection Criteria:</p>
-<p>By Priority: Kill P4 (priority = 3, lowest)</p>
-<p>By Compute Time: Kill P2 (only 5 min</p>
-<p>invested)</p>
-<p>By Resources: Kill P4 (frees 6 resources)</p>
-<p>By Completion: Kill P2 (only 10% done, least</p>
-<p>wasted)</p>
-<p>The Dilemma:</p>
-<p>P4 has lowest priority BUT 60 minutes</p>
-<p>invested and 95% done!</p>
-<p>P2 has only 5 minutes invested BUT higher</p>
-<p>priority!</p>
+<p>By Priority: Kill P4 (priority = 3, lowest) By Compute Time: Kill P2 (only 5 min invested) By Resources: Kill P4 (frees 6 resources) By Completion: Kill P2 (only 10% done, least wasted) The Dilemma:</p>
+<p>P4 has lowest priority BUT 60 minutes invested and 95% done!</p>
+<p>P2 has only 5 minutes invested BUT higher priority!</p>
 <p>There's no perfect answer - it's a trade-off!</p>
 
 <h3 id="sub-3-4">3.4 </h3>
-<p>macOS FORCE QUIT</p>
-<p>When your Mac freezes:</p>
-<p> +  + Esc → Force Quit Applications</p>
-<p>What's happening?</p>
-<p>1. Detection: You (the user) detected something is wrong</p>
-<p>2. Selection: You choose which app to terminate</p>
-<p>3. Recovery: OS terminates the process</p>
-<p>4. Cleanup: OS reclaims resources</p>
-<p>This is Manual Recovery!</p>
+<p>macOS FORCE QUIT When your Mac freezes:</p>
+<p>+  + Esc → Force Quit Applications What's happening?</p>
+<p>1. Detection: You (the user) detected something is wrong 2. Selection: You choose which app to terminate 3. Recovery: OS terminates the process 4. Cleanup: OS reclaims resources This is Manual Recovery!</p>
 <p>Modern macOS:</p>
 <ul>
     <li>User acts as the detection algorithm</li>
@@ -412,10 +321,7 @@
 <p>Instead of killing process, take its resources!</p>
 <p>Steps:</p>
 <p>1. Select a Victim - Which process to preempt?</p>
-<p>2. Rollback - Return process to safe earlier state</p>
-<p>3. Reassign - Give resources to waiting process</p>
-<p>4. Resume - Let victim try again later</p>
-<p>Rollback Options:</p>
+<p>2. Rollback - Return process to safe earlier state 3. Reassign - Give resources to waiting process 4. Resume - Let victim try again later Rollback Options:</p>
 <p>Total Rollback:</p>
 <p>Partial Rollback:</p>
 <ul>
@@ -434,14 +340,9 @@
 <p>When to Checkpoint:</p>
 <p>Challenges:</p>
 <p>Overhead:</p>
-<p></p>
 <p>Storage space (snapshots are large!)</p>
-<p></p>
 <p>Time to save state (pause process)</p>
-<p></p>
-<p>I/O to disk</p>
-<p>Preemption Limitations:</p>
-<p></p>
+<p>I/O to disk Preemption Limitations:</p>
 <p>Not all resources can be preempted!</p>
 <ul>
     <li>Memory contents (heap, stack)</li>
@@ -478,52 +379,27 @@
 <p>1. Using priority-based selection, which terminate?</p>
 <p>2. Using compute-time-based selection, which?</p>
 <p>3. If you need to free maximum resources quickly?</p>
-<p>4. What if P4 is an interactive user's application and P2</p>
-<p>is a batch job?</p>
+<p>4. What if P4 is an interactive user's application and P2 is a batch job?</p>
 <p>5. What's your final recommendation and why?</p>
 <p>Analysis:</p>
 <div class="formula-box">1. Priority-Based: Kill P4 (priority = 3)</div>
-<p></p>
 <p>But P4 is 95% done with 60 min invested - HUGE waste!</p>
-<p>2. Compute-Time: Kill P2 (only 5 min invested)</p>
-<p> Minimal wasted work</p>
-<p></p>
-<p>But P2 has higher priority (5 vs 3)</p>
-<p>3. Maximum Resources: Kill P4 (holds 6)</p>
-<p> Frees most resources immediately</p>
-<p></p>
-<p>Same problem - 95% done, 60 min wasted</p>
-<p>4. Interactive vs Batch: Kill P2 (batch)</p>
-<p> Batch jobs easier to restart</p>
-<p> User experience preserved</p>
-<p>5. Best Choice: Probably P2</p>
-<p>Key Insight: NO PERFECT ANSWER!</p>
-<p>System designers must prioritize what matters: fairness, efficiency,</p>
-<p>user experience?</p>
+<p>2. Compute-Time: Kill P2 (only 5 min invested) Minimal wasted work</p>
+<p>But P2 has higher priority (5 vs 3) 3. Maximum Resources: Kill P4 (holds 6) Frees most resources immediately</p>
+<p>Same problem - 95% done, 60 min wasted 4. Interactive vs Batch: Kill P2 (batch) Batch jobs easier to restart User experience preserved 5. Best Choice: Probably P2 Key Insight: NO PERFECT ANSWER!</p>
+<p>System designers must prioritize what matters: fairness, efficiency, user experience?</p>
 <ul>
     <li>Least work wasted (5 min)</li>
     <li>Batch job (easy to restart)</li>
     <li>Only 10% complete</li>
     <li>Trade-off: Slightly higher priority</li>
-</ul>
-
-
+</ul>
+
 <h3 id="sub-4-2">4.2 Recovery Understanding Check</h3>
 
 <p>What does a cycle in a Wait-For Graph indicate?</p>
-<p>A) The system is in a safe state</p>
-<p>B) Deadlock is possible in the future</p>
-<p>C) Deadlock currently exists</p>
-<p>D) Resources are being wasted</p>
-<p>ANSWER: C) Deadlock currently exists</p>
-<p>A cycle in a WFG means processes are</p>
-<p>currently waiting in a circle - deadlock exists</p>
-<p>RIGHT NOW. This is different from</p>
-<p>avoidance (which checks for future</p>
-<p>possibilities) or RAGs with multiple instances</p>
-<p>(where cycles don't always mean deadlock).</p>
-
-
+<p>A) The system is in a safe state B) Deadlock is possible in the future C) Deadlock currently exists D) Resources are being wasted ANSWER: C) Deadlock currently exists A cycle in a WFG means processes are currently waiting in a circle - deadlock exists RIGHT NOW. This is different from avoidance (which checks for future possibilities) or RAGs with multiple instances (where cycles don't always mean deadlock).</p>
+
 <h3 id="sub-4-3">4.3 DETECTION FREQUENCY</h3>
 
 <p>Detection is NOT Free!</p>
@@ -538,12 +414,8 @@
 
 <p>Example Calculation:</p>
 <p>Assumptions:</p>
-<p>Strategy A: Detect every 100 requests</p>
-<p>Strategy B: Detect every 1000 requests</p>
-<p>Strategy C: Detect every 60 seconds</p>
-<p>The Balance:</p>
-<p>More frequent = Shorter deadlock duration but higher overhead</p>
-<p>Less frequent = Lower overhead but longer deadlock duration</p>
+<p>Strategy A: Detect every 100 requests Strategy B: Detect every 1000 requests Strategy C: Detect every 60 seconds The Balance:</p>
+<p>More frequent = Shorter deadlock duration but higher overhead Less frequent = Lower overhead but longer deadlock duration</p>
 <ul>
     <li>Detection algorithm takes 10ms</li>
     <li>System handles 10,000 requests/second</li>
@@ -560,39 +432,23 @@
 <h3 id="sub-4-5">4.5 Detection Frequency Check</h3>
 
 <p>Why is detecting deadlock after every resource request impractical?</p>
-<p>A) It doesn't work correctly</p>
-<p>B) It causes deadlocks itself</p>
-<p>C) The overhead is too high for high-request systems</p>
-<p>D) It's impossible to implement</p>
-<p>ANSWER: C) The overhead is too high for high-request systems</p>
-<p>Running the detection algorithm (O(m×n²)) after every request would</p>
-<p>consume enormous CPU time when systems handle thousands of</p>
-<p>requests per second, making it impractical despite finding deadlocks</p>
-<p>immediately.</p>
+<p>A) It doesn't work correctly B) It causes deadlocks itself C) The overhead is too high for high-request systems D) It's impossible to implement ANSWER: C) The overhead is too high for high-request systems Running the detection algorithm (O(m×n²)) after every request would consume enormous CPU time when systems handle thousands of requests per second, making it impractical despite finding deadlocks immediately.</p>
 
 <h3 id="sub-4-6">4.6 THE OSTRICH ALGORITHM</h3>
 
 <p>The Ostrich Algorithm:</p>
 <p>Strategy:</p>
-<p>1. Ignore deadlocks completely</p>
-<p>2. If system hangs → User reboots</p>
-<p>3. Pretend the problem doesn't exist</p>
-<p>Wait, WHAT?! Is this serious?</p>
+<p>1. Ignore deadlocks completely 2. If system hangs → User reboots 3. Pretend the problem doesn't exist Wait, WHAT?! Is this serious?</p>
 <p>YES! Many systems use this approach!</p>
 <p>When Is This Reasonable?</p>
-<p> Deadlocks are extremely rare (once per year)</p>
-<p> Cost of prevention/detection > cost of occasional reboot</p>
-<p> Non-critical systems (personal computers)</p>
-<p> Users know how to reboot</p>
-<p>Real-World Usage:</p>
+<p>Deadlocks are extremely rare (once per year) Cost of prevention/detection > cost of occasional reboot Non-critical systems (personal computers) Users know how to reboot Real-World Usage:</p>
 <p>Philosophy: "Stick your head in the sand"</p>
 <ul>
     <li>UNIX/Linux: Historically for user-level deadlocks</li>
     <li>Early Windows: Relied on user reboots</li>
     <li>macOS: Hybrid - some detection, but users often force quit</li>
-</ul>
-
-
+</ul>
+
                     
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
@@ -607,19 +463,14 @@
                     <h2>The Ostrich Algorithm</h2>
                 </div>
                 <div id="content-5" class="collapsible-content">
-                    <h3 id="sub-5-1">5.1 OSTRICH JUSTIFICATION</h3>
-
-
+                    <h3 id="sub-5-1">5.1 OSTRICH JUSTIFICATION</h3>
+
 <h3 id="sub-5-2">5.2 WHEN OSTRICH FAILS</h3>
 
 <p>Unacceptable for Ostrich:</p>
-<p></p>
 <p>Safety-Critical Systems</p>
-<p></p>
 <p>Mission-Critical Systems</p>
-<p></p>
-<p>High-Value Work</p>
-<p>The Consequences:</p>
+<p>High-Value Work The Consequences:</p>
 <p>These systems MUST use prevention/avoidance/detection!</p>
 <ul>
     <li>Medical devices (pacemakers, surgery robots)</li>
@@ -641,49 +492,17 @@
 
 <h3 id="sub-5-3">5.3 All Deadlock Strategies</h3>
 
-<p>Real-World Hybrid Approaches:</p>
-<p>macOS Strategy:</p>
-<p> Resource ordering for kernel locks</p>
-<p>(prevention)</p>
-<p> Timeouts and watchdogs (pseudo-detection)</p>
-<p> User force quit (manual recovery)</p>
-<p> Grand Central Dispatch avoids many</p>
-<p>deadlocks (design)</p>
-<p>Database Systems:</p>
-<p> Timeout-based detection</p>
-<p> Transaction rollback (recovery via preemption)</p>
-<p> Two-phase locking (prevention)</p>
-<p>Embedded/Real-Time:</p>
-<p> Prevention (resource ordering, no</p>
-<p>hold-and-wait)</p>
-<p> Cannot afford detection or recovery</p>
-<p>complexity</p>
-
-
+<p>Real-World Hybrid Approaches: macOS Strategy:</p>
+<p>Resource ordering for kernel locks (prevention) Timeouts and watchdogs (pseudo-detection) User force quit (manual recovery) Grand Central Dispatch avoids many deadlocks (design) Database Systems:</p>
+<p>Timeout-based detection Transaction rollback (recovery via preemption) Two-phase locking (prevention) Embedded/Real-Time:</p>
+<p>Prevention (resource ordering, no hold-and-wait) Cannot afford detection or recovery complexity</p>
+
 <h3 id="sub-5-4">5.4 Key Takeaways</h3>
 
 <p>What We've Learned:</p>
-<p>1. Detection Finds Current Deadlocks</p>
-<p>→ Use RAG/WFG analysis and cycle detection</p>
-<p>→ Check: "Can all processes finish with current resources?"</p>
-<p>2. Recovery Requires Hard Choices</p>
-<p>→ Terminate processes (simple but wasteful)</p>
-<p>→ Preempt resources (needs checkpointing)</p>
-<p>→ Victim selection is policy, not algorithm</p>
-<p>3. Frequency Matters</p>
-<p>→ Trade-off: overhead vs deadlock duration</p>
-<p>→ Most systems use timeouts/heuristics</p>
-<p>4. Ostrich is Sometimes Right</p>
-<p>→ Ignoring rare problems saves resources</p>
-<p>→ Acceptable for non-critical consumer systems</p>
-<p>5. Real Systems Use Hybrid Approaches</p>
-<p>→ Mix prevention, detection, and ignorance</p>
-<p>→ Context determines strategy</p>
-<p>The Engineer's Question:</p>
-<p>"How often do deadlocks occur, and what's the</p>
-<p>cost if they do?"</p>
-
-
+<p>1. Detection Finds Current Deadlocks → Use RAG/WFG analysis and cycle detection → Check: "Can all processes finish with current resources?" 2. Recovery Requires Hard Choices → Terminate processes (simple but wasteful) → Preempt resources (needs checkpointing) → Victim selection is policy, not algorithm 3. Frequency Matters → Trade-off: overhead vs deadlock duration → Most systems use timeouts/heuristics 4. Ostrich is Sometimes Right → Ignoring rare problems saves resources → Acceptable for non-critical consumer systems 5. Real Systems Use Hybrid Approaches → Mix prevention, detection, and ignorance → Context determines strategy The Engineer's Question:</p>
+<p>"How often do deadlocks occur, and what's the cost if they do?"</p>
+
 <h3 id="sub-5-5">5.5 Practical Guidelines</h3>
 
 <p>Special Cases:</p>
@@ -699,9 +518,8 @@
 </ul>
 
 <h3 id="sub-5-6">5.6 Thank You!</h3>
-<p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
-
-
+<p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
+
                     
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>

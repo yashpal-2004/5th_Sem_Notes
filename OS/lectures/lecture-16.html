@@ -101,60 +101,32 @@
                     <h2>Deadlocks Introduction</h2>
                 </div>
                 <div id="content-1" class="collapsible-content">
-                    <h3 id="sub-1-1">1.1 Join the lecture online on your dashboard</h3>
-
-
-
+                    <h3 id="sub-1-1">1.1 Join the lecture online on your dashboard</h3>
+
 <h3 id="sub-1-2">1.2 Today’s Agenda</h3>
 
 <p>Part I — Foundation</p>
-<p></p>
 <p>Introduction to deadlocks</p>
-<p></p>
 <p>Real-world analogies & motivation</p>
-<p></p>
-<p>System model & resource concepts</p>
-<p>Part II — Theoretical Framework</p>
-<p></p>
+<p>System model & resource concepts Part II — Theoretical Framework</p>
 <p>Deadlock characterization</p>
-<p></p>
 <p>Four necessary (Coffman) conditions</p>
-<p></p>
-<p>Deep dive into each condition</p>
-<p>Part III — Visual Analysis</p>
-<p></p>
+<p>Deep dive into each condition Part III — Visual Analysis</p>
 <p>Resource Allocation Graphs (RAGs)</p>
-<p></p>
 <p>RAG construction & interpretation</p>
-<p></p>
-<p>Examples of increasing complexity</p>
-<p>Part IV — Application</p>
-<p></p>
+<p>Examples of increasing complexity Part IV — Application</p>
 <p>Classic deadlock problems</p>
-<p></p>
 <p>Real-world case studies</p>
-<p></p>
 <p>System impacts & consequences</p>
 <div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
 
 <h3 id="sub-1-3">1.3 Let's Start with a Challenge!</h3>
 
 <p>Deadlock Analogy: Narrow Bridge</p>
-<p></p>
-<p>↔</p>
-<p>One-lane bridge, two cars arrive</p>
-<p>together</p>
-<p>Both drivers refuse to reverse.</p>
+<p>↔ One-lane bridge, two cars arrive together Both drivers refuse to reverse.</p>
 <p>What happens?</p>
-<p>No movement</p>
-<p>Stuck situation</p>
-<p>Someone must give way</p>
-<p>A rule is required</p>
-<p></p>
-<p>Bridge to Computing</p>
-<p>Same in computer systems: Processes</p>
-<p>competing for resources can deadlock — no</p>
-<p>progress.</p>
+<p>No movement Stuck situation Someone must give way A rule is required</p>
+<p>Bridge to Computing Same in computer systems: Processes competing for resources can deadlock — no progress.</p>
 <ul>
     <li></li>
     <li></li>
@@ -165,18 +137,9 @@
 
 <h3 id="sub-1-4">1.4 What is a Deadlock?</h3>
 
-<p>Definition</p>
-<p>A state where processes wait on each other indefinitely, so no</p>
-<p>progress is possible.</p>
-<p>Simplified</p>
-<p>Blocked processes holding resources while waiting for others.</p>
-<p>Key Characteristics</p>
-<p>Permanent block (no timeout)</p>
-<p>Circular dependency</p>
-<p>No self-recovery</p>
-<p>Affects all involved processes</p>
-<p>Formal View</p>
-<p>P₀ → P₁ → … → Pⱼ → P₀</p>
+<p>Definition A state where processes wait on each other indefinitely, so no progress is possible.</p>
+<p>Simplified Blocked processes holding resources while waiting for others.</p>
+<p>Key Characteristics Permanent block (no timeout) Circular dependency No self-recovery Affects all involved processes Formal View P₀ → P₁ → … → Pⱼ → P₀</p>
 <ul>
     <li></li>
     <li></li>
@@ -184,18 +147,13 @@
     <li></li>
     <li>Each process waits for another</li>
     <li>Circular wait exists:</li>
-</ul>
-
-
+</ul>
+
 <h3 id="sub-1-5">1.5 Deadlock vs Other Blocking States</h3>
 
 <p>Starvation vs Livelock vs Deadlock</p>
-<p></p>
 <p>Starvation</p>
-<p></p>
-<p>Deadlock</p>
-<p>Simple Analogies</p>
-<p></p>
+<p>Deadlock Simple Analogies</p>
 <p>Livelock</p>
 <ul>
     <li>Low-priority process waits</li>
@@ -210,9 +168,8 @@
     <li>State keeps changing</li>
     <li>No real progress</li>
     <li>Overreaction loop</li>
-</ul>
-
-
+</ul>
+
                     
                     <div class="topic-nav">
                         <a href="lecture-15.html" class="btn" style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;">Previous Lecture</a>
@@ -230,11 +187,8 @@
                     <h3 id="sub-2-1">2.1 System Model Resources</h3>
 
 <p>Resource Types</p>
-<p></p>
 <p>Reusable Resources</p>
-<p></p>
 <p>Consumable Resources</p>
-<p></p>
 <p>Resource Instances</p>
 <ul>
     <li>Used by one process at a time</li>
@@ -251,20 +205,11 @@
 <h3 id="sub-2-2">2.2 Process-Resource Interaction</h3>
 
 <p>Standard Resource Usage Pattern</p>
-<p></p>
 <p>Request</p>
-<p></p>
 <p>Use</p>
-<p></p>
-<p>Release</p>
-<p>System Call Examples (Unix/Linux)</p>
-<p></p>
-<p></p>
+<p>Release System Call Examples (Unix/Linux)</p>
 <p>Use: read(), write(), memory access</p>
-<p></p>
-<p></p>
-<p>Important</p>
-<p>Request → Use → Release is mandatory.</p>
+<p>Important Request → Use → Release is mandatory.</p>
 <p>Failure to release ⇒ starvation or deadlock.</p>
 <ul>
     <li>Ask for resource</li>
@@ -279,38 +224,22 @@ Release: close(), free(), signal()</code></pre>
 
 <h3 id="sub-2-3">2.3 Deadlock Characterization</h3>
 
-<p>Definition</p>
-<p>A set of processes is in deadlock when each</p>
-<p>process waits for an event that only another</p>
-<p>process in the set can cause.</p>
-<p>Key Characteristics</p>
-<p>At least 2 processes</p>
-<p>At least 2 resources</p>
-<p>Circular wait</p>
-<p>No independent progress</p>
+<p>Definition A set of processes is in deadlock when each process waits for an event that only another process in the set can cause.</p>
+<p>Key Characteristics At least 2 processes At least 2 resources Circular wait No independent progress</p>
 <ul>
     <li></li>
     <li></li>
     <li></li>
     <li></li>
-</ul>
-
-
+</ul>
+
 <h3 id="sub-2-4">2.4 Necessary Conditions (Coffman Conditions)</h3>
 
 <p>Deadlock occurs if all four hold simultaneously</p>
-<p></p>
-<p>Mutual Exclusion</p>
-<p>Only one process uses it</p>
-<p></p>
+<p>Mutual Exclusion Only one process uses it</p>
 <p>Circular Wait</p>
-<p></p>
-<p>Critical Insight</p>
-<p>These conditions are necessary but not sufficient</p>
-<p>→ All must exist, but their presence alone doesn’t guarantee deadlock.</p>
-<p></p>
+<p>Critical Insight These conditions are necessary but not sufficient → All must exist, but their presence alone doesn’t guarantee deadlock.</p>
 <p>No Preemption</p>
-<p></p>
 <p>Hold & Wait</p>
 <ul>
     <li>Resource is non-shareable</li>
@@ -320,27 +249,14 @@ Release: close(), free(), signal()</code></pre>
     <li>Released voluntarily</li>
     <li>Holding one resource</li>
     <li>Waiting for another</li>
-</ul>
-
-
+</ul>
+
 <h3 id="sub-2-5">2.5 Condition 1 Mutual Exclusion</h3>
 
-<p>Definition</p>
-<p>Only one process can use a resource at a time. Others</p>
-<p>must wait until it’s released.</p>
-<p>Why It Exists</p>
-<p>Code Example: Mutex (C / POSIX)</p>
-<p>pthread_mutex_t lock;</p>
-<p>pthread_mutex_lock(&lock); // Acquire</p>
-<p>access_shared_resource();  // Critical section</p>
-<p>pthread_mutex_unlock(&lock); // Release</p>
-<p>Examples</p>
-<p></p>
-<p>Shareable (No Mutual Exclusion)</p>
-<p>code</p>
-<p></p>
-<p>Non-Sharable (Needs Mutual Exclusion)</p>
-<p>records and Critical sections (mutex)</p>
+<p>Definition Only one process can use a resource at a time. Others must wait until it’s released.</p>
+<p>Why It Exists Code Example: Mutex (C / POSIX) pthread_mutex_t lock; pthread_mutex_lock(&lock); // Acquire access_shared_resource();  // Critical section pthread_mutex_unlock(&lock); // Release Examples</p>
+<p>Shareable (No Mutual Exclusion) code</p>
+<p>Non-Sharable (Needs Mutual Exclusion) records and Critical sections (mutex)</p>
 <ul>
     <li>Non-shareable resources (e.g., printer)</li>
     <li>Data consistency (file writes)</li>
@@ -366,11 +282,8 @@ Release: close(), free(), signal()</code></pre>
                     <h3 id="sub-3-1">3.1 Code Example - Mutual Exclusion with Mutex</h3>
 
 <p>Mutual Exclusion with Mutex</p>
-<p></p>
 <p>Without Mutual Exclusion</p>
-<p></p>
-<p>With Mutual Exclusion</p>
-<p>Risk of deadlock (multiple mutexes)</p>
+<p>With Mutual Exclusion Risk of deadlock (multiple mutexes)</p>
 <ul>
     <li>Race condition</li>
     <li>Lost updates</li>
@@ -382,16 +295,10 @@ Release: close(), free(), signal()</code></pre>
 
 <h3 id="sub-3-2">3.2 Condition 2 Hold and Wait</h3>
 
-<p>Definition</p>
-<p>A process holds at least one resource while waiting</p>
-<p>for others held by different processes.</p>
+<p>Definition A process holds at least one resource while waiting for others held by different processes.</p>
 <p>Scenario</p>
-<p></p>
-<p>Key Insight</p>
-<p>Hold-and-wait increases resource utilization,</p>
-<p>but combined with other conditions → deadlock risk.</p>
+<p>Key Insight Hold-and-wait increases resource utilization, but combined with other conditions → deadlock risk.</p>
 <p>Real Example</p>
-<p></p>
 <p>Text Editor</p>
 <ul>
     <li>P1 holds R1</li>
@@ -404,34 +311,21 @@ Release: close(), free(), signal()</code></pre>
 
 <h3 id="sub-3-3">3.3 Code Example - Hold and Wait Pattern</h3>
 
-<p>Hold and Wait Pattern</p>
-<p>Output: Hold & Wait Deadlock</p>
-<p>Process A holds R1, waits for R2</p>
-<p>Process B holds R2, waits for R1</p>
-<p>Resources not released while waiting</p>
-<p>Circular wait formed</p>
+<p>Hold and Wait Pattern Output: Hold & Wait Deadlock Process A holds R1, waits for R2 Process B holds R2, waits for R1 Resources not released while waiting Circular wait formed</p>
 <ul>
     <li></li>
     <li></li>
     <li></li>
     <li></li>
-</ul>
-
-
+</ul>
+
 <h3 id="sub-3-4">3.4 Condition 3 No Preemption</h3>
 
-<p>Definition</p>
-<p>Resources cannot be forcibly taken. They are released only</p>
-<p>voluntarily by the holding process.</p>
+<p>Definition Resources cannot be forcibly taken. They are released only voluntarily by the holding process.</p>
 <p>Why It Matters</p>
-<p></p>
-<p>Key Insight</p>
-<p>No preemption preserves correctness, but contributes to</p>
-<p>deadlock when combined with other conditions.</p>
+<p>Key Insight No preemption preserves correctness, but contributes to deadlock when combined with other conditions.</p>
 <p>Examples</p>
-<p></p>
 <p>Non-Preemptable Resources</p>
-<p></p>
 <p>Preemptable Resources</p>
 <ul>
     <li>Data integrity</li>
@@ -446,12 +340,7 @@ Release: close(), free(), signal()</code></pre>
 
 <h3 id="sub-3-5">3.5 Code Example - Non-Preemptible Mutex</h3>
 
-<p>Non-Preemptible Mutex</p>
-<p>Output: No Preemption Demonstrated</p>
-<p>High-priority process acquires resource first</p>
-<p>Low-priority process requests urgently</p>
-<p>Cannot preempt the holder</p>
-<p>Must wait until release</p>
+<p>Non-Preemptible Mutex Output: No Preemption Demonstrated High-priority process acquires resource first Low-priority process requests urgently Cannot preempt the holder Must wait until release</p>
 <ul>
     <li></li>
     <li></li>
@@ -475,37 +364,21 @@ Release: close(), free(), signal()</code></pre>
                 <div id="content-4" class="collapsible-content">
                     <h3 id="sub-4-1">4.1 Condition 4 Circular Wait</h3>
 
-<p>Definition</p>
-<p>A closed chain of processes exists where each process waits</p>
-<p>for a resource held by the next.</p>
-<p>Formal View</p>
-<p>P₀ → P₁ → … → Pⱼ → P₀</p>
-<p>(Pᵢ waits for a resource held by Pⱼ)</p>
-<p>Example Scenario</p>
-<p></p>
+<p>Definition A closed chain of processes exists where each process waits for a resource held by the next.</p>
+<p>Formal View P₀ → P₁ → … → Pⱼ → P₀ (Pᵢ waits for a resource held by Pⱼ) Example Scenario</p>
 <p>P1 → P2 → P3 → P1</p>
-<p></p>
-<p>Key Insight</p>
-<p>Circular wait is the final condition that completes deadlock.</p>
+<p>Key Insight Circular wait is the final condition that completes deadlock.</p>
 <p>Breaking the cycle ⇒ deadlock prevention.</p>
-<p>Deadlock-Prone Code</p>
-<p>// Process P1</p>
-<p>acquire(R1);</p>
-<p>acquire(R2);   // waits if P2 holds R2</p>
-<p>// Process P2</p>
-<p>acquire(R2);</p>
-<p>acquire(R1);   // waits if P1 holds R1</p>
+<p>Deadlock-Prone Code // Process P1 acquire(R1); acquire(R2);   // waits if P2 holds R2 // Process P2 acquire(R2); acquire(R1);   // waits if P1 holds R1</p>
 <ul>
     <li>P1 holds R1, waits for R2</li>
     <li>P2 holds R2, waits for R3</li>
     <li>P3 holds R3, waits for R1</li>
-</ul>
-
-
+</ul>
+
 <h3 id="sub-4-2">4.2 Code Example - Three-Process Circular Wait</h3>
 
-<p>Three-Process Circular Wait</p>
-<p>Circular wait chain:</p>
+<p>Three-Process Circular Wait Circular wait chain:</p>
 <p>Cycle: P1 → R2 → P2 → R3 → P3 → R1 → P1</p>
 <ul>
     <li>P1 holds R1, wants R2</li>
@@ -515,23 +388,12 @@ Release: close(), free(), signal()</code></pre>
 
 <h3 id="sub-4-3">4.3 Resource Allocation Graph (RAG) Introduction</h3>
 
-<p>Purpose</p>
-<p>A directed graph that visually represents resource</p>
-<p>allocation and deadlock situations.</p>
+<p>Purpose A directed graph that visually represents resource allocation and deadlock situations.</p>
 <p>Graph Components</p>
-<p></p>
-<p>Vertices</p>
-<p>Processes (P) – Circles</p>
-<p></p>
-<p>Resources (R) – Rectangles</p>
-<p>Edges</p>
-<p></p>
-<p>Request Edge: Pᵢ → Rⱼ</p>
-<p>⬅</p>
-<p>Assignment Edge: Rⱼ → Pᵢ</p>
-<p></p>
-<p>Key Idea</p>
-<p>Cycles in the graph indicate possible or actual deadlock.</p>
+<p>Vertices Processes (P) – Circles</p>
+<p>Resources (R) – Rectangles Edges</p>
+<p>Request Edge: Pᵢ → Rⱼ ⬅ Assignment Edge: Rⱼ → Pᵢ</p>
+<p>Key Idea Cycles in the graph indicate possible or actual deadlock.</p>
 <ul>
     <li>● Dots inside = resource instances</li>
     <li>Process Pᵢ is waiting for Rⱼ</li>
@@ -542,15 +404,7 @@ Release: close(), free(), signal()</code></pre>
 
 <h3 id="sub-4-4">4.4 RAG Notation and Symbols</h3>
 
-<p>Symbols</p>
-<p>Edges</p>
-<p>Request: Pᵢ → Rⱼ (process waiting)</p>
-<p>Assignment: Rⱼ → Pᵢ (resource held)</p>
-<p>Example</p>
-<p>How to Read the Graph</p>
-<p>resource</p>
-<p>instances</p>
-<p>Important Notes</p>
+<p>Symbols Edges Request: Pᵢ → Rⱼ (process waiting) Assignment: Rⱼ → Pᵢ (resource held) Example How to Read the Graph resource instances Important Notes</p>
 <ul>
     <li>○ Process: P₁, P₂, …</li>
     <li>□ Resource: R₁, R₂, …</li>
@@ -571,26 +425,9 @@ Release: close(), free(), signal()</code></pre>
 
 <h3 id="sub-4-5">4.5 RAG Example 1 No Deadlock</h3>
 
-<p>Setup</p>
-<p>○ R₁ (1 instance)</p>
-<p>○ R₂ (2 instances)</p>
-<p>○ R₃ (1 instance)</p>
-<p>Allocations & Requests</p>
-<p>Safe Execution Order</p>
-<p>P₃ → P₂ → P₁</p>
-<p>Conclusion</p>
-<p></p>
-<p>NO DEADLOCK</p>
-<p>System is in a safe state.</p>
-<p>Analysis</p>
-<p>No cycle in graph</p>
-<p>P₃ can finish first</p>
-<p>Releases R₃ → P₂ proceeds</p>
-<p>P₁ completes afterward</p>
-<p>P1</p>
-<p>P2</p>
-<p>P3</p>
-<p>R2</p>
+<p>Setup ○ R₁ (1 instance) ○ R₂ (2 instances) ○ R₃ (1 instance) Allocations & Requests Safe Execution Order P₃ → P₂ → P₁ Conclusion</p>
+<p>NO DEADLOCK System is in a safe state.</p>
+<p>Analysis No cycle in graph P₃ can finish first Releases R₃ → P₂ proceeds P₁ completes afterward P1 P2 P3 R2</p>
 <ul>
     <li>Processes: P₁, P₂, P₃</li>
     <li>Resources:</li>
@@ -606,9 +443,8 @@ Release: close(), free(), signal()</code></pre>
     <li></li>
     <li></li>
     <li>R3</li>
-</ul>
-
-
+</ul>
+
                     
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
@@ -625,19 +461,9 @@ Release: close(), free(), signal()</code></pre>
                 <div id="content-5" class="collapsible-content">
                     <h3 id="sub-5-1">5.1 RAG Example 2 Deadlock Exists</h3>
 
-<p>Setup</p>
-<p>Allocations & Requests</p>
-<p>Why Deadlock Occurs</p>
-<p>Circular wait satisfied</p>
-<p>Conclusion</p>
-<p></p>
+<p>Setup Allocations & Requests Why Deadlock Occurs Circular wait satisfied Conclusion</p>
 <p>DEADLOCK EXISTS: No process can proceed.</p>
-<p>Analysis</p>
-<p>Cycle detected: P₁ → R₂ → P₂ → R₃ → P₃ → R₁ → P₁</p>
-<p>P1</p>
-<p>P2</p>
-<p>P3</p>
-<p>R2</p>
+<p>Analysis Cycle detected: P₁ → R₂ → P₂ → R₃ → P₃ → R₁ → P₁ P1 P2 P3 R2</p>
 <ul>
     <li>Processes: P₁, P₂, P₃</li>
     <li>Resources: R₁, R₂, R₃ (1 instance each)</li>
@@ -654,31 +480,14 @@ Release: close(), free(), signal()</code></pre>
     <li>R1</li>
     <li></li>
     <li>R3</li>
-</ul>
-
-
+</ul>
+
 <h3 id="sub-5-2">5.2 RAG Example 3 Cycle But No Deadlock</h3>
 
-<p>Setup</p>
-<p>Allocations & Requests</p>
-<p>Safe Execution</p>
-<p>P₃ → P₂ → P₁</p>
-<p>Conclusion</p>
-<p></p>
+<p>Setup Allocations & Requests Safe Execution P₃ → P₂ → P₁ Conclusion</p>
 <p>NO DEADLOCK (despite cycle)</p>
-<p></p>
-<p>Key Insight</p>
-<p>With multiple resource instances, a cycle is necessary but not sufficient for deadlock.</p>
-<p>Draw RAG by Yourself</p>
-<p>Analysis</p>
-<p>Cycle exists: P₁ → R₂ → P₂ → R₁ → P₁</p>
-<p>R₁ has multiple instances</p>
-<p>P₃ can release R₁</p>
-<p>Others proceed sequentially</p>
-<p>P1</p>
-<p>P2</p>
-<p>P3</p>
-<p>R2</p>
+<p>Key Insight With multiple resource instances, a cycle is necessary but not sufficient for deadlock.</p>
+<p>Draw RAG by Yourself Analysis Cycle exists: P₁ → R₂ → P₂ → R₁ → P₁ R₁ has multiple instances P₃ can release R₁ Others proceed sequentially P1 P2 P3 R2</p>
 <ul>
     <li>Processes: P₁, P₂, P₃</li>
     <li>Resources: R₁ (2 instances), R₂ (1 instance)</li>
@@ -694,28 +503,17 @@ Release: close(), free(), signal()</code></pre>
     <li></li>
     <li>R1</li>
     <li></li>
-</ul>
-
-
+</ul>
+
 <h3 id="sub-5-3">5.3 RAG Analysis Summary Rules</h3>
 
 <p>Case 1: No Cycle</p>
-<p></p>
 <p>No Deadlock</p>
-<p></p>
 <p>Multiple Resource Instances</p>
-<p></p>
-<p>Deadlock May Exist</p>
-<p>Key Rule</p>
-<p></p>
+<p>Deadlock May Exist Key Rule</p>
 <p>Cycle is necessary for deadlock</p>
-<p></p>
-<p>Cycle is sufficient only if each resource has one</p>
-<p>instance</p>
-<p>Case 2: Cycle Exists</p>
-<p></p>
+<p>Cycle is sufficient only if each resource has one instance Case 2: Cycle Exists</p>
 <p>Single Instance per Resource</p>
-<p></p>
 <p>Deadlock Exists</p>
 <ul>
     <li>Safe state</li>
@@ -724,28 +522,13 @@ Release: close(), free(), signal()</code></pre>
     <li>Check resource release outside cycle</li>
     <li>Use Banker’s / detection algorithms</li>
     <li>All processes in cycle blocked</li>
-</ul>
-
-
+</ul>
+
 <h3 id="sub-5-4">5.4 Deadlock Example Dining Philosophers</h3>
 
-<p>Problem Setup</p>
-<p>Deadlock Scenario</p>
-<p>1. All pick up left chopstick</p>
-<p>2. All try to pick up right chopstick</p>
-<p>3. Right chopstick held by neighbor</p>
-<p>4. Everyone waits forever</p>
-<p></p>
-<p>DEADLOCK</p>
-<p>Why Deadlock Occurs (All 4 Conditions)</p>
-<p>Mutual Exclusion: One chopstick → one philosopher</p>
-<p>Hold & Wait: Holding left, waiting for right</p>
-<p>No Preemption: Cannot force release</p>
-<p>Circular Wait: P₁ → P₂ → … → P₅ → P₁</p>
-<p></p>
-<p>Key Insight</p>
-<p>Dining Philosophers is a classic deadlock illustration showing how all four</p>
-<p>conditions can arise naturally.</p>
+<p>Problem Setup Deadlock Scenario 1. All pick up left chopstick 2. All try to pick up right chopstick 3. Right chopstick held by neighbor 4. Everyone waits forever</p>
+<p>DEADLOCK Why Deadlock Occurs (All 4 Conditions) Mutual Exclusion: One chopstick → one philosopher Hold & Wait: Holding left, waiting for right No Preemption: Cannot force release Circular Wait: P₁ → P₂ → … → P₅ → P₁</p>
+<p>Key Insight Dining Philosophers is a classic deadlock illustration showing how all four conditions can arise naturally.</p>
 <ul>
     <li>5 philosophers, circular table</li>
     <li>5 chopsticks (one between each pair)</li>
@@ -755,25 +538,16 @@ Release: close(), free(), signal()</code></pre>
     <li></li>
     <li></li>
     <li></li>
-</ul>
-
-
+</ul>
+
 <h3 id="sub-5-5">5.5 Consequences of Deadlocks</h3>
 
-<p></p>
 <p>Resource Wastage</p>
-<p></p>
-<p>Economic Costs</p>
-<p>Real-World Impact</p>
-<p></p>
+<p>Economic Costs Real-World Impact</p>
 <p>Databases: 1–5% transactions deadlock</p>
-<p></p>
 <p>Operating Systems: May freeze completely</p>
-<p></p>
 <p>Distributed Systems: Hard to detect & resolve</p>
-<p></p>
 <p>Application Failures</p>
-<p></p>
 <p>System Performance</p>
 <ul>
     <li>Wasted CPU cycles</li>
@@ -784,9 +558,8 @@ Release: close(), free(), signal()</code></pre>
     <li>Possible data inconsistency</li>
     <li>Lower throughput</li>
     <li>Higher response time</li>
-</ul>
-
-
+</ul>
+
                     
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
@@ -805,19 +578,11 @@ Release: close(), free(), signal()</code></pre>
 
 <p>All 4 Coffman Conditions are necessary:</p>
 <p>Circular Wait</p>
-<p></p>
-<p>If any one is missing → NO deadlock</p>
-<p>Key Distinction</p>
-<p></p>
+<p>If any one is missing → NO deadlock Key Distinction</p>
 <p>All 4 present ≠ guaranteed deadlock</p>
-<p></p>
 <div class="formula-box">All 4 + single instances + cycle = deadlock</div>
 <p>Practical Insight</p>
-<p></p>
-<p>Prevent deadlock by breaking at least ONE necessary condition</p>
-<p>Sufficient Conditions</p>
-<p> Presence guarantees deadlock</p>
-<p>Deadlock is certain when:</p>
+<p>Prevent deadlock by breaking at least ONE necessary condition Sufficient Conditions Presence guarantees deadlock Deadlock is certain when:</p>
 <ul>
     <li>Mutual Exclusion, Hold and Wait, No Preemption and</li>
     <li>Necessary → “Must have”</li>
@@ -825,21 +590,14 @@ Release: close(), free(), signal()</code></pre>
     <li>All 4 conditions present</li>
     <li>Each resource has one instance</li>
     <li>Cycle exists in RAG</li>
-</ul>
-
-
+</ul>
+
 <h3 id="sub-6-2">6.2 Practice Problems</h3>
 
 <p>Problem 1: Given:</p>
 <p>Result:</p>
-<p></p>
 <p>No Deadlock</p>
-<p></p>
-<p>No cycle (P3 not waiting)</p>
-<p>P1</p>
-<p>P2</p>
-<p>P3</p>
-<p>R2</p>
+<p>No cycle (P3 not waiting) P1 P2 P3 R2</p>
 <ul>
     <li>P1 holds R1 → requests R2</li>
     <li>P2 holds R2 → requests R3</li>
@@ -848,25 +606,15 @@ Release: close(), free(), signal()</code></pre>
     <li>R1</li>
     <li></li>
     <li>R3</li>
-</ul>
-
-
+</ul>
+
 <h3 id="sub-6-3">6.3 Practice Problems</h3>
 
-<p></p>
 <p>Key Tips:</p>
 <p>Problem 2: Given:</p>
 <p>Analysis:</p>
 <p>Result:</p>
-<p></p>
-<p>No Deadlock (Safe State)</p>
-<p>P1</p>
-<p>P2</p>
-<p>P3</p>
-<p>R1</p>
-<p>R2</p>
-<p>P4</p>
-<p>R3</p>
+<p>No Deadlock (Safe State) P1 P2 P3 R1 R2 P4 R3</p>
 <ul>
     <li>No cycle → No deadlock</li>
     <li>Cycle + single instance → Deadlock</li>
@@ -886,9 +634,8 @@ Release: close(), free(), signal()</code></pre>
     <li></li>
     <li></li>
     <li></li>
-</ul>
-
-
+</ul>
+
 <h3 id="sub-6-4">6.4 Key Takeaways</h3>
 
 <ul>
@@ -897,13 +644,11 @@ Release: close(), free(), signal()</code></pre>
     <li>Four Necessary Conditions (Coffman Conditions)</li>
     <li>Resource Allocation Graphs (RAG)</li>
     <li>RAG Analysis</li>
-</ul>
-
-
+</ul>
+
 <h3 id="sub-6-5">6.5 Thank You!</h3>
-<p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
-
-
+<p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
+
                     
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>

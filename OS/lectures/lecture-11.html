@@ -110,23 +110,12 @@
                     <h3 id="sub-1-1">1.1 Join the lecture online on your dashboard.</h3>
 
 <h3 id="sub-1-2">1.2 Today's Lecture Agenda:</h3>
-<p>1. Review of Critical Section Requirements</p>
-<p>2. Simple Lock Variables and Their Failures</p>
-<p>3. Strict Alternation (Turn Variable) Solution</p>
-<p>4. The Interest Variable (Individual Interest Flags)</p>
-<p>5. Peterson's Algorithm - The First Correct Solution</p>
-<p>6. Limitations of Software Solutions</p>
-<p>The Journey: From broken attempts to working solutions, understanding why synchronization</p>
-<p>is fundamentally hard.</p>
+<p>1. Review of Critical Section Requirements 2. Simple Lock Variables and Their Failures 3. Strict Alternation (Turn Variable) Solution 4. The Interest Variable (Individual Interest Flags) 5. Peterson's Algorithm - The First Correct Solution 6. Limitations of Software Solutions The Journey: From broken attempts to working solutions, understanding why synchronization is fundamentally hard.</p>
 
 <h3 id="sub-1-3">1.3 Quick Recap - The Critical Section Problem:</h3>
 <p>What We Learned in the last lecture:</p>
 <p>The critical section is a code segment where processes access shared resources that require protection.</p>
-<p>The Challenge: How do we implement</p>
-<p>entry and exit sections using only</p>
-<p>software?</p>
-<p>request permission</p>
-<p>release permission</p>
+<p>The Challenge: How do we implement entry and exit sections using only software? request permission release permission</p>
 <div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
 
 <h3 id="sub-1-4">1.4 Review - The Three Sacred Requirements:</h3>
@@ -134,13 +123,7 @@
 <div class="box box-green"><div class="box-title">Analogy</div><p>Real-Life Analogy: A Single-Occupancy Restroom</p></div>
 
 <h3 id="sub-1-5">1.5 Review - The Three Sacred Requirements:</h3>
-<p>Any solution MUST satisfy all three:</p>
-<p>section at a time</p>
-<p>want to enter, one MUST</p>
-<p>eventually get in</p>
-<p>who enters next</p>
-<p>eventually</p>
-<p>Memory Aid: MPB (Mutual, Progress, Bounded)</p>
+<p>Any solution MUST satisfy all three: section at a time want to enter, one MUST eventually get in who enters next eventually Memory Aid: MPB (Mutual, Progress, Bounded)</p>
 <ul>
     <li>Only ONE process in critical</li>
     <li>Prevents data corruption</li>
@@ -153,8 +136,7 @@
 </ul>
 
 <h3 id="sub-1-6">1.6 Solution to Process Synchronization Problems:</h3>
-<p>Types of Solutions to Critical Section Problem</p>
-<p>Software Based Hardware Based OS Based</p>
+<p>Types of Solutions to Critical Section Problem Software Based Hardware Based OS Based</p>
 <ul>
     <li>Lock Variable</li>
     <li>Strict Alternation</li>
@@ -203,40 +185,16 @@
 </ul>
 
 <h3 id="sub-2-5">2.5 Why Simple Lock FAILS - Mutual exclusion VIOLATED:</h3>
-<p>Time Process P0 Process P1 Lock</p>
-<p>Initially Lock = 0 (Free)</p>
-<p>P0 enters Critical Section P1 enters Critical Section</p>
-<p>Both processes in CS! Mutual exclusion VIOLATED</p>
-<p>t2 lock = 1 1</p>
-<p>t3 lock = 1 1</p>
-<p>t4 CRITICAL SECTION CRITICAL SECTION 1</p>
+<p>Time Process P0 Process P1 Lock Initially Lock = 0 (Free) P0 enters Critical Section P1 enters Critical Section Both processes in CS! Mutual exclusion VIOLATED t2 lock = 1 1 t3 lock = 1 1 t4 CRITICAL SECTION CRITICAL SECTION 1</p>
 <pre class="code-block"><code>t0 while(lock!=0) 0
-t1 while(lock!=0) 0</code></pre>
-
-
+t1 while(lock!=0) 0</code></pre>
+
 <h3 id="sub-2-6">2.6 Checking for Progress:</h3>
-<p>Time Process P0 Process P1 Lock</p>
-<p>t2 lock = 1 1</p>
-<p>t3 lock = 1 1</p>
-<p>t4 CRITICAL SECTION CRITICAL SECTION 1</p>
-<p>Initially Lock = 0 (Free)</p>
-<p>P0 enters Critical Section P1 enters Critical Section</p>
-<p>Both processes in CS! Mutual exclusion VIOLATED</p>
-<p>Technically, Progress assumes</p>
-<p>Mutual Exclusion is already</p>
-<p>satisfied. If multiple processes</p>
-<p>can enter together, the</p>
-<p>"progress" concept becomes</p>
-<p>meaningless because the</p>
-<p>critical section isn't being</p>
-<p>protected at all.</p>
-<p>No Mutual Exclusion               No Progress</p>
-<p>P0 interested</p>
-<p>P1 interested</p>
+<p>Time Process P0 Process P1 Lock t2 lock = 1 1 t3 lock = 1 1 t4 CRITICAL SECTION CRITICAL SECTION 1 Initially Lock = 0 (Free) P0 enters Critical Section P1 enters Critical Section Both processes in CS! Mutual exclusion VIOLATED Technically, Progress assumes Mutual Exclusion is already satisfied. If multiple processes can enter together, the "progress" concept becomes meaningless because the critical section isn't being protected at all.</p>
+<p>No Mutual Exclusion               No Progress P0 interested P1 interested</p>
 <pre class="code-block"><code>t0 while(lock!=0) 0
-t1 while(lock!=0) 0</code></pre>
-
-
+t1 while(lock!=0) 0</code></pre>
+
                     
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
@@ -255,22 +213,15 @@ t1 while(lock!=0) 0</code></pre>
 <p>No process should wait indefinitely or unboundedly long while others keep entering.</p>
 
 <h3 id="sub-3-2">3.2 Time Process P0 Process P1 Lock</h3>
-<p>t2 lock=1[P0 wins race!] lock = 1 (too late!)</p>
-<p>← P1 WAITING</p>
+<p>t2 lock=1[P0 wins race!] lock = 1 (too late!) ← P1 WAITING</p>
 
 <p>t3 // CRITICAL SECTION ← P1 WAITING 1</p>
 <div class="formula-box">t6  lock = 1  [P0 RE-ENTERS!] [P1 still checking...]</div>
-<p>lock = 1 (too late!)</p>
-<p>← P1 WAITING</p>
+<p>lock = 1 (too late!) ← P1 WAITING</p>
 
-<p>t7 // CRITICAL SECTION ← P1 WAITING 1</p>
-<p>Why This Violates</p>
-<p>Bounded Waiting:</p>
+<p>t7 // CRITICAL SECTION ← P1 WAITING 1 Why This Violates Bounded Waiting:</p>
 <p>P1's Perspective:</p>
-<p>(3 times so far)</p>
-<p>can keep re-entering</p>
-<p>P0 interested</p>
-<p>P1 interested</p>
+<p>(3 times so far) can keep re-entering P0 interested P1 interested</p>
 <ul>
     <li>Requested CS at t0</li>
     <li>P0 entered CS at times: t3, t7, t11</li>
@@ -288,44 +239,28 @@ while(lock!=0) [TRUE]
 t8 lock = 0[P0 exits] while(lock!=0) [TRUE] 0</code></pre>
 
 <h3 id="sub-3-3">3.3 Evaluation of The Simple Boolean Lock Variable Solution:</h3>
-<p>Requirement Status Actual Reason</p>
-<p>Mutual Exclusion  PRIMARY</p>
-<p>FAILURE</p>
-<p>Race condition allows both processes in CS</p>
-<p>simultaneously</p>
-<p>Progress  Fails (but</p>
-<p>secondary)</p>
-<p>Meaningless when mutual exclusion fails; no</p>
-<p>proper selection mechanism</p>
-<p>Bounded Waiting  FAILS One process can monopolize (enter repeatedly</p>
-<p>before other gets a chance)</p>
+<p>Requirement Status Actual Reason Mutual Exclusion  PRIMARY FAILURE Race condition allows both processes in CS simultaneously Progress  Fails (but secondary) Meaningless when mutual exclusion fails; no proper selection mechanism Bounded Waiting  FAILS One process can monopolize (enter repeatedly before other gets a chance)</p>
 
 <h3 id="sub-3-4">3.4 . Strict Alternation (Turn Variable) Solution:</h3>
-<p>Using a turn variable to force processes to take turns.</p>
-<p>turn = i means "Process i wants to enter the CS".</p>
+<p>Using a turn variable to force processes to take turns. turn = i means "Process i wants to enter the CS".</p>
 <p>The Logic:</p>
 <ul>
     <li>P0 only enters if turn == 0; P1 only if turn == 1.</li>
     <li>Success: Guarantees Mutual Exclusion.</li>
     <li>Failure: Violates Progress</li>
-</ul>
-
-
+</ul>
+
 <h3 id="sub-3-5">3.5 . Strict Alternation (Turn Variable) Solution:</h3>
-<p>Mutual Exclusion </p>
-<p>can enter the critical section at a time.</p>
+<p>Mutual Exclusion can enter the critical section at a time.</p>
 <p>The Logic:</p>
-<p>If turn = 0, only P0 can enter</p>
-<p>The Logic:</p>
+<p>If turn = 0, only P0 can enter The Logic:</p>
 <p>If turn = 1, only P1 can enter</p>
 <ul>
     <li>Only one process</li>
 </ul>
 
 <h3 id="sub-3-6">3.6 Checking for Progress:</h3>
-<p>The Analogy Connection: Imagine two neighbors sharing one lawnmower. Neighbor A uses it, then must give it to</p>
-<p>Neighbor B. If Neighbor B goes on vacation and doesn't want to mow, Neighbor A can never use the mower again,</p>
-<p>even though it's sitting idle in the garage</p>
+<p>The Analogy Connection: Imagine two neighbors sharing one lawnmower. Neighbor A uses it, then must give it to Neighbor B. If Neighbor B goes on vacation and doesn't want to mow, Neighbor A can never use the mower again, even though it's sitting idle in the garage</p>
 
                     
                     <div class="topic-nav">
@@ -342,70 +277,46 @@ t8 lock = 0[P0 exits] while(lock!=0) [TRUE] 0</code></pre>
                 </div>
                 <div id="content-4" class="collapsible-content">
                     <h3 id="sub-4-1">4.1 Checking for Progress:</h3>
-<p>turn = 0, P0 enters CS, exits, sets turn = 1</p>
-<p>P0 wants to enter CS again immediately</p>
-<p>P1 is in remainder section (not interested in CS)</p>
-<p>CS is FREE but P0 cannot enter!</p>
-<p>P0 must wait for P1 to take its turn first</p>
-<p>This violates the Progress!</p>
-<p>Problem: Process in remainder section (not wanting CS) prevents others from</p>
-<p>entering. Violates progress requirement.</p>
-<p>P0 interested</p>
-<p>P1 is NOT interested</p>
-<p>Initially turn = 0</p>
-
-
+<p>turn = 0, P0 enters CS, exits, sets turn = 1 P0 wants to enter CS again immediately P1 is in remainder section (not interested in CS) CS is FREE but P0 cannot enter!</p>
+<p>P0 must wait for P1 to take its turn first This violates the Progress!</p>
+<p>Problem: Process in remainder section (not wanting CS) prevents others from entering. Violates progress requirement.</p>
+<p>P0 interested P1 is NOT interested Initially turn = 0</p>
+
 <h3 id="sub-4-2">4.2 Checking for Bounded Waiting:</h3>
-<p>P0 waiting forever</p>
-<p>Note:</p>
-<p>Bound = 1? Only if P1 cooperates! If P1</p>
-<p>delays or never comes, no bound exists.</p>
+<p>P0 waiting forever Note:</p>
+<p>Bound = 1? Only if P1 cooperates! If P1 delays or never comes, no bound exists.</p>
 <p>YES!</p>
 <p> It CAN violate Bounded Waiting</p>
 <div class="box box-blue"><div class="box-title">Important Note</div><p>Make sure to enforce ordering and handle edge conditions to ensure correctness and stability.</p></div>
 
 <h3 id="sub-4-3">4.3 Evaluation of Strict Alternation (Turn Variable) Solution:</h3>
-<p>Requirement Status Actual Reason</p>
-<p>Mutual Exclusion  YES Turn can only be 0 or 1 at any time, allowing only one process</p>
-<p>Progress  FAILS Uninterested process in remainder section can block</p>
-<p>interested process. If turn=1 and P1 is not interested, P0</p>
-<p>cannot enter even though CS is free.</p>
-<p>Bounded Waiting  FAILS Process must wait for other's turn even if other is not</p>
-<p>interested. No bound on waiting time if other process delays or</p>
-<p>never requests CS.</p>
+<p>Requirement Status Actual Reason Mutual Exclusion  YES Turn can only be 0 or 1 at any time, allowing only one process Progress  FAILS Uninterested process in remainder section can block interested process. If turn=1 and P1 is not interested, P0 cannot enter even though CS is free.</p>
+<p>Bounded Waiting  FAILS Process must wait for other's turn even if other is not interested. No bound on waiting time if other process delays or never requests CS.</p>
 <pre class="code-block"><code>to pass while(turn!=i) and enter CS.</code></pre>
 
 <h3 id="sub-4-4">4.4 . The Interest Variable (Individual Interest Flags):</h3>
 
 <h3 id="sub-4-5">4.5 . The Interest Variable (Individual Interest Flags):</h3>
-<p>Flag[0] = True: P0 Wants to enter</p>
-<p>while (flag[1]);</p>
-<p>Flag[1] = True: P1 Wants to enter</p>
-<p>while (flag[0]);</p>
-<p>flag[i] = true means "Process i is ready to enter the CS".</p>
-<p>The Logic:</p>
-<p>process's flag is true .</p>
+<p>Flag[0] = True: P0 Wants to enter while (flag[1]);</p>
+<p>Flag[1] = True: P1 Wants to enter while (flag[0]); flag[i] = true means "Process i is ready to enter the CS".</p>
+<p>The Logic: process's flag is true .</p>
 <p>Flag[0] = True;</p>
-<p>(Local)</p>
-<p>Flag[1] = True;</p>
+<p>(Local) Flag[1] = True;</p>
 <p>(Local)</p>
 <ul>
     <li>Set my flag to true, then wait while the other</li>
     <li>The Failure: Deadlock (Progress Violation).</li>
 </ul>
-<pre class="code-block"><code>Instead of a "turn," let each process have its own "interest" flag.</code></pre>
-
-
+<pre class="code-block"><code>Instead of a "turn," let each process have its own "interest" flag.</code></pre>
+
 <h3 id="sub-4-6">4.6 . The Interest Variable (Individual Interest Flags):</h3>
 <div class="formula-box">Flag[0] = True; // I'm interested</div>
 <div class="formula-box">while (Flag[1] == True); // Wait while P1 interested</div>
-<p>CRITICAL SECTION</p>
-<p>Flag[0] = False;</p>
+<p>CRITICAL SECTION Flag[0] = False;</p>
 <p>Process P0</p>
 <div class="formula-box">Flag[1] = True;              // I'm interested</div>
 <div class="formula-box">while (Flag[0] == True); // Wait while P0 interested</div>
-<p>CRITICAL SECTION</p>
-<p>Flag[1] = False;</p>
+<p>CRITICAL SECTION Flag[1] = False;</p>
 <p>Process P1</p>
 
                     
@@ -425,45 +336,24 @@ t8 lock = 0[P0 exits] while(lock!=0) [TRUE] 0</code></pre>
                     <h3 id="sub-5-1">5.1 The ACTUAL Mutual Exclusion /Progress /Bounded Waiting Violation:</h3>
 <p>This is DEADLOCK:</p>
 <p>Deadlock Scenario (Mutual Exclusion Failure by Deadlock):</p>
-<p>No Mutual Exclusion</p>
-<p>No Progress</p>
-<p>Both processes in CS!</p>
-<p>Progress VIOLATED</p>
-<p>Due to Deadlock</p>
-<p>Bounded Waiting VIOLATED</p>
-<p>Here: Neither process can</p>
-<p>enter CS at all - infinite wait</p>
-<p>time means no bound exists.</p>
+<p>No Mutual Exclusion No Progress Both processes in CS!</p>
+<p>Progress VIOLATED Due to Deadlock Bounded Waiting VIOLATED Here: Neither process can enter CS at all - infinite wait time means no bound exists.</p>
 <ul>
     <li>Neither process enters CS</li>
     <li>Both wait forever</li>
     <li>CS remains empty forever</li>
     <li>This violates the purpose of mutual exclusion (ensuring CS is used)</li>
-</ul>
-
-
+</ul>
+
 <h3 id="sub-5-2">5.2 Evaluation of The Interest Variable (Individual Interest Flags):</h3>
-<p>Requirement Status Actual Reason</p>
-<p>Mutual Exclusion  FAILS</p>
-<p>Deadlock scenario: Both set flags True, both check and wait</p>
-<p>forever. No one enters CS, but also violates the spirit of mutual</p>
-<p>exclusion as the mechanism fails.</p>
-<p>Progress  FAILS Both interested processes can deadlock. CS is free but neither</p>
-<p>can enter - selection postponed indefinitely.</p>
+<p>Requirement Status Actual Reason Mutual Exclusion  FAILS Deadlock scenario: Both set flags True, both check and wait forever. No one enters CS, but also violates the spirit of mutual exclusion as the mechanism fails.</p>
+<p>Progress  FAILS Both interested processes can deadlock. CS is free but neither can enter - selection postponed indefinitely.</p>
 <p>Bounded Waiting  FAILS Deadlock causes infinite waiting time - no bound exists.</p>
-<p>Processes wait forever without entering CS.</p>
-
-
+<p>Processes wait forever without entering CS.</p>
+
 <h3 id="sub-5-3">5.3 . Dekker's Algorithm: The First Complete Solution:</h3>
-<p>The Logic:</p>
-<p>ready to enter the Critical Section (CS).</p>
-<p>to true, check whose turn it is.</p>
-<p>set its own flag to false (withdrawing interest) until the</p>
-<p>turn changes back to them.</p>
-<p>flag or it becomes Process i's turn, Process i re-sets its</p>
-<p>flag and enters the CS.</p>
-<p>Instead of just a "flag" or just a "turn," Dekker’s Algorithm combines both to overcome the deadlock seen in</p>
-<p>the Interest Variable approach. flag[i] = true means "Process  is ready to enter the CS".</p>
+<p>The Logic: ready to enter the Critical Section (CS). to true, check whose turn it is. set its own flag to false (withdrawing interest) until the turn changes back to them. flag or it becomes Process i's turn, Process i re-sets its flag and enters the CS.</p>
+<p>Instead of just a "flag" or just a "turn," Dekker’s Algorithm combines both to overcome the deadlock seen in the Interest Variable approach. flag[i] = true means "Process  is ready to enter the CS".</p>
 <ul>
     <li>Set Interest: Process i sets flag[i] = true to indicate it</li>
     <li>Check Conflict: If the other process also has its flag set</li>
@@ -473,36 +363,20 @@ t8 lock = 0[P0 exits] while(lock!=0) [TRUE] 0</code></pre>
 
 <h3 id="sub-5-4">5.4 The Comparison:</h3>
 <p>Interest Variable approach because the turn variable acts as a tie-breaker.</p>
-<p>Alternation" trap, meaning a process doesn't have to wait if the other is not</p>
-<p>interested.</p>
+<p>Alternation" trap, meaning a process doesn't have to wait if the other is not interested.</p>
 <ul>
     <li>Why it succeeds: It overcomes the Deadlock (Progress Violation) of the</li>
     <li>The Improvement: It ensures Mutual Exclusion without the "Strict</li>
-</ul>
-
-
+</ul>
+
 <h3 id="sub-5-5">5.5 Evaluation of Dekker's Algorithm:</h3>
-<p>Requirement Status Actual Reason</p>
-<p>Mutual Exclusion  PASS</p>
-<p>The combined check of flag and turn ensures only one process</p>
-<p>enters the Critical Section (CS) at a time.</p>
-<p>Progress  PASS By having a process "withdraw" its interest (setting flag = false)</p>
-<p>when it is not its turn, it prevents the deadlock failure seen in</p>
-<p>the Interest Variable solution.</p>
-<p>Bounded Waiting  PASS The turn variable acts as a tie-breaker, ensuring that if both</p>
-<p>processes are interested, they will eventually take turns, and</p>
-<p>no process is postponed indefinitely.</p>
+<p>Requirement Status Actual Reason Mutual Exclusion  PASS The combined check of flag and turn ensures only one process enters the Critical Section (CS) at a time.</p>
+<p>Progress  PASS By having a process "withdraw" its interest (setting flag = false) when it is not its turn, it prevents the deadlock failure seen in the Interest Variable solution.</p>
+<p>Bounded Waiting  PASS The turn variable acts as a tie-breaker, ensuring that if both processes are interested, they will eventually take turns, and no process is postponed indefinitely.</p>
 
 <h3 id="sub-5-6">5.6 . Peterson's Algorithm - The First Correct Solution:</h3>
-<p>Also called - Simplified Elegance Solution / Humble Solution</p>
-<p>2. Strict Alternation (Turn Variable) Solution + 3. The Interest Variable (Individual Interest Flags)</p>
-<p>Ideology - Combining both:</p>
-<p>Turn:Shared Variable</p>
-<p>Indicates whose turn it is to enter</p>
-<p>its critical section</p>
-<p>Used to indicate if a process is</p>
-<p>ready to enter its critical section</p>
-<p>Flag[0], Flag[1]:Local Variable</p>
+<p>Also called - Simplified Elegance Solution / Humble Solution 2. Strict Alternation (Turn Variable) Solution + 3. The Interest Variable (Individual Interest Flags) Ideology - Combining both:</p>
+<p>Turn:Shared Variable Indicates whose turn it is to enter its critical section Used to indicate if a process is ready to enter its critical section Flag[0], Flag[1]:Local Variable</p>
 
                     
                     <div class="topic-nav">
@@ -549,8 +423,7 @@ Flag[1] = False;</code></pre>
 <p>Mutual exclusion  SATISFIES</p>
 
 <h3 id="sub-6-3">6.3 Checking for Progress:</h3>
-<p>Progress  SATISFIES</p>
-<p>Note:</p>
+<p>Progress  SATISFIES Note:</p>
 <ul>
     <li>Uninterested processes don't block:<strong> If Flag[j]=False, process i enters immediately</li>
     <li>When both interested:</strong> Turn variable ensures one enters (no deadlock)</li>

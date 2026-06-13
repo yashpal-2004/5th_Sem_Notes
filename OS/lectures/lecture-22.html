@@ -126,9 +126,8 @@
     <li>How do high-level programs become running processes?</li>
 </ul>
 
-<h3 id="sub-1-4">1.4 The Grand Vision</h3>
-
-
+<h3 id="sub-1-4">1.4 The Grand Vision</h3>
+
                     
                     <div class="topic-nav">
                         <a href="lecture-21.html" class="btn" style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;">Previous Lecture</a>
@@ -151,18 +150,14 @@
 
 <p>16-bit Harvard Architecture. Minimalist design.</p>
 <p>CPU Registers : "A" and "D" Registers.</p>
-<p>The ALU (Arithmetic Logic Unit) : The</p>
-<p>calculator of the system.</p>
+<p>The ALU (Arithmetic Logic Unit) : The calculator of the system.</p>
 <p>Memory Mapping (The Map): 32K words.</p>
-<p>RAM (0-16K), Screen (16K-24K),</p>
-<p>Keyboard (24K).</p>
+<p>RAM (0-16K), Screen (16K-24K), Keyboard (24K).</p>
 
 <h3 id="sub-2-3">2.3 The Hack Computer Platform</h3>
 
-<p>Screen Memory: 256 rows x 512</p>
-<p>columns. 1 bit = 1 pixel.</p>
-<p>Keyboard I/O: Reading address</p>
-<p>24576.</p>
+<p>Screen Memory: 256 rows x 512 columns. 1 bit = 1 pixel.</p>
+<p>Keyboard I/O: Reading address 24576.</p>
 <p>The CPU Emulator</p>
 
 <h3 id="sub-2-4">2.4 The Software Hierarchy</h3>
@@ -265,10 +260,8 @@
                     <h3 id="sub-4-1">4.1 Jack Language (Layer 6)</h3>
 
 <p>High-level, Object-Oriented.</p>
-<p>Features: Classes, methods, fields, and</p>
-<p>static variables.</p>
-<p>Role: The bridge between human logic and</p>
-<p>the VM translator.</p>
+<p>Features: Classes, methods, fields, and static variables.</p>
+<p>Role: The bridge between human logic and the VM translator.</p>
 <pre class="code-block"><code>class Main {
     function int addPair(int x, int y) {
         var int result;
@@ -280,14 +273,7 @@
 <h3 id="sub-4-2">4.2 The Operating System (Layer 6)</h3>
 
 <p>Jack OS Library: 8 Core Modules.</p>
-<p>Math.jack (Mult/Div), Output.jack (Text),</p>
-<p>Screen.jack (Graphics), Memory.jack</p>
-<p>(Heap), String.jack, Keyboard.jack,</p>
-<p>Sys.jack</p>
-<p>The "Library" Model: In Nand2Tetris, the OS is a</p>
-<p>set of functions called directly by your</p>
-<p>program—no complex kernel/user mode</p>
-<p>separation.</p>
+<p>Math.jack (Mult/Div), Output.jack (Text), Screen.jack (Graphics), Memory.jack (Heap), String.jack, Keyboard.jack, Sys.jack The "Library" Model: In Nand2Tetris, the OS is a set of functions called directly by your program—no complex kernel/user mode separation.</p>
 
 <h3 id="sub-4-3">4.3 Translation Example</h3>
 
@@ -327,12 +313,8 @@ M=M+D</code></pre>
 
 <h3 id="sub-4-4">4.4 Jack vs Java/C</h3>
 
-<p>Similarities: Statically typed, OO</p>
-<p>structure, curly braces.</p>
-<p>Differences: No inheritance, no</p>
-<p>interfaces, very simple memory</p>
-<p>management, no garbage collection</p>
-<p>(in the basic version).</p>
+<p>Similarities: Statically typed, OO structure, curly braces.</p>
+<p>Differences: No inheritance, no interfaces, very simple memory management, no garbage collection (in the basic version).</p>
 
                     
                     <div class="topic-nav">
@@ -350,20 +332,13 @@ M=M+D</code></pre>
                 <div id="content-5" class="collapsible-content">
                     <h3 id="sub-5-1">5.1 Jack File Structure</h3>
 
-<p>Rule: One class per file. Filename</p>
-<p>must match ClassName.</p>
-<p>Structure: Class declaration -></p>
-<p>Fields/Statics -> Constructor -></p>
-<p>Subroutines.</p>
+<p>Rule: One class per file. Filename must match ClassName.</p>
+<p>Structure: Class declaration -> Fields/Statics -> Constructor -> Subroutines.</p>
 
 <h3 id="sub-5-2">5.2 Primitive Data Types</h3>
 
-<p>int: 16-bit signed (-32768 to 32767).</p>
-<p>char: ASCII character.</p>
-<p>boolean: true or false.</p>
-<p>Arrays & Strings: Handled as</p>
-<p>objects using Array.new(size)</p>
-<p>and String.new(length).</p>
+<p>int: 16-bit signed (-32768 to 32767). char: ASCII character. boolean: true or false.</p>
+<p>Arrays & Strings: Handled as objects using Array.new(size) and String.new(length).</p>
 
 <h3 id="sub-5-3">5.3 Variable Types & Scope</h3>
 
@@ -412,8 +387,7 @@ M=M+D</code></pre>
 
 <h3 id="sub-6-2">6.2 Control Flow: If-Else</h3>
 
-<p>Conditions must be boolean</p>
-<p>expressions.</p>
+<p>Conditions must be boolean expressions.</p>
 <pre class="code-block"><code>Syntax: if (condition) { ...
 } else { ... }.</code></pre>
 
@@ -460,9 +434,7 @@ do Output.println();</code></pre>
 
 <h3 id="sub-6-6">6.6 Some Jack Programs</h3>
 
-<p>Sum of array Elements</p>
-<p>Output</p>
-<p>Sum of array elements: 150</p>
+<p>Sum of array Elements Output Sum of array elements: 150</p>
 <pre class="code-block"><code>let arr[0] = 10;
 let arr[1] = 20;
 let arr[2] = 30;
@@ -470,9 +442,8 @@ let arr[3] = 40;
 let arr[4] = 50;</code></pre>
 
 <h3 id="sub-6-7">6.7 Thank You!</h3>
-<p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
-
-
+<p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
+
                     
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>

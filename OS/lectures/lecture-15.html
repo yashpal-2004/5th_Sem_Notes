@@ -92,10 +92,8 @@
                     <h2>Dining Philosophers Problem Setup</h2>
                 </div>
                 <div id="content-1" class="collapsible-content">
-                    <h3 id="sub-1-1">1.1 Join the lecture online on your dashboard</h3>
-
-
-
+                    <h3 id="sub-1-1">1.1 Join the lecture online on your dashboard</h3>
+
 <h3 id="sub-1-2">1.2 Today’s Agenda</h3>
 
 <ul>
@@ -109,25 +107,10 @@
 
 <h3 id="sub-1-3">1.3 Review of Producer-Consumer Problem</h3>
 
-<p></p>
 <p>What is it?</p>
-<p></p>
-<p>Scenario</p>
-<p>Producer: creates data → puts into buffer</p>
-<p>Consumer: removes data → processes it</p>
-<p>Buffer: limited size (bounded buffer)</p>
-<p></p>
-<p>Key Challenges</p>
-<p>Producer waits if buffer is full</p>
-<p>Consumer waits if buffer is empty</p>
-<p>Mutual exclusion required for buffer access</p>
-<p>Prevent race conditions</p>
-<p></p>
-<p>Synchronization Requirements</p>
-<p>Only one process accesses buffer at a time</p>
-<p>Producer sleeps when buffer is full</p>
-<p>Consumer sleeps when buffer is empty</p>
-<p>Waiting process wakes up when condition changes</p>
+<p>Scenario Producer: creates data → puts into buffer Consumer: removes data → processes it Buffer: limited size (bounded buffer)</p>
+<p>Key Challenges Producer waits if buffer is full Consumer waits if buffer is empty Mutual exclusion required for buffer access Prevent race conditions</p>
+<p>Synchronization Requirements Only one process accesses buffer at a time Producer sleeps when buffer is full Consumer sleeps when buffer is empty Waiting process wakes up when condition changes</p>
 <ul>
     <li>A classic synchronization problem</li>
     <li>Demonstrates process coordination using a shared buffer</li>
@@ -146,21 +129,12 @@
 
 <h3 id="sub-1-4">1.4 Producer-Consumer Semaphore Solution</h3>
 
-<p></p>
-<p>Consumer Code</p>
-<p>item = buffer[out];</p>
+<p>Consumer Code item = buffer[out];</p>
 <div class="formula-box">out = (out + 1) % n;</div>
 <p>consumeItem(item);</p>
-<p></p>
-<p>Semaphores Used (n = buffer size): </p>
-<p>mutex = 1 → Mutual exclusion, </p>
-<p>empty = n → Empty slots in buffer and</p>
-<p></p>
+<p>Semaphores Used (n = buffer size): mutex = 1 → Mutual exclusion, empty = n → Empty slots in buffer and</p>
 <p>full = 0 → Filled slots in buffer</p>
-<p></p>
-<p>Producer Code</p>
-<p>item = produceItem();</p>
-<p>buffer[in] = item;</p>
+<p>Producer Code item = produceItem(); buffer[in] = item;</p>
 <div class="formula-box">in = (in + 1) % n;</div>
 <pre class="code-block"><code>while (true) {
 wait(full);       // Wait if buffer is empty
@@ -177,29 +151,13 @@ signal(full);     // One more full slot
 
 <h3 id="sub-1-5">1.5 The Dining Philosophers Problem</h3>
 
-<p></p>
 <p>Problem Overview</p>
-<p></p>
-<p>Scenario</p>
-<p>5 philosophers sit around a circular table</p>
-<p>5 forks, one between each pair</p>
-<p>Each philosopher alternates between: Thinking and Eating</p>
-<p>To eat, a philosopher needs both left & right chopsticks</p>
-<p>After eating, forks are released</p>
-<p></p>
-<p>Philosopher States</p>
-<p>1. </p>
-<p>Thinking: Not using forks</p>
-<p>2. </p>
-<p>Hungry: Tries to acquire forks</p>
-<p>3. </p>
+<p>Scenario 5 philosophers sit around a circular table 5 forks, one between each pair Each philosopher alternates between: Thinking and Eating To eat, a philosopher needs both left & right chopsticks After eating, forks are released</p>
+<p>Philosopher States 1.</p>
+<p>Thinking: Not using forks 2.</p>
+<p>Hungry: Tries to acquire forks 3.</p>
 <p>Eating: Holds both forks</p>
-<p></p>
-<p>Key Issues Highlighted</p>
-<p>Mutual exclusion of forks</p>
-<p>Possible deadlock</p>
-<p>Possible starvation</p>
-<p>Fair resource allocation</p>
+<p>Key Issues Highlighted Mutual exclusion of forks Possible deadlock Possible starvation Fair resource allocation</p>
 <ul>
     <li>A classic synchronization problem</li>
     <li>Used to explain deadlock, starvation, and resource sharing</li>
@@ -231,21 +189,11 @@ signal(full);     // One more full slot
                 <div id="content-2" class="collapsible-content">
                     <h3 id="sub-2-1">2.1 Dining Philosophers - Key Challenges</h3>
 
-<p></p>
-<p>1. Mutual Exclusion</p>
-<p>Only one philosopher can hold a chopstick</p>
-<p></p>
-<p>2. Deadlock</p>
-<p>No one can proceed → System stuck</p>
-<p></p>
+<p>1. Mutual Exclusion Only one philosopher can hold a chopstick</p>
+<p>2. Deadlock No one can proceed → System stuck</p>
 <p>3. Starvation</p>
-<p></p>
 <p>4. Concurrent Access</p>
-<p></p>
-<p>Deadlock Scenario (Example)</p>
-<p>T1: All philosophers pick up LEFT chopstick</p>
-<p>T2: All try to pick up RIGHT chopstick</p>
-<p>→ DEADLOCK (infinite waiting)</p>
+<p>Deadlock Scenario (Example) T1: All philosophers pick up LEFT chopstick T2: All try to pick up RIGHT chopstick → DEADLOCK (infinite waiting)</p>
 <ul>
     <li></li>
     <li>Chopsticks are shared resources</li>
@@ -264,16 +212,9 @@ signal(full);     // One more full slot
 
 <h3 id="sub-2-2">2.2 Naive Semaphore Solution (Incorrect)</h3>
 
-<p></p>
 <p>Approach</p>
-<p></p>
-<p>Philosopher Code</p>
-<p>think();</p>
-<p>eat();</p>
-<p></p>
-<p>Why This Fails</p>
-<p>Deadlock is possible</p>
-<p>Everyone waits for the right chopstick → DEADLOCK</p>
+<p>Philosopher Code think(); eat();</p>
+<p>Why This Fails Deadlock is possible Everyone waits for the right chopstick → DEADLOCK</p>
 <ul>
     <li>One semaphore per chopstick</li>
     <li>Each chopstick initialized to 1</li>
@@ -290,21 +231,14 @@ wait(chopstick[(i+1) % 5]);   // Pick right
 signal(chopstick[i]);         // Put left
 signal(chopstick[(i+1) % 5]); // Put right
 }
-}</code></pre>
-
-
+}</code></pre>
+
 <h3 id="sub-2-3">2.3 Solution 1 - Asymmetric Solution</h3>
 
-<p></p>
 <p>Strategy</p>
-<p></p>
 <p>Why This Works</p>
-<p></p>
-<p>Philosopher Code (Asymmetric)</p>
-<p>think();</p>
-<p>// Last philosopher picks RIGHT first</p>
-<p>// Others pick LEFT first</p>
-<p>eat();</p>
+<p>Philosopher Code (Asymmetric) think();</p>
+<p>// Last philosopher picks RIGHT first // Others pick LEFT first eat();</p>
 <ul>
     <li>Use one semaphore per chopstick</li>
     <li>Make one philosopher pick chopsticks in reverse order</li>
@@ -327,21 +261,14 @@ wait(chopstick[(i+1) % 5]);
 signal(chopstick[i]);
 signal(chopstick[(i+1) % 5]);
 }
-}</code></pre>
-
-
+}</code></pre>
+
 <h3 id="sub-2-4">2.4 Solution 2 - Allow Maximum N-1 Philosophers</h3>
 
 <div class="formula-box">semaphore room = 4;   // Only 4 philosophers allowed</div>
-<p></p>
-<p>Philosopher Code</p>
-<p>think();</p>
-<p>eat();</p>
-<p></p>
+<p>Philosopher Code think(); eat();</p>
 <p>Why This Works</p>
-<p></p>
-<p>Strategy: Allow at most 4 philosophers to try eating at the same time. Use an extra semaphore (room) to limit entry. Ensures</p>
-<p>at least one philosopher can eat.</p>
+<p>Strategy: Allow at most 4 philosophers to try eating at the same time. Use an extra semaphore (room) to limit entry. Ensures at least one philosopher can eat.</p>
 <ul>
     <li>At most N−1 philosophers compete for chopsticks</li>
     <li>At least one philosopher gets both chopsticks</li>
@@ -363,17 +290,10 @@ signal(room);               // Leave dining room
 <h3 id="sub-2-5">2.5 Solution 3 - Using Mutex (All or Nothing)</h3>
 
 <div class="formula-box">semaphore mutex = 1;   // Protects critical section</div>
-<p></p>
-<p>Philosopher Code</p>
-<p>think();</p>
-<p>eat();</p>
-<p></p>
-<p>Strategy: Use a global mutex to protect chopstick pickup. A philosopher must acquire both chopsticks atomically. Prevents</p>
-<p>partial allocation of resources.</p>
-<p> Pros: No deadlock. Easy to understand and implement. Ensures atomic</p>
-<p>resource acquisition.</p>
-<p> Cons: Poor concurrency. Only one philosopher can pick chopsticks at a</p>
-<p>time. Reduces parallelism significantly.</p>
+<p>Philosopher Code think(); eat();</p>
+<p>Strategy: Use a global mutex to protect chopstick pickup. A philosopher must acquire both chopsticks atomically. Prevents partial allocation of resources.</p>
+<p>Pros: No deadlock. Easy to understand and implement. Ensures atomic resource acquisition.</p>
+<p>Cons: Poor concurrency. Only one philosopher can pick chopsticks at a time. Reduces parallelism significantly.</p>
 <pre class="code-block"><code>semaphore chopstick[5] = {1, 1, 1, 1, 1};
 void philosopher(int i) {
 while (true) {
@@ -404,35 +324,21 @@ signal(mutex);            // Exit critical section
                 <div id="content-3" class="collapsible-content">
                     <h3 id="sub-3-1">3.1 Solution 4 - Check Both Chopsticks (Tanenbaum's Solution)</h3>
 
-<p></p>
-<p>Philosopher States</p>
-<p>#define THINKING 0</p>
-<p>#define HUNGRY   1</p>
-<p>#define EATING   2</p>
-<p></p>
-<p>Shared Data Structures</p>
-<p>int state[5];                 // State of each philosopher</p>
+<p>Philosopher States #define THINKING 0 #define HUNGRY   1 #define EATING   2</p>
+<p>Shared Data Structures int state[5];                 // State of each philosopher</p>
 <div class="formula-box">semaphore mutex = 1;          // Protects critical section</div>
-<p></p>
-<p>Helper Macros</p>
-<p>#define LEFT  (i+4) % 5</p>
-<p>#define RIGHT (i+1) % 5</p>
-<p></p>
+<p>Helper Macros #define LEFT  (i+4) % 5 #define RIGHT (i+1) % 5</p>
 <p>Strategy: A philosopher eats only if both neighbors are not eating. Chopsticks are picked up together (logically).</p>
 <p>Uses states + per-philosopher semaphore.</p>
 <pre class="code-block"><code>semaphore s[5] = { 0,0,0,0,0}; // One semaphore per philosopher</code></pre>
 
 <h3 id="sub-3-2">3.2 Solution 4 - Check Both Chopsticks (Tanenbaum's Solution)</h3>
 
-<p></p>
-<p>Test Function (Core Logic)</p>
-<p>if ( state[i] == HUNGRY &&</p>
+<p>Test Function (Core Logic) if ( state[i] == HUNGRY &&</p>
 <div class="formula-box">state[LEFT] != EATING &&</div>
 <div class="formula-box">state[i] = EATING;</div>
 <p>to eat</p>
-<p></p>
-<p>Why This Works</p>
-<p>are free</p>
+<p>Why This Works are free</p>
 <ul>
     <li> Philosopher eats only when both chopsticks</li>
     <li> No deadlock (no circular wait)</li>
@@ -447,15 +353,8 @@ signal(s[i]); // Allow philosopher i
 
 <h3 id="sub-3-3">3.3 Tanenbaum's Solution - Main Functions</h3>
 
-<p></p>
-<p>Take Chopsticks</p>
-<p>state[i] = HUNGRY;</p>
-<p>test(i);      // Try to acquire both chopsticks</p>
-<p></p>
-<p>Put Down Chopsticks</p>
-<p>state[i] = THINKING;</p>
-<p>test(LEFT);      // Check left neighbor</p>
-<p>test(RIGHT);     // Check right neighbor</p>
+<p>Take Chopsticks state[i] = HUNGRY; test(i);      // Try to acquire both chopsticks</p>
+<p>Put Down Chopsticks state[i] = THINKING; test(LEFT);      // Check left neighbor test(RIGHT);     // Check right neighbor</p>
 <pre class="code-block"><code>void take_chopsticks(int i) {
 wait(mutex);
 signal(mutex);
@@ -468,13 +367,7 @@ signal(mutex);
 
 <h3 id="sub-3-4">3.4 Tanenbaum's Solution - Main Functions</h3>
 
-<p></p>
-<p>Philosopher Routine</p>
-<p>think();</p>
-<p>take_chopsticks(i);</p>
-<p>eat();</p>
-<p>put_chopsticks(i);</p>
-<p></p>
+<p>Philosopher Routine think(); take_chopsticks(i); eat(); put_chopsticks(i);</p>
 <p>Advantages</p>
 <ul>
     <li>Cycles through Thinking → Hungry → Eating</li>
@@ -490,23 +383,12 @@ while ( true) {
 }</code></pre>
 
 <h3 id="sub-3-5">3.5 </h3>
-<p>Hard to verify correctness</p>
-<p>Easy to introduce bugs</p>
-<p>Problems with Semaphores</p>
+<p>Hard to verify correctness Easy to introduce bugs Problems with Semaphores</p>
 
-<p></p>
 <p>2. Common Programming Errors</p>
-<p></p>
-<p>3. No Data Abstraction</p>
-<p>Poor readability</p>
-<p>Difficult maintenance</p>
-<p></p>
-<p>5. Global Visibility</p>
-<p>No encapsulation</p>
-<p>Weak modular design</p>
-<p></p>
-<p>4. Order Matters</p>
-<p>Bugs are hard to debug</p>
+<p>3. No Data Abstraction Poor readability Difficult maintenance</p>
+<p>5. Global Visibility No encapsulation Weak modular design</p>
+<p>4. Order Matters Bugs are hard to debug</p>
 <ul>
     <li>Spread across the program</li>
     <li></li>
@@ -524,9 +406,8 @@ while ( true) {
 signal(mutex); ... wait(mutex);   // Mutual exclusion violated
 wait(mutex); ... wait(mutex);     // Deadlock
 wait(mutex); ... /<em> forget signal </em>/ // Deadlock
-● Incorrect order of wait() calls → deadlock</code></pre>
-
-
+● Incorrect order of wait() calls → deadlock</code></pre>
+
                     
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
@@ -543,12 +424,8 @@ wait(mutex); ... /<em> forget signal </em>/ // Deadlock
                 <div id="content-4" class="collapsible-content">
                     <h3 id="sub-4-1">4.1 </h3>
 <p>Key Limitation</p>
-<p></p>
-<p>Need for Better Solution</p>
-<p>A synchronization construct that is:</p>
-<p></p>
-<p>Leads to: Monitors & Condition Variables</p>
-<p>Problems with Semaphores</p>
+<p>Need for Better Solution A synchronization construct that is:</p>
+<p>Leads to: Monitors & Condition Variables Problems with Semaphores</p>
 
 <ul>
     <li>Semaphores are low-level & error-prone</li>
@@ -560,16 +437,8 @@ wait(mutex); ... /<em> forget signal </em>/ // Deadlock
 <h3 id="sub-4-2">4.2 Introduction to Monitors</h3>
 
 <p>It is a high-level synchronization construct that provides:</p>
-<p>Data Encapsulation (like a class/module)</p>
-<p>Automatic Mutual Exclusion</p>
-<p>Condition Synchronization (via condition variables)</p>
-<p></p>
-<p>Key Characteristics</p>
-<p>1⃣ Encapsulation</p>
-<p>2⃣ Mutual Exclusion</p>
-<p>Only ONE process active inside the monitor at a time</p>
-<p>3⃣ Structured Design</p>
-<p>All synchronization logic in one place</p>
+<p>Data Encapsulation (like a class/module) Automatic Mutual Exclusion Condition Synchronization (via condition variables)</p>
+<p>Key Characteristics 1⃣ Encapsulation 2⃣ Mutual Exclusion Only ONE process active inside the monitor at a time 3⃣ Structured Design All synchronization logic in one place</p>
 <ul>
     <li></li>
     <li></li>
@@ -585,21 +454,10 @@ wait(mutex); ... /<em> forget signal </em>/ // Deadlock
 
 <h3 id="sub-4-3">4.3 Monitor Syntax and Structure</h3>
 
-<p></p>
-<p>Monitor Syntax (Pseudo-code)</p>
-<p>// 1. SHARED DATA (private to monitor)</p>
-<p>int sharedVariable1;</p>
-<p>int sharedVariable2;</p>
-<p>// 2. CONDITION VARIABLES (for synchronization)</p>
-<p>condition conditionVar1;</p>
-<p>condition conditionVar2;</p>
-<p>// 3. INITIALIZATION (optional)</p>
-<p>sharedVariable1 = 0;</p>
-<p>sharedVariable2 = 0;</p>
-<p>// 4. ENTRY PROCEDURES (the only way to access shared data)</p>
-<p>// Code that operates on shared data</p>
-<p>// Can use condition variables here</p>
-<p>// More operations</p>
+<p>Monitor Syntax (Pseudo-code) // 1. SHARED DATA (private to monitor) int sharedVariable1; int sharedVariable2;</p>
+<p>// 2. CONDITION VARIABLES (for synchronization) condition conditionVar1; condition conditionVar2;</p>
+<p>// 3. INITIALIZATION (optional) sharedVariable1 = 0; sharedVariable2 = 0;</p>
+<p>// 4. ENTRY PROCEDURES (the only way to access shared data) // Code that operates on shared data // Can use condition variables here // More operations</p>
 <pre class="code-block"><code>monitor MonitorName {
 procedure init() {
 }
@@ -611,22 +469,11 @@ procedure entryProcedure2(parameters) {
 
 <h3 id="sub-4-4">4.4 Monitor Syntax and Structure</h3>
 
-<p></p>
 <p>Key Rules</p>
-<p></p>
-<p>Automatic Mutual Exclusion</p>
-<p>Only ONE process executes inside the monitor</p>
-<p>No explicit locks (wait/signal) required</p>
-<p></p>
-<p>Entry Queue</p>
-<p>entry queue</p>
-<p></p>
-<p>Local vs Shared Data</p>
-<p>Shared data → protected inside monitor</p>
-<p>Local variables → private to each procedure call</p>
-<p></p>
-<p>Procedure Calls</p>
-<p>Mutual exclusion enforced automatically</p>
+<p>Automatic Mutual Exclusion Only ONE process executes inside the monitor No explicit locks (wait/signal) required</p>
+<p>Entry Queue entry queue</p>
+<p>Local vs Shared Data Shared data → protected inside monitor Local variables → private to each procedure call</p>
+<p>Procedure Calls Mutual exclusion enforced automatically</p>
 <ul>
     <li></li>
     <li></li>
@@ -642,13 +489,8 @@ procedure entryProcedure2(parameters) {
 <h3 id="sub-4-5">4.5 Condition Variables</h3>
 
 <p>What are Condition Variables?</p>
-<p></p>
-<p>Syntax (Pseudo-code)</p>
-<p>condition x, y;   // Declaration</p>
-<p></p>
+<p>Syntax (Pseudo-code) condition x, y;   // Declaration</p>
 <p>Operations</p>
-<p></p>
-<p></p>
 <ul>
     <li>Special variables used for synchronization inside a monitor</li>
     <li>Allow processes to wait for a condition to become true</li>
@@ -679,11 +521,7 @@ signal(condition)</code></pre>
                 </div>
                 <div id="content-5" class="collapsible-content">
                     <h3 id="sub-5-1">5.1 Producer-Consumer Using Monitor</h3>
-<p></p>
-<p>Monitor Definition (Pseudo-code)</p>
-<p>int buffer[N];</p>
-<p>int count = 0, in = 0, out = 0;</p>
-<p>condition notFull, notEmpty;</p>
+<p>Monitor Definition (Pseudo-code) int buffer[N]; int count = 0, in = 0, out = 0; condition notFull, notEmpty;</p>
 <div class="formula-box">while (count == N)    // Buffer full</div>
 <p>buffer[in] = item;</p>
 <div class="formula-box">in = (in + 1) % N;</div>
@@ -707,15 +545,9 @@ notFull.signal();     // Wake producer
 
 <h3 id="sub-5-2">5.2 Producer-Consumer Using Monitor</h3>
 
-<p></p>
-<p>Producer Code</p>
-<p>item = produceItem();</p>
+<p>Producer Code item = produceItem();</p>
 <p>ProducerConsumer.insert(item);</p>
-<p></p>
-<p>Consumer Code</p>
-<p>ProducerConsumer.remove(&item);</p>
-<p>consumeItem(item);</p>
-<p></p>
+<p>Consumer Code ProducerConsumer.remove(&item); consumeItem(item);</p>
 <p>Key Points</p>
 <ul>
     <li>Mutual exclusion handled automatically</li>
@@ -730,10 +562,7 @@ while ( true) {
 
 <h3 id="sub-5-3">5.3 Semaphores vs Monitors Comparison</h3>
 
-<p></p>
-<p>Comparison Table </p>
-<p>Use Semaphores when:</p>
-<p></p>
+<p>Comparison Table Use Semaphores when:</p>
 <p>Use Monitors when:</p>
 <ul>
     <li>Simple synchronization is required</li>
@@ -746,21 +575,15 @@ while ( true) {
 
 <h3 id="sub-5-4">5.4 Implementing Monitors Using Semaphores</h3>
 
-<p></p>
-<p>Key Idea: Monitors are high-level constructs. Internally, they are implemented using semaphores. Ensures</p>
-<p>mutual exclusion and condition synchronization</p>
-<p></p>
+<p>Key Idea: Monitors are high-level constructs. Internally, they are implemented using semaphores. Ensures mutual exclusion and condition synchronization</p>
 <p>Required Semaphores (Monitor-Level)</p>
 <div class="formula-box">semaphore mutex = 1;   // Ensures mutual exclusion</div>
 <div class="formula-box">semaphore next = 0;    // Controls signaling order</div>
 <div class="formula-box">int next_count = 0;    // Number of suspended signalers</div>
-<p></p>
 <p>For Each Condition Variable x</p>
 <div class="formula-box">semaphore x_sem = 0;   // Queue for condition x</div>
 <div class="formula-box">int x_count = 0;      // Waiting process count</div>
-<p></p>
-<p>Monitor Entry / Exit</p>
-<p>// Monitor procedure body</p>
+<p>Monitor Entry / Exit // Monitor procedure body</p>
 <ul>
     <li>Ensures only one process is inside the monitor</li>
 </ul>
@@ -779,9 +602,8 @@ signal(mutex);</code></pre>
 </ul>
 
 <h3 id="sub-5-6">5.6 Thank You!</h3>
-<p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
-
-
+<p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
+
                     
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>

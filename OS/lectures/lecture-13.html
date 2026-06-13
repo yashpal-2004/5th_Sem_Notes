@@ -116,11 +116,8 @@ signal() (V).</code></pre>
 <h3 id="sub-1-2">1.2 Recap: The Synchronization Hierarchy</h3>
 
 <p>Mutexes:</p>
-<p>Hardware (TAS/CAS):</p>
-<p>program directly.</p>
-<p>Spinlocks:</p>
-<p>cycles.</p>
-<p>critical sections.</p>
+<p>Hardware (TAS/CAS): program directly.</p>
+<p>Spinlocks: cycles. critical sections.</p>
 <ul>
     <li>Simple locks (0 or 1).</li>
     <li>Strict ownership: Only the locker can unlock.</li>
@@ -130,24 +127,16 @@ signal() (V).</code></pre>
 </ul>
 
 <h3 id="sub-1-3">1.3 The Problem with Mutexes</h3>
-<p>Scenario: You have 5 Database Connections</p>
-<p>and 50 Threads.</p>
+<p>Scenario: You have 5 Database Connections and 50 Threads.</p>
 <p>The Limitation:</p>
 <p>A Mutex is binary: It is either locked or unlocked.</p>
-<p>It cannot count "5 available slots."</p>
-<p>If you have 3 printers and 10 threads, how do</p>
-<p>you coordinate access using only mutexes?</p>
-<p>Answer: It requires messy counters and</p>
-<p>multiple locks. We need a better</p>
-<p>abstraction.</p>
-
-
+<p>It cannot count "5 available slots." If you have 3 printers and 10 threads, how do you coordinate access using only mutexes?</p>
+<p>Answer: It requires messy counters and multiple locks. We need a better abstraction.</p>
+
 <h3 id="sub-1-4">1.4 Enter the Semaphore</h3>
 
-<p>Definition: A synchronization primitive introduced</p>
-<p>by Edsger Dijkstra (1965).</p>
-<p>Concept: An integer variable accessed only</p>
-<p>through two atomic operations.</p>
+<p>Definition: A synchronization primitive introduced by Edsger Dijkstra (1965).</p>
+<p>Concept: An integer variable accessed only through two atomic operations.</p>
 <p>Versatility:</p>
 <p>Name Origin: Railroad signals (P =</p>
 <div class="formula-box">Proberen/Test, V = Verhogen/Increment).</div>
@@ -173,11 +162,7 @@ signal() (V).</code></pre>
                 <div id="content-2" class="collapsible-content">
                     <h3 id="sub-2-1">2.1 The Semaphore Abstract Data Type</h3>
 
-<p>It is not just an integer.</p>
-<p>int value;           // Counter</p>
-<p>(available resources)</p>
-<p>queue waiting_list;  // List of</p>
-<p>blocked threads</p>
+<p>It is not just an integer. int value;           // Counter (available resources) queue waiting_list;  // List of blocked threads</p>
 <pre class="code-block"><code>typedef struct {
 } semaphore;</code></pre>
 
@@ -194,8 +179,7 @@ signal() (V).</code></pre>
 <h3 id="sub-2-3">2.3 Counting Semaphore</h3>
 
 <p>Value Range: 0 to N.</p>
-<p>Initial Value: Total resources (e.g., N=5</p>
-<p>connections).</p>
+<p>Initial Value: Total resources (e.g., N=5 connections).</p>
 <p>Logic:</p>
 <ul>
     <li>Value > 0: Resources available.</li>
@@ -206,14 +190,9 @@ signal() (V).</code></pre>
 <h3 id="sub-2-4">2.4 Visualizing the Difference</h3>
 
 <p>Binary:</p>
-<p>[1] → [0] (Lock) → [1] (Unlock)</p>
-<p>Counting (Init 3):</p>
-<p>[3] → [2] → [1] → [0] (Full) → Wait</p>
-<p>How is a counting semaphore (N=3) different</p>
-<p>from 3 binary semaphores?</p>
-<p>Answer: The counting semaphore</p>
-<p>manages the pool as a single unified</p>
-<p>group.</p>
+<p>[1] → [0] (Lock) → [1] (Unlock) Counting (Init 3):</p>
+<p>[3] → [2] → [1] → [0] (Full) → Wait How is a counting semaphore (N=3) different from 3 binary semaphores?</p>
+<p>Answer: The counting semaphore manages the pool as a single unified group.</p>
 
                     
                     <div class="topic-nav">
@@ -232,11 +211,8 @@ signal() (V).</code></pre>
                     <h3 id="sub-3-1">3.1 The Two Atomic Operations</h3>
 
 <p>Signal() (V, up, release):</p>
-<p>Wait() (P, down, acquire):</p>
-<p>unavailable.</p>
-<p>S->value--;</p>
-<p>add_to_queue(current_thread);</p>
-<p>block(); // Puts thread to sleep!</p>
+<p>Wait() (P, down, acquire): unavailable.</p>
+<p>S->value--; add_to_queue(current_thread); block(); // Puts thread to sleep!</p>
 <ul>
     <li>Increments value.</li>
     <li>Wakes a waiting thread (if any).</li>
@@ -251,16 +227,11 @@ if (S->value < 0) {
 
 <h3 id="sub-3-2">3.2 Signal : Pseudo Code</h3>
 
-<p>Crucial Insight:If value was negative, it</p>
-<p>means someone was waiting.</p>
-<p>S->value++;</p>
-<p>remove_thread_from_queue();</p>
-<p>wakeup(thread);</p>
+<p>Crucial Insight:If value was negative, it means someone was waiting.</p>
+<p>S->value++; remove_thread_from_queue(); wakeup(thread);</p>
 <p>The Rule of Magnitude:</p>
-<p>If value is negative:</p>
-<p>number of sleeping threads.</p>
-<p>If value is zero:</p>
-<p>boundary case).</p>
+<p>If value is negative: number of sleeping threads.</p>
+<p>If value is zero: boundary case).</p>
 <ul>
     <li>(e.g., -3), the magnitude (3) equals the</li>
     <li>0 resources left, but 0 threads waiting. (The</li>
@@ -272,8 +243,7 @@ if (S->value <= 0) {
 
 <h3 id="sub-3-3">3.3 Simulation Trace</h3>
 
-<p>Scenario: Init = 3 (Printers). 5 Threads request</p>
-<p>access.</p>
+<p>Scenario: Init = 3 (Printers). 5 Threads request access.</p>
 <p>Trace:</p>
 <p>Time 0: Val = 3.</p>
 <p>Time 3 (A,B,C wait): Val = 0. (All taken).</p>
@@ -283,11 +253,8 @@ if (S->value <= 0) {
 
 <h3 id="sub-3-4">3.4 Busy Waiting (The Spinlock Approach)</h3>
 
-<p>Mechanism: Thread loops constantly</p>
-<p>CPU: High impact. Core locked at 100% usage doing</p>
-<p>"useless" checks.</p>
-<p>Latency: Ultra-low. Immediate access when available</p>
-<p>(nanoseconds).</p>
+<p>Mechanism: Thread loops constantly CPU: High impact. Core locked at 100% usage doing "useless" checks.</p>
+<p>Latency: Ultra-low. Immediate access when available (nanoseconds).</p>
 <p>Use Case: Tiny critical sections (< 1μs).</p>
 <pre class="code-block"><code>(while(!free){}), staying in the Running state.</code></pre>
 
@@ -307,56 +274,34 @@ if (S->value <= 0) {
                 <div id="content-4" class="collapsible-content">
                     <h3 id="sub-4-1">4.1 Blocking (Semaphore)</h3>
 
-<p>Mechanism: Thread yields CPU (block()),</p>
-<p>moving to the Waiting state.</p>
+<p>Mechanism: Thread yields CPU (block()), moving to the Waiting state.</p>
 <p>CPU: Zero usage. OS schedules other work.</p>
-<p>Latency: Moderate. Requires expensive</p>
-<p>context switch to wake up (microseconds).</p>
-<p>Use Case: Long waits (I/O, DB) or high</p>
-<p>contention.</p>
+<p>Latency: Moderate. Requires expensive context switch to wake up (microseconds).</p>
+<p>Use Case: Long waits (I/O, DB) or high contention.</p>
 
 <h3 id="sub-4-2">4.2 Inside the OS Kernel: The Data Structure</h3>
 
-<p>The "Black Box" Revealed: A semaphore isn't</p>
-<p>just a number; it's a kernel object.</p>
+<p>The "Black Box" Revealed: A semaphore isn't just a number; it's a kernel object.</p>
 <p>Kernel Struct Components:</p>
-<p>Atomic Integer (count): Tracks resources. Must</p>
-<p>be manipulated atomically.</p>
-<p>Wait Queue (wait_list): A linked list of Thread</p>
-<p>Control Blocks (TCBs) representing sleeping</p>
-<p>threads.</p>
-<p>Lock (spinlock): A tiny internal lock to protect</p>
-<p>the integrity of the struct itself during updates.</p>
+<p>Atomic Integer (count): Tracks resources. Must be manipulated atomically.</p>
+<p>Wait Queue (wait_list): A linked list of Thread Control Blocks (TCBs) representing sleeping threads.</p>
+<p>Lock (spinlock): A tiny internal lock to protect the integrity of the struct itself during updates.</p>
 <p>Why Kernel Space?</p>
-<p>Because "blocking" a thread requires changing its state in</p>
-<p>the Scheduler, which is a privileged OS operation.</p>
+<p>Because "blocking" a thread requires changing its state in the Scheduler, which is a privileged OS operation.</p>
 
 <h3 id="sub-4-3">4.3 The Atomicity Challenge</h3>
 
-<p>same nanosecond on different cores, they</p>
-<p>might both read the same count value</p>
-<p>before updating it.</p>
-<p>Result: Corrupted state (e.g., count is -1</p>
-<p>but no one is in the queue).</p>
-<p>The Fix: We need a mechanism to make</p>
-<p>block indivisible.</p>
+<p>same nanosecond on different cores, they might both read the same count value before updating it.</p>
+<p>Result: Corrupted state (e.g., count is -1 but no one is in the queue).</p>
+<p>The Fix: We need a mechanism to make block indivisible.</p>
 <pre class="code-block"><code>The Critical Race: If Thread A calls wait()
 and Thread B calls signal() at the exact
 the entire if (count < 0) { ... }</code></pre>
 
 <h3 id="sub-4-4">4.4 The "Spinlock Inside" (Implementation Irony)</h3>
 
-<p>The Paradox: "I thought Semaphores were</p>
-<p>used to avoid spinlocks?"</p>
-<p>The Reality: We use a Spinlock inside the</p>
-<p>Semaphore implementation, but its scope</p>
-<p>is tiny.</p>
-<p>assembly instructions needed to</p>
-<p>increment count and add a node to</p>
-<p>the linked list.</p>
-<p>Key Distinction: Threads spin to update the</p>
-<p>metadata, but they block (sleep) to wait for the</p>
-<p>resource.</p>
+<p>The Paradox: "I thought Semaphores were used to avoid spinlocks?" The Reality: We use a Spinlock inside the Semaphore implementation, but its scope is tiny. assembly instructions needed to increment count and add a node to the linked list.</p>
+<p>Key Distinction: Threads spin to update the metadata, but they block (sleep) to wait for the resource.</p>
 <ul>
     <li>Scope: It only protects the 10-20</li>
     <li>Duration: Nanoseconds.</li>
@@ -378,32 +323,20 @@ the entire if (count < 0) { ... }</code></pre>
                 <div id="content-5" class="collapsible-content">
                     <h3 id="sub-5-1">5.1 Modern Optimization: The "Two-Phase" Wait</h3>
 
-<p>The Problem: Putting a thread to sleep (Context</p>
-<p>Switch) is "expensive" (~5-10 microseconds). If the</p>
-<p>resource frees up in 1 microsecond, we wasted time</p>
-<p>sleeping.</p>
-<p>The Solution (Linux Futex / Windows Dispatcher):</p>
-<p>iteration). Is it free yet? Is it free yet?</p>
+<p>The Problem: Putting a thread to sleep (Context Switch) is "expensive" (~5-10 microseconds). If the resource frees up in 1 microsecond, we wasted time sleeping.</p>
+<p>The Solution (Linux Futex / Windows Dispatcher): iteration). Is it free yet? Is it free yet?</p>
 <p>CPU and sleep.</p>
-<p>Benefit: Gives the responsiveness of a spinlock for</p>
-<p>short waits and the efficiency of a semaphore for long</p>
-<p>waits.</p>
+<p>Benefit: Gives the responsiveness of a spinlock for short waits and the efficiency of a semaphore for long waits.</p>
 <ul>
     <li>Phase 1 (Spin): Spin for a tiny limit (e.g., 50</li>
     <li>Phase 2 (Block): If still unavailable, then yield the</li>
-</ul>
-
-
+</ul>
+
 <h3 id="sub-5-2">5.2 Queue Policies & Fairness</h3>
 
-<p>Strict FIFO (First-In-First-Out):</p>
-<p>wakes up first.</p>
-<p>no starvation.</p>
+<p>Strict FIFO (First-In-First-Out): wakes up first. no starvation.</p>
 <p>Priority-Based:</p>
-<p>(e.g., Real-Time Audio) wakes up first,</p>
-<p>jumping the line.</p>
-<p>threads might never wake up if</p>
-<p>high-priority threads keep arriving.</p>
+<p>(e.g., Real-Time Audio) wakes up first, jumping the line. threads might never wake up if high-priority threads keep arriving.</p>
 <ul>
     <li>The thread that has waited longest</li>
     <li>Pro: Strong Semaphore. Guarantees</li>
@@ -414,10 +347,8 @@ the entire if (count < 0) { ... }</code></pre>
 <h3 id="sub-5-3">5.3 The Standard API (POSIX)</h3>
 
 <p>Library: <semaphore.h> (Standard on Linux/Unix).</p>
-<p>The "Big 4" Functions:</p>
-<p>count. pshared=0 for threads.</p>
-<p>Return Values: Always check for -1! (Interrupted</p>
-<p>system calls are common).</p>
+<p>The "Big 4" Functions: count. pshared=0 for threads.</p>
+<p>Return Values: Always check for -1! (Interrupted system calls are common).</p>
 <pre class="code-block"><code>sem_t s; //Initialize
 sem_init(&s, pshared, value): Set initial
 sem_wait(&s): The blocking "Down" operation.
@@ -426,23 +357,17 @@ sem_destroy(&s): Clean up kernel resources.</code></pre>
 
 <h3 id="sub-5-4">5.4 The Binary Mutex Pattern</h3>
 
-<p>Objective: Protect a shared counter from race</p>
-<p>conditions.</p>
-<p>Implementation:</p>
-<p>int counter = 0;</p>
-<p>(Important: 1 means "unlocked").</p>
-<p>counter++;         // Critical Section</p>
-<p>What happens if you initialize to 0?</p>
-<p>// Deadlock: Thread waits forever for itself to release</p>
-<p>Always initialize binary semaphore to 1 for mutual exclusion!</p>
+<p>Objective: Protect a shared counter from race conditions.</p>
+<p>Implementation: int counter = 0;</p>
+<p>(Important: 1 means "unlocked"). counter++;         // Critical Section What happens if you initialize to 0?</p>
+<p>// Deadlock: Thread waits forever for itself to release Always initialize binary semaphore to 1 for mutual exclusion!</p>
 <pre class="code-block"><code>sem_t mutex;
 sem_init(&mutex, 0, 1)
 sem_wait(&mutex);  // Lock
 sem_post(&mutex);  // Unlock
 sem_init(&mutex, 0, 0);
-sem_wait(&mutex);  // Blocks immediately!</code></pre>
-
-
+sem_wait(&mutex);  // Blocks immediately!</code></pre>
+
                     
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
@@ -459,13 +384,10 @@ sem_wait(&mutex);  // Blocks immediately!</code></pre>
                 <div id="content-6" class="collapsible-content">
                     <h3 id="sub-6-1">6.1 Pattern: The Resource Pool</h3>
 
-<p>Scenario: Managing N Database</p>
-<p>Connections.</p>
-<p>Logic:</p>
-<p>immediately for the first N threads.</p>
+<p>Scenario: Managing N Database Connections.</p>
+<p>Logic: immediately for the first N threads.</p>
 <p>Efficiency: No "manager thread" needed.</p>
-<p>The kernel handles the queuing</p>
-<p>automatically.</p>
+<p>The kernel handles the queuing automatically.</p>
 <ul>
     <li>Block: The (N+1)th thread blocks until</li>
 </ul>
@@ -475,80 +397,46 @@ someone calls sem_post.</code></pre>
 
 <h3 id="sub-6-2">6.2 Deep Dive: Mutex vs. Semaphore</h3>
 
-<p>Semaphore: "Someone needs to wait, someone</p>
-<p>needs to signal." (No ownership).</p>
-<p>Mutex: "I locked it, so only I can unlock it." (Good</p>
-<p>for sanity/debugging).</p>
-<p>Consequence: A thread can post() a</p>
-<p>legal (and necessary for Signaling) but</p>
-<p>impossible with a Mutex.</p>
-<p>Mutex: A personal hotel key card (User</p>
-<p>specific).</p>
-<p>Semaphore: A generic "Press to Open" door</p>
-<p>button (Anyone can press it).</p>
+<p>Semaphore: "Someone needs to wait, someone needs to signal." (No ownership).</p>
+<p>Mutex: "I locked it, so only I can unlock it." (Good for sanity/debugging).</p>
+<p>Consequence: A thread can post() a legal (and necessary for Signaling) but impossible with a Mutex.</p>
+<p>Mutex: A personal hotel key card (User specific).</p>
+<p>Semaphore: A generic "Press to Open" door button (Anyone can press it).</p>
 <pre class="code-block"><code>semaphore it never wait()ed on. This is</code></pre>
 
 <h3 id="sub-6-3">6.3 Pitfall 1: Deadlock (The Deadly Embrace)</h3>
 
-<p>Definition: A circular chain of waiting threads. T1</p>
-<p>waits for T2, T2 waits for T1.</p>
+<p>Definition: A circular chain of waiting threads. T1 waits for T2, T2 waits for T1.</p>
 <p>The Code of Doom:</p>
-<p>The "Context Switch" Trigger: T1 gets A, T2</p>
-<p>gets B. Both block. Game over.</p>
+<p>The "Context Switch" Trigger: T1 gets A, T2 gets B. Both block. Game over.</p>
 <pre class="code-block"><code>● Thread 1: wait(A); wait(B);
-● Thread 2: wait(B); wait(A);</code></pre>
-
-
+● Thread 2: wait(B); wait(A);</code></pre>
+
 <h3 id="sub-6-4">6.4 Pitfall 2: Starvation & Fairness</h3>
 
-<p>Definition: The system is making</p>
-<p>progress, but one specific thread is stuck</p>
-<p>waiting forever.</p>
-<p>Cause: "Weak" Semaphore</p>
-<p>implementation or aggressive</p>
-<p>High-Priority threads.</p>
-<p>The "Polite" Problem: If the semaphore</p>
-<p>queue is LIFO (Last-In-First-Out), a steady</p>
-<p>stream of new threads could keep an old</p>
-<p>thread buried at the bottom of the stack.</p>
-<p>A busy intersection where the traffic</p>
-<p>light stays green for the main road</p>
-<p>forever, and the car on the small</p>
-<p>side street never gets a turn.</p>
-
-
+<p>Definition: The system is making progress, but one specific thread is stuck waiting forever.</p>
+<p>Cause: "Weak" Semaphore implementation or aggressive High-Priority threads.</p>
+<p>The "Polite" Problem: If the semaphore queue is LIFO (Last-In-First-Out), a steady stream of new threads could keep an old thread buried at the bottom of the stack.</p>
+<p>A busy intersection where the traffic light stays green for the main road forever, and the car on the small side street never gets a turn.</p>
+
 <h3 id="sub-6-5">6.5 Common Coding Bugs (Logic Errors)</h3>
 
-<p>Bug 1: Unbalanced Signal: Calling post() one</p>
-<p>too many times.</p>
-<p>Result: count exceeds N. Two threads enter a</p>
-<p>critical section designed for one. (Safety</p>
-<p>Violation).</p>
-<p>Bug 2: The Lost Wakeup: Forgetting to post()</p>
-<p>on an error path (e.g., inside an if (error)</p>
-<p>return; block).</p>
-<p>Result: The resource leaks. Eventually, all</p>
-<p>threads block.</p>
-<p>A "Leak" in a pipe. The water (resources)</p>
-<p>drips out until the pipe is dry (System</p>
-<p>halts).</p>
+<p>Bug 1: Unbalanced Signal: Calling post() one too many times.</p>
+<p>Result: count exceeds N. Two threads enter a critical section designed for one. (Safety Violation).</p>
+<p>Bug 2: The Lost Wakeup: Forgetting to post() on an error path (e.g., inside an if (error) return; block).</p>
+<p>Result: The resource leaks. Eventually, all threads block.</p>
+<p>A "Leak" in a pipe. The water (resources) drips out until the pipe is dry (System halts).</p>
 
 <h3 id="sub-6-6">6.6 Best Practices Checklist</h3>
 
-<p>Lock Ordering: Always acquire Mutex A</p>
-<p>before Mutex B.</p>
-<p>RAII (Resource Acquisition Is</p>
-<p>Initialization): Use C++ destructors or defer</p>
-<p>called, even if code crashes.</p>
-<p>Keep Critical Sections Short: Don't do I/O</p>
-<p>or network calls inside a binary semaphore</p>
-<p>lock.</p>
+<p>Lock Ordering: Always acquire Mutex A before Mutex B.</p>
+<p>RAII (Resource Acquisition Is Initialization): Use C++ destructors or defer called, even if code crashes.</p>
+<p>Keep Critical Sections Short: Don't do I/O or network calls inside a binary semaphore lock.</p>
 <pre class="code-block"><code>(in Go/Swift) to ensure signal() is always</code></pre>
 
 <h3 id="sub-6-7">6.7 Thank You!</h3>
-<p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
-
-
+<p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
+
                     
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>

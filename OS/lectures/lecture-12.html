@@ -110,24 +110,16 @@
                 <div id="content-1" class="collapsible-content">
                     <h3 id="sub-1-1">1.1 THE STORY SO FAR</h3>
 
-<p>The Question: Can the hardware</p>
-<p>make synchronization easier?</p>
+<p>The Question: Can the hardware make synchronization easier?</p>
 
 <h3 id="sub-1-2">1.2 THE SOFTWARE SOLUTION PROBLEM</h3>
 
 <p>Problems with Peterson's and Dekker's:</p>
-<p></p>
 <p>Busy Waiting - CPU cycles wasted spinning</p>
-<p></p>
 <p>Complex Logic - Hard to understand and debug</p>
-<p></p>
 <p>Not Scalable - Try extending to 10 threads!</p>
-<p></p>
-<p>No Atomicity Guarantee - Memory operations can be</p>
-<p>reordered</p>
-<p></p>
-<p>Platform Dependent - May not work on all architectures</p>
-<p>Real-World Impact:</p>
+<p>No Atomicity Guarantee - Memory operations can be reordered</p>
+<p>Platform Dependent - May not work on all architectures Real-World Impact:</p>
 <p>We need ATOMIC operations guaranteed by hardware!</p>
 <ul>
     <li>Your laptop battery draining while threads spin</li>
@@ -137,45 +129,23 @@
 
 <h3 id="sub-1-3">1.3 Understanding the Limitation</h3>
 
-<p>Why can't we rely solely on software solutions like Peterson's</p>
-<p>algorithm in real-world systems?</p>
-<p>A) They're too fast</p>
-<p>B) They waste CPU with busy waiting and don't scale</p>
-<p>C) They're too simple</p>
-<p>D) Hardware doesn't support them</p>
-<p>ANSWER: B) They waste CPU with busy waiting and</p>
-<p>don't scale</p>
-<p>Software solutions busy-wait (wasting cycles), are</p>
-<p>complex to implement correctly, don't scale beyond 2-3</p>
-<p>threads, and lack guaranteed atomicity on modern</p>
-<p>hardware.</p>
+<p>Why can't we rely solely on software solutions like Peterson's algorithm in real-world systems?</p>
+<p>A) They're too fast B) They waste CPU with busy waiting and don't scale C) They're too simple D) Hardware doesn't support them ANSWER: B) They waste CPU with busy waiting and don't scale Software solutions busy-wait (wasting cycles), are complex to implement correctly, don't scale beyond 2-3 threads, and lack guaranteed atomicity on modern hardware.</p>
 
 <h3 id="sub-1-4">1.4 ENTER THE HARDWARE</h3>
 
 <p>What if the CPU could do this in ONE uninterruptible step?</p>
 <p>Instead of:</p>
-<p>1. Read lock value</p>
-<p>2. Check if it's 0</p>
-<p>3. Set it to 1</p>
-<p>[Other thread can interrupt here! Race condition!]</p>
-<p>Hardware Provides:</p>
+<p>1. Read lock value 2. Check if it's 0 3. Set it to 1 [Other thread can interrupt here! Race condition!] Hardware Provides:</p>
 <p>ReadAndSet in ONE atomic instruction!</p>
-<p>→ Uninterruptible by other cores</p>
-<p>→ Guaranteed by the CPU</p>
-<p>→ Hardware magic </p>
-<p>The Revolution: Test-and-Set (TAS) and Compare-and-Swap (CAS)</p>
+<p>→ Uninterruptible by other cores → Guaranteed by the CPU → Hardware magic The Revolution: Test-and-Set (TAS) and Compare-and-Swap (CAS)</p>
 
 <h3 id="sub-1-5">1.5 TEST-AND-SET (TAS)</h3>
 
 <p>Test-and-Set (TAS):</p>
 <div class="formula-box">boolean old = <em>lock;  // Read current value</div>
-<p>return old;           // Return old value</p>
-<p>// ENTIRE operation is ATOMIC (one CPU instruction!)</p>
-<p>How It Works:</p>
-<p>1. Returns the OLD value of the lock</p>
-<p>2. Sets the lock to TRUE (locked state)</p>
-<p>3. All in ONE uninterruptible instruction</p>
-<p>CPU Instructions:</p>
+<p>return old;           // Return old value // ENTIRE operation is ATOMIC (one CPU instruction!) How It Works:</p>
+<p>1. Returns the OLD value of the lock 2. Sets the lock to TRUE (locked state) 3. All in ONE uninterruptible instruction CPU Instructions:</p>
 <ul>
     <li>lock = true;         // Set to true</li>
     <li>x86: XCHG instruction</li>
@@ -195,9 +165,7 @@ while (TestAndSet(&amp;lock))
 <span class="code-comment">// Release lock</span>
 lock = false;</code></pre>
 <p>The Magic:</p>
-<p> Only ONE thread sees false and sets it to true</p>
-<p> All others see true and keep spinning</p>
-<p> Mutual exclusion guaranteed by hardware!</p>
+<p>Only ONE thread sees false and sets it to true All others see true and keep spinning Mutual exclusion guaranteed by hardware!</p>
 <pre class="code-block"><code>void acquire() {
 }
 void release() {
@@ -221,10 +189,7 @@ void release() {
 
 <p>On macOS (Apple Silicon - ARM64):</p>
 <p>Modern Approach - C11 Atomics:</p>
-<p>#include <stdatomic.h></p>
-<p>atomic_flag lock = ATOMIC_FLAG_INIT;</p>
-<p>while (atomic_flag_test_and_set(&lock)); // spin</p>
-<p>atomic_flag_clear(&lock);</p>
+<p>#include <stdatomic.h> atomic_flag lock = ATOMIC_FLAG_INIT; while (atomic_flag_test_and_set(&lock)); // spin atomic_flag_clear(&lock);</p>
 <p>Under the Hood (ARM64):</p>
 <ul>
     <li>LDAXR - Load Exclusive Register (with Acquire)</li>
@@ -239,24 +204,14 @@ void release() {
 <h3 id="sub-2-2">2.2 TAS ADVANTAGES & DISADVANTAGES</h3>
 
 <p>Advantages:</p>
-<p></p>
 <p>Simple to understand and implement</p>
-<p></p>
 <p>Guarantees mutual exclusion (hardware-backed)</p>
-<p></p>
 <p>No complex protocols like Peterson's</p>
-<p></p>
-<p>Works correctly on multi-core systems</p>
-<p>Disadvantages:</p>
-<p></p>
+<p>Works correctly on multi-core systems Disadvantages:</p>
 <p>Still uses busy waiting (wastes CPU!)</p>
-<p></p>
 <p>No bounded waiting (starvation possible)</p>
-<p></p>
 <p>Cache coherence traffic on multi-core</p>
-<p></p>
-<p>Battery drain on mobile devices</p>
-<p>The Insight: TAS solves correctness, but not efficiency!</p>
+<p>Battery drain on mobile devices The Insight: TAS solves correctness, but not efficiency!</p>
 <p>We still have the busy-waiting problem...</p>
 
 <h3 id="sub-2-3">2.3 TAS Lock Simulation</h3>
@@ -268,20 +223,9 @@ void release() {
 <p>3. How many times do they spin (approximately)?</p>
 <p>4. What happens when T1 releases at t=10?</p>
 <p>Draw a timeline showing TAS calls and results!</p>
-<p>Solution:</p>
-<p>t=0: T1 calls TAS(lock)</p>
-<p>→ lock was false, TAS returns false</p>
-<p>→ lock set to true, T1 ENTERS critical section </p>
-<p>t=1: T2 calls TAS(lock)</p>
-<p>→ lock is true, TAS returns true</p>
-<p>→ T2 keeps spinning ⟳</p>
-<p>t=2: T3 calls TAS(lock)</p>
-<p>→ lock is true, TAS returns true</p>
-<p>→ T3 keeps spinning ⟳</p>
+<p>Solution: t=0: T1 calls TAS(lock) → lock was false, TAS returns false → lock set to true, T1 ENTERS critical section t=1: T2 calls TAS(lock) → lock is true, TAS returns true → T2 keeps spinning ⟳ t=2: T3 calls TAS(lock) → lock is true, TAS returns true → T3 keeps spinning ⟳</p>
 <div class="formula-box">t=0-10: T2 and T3 spin continuously (busy waiting!)</div>
-<p>→ Approximately thousands of spin iterations</p>
-<p>t=10: T1 calls release(), lock = false</p>
-<p>→ Next TAS by T2 or T3 succeeds (whoever calls first)</p>
+<p>→ Approximately thousands of spin iterations t=10: T1 calls release(), lock = false → Next TAS by T2 or T3 succeeds (whoever calls first)</p>
 <ul>
     <li>lock = false initially</li>
     <li>T1 calls TAS at t=0</li>
@@ -292,13 +236,9 @@ void release() {
 
 <h3 id="sub-2-4">2.4 COMPARE-AND-SWAP (CAS)</h3>
 
-<p>Compare-and-Swap (CAS) - More Flexible!</p>
-<p>boolean CompareAndSwap(int <em>ptr, int expected, int</p>
+<p>Compare-and-Swap (CAS) - More Flexible! boolean CompareAndSwap(int <em>ptr, int expected, int</p>
 <div class="formula-box">int actual = </em>ptr;</div>
-<p>return true;  // Swap succeeded!</p>
-<p>return false;     // Swap failed, someone changed it</p>
-<p>// ENTIRE operation is ATOMIC</p>
-<p>Key Difference from TAS:</p>
+<p>return true;  // Swap succeeded! return false;     // Swap failed, someone changed it // ENTIRE operation is ATOMIC Key Difference from TAS:</p>
 <p>Power: Can check for SPECIFIC values, not just set blindly!</p>
 <ul>
     <li>ptr = new;</li>
@@ -312,10 +252,8 @@ if (actual == expected) {
 
 <h3 id="sub-2-5">2.5 CAS ON DIFFERENT ARCHITECTURES</h3>
 
-<p>CPU Instructions:</p>
-<p>x86 (Intel/AMD):</p>
-<p>ARM64 (Apple Silicon):</p>
-<p>macOS/C11 Standard:</p>
+<p>CPU Instructions: x86 (Intel/AMD):</p>
+<p>ARM64 (Apple Silicon): macOS/C11 Standard:</p>
 <p>All provide the same guarantee: Atomicity!</p>
 <ul>
     <li>CMPXCHG instruction</li>
@@ -331,14 +269,8 @@ if (actual == expected) {
 <p>Optimistic Concurrency with CAS:</p>
 <p>Philosophy:</p>
 <p>Traditional Lock (Pessimistic):</p>
-<p>1. Acquire lock (always block others)</p>
-<p>2. Do work</p>
-<p>3. Release lock</p>
-<p>CAS Approach (Optimistic):</p>
-<p>1. Read current value</p>
-<p>2. Calculate new value</p>
-<p>3. Try CAS - if it worked, done! If not, retry</p>
-<p>Best for: Low contention scenarios (conflicts rare)</p>
+<p>1. Acquire lock (always block others) 2. Do work 3. Release lock CAS Approach (Optimistic):</p>
+<p>1. Read current value 2. Calculate new value 3. Try CAS - if it worked, done! If not, retry Best for: Low contention scenarios (conflicts rare)</p>
 <ul>
     <li>Assume NO conflict will occur</li>
     <li>Try to update without locking</li>
@@ -361,17 +293,11 @@ if (actual == expected) {
                 <div id="content-3" class="collapsible-content">
                     <h3 id="sub-3-1">3.1 CAS EXAMPLE - ATOMIC INCREMENT</h3>
 
-<p>Atomic Increment WITHOUT Traditional Locks:</p>
-<p>int old, new;</p>
+<p>Atomic Increment WITHOUT Traditional Locks: int old, new;</p>
 <div class="formula-box">old = <em>counter;          // Read current value</div>
 <div class="formula-box">new = old + 1;           // Calculate new value</div>
-<p>// Retry if another thread modified counter</p>
-<p>How It Works:</p>
-<p>1. Read counter (say it's 10)</p>
-<p>2. Calculate new value (11)</p>
-<p>3. CAS: "Is counter still 10? If yes, set to 11"</p>
-<p>4. If another thread changed counter → CAS fails → retry</p>
-<p>5. Eventually succeeds!</p>
+<p>// Retry if another thread modified counter How It Works:</p>
+<p>1. Read counter (say it's 10) 2. Calculate new value (11) 3. CAS: "Is counter still 10? If yes, set to 11" 4. If another thread changed counter → CAS fails → retry 5. Eventually succeeds!</p>
 <p>No locks needed! This is lock-free programming!</p>
 <pre class="code-block"><code>void atomic_increment(int </em>counter) {
 do {
@@ -381,18 +307,11 @@ do {
 <h3 id="sub-3-2">3.2 THE ABA PROBLEM</h3>
 
 <p>The ABA Problem:</p>
-<p>Time 0: Thread 1 reads value A</p>
-<p>Time 1: Thread 2 changes A → B</p>
-<p>Time 2: Thread 2 changes B → A (back to original!)</p>
-<p>Time 3: Thread 1's CAS succeeds! (sees A, expects A)</p>
-<p>BUT Thread 1 doesn't know A changed and came back!</p>
+<p>Time 0: Thread 1 reads value A Time 1: Thread 2 changes A → B Time 2: Thread 2 changes B → A (back to original!) Time 3: Thread 1's CAS succeeds! (sees A, expects A) BUT Thread 1 doesn't know A changed and came back!</p>
 <p>The Problem:</p>
-<p>CAS only checks current value, not "has it changed?"</p>
-<p>Real-World Impact:</p>
+<p>CAS only checks current value, not "has it changed?" Real-World Impact:</p>
 <p>Solutions:</p>
-<p> Version numbers (A₁, A₂, A₃...)</p>
-<p> Tagged pointers (extra bits for version)</p>
-<p> Hazard pointers (mark in-use objects)</p>
+<p>Version numbers (A₁, A₂, A₃...) Tagged pointers (extra bits for version) Hazard pointers (mark in-use objects)</p>
 <ul>
     <li>Lock-free data structures can corrupt</li>
     <li>Pointers reused can cause use-after-free</li>
@@ -411,49 +330,28 @@ do {
 <h3 id="sub-3-4">3.4 TAS Understanding Check</h3>
 
 <p>What does Test-and-Set return, and what does it set?</p>
-<p>A) Returns true, sets to false</p>
-<p>B) Returns the old value, sets to true</p>
-<p>C) Returns the new value, sets to old value</p>
-<p>D) Returns false, sets to the thread ID</p>
-<p>ANSWER: B) Returns the old value, sets to true</p>
-<p>TAS atomically reads the current value (returns it)</p>
-<p>and then sets the lock to true (locked state). This</p>
-<p>lets the caller know if the lock was free (returned</p>
-<p>false) or taken (returned true).</p>
+<p>A) Returns true, sets to false B) Returns the old value, sets to true C) Returns the new value, sets to old value D) Returns false, sets to the thread ID ANSWER: B) Returns the old value, sets to true TAS atomically reads the current value (returns it) and then sets the lock to true (locked state). This lets the caller know if the lock was free (returned false) or taken (returned true).</p>
 
 <h3 id="sub-3-5">3.5 </h3>
-<p>THE EFFICIENCY PROBLEM REMAINS</p>
-<p>We Still Have a Problem...</p>
+<p>THE EFFICIENCY PROBLEM REMAINS We Still Have a Problem...</p>
 <p>TAS and CAS Solved:</p>
-<p></p>
 <p>Correctness (mutual exclusion guaranteed)</p>
-<p></p>
 <p>Simplicity (easier than Peterson's)</p>
-<p></p>
-<p>Multi-core support (hardware atomicity)</p>
-<p>But We STILL Have:</p>
-<p></p>
+<p>Multi-core support (hardware atomicity) But We STILL Have:</p>
 <p>Busy Waiting - CPUs spin in while loops</p>
-<p></p>
 <p>Wasted Energy - Battery drain</p>
-<p></p>
 <p>Wasted Cycles - Could run other threads!</p>
 <p>The Question:</p>
-<p>What if instead of spinning, threads could SLEEP and be</p>
-<p>WOKEN when the lock is free?</p>
+<p>What if instead of spinning, threads could SLEEP and be WOKEN when the lock is free?</p>
 <p>Enter: The Mutex (Mutual Exclusion Lock)</p>
 
 <h3 id="sub-3-6">3.6 INTRODUCING THE MUTEX</h3>
 
 <p>What is a Mutex?</p>
-<p>Mutex = Mutual Exclusion Lock</p>
-<p>Key Difference:</p>
+<p>Mutex = Mutual Exclusion Lock Key Difference:</p>
 <p>Spinlock:</p>
-<p>Thread → TAS → If locked, SPIN (busy-wait) ⟳</p>
-<p>Mutex:</p>
-<p>Thread → Lock attempt → If locked, SLEEP </p>
-<p>Lock released → OS WAKES thread → Thread runs </p>
-<p>Result: No wasted CPU cycles!</p>
+<p>Thread → TAS → If locked, SPIN (busy-wait) ⟳ Mutex:</p>
+<p>Thread → Lock attempt → If locked, SLEEP Lock released → OS WAKES thread → Thread runs Result: No wasted CPU cycles!</p>
 <ul>
     <li>OS-provided synchronization primitive</li>
     <li>Built on hardware primitives (TAS/CAS)</li>
@@ -478,18 +376,12 @@ do {
                     <h3 id="sub-4-1">4.1 MUTEX BASIC OPERATIONS</h3>
 
 <p>Basic Mutex Operations (macOS/POSIX):</p>
-<p>#include <pthread.h></p>
-<p>pthread_mutex_t lock;</p>
-<p>// 1. Initialize</p>
-<p>pthread_mutex_init(&lock, NULL);</p>
-<p>// 2. Acquire lock (blocks if unavailable)</p>
-<p>pthread_mutex_lock(&lock);</p>
-<p>// 3. Critical section</p>
-<p>shared_data++;</p>
-<p>// 4. Release lock</p>
-<p>pthread_mutex_unlock(&lock);</p>
-<p>// 5. Cleanup</p>
-<p>pthread_mutex_destroy(&lock);</p>
+<p>#include <pthread.h> pthread_mutex_t lock;</p>
+<p>// 1. Initialize pthread_mutex_init(&lock, NULL);</p>
+<p>// 2. Acquire lock (blocks if unavailable) pthread_mutex_lock(&lock);</p>
+<p>// 3. Critical section shared_data++;</p>
+<p>// 4. Release lock pthread_mutex_unlock(&lock);</p>
+<p>// 5. Cleanup pthread_mutex_destroy(&lock);</p>
 <p>Simple API, powerful guarantees!</p>
 
 <h3 id="sub-4-2">4.2 HOW MUTEX WORKS</h3>
@@ -497,29 +389,13 @@ do {
 <p>Mutex Acquisition Process:</p>
 <p>Thread calls pthread_mutex_lock():</p>
 <p>Is lock available?</p>
-<p>YES → Acquire it, enter critical section </p>
-<p>NO  → Add thread to waiting queue</p>
-<p>→ Thread state: RUNNING → BLOCKED</p>
-<p>→ OS schedules another thread</p>
-<p>→ Thread SLEEPS (not wasting CPU) </p>
-<p>When lock released (pthread_mutex_unlock()):</p>
-<p>→ OS checks waiting queue</p>
-<p>→ Wakes ONE thread (removes from queue)</p>
-<p>→ Awakened thread: BLOCKED → READY → RUNNING</p>
-<p>→ Awakened thread acquires lock </p>
-<p>Key: Thread gives up CPU when waiting!</p>
+<p>YES → Acquire it, enter critical section NO  → Add thread to waiting queue → Thread state: RUNNING → BLOCKED → OS schedules another thread → Thread SLEEPS (not wasting CPU) When lock released (pthread_mutex_unlock()):</p>
+<p>→ OS checks waiting queue → Wakes ONE thread (removes from queue) → Awakened thread: BLOCKED → READY → RUNNING → Awakened thread acquires lock Key: Thread gives up CPU when waiting!</p>
 
 <h3 id="sub-4-3">4.3 CAS vs TAS Check</h3>
 
 <p>How is Compare-and-Swap different from Test-and-Set?</p>
-<p>A) CAS is faster</p>
-<p>B) CAS checks for a specific expected value before swapping</p>
-<p>C) CAS doesn't require hardware support</p>
-<p>D) CAS can work with multiple threads, TAS cannot</p>
-<p>ANSWER: B) CAS checks for a specific expected value before swapping</p>
-<p>CAS takes an expected value and only performs the swap if the current value</p>
-<p>matches the expected value. TAS simply always sets to true and returns the</p>
-<p>old value. This makes CAS more flexible for optimistic concurrency patterns.</p>
+<p>A) CAS is faster B) CAS checks for a specific expected value before swapping C) CAS doesn't require hardware support D) CAS can work with multiple threads, TAS cannot ANSWER: B) CAS checks for a specific expected value before swapping CAS takes an expected value and only performs the swap if the current value matches the expected value. TAS simply always sets to true and returns the old value. This makes CAS more flexible for optimistic concurrency patterns.</p>
 
 <h3 id="sub-4-4">4.4 LIVE DEMO - MUTEX IN ACTION</h3>
 
@@ -528,19 +404,12 @@ do {
 <h3 id="sub-4-5">4.5 MUTEX ADVANTAGES</h3>
 
 <p>Advantages of Mutex over Spinlock:</p>
-<p></p>
 <p>No CPU Wasted - Threads sleep, don't spin</p>
-<p></p>
 <p>Better for Long Critical Sections - Minutes, hours OK!</p>
-<p></p>
 <p>Scalable to Many Threads - OS manages queues efficiently</p>
-<p></p>
 <p>Fairness - Waiting queue prevents starvation</p>
-<p></p>
 <p>Priority Inheritance - Prevents priority inversion</p>
-<p></p>
-<p>Works with I/O - Can block during I/O operations</p>
-<p>When to Use Mutex:</p>
+<p>Works with I/O - Can block during I/O operations When to Use Mutex:</p>
 <p>Default Choice: Use mutex unless you have a specific reason not to!</p>
 <ul>
     <li>User-space applications (99% of the time!)</li>
@@ -552,15 +421,7 @@ do {
 <h3 id="sub-4-6">4.6 Mutex Understanding Check</h3>
 
 <p>What is the main advantage of a mutex over a spinlock?</p>
-<p>A) Mutexes are faster</p>
-<p>B) Mutexes block/sleep instead of busy-waiting</p>
-<p>C) Mutexes don't require hardware support</p>
-<p>D) Mutexes prevent all deadlocks</p>
-<p>ANSWER: B) Mutexes block/sleep instead of busy-waiting</p>
-<p>When a mutex is unavailable, the requesting thread is put to</p>
-<p>sleep (blocked state) by the OS, yielding the CPU to other</p>
-<p>threads. Spinlocks busy-wait, wasting CPU cycles. This makes</p>
-<p>mutexes far more efficient for most scenarios.</p>
+<p>A) Mutexes are faster B) Mutexes block/sleep instead of busy-waiting C) Mutexes don't require hardware support D) Mutexes prevent all deadlocks ANSWER: B) Mutexes block/sleep instead of busy-waiting When a mutex is unavailable, the requesting thread is put to sleep (blocked state) by the OS, yielding the CPU to other threads. Spinlocks busy-wait, wasting CPU cycles. This makes mutexes far more efficient for most scenarios.</p>
 
                     
                     <div class="topic-nav">
@@ -578,13 +439,10 @@ do {
                 <div id="content-5" class="collapsible-content">
                     <h3 id="sub-5-1">5.1 MUTEX IMPLEMENTATION DETAILS</h3>
 
-<p>Mutex Implementation: Hybrid Approach</p>
-<p>Phase 1 - Fast Path (Userspace):</p>
+<p>Mutex Implementation: Hybrid Approach Phase 1 - Fast Path (Userspace):</p>
 <p>Phase 2 - Slow Path (Kernel):</p>
 <p>Optimization:</p>
-<p>Most locks are uncontended (fast path succeeds)</p>
-<p>Only pay kernel cost when there's actual contention</p>
-<p>This is why mutexes can be efficient!</p>
+<p>Most locks are uncontended (fast path succeeds) Only pay kernel cost when there's actual contention This is why mutexes can be efficient!</p>
 <ul>
     <li>Try to acquire using atomic operation (CAS/TAS)</li>
     <li>If successful: No kernel involvement! </li>
@@ -598,42 +456,22 @@ do {
 <h3 id="sub-5-2">5.2 MUTEX WAITING QUEUE</h3>
 
 <p>When T1 releases:</p>
-<p>1. Kernel removes T2 from queue</p>
-<p>2. T2 state: BLOCKED → READY</p>
-<p>3. Scheduler eventually runs T2</p>
-<p>4. T2 acquires lock and enters critical section</p>
-<p>Fair: First-in, first-out (FIFO) ordering</p>
-<p>No starvation: Everyone eventually gets the lock</p>
+<p>1. Kernel removes T2 from queue 2. T2 state: BLOCKED → READY 3. Scheduler eventually runs T2 4. T2 acquires lock and enters critical section Fair: First-in, first-out (FIFO) ordering No starvation: Everyone eventually gets the lock</p>
 
 <h3 id="sub-5-3">5.3 PRIORITY INVERSION PROBLEM</h3>
 
 <p>The Priority Inversion Scenario:</p>
-<p>1. Low-priority Thread (T_low) acquires mutex</p>
-<p>2. High-priority Thread (T_high) needs mutex, BLOCKS</p>
-<p>3. Medium-priority Thread (T_med) preempts T_low</p>
-<p>4. T_high waits while T_med runs!</p>
-<p>(High-priority waiting for low-priority indirectly!)</p>
-<p>Priority Order: T_high > T_med > T_low</p>
-<p>Expected: T_high runs first</p>
-<p>Reality: T_high waits for T_low to finish, but T_med blocks T_low!</p>
+<p>1. Low-priority Thread (T_low) acquires mutex 2. High-priority Thread (T_high) needs mutex, BLOCKS 3. Medium-priority Thread (T_med) preempts T_low 4. T_high waits while T_med runs!</p>
+<p>(High-priority waiting for low-priority indirectly!) Priority Order: T_high > T_med > T_low Expected: T_high runs first Reality: T_high waits for T_low to finish, but T_med blocks T_low!</p>
 <p>Famous Example:</p>
 <p>Mars Pathfinder (1997) - rover kept resetting due to priority inversion!</p>
-<p>Solution: Priority Inheritance</p>
-<p>→ Temporarily boost T_low's priority to T_high's priority</p>
-<p>→ T_low finishes quickly, releases lock</p>
-<p>→ T_high can run</p>
+<p>Solution: Priority Inheritance → Temporarily boost T_low's priority to T_high's priority → T_low finishes quickly, releases lock → T_high can run</p>
 
 <h3 id="sub-5-4">5.4 MUTEX STATES</h3>
 
 <p>Three Mutex States:</p>
-<p>State 1: UNLOCKED</p>
-<p>State 2: LOCKED (Uncontended)</p>
-<p>State 3: LOCKED (Contended)</p>
-<p>Transitions:</p>
-<p>UNLOCKED ─(lock)→ LOCKED (Uncontended)</p>
-<p>LOCKED (Uncontended) ─(another lock attempt)→ LOCKED (Contended)</p>
-<p>LOCKED ─(unlock)→ UNLOCKED (if queue empty)</p>
-<p>LOCKED (Contended) ─(unlock)→ LOCKED (Uncontended) or UNLOCKED</p>
+<p>State 1: UNLOCKED State 2: LOCKED (Uncontended) State 3: LOCKED (Contended) Transitions:</p>
+<p>UNLOCKED ─(lock)→ LOCKED (Uncontended) LOCKED (Uncontended) ─(another lock attempt)→ LOCKED (Contended) LOCKED ─(unlock)→ UNLOCKED (if queue empty) LOCKED (Contended) ─(unlock)→ LOCKED (Uncontended) or UNLOCKED</p>
 <ul>
     <li>No owner</li>
     <li>Available for acquisition</li>
@@ -658,18 +496,7 @@ do {
 <h3 id="sub-5-6">5.6 When to Spinlock Check</h3>
 
 <p>When would you prefer a spinlock over a mutex?</p>
-<p>A) For long critical sections</p>
-<p>B) For short, low-contention critical sections</p>
-<p>C) When many threads compete</p>
-<p>D) In user-space applications with I/O</p>
-<p>ANSWER: B) For short, low-contention</p>
-<p>critical sections (<µs)</p>
-<p>Spinlocks are appropriate when the critical</p>
-<p>section is very short (microseconds) and</p>
-<p>contention is low, as the cost of blocking</p>
-<p>(syscall + context switch) would exceed the</p>
-<p>spin time. They're commonly used in kernel</p>
-<p>code where sleeping isn't allowed.</p>
+<p>A) For long critical sections B) For short, low-contention critical sections C) When many threads compete D) In user-space applications with I/O ANSWER: B) For short, low-contention critical sections (<µs) Spinlocks are appropriate when the critical section is very short (microseconds) and contention is low, as the cost of blocking (syscall + context switch) would exceed the spin time. They're commonly used in kernel code where sleeping isn't allowed.</p>
 
                     
                     <div class="topic-nav">
@@ -688,57 +515,21 @@ do {
                     <h3 id="sub-6-1">6.1 WHEN TO USE SPINLOCKS</h3>
 
 <p>Scenarios for Spinlocks:</p>
-<p> Critical Section is Very Short</p>
-<p>→ Few CPU instructions (nanoseconds)</p>
-<p>→ Cost of blocking exceeds spin time</p>
-<p> In Kernel Code</p>
-<p>→ Interrupt handlers can't sleep!</p>
-<p>→ Some kernel paths where sleeping not allowed</p>
-<p> Real-Time Systems</p>
-<p>→ Predictable timing requirements</p>
-<p>→ No unpredictable wake-up delays</p>
-<p> Low Contention</p>
-<p>→ Rarely conflict with other threads</p>
-<p>→ Spin time minimal</p>
-<p> Already Holding Other Locks</p>
-<p>→ To avoid deadlock from nested blocking</p>
+<p>Critical Section is Very Short → Few CPU instructions (nanoseconds) → Cost of blocking exceeds spin time In Kernel Code → Interrupt handlers can't sleep!</p>
+<p>→ Some kernel paths where sleeping not allowed Real-Time Systems → Predictable timing requirements → No unpredictable wake-up delays Low Contention → Rarely conflict with other threads → Spin time minimal Already Holding Other Locks → To avoid deadlock from nested blocking</p>
 
 <h3 id="sub-6-2">6.2 WHEN TO USE MUTEXES</h3>
 
 <p>Scenarios for Mutexes:</p>
-<p> Critical Section Involves I/O</p>
-<p>→ File operations, network calls</p>
-<p>→ Would waste CPU spinning during I/O</p>
-<p> Significant Computation</p>
-<p>→ More than a few microseconds</p>
-<p> Many Threads Competing</p>
-<p>→ High contention scenarios</p>
-<p>→ Waiting queue provides fairness</p>
-<p> User-Space Applications</p>
-<p>→ Default choice for 99% of applications!</p>
-<p>→ Battery-efficient on mobile</p>
-<p> When Fairness Matters</p>
-<p>→ FIFO queue ensures no starvation</p>
-<p>Examples: Web servers, databases, GUI applications, all</p>
-<p>normal programs!</p>
+<p>Critical Section Involves I/O → File operations, network calls → Would waste CPU spinning during I/O Significant Computation → More than a few microseconds Many Threads Competing → High contention scenarios → Waiting queue provides fairness User-Space Applications → Default choice for 99% of applications!</p>
+<p>→ Battery-efficient on mobile When Fairness Matters → FIFO queue ensures no starvation Examples: Web servers, databases, GUI applications, all normal programs!</p>
 <pre class="code-block"><code>→ Better to let other threads run</code></pre>
 
 <h3 id="sub-6-3">6.3 HYBRID APPROACHES</h3>
 
-<p>Adaptive Locks: Spin-Then-Block</p>
-<p>Strategy:</p>
-<p>1. Spin in userspace for N iterations</p>
-<p>2. If still locked, call blocking syscall</p>
-<p>3. Sleep in kernel waiting queue</p>
-<p>Benefits:</p>
-<p> Fast for short waits (avoid syscall)</p>
-<p> Efficient for long waits (don't waste CPU)</p>
-<p> Adapts to workload automatically</p>
-<p>Real-World Implementations:</p>
-<p>macOS: os_unfair_lock</p>
-<p>Linux: pthread_mutex with spin count</p>
-<p>Modern Best Practice: Use adaptive locks</p>
-<p>(os_unfair_lock on macOS)</p>
+<p>Adaptive Locks: Spin-Then-Block Strategy:</p>
+<p>1. Spin in userspace for N iterations 2. If still locked, call blocking syscall 3. Sleep in kernel waiting queue Benefits:</p>
+<p>Fast for short waits (avoid syscall) Efficient for long waits (don't waste CPU) Adapts to workload automatically Real-World Implementations: macOS: os_unfair_lock Linux: pthread_mutex with spin count Modern Best Practice: Use adaptive locks (os_unfair_lock on macOS)</p>
 <ul>
     <li>Replaces deprecated OSSpinLock</li>
     <li>Spins briefly, then blocks</li>
@@ -781,36 +572,13 @@ do {
 <h3 id="sub-6-6">6.6 Key Takeaways</h3>
 
 <p>What We've Learned:</p>
-<p>1. Hardware Primitives (TAS, CAS)</p>
-<p>→ Atomic operations solve correctness</p>
-<p>→ Foundation for all synchronization</p>
-<p>2. Spinlocks</p>
-<p>→ Simple but waste CPU</p>
-<p>→ Good for very short critical sections</p>
-<p>→ Mainly for kernel code</p>
-<p>3. Mutexes</p>
-<p>→ OS-provided, efficient (sleep not spin)</p>
-<p>→ Default choice for user-space</p>
-<p>→ Built on hardware + OS queues</p>
-<p>4. Trade-offs Matter</p>
-<p>→ Critical section length</p>
-<p>→ Contention level</p>
-<p>→ User vs kernel context</p>
-<p>5. Modern Solutions are Hybrid</p>
-<p>→ Adaptive locks (spin-then-block)</p>
-<p>→ Best of both worlds</p>
-<p>What Should YOU Use?</p>
+<p>1. Hardware Primitives (TAS, CAS) → Atomic operations solve correctness → Foundation for all synchronization 2. Spinlocks → Simple but waste CPU → Good for very short critical sections → Mainly for kernel code 3. Mutexes → OS-provided, efficient (sleep not spin) → Default choice for user-space → Built on hardware + OS queues 4. Trade-offs Matter → Critical section length → Contention level → User vs kernel context 5. Modern Solutions are Hybrid → Adaptive locks (spin-then-block) → Best of both worlds What Should YOU Use?</p>
 <p>Special Cases:</p>
-<p>Default Rule: Use pthread_mutex unless you</p>
-<p>have a specific reason not to!</p>
+<p>Default Rule: Use pthread_mutex unless you have a specific reason not to!</p>
 <p>Red Flags (Don't do this!):</p>
-<p></p>
 <p>Spinlocks in user-space for long critical sections</p>
-<p></p>
 <p>Mutexes in interrupt handlers</p>
-<p></p>
 <p>Lock-free code without understanding ABA problem</p>
-<p></p>
 <p>Rolling your own synchronization primitives</p>
 <ul>
     <li>Need lock-free? → CAS-based algorithms</li>
@@ -819,9 +587,8 @@ do {
 </ul>
 
 <h3 id="sub-6-7">6.7 Thank You!</h3>
-<p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
-
-
+<p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
+
                     
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>

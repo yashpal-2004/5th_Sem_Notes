@@ -101,9 +101,7 @@
 
 <h3 id="sub-1-2">1.2 Choose Your Weapon</h3>
 
-<p>If you could snap your fingers and eliminate ONE of</p>
-<p>the four deadlock conditions from an operating</p>
-<p>system, which would you choose?</p>
+<p>If you could snap your fingers and eliminate ONE of the four deadlock conditions from an operating system, which would you choose?</p>
 <p>A) Mutual Exclusion - Make everything shareable!</p>
 <p>B) Hold and Wait - No holding while waiting!</p>
 <p>C) No Preemption - Take resources by force!</p>
@@ -114,41 +112,24 @@
     <li>Which is your OS superpower choice?</li>
 </ul>
 
-<h3 id="sub-1-3">1.3 TODAY'S JOURNEY</h3>
-
-
+<h3 id="sub-1-3">1.3 TODAY'S JOURNEY</h3>
+
 <h3 id="sub-1-4">1.4 PREVENTION STRATEGY 1</h3>
 
-<p>Strategy: Make resources shareable when possible</p>
-<p>Examples That Work:</p>
-<p> Read-only files - Multiple processes read simultaneously</p>
-<p> macOS Example: Multiple apps reading system config files</p>
-<p>The Problem - Not Always Possible:</p>
-<p></p>
+<p>Strategy: Make resources shareable when possible Examples That Work:</p>
+<p>Read-only files - Multiple processes read simultaneously macOS Example: Multiple apps reading system config files The Problem - Not Always Possible:</p>
 <p>Printers (can't print two jobs simultaneously)</p>
-<p></p>
 <p>Disk blocks being written (data corruption!)</p>
-<p></p>
 <p>Critical sections with shared variables</p>
-<p></p>
-<p>Mutexes (defeats their purpose!)</p>
-<p>Reality Check: Some resources are INHERENTLY non-shareable</p>
-<p>Verdict: Can't rely on this alone!</p>
+<p>Mutexes (defeats their purpose!) Reality Check: Some resources are INHERENTLY non-shareable Verdict: Can't rely on this alone!</p>
 
 <h3 id="sub-1-5">1.5 PREVENTION STRATEGY 2</h3>
 
 <p>Two Approaches:</p>
-<p>Approach A: Request All at Once</p>
-<p>Approach B: Release Before Requesting</p>
-<p>Advantages:</p>
-<p> Simple to implement</p>
-<p> Guarantees no hold-and-wait</p>
-<p>Disadvantages:</p>
-<p></p>
+<p>Approach A: Request All at Once Approach B: Release Before Requesting Advantages:</p>
+<p>Simple to implement Guarantees no hold-and-wait Disadvantages:</p>
 <p>Low resource utilization (hoarding!)</p>
-<p></p>
 <p>Starvation risk (big requests wait forever)</p>
-<p></p>
 <p>Impractical - processes don't know all needs in advance!</p>
 <ul>
     <li>Process must request ALL resources before starting</li>
@@ -174,58 +155,30 @@
                 <div id="content-2" class="collapsible-content">
                     <h3 id="sub-2-1">2.1 Hold and Wait Reality Check</h3>
 
-<p>Why might a text editor have difficulty using the "request</p>
-<p>all resources at once" strategy?</p>
-<p>A) Text editors are too simple</p>
-<p>B) It doesn't know in advance which files the user will open</p>
-<p>C) Text editors don't use resources</p>
-<p>D) The strategy only works for database systems</p>
-<p>ANSWER: B) It doesn't know in advance which</p>
-<p>files the user will open</p>
-<p>The text editor can't predict user behavior - which</p>
-<p>files you'll open, when you'll open them, or how</p>
-<p>many you'll need. This unpredictability makes</p>
-<p>"request all at once" impractical for interactive</p>
-<p>applications.</p>
+<p>Why might a text editor have difficulty using the "request all resources at once" strategy?</p>
+<p>A) Text editors are too simple B) It doesn't know in advance which files the user will open C) Text editors don't use resources D) The strategy only works for database systems ANSWER: B) It doesn't know in advance which files the user will open The text editor can't predict user behavior - which files you'll open, when you'll open them, or how many you'll need. This unpredictability makes "request all at once" impractical for interactive applications.</p>
 
 <h3 id="sub-2-2">2.2 PREVENTION STRATEGY 3</h3>
 
-<p>Strategy: Allow OS to forcibly take resources from processes</p>
-<p>Implementation Options:</p>
-<p>Option A: If P1 needs resource held by waiting P2, preempt P2</p>
-<p>Option B: If P1 can't get resource, preempt ALL its resources</p>
-<p>When This Works:</p>
+<p>Strategy: Allow OS to forcibly take resources from processes Implementation Options:</p>
+<p>Option A: If P1 needs resource held by waiting P2, preempt P2 Option B: If P1 can't get resource, preempt ALL its resources When This Works:</p>
 <p> CPU time - Just context switch!</p>
-<p> Memory pages - Swap to disk</p>
-<p> macOS Virtual Memory - Preempts memory by swapping</p>
-<p>When This FAILS:</p>
-<p></p>
+<p>Memory pages - Swap to disk macOS Virtual Memory - Preempts memory by swapping When This FAILS:</p>
 <p>Printers - Can't "undo" half-printed page!</p>
-<p></p>
 <p>Mutexes - State can't be saved/restored</p>
-<p></p>
 <p>Database locks - Transaction consistency breaks</p>
-<p></p>
-<p>File writes - Data corruption risk</p>
-<p>The Challenge: Resource state must be savable and restorable</p>
+<p>File writes - Data corruption risk The Challenge: Resource state must be savable and restorable</p>
 
 <h3 id="sub-2-3">2.3 PREVENTION STRATEGY 4</h3>
 
-<p>Strategy: Impose total ordering on all resources</p>
-<p>The Rule:</p>
+<p>Strategy: Impose total ordering on all resources The Rule:</p>
 <p>Why It Works - Proof:</p>
-<p>For a cycle to exist: P1 ← R1 ← P2 ← R2 ← P3 ← R3 ← P1</p>
-<p>But if P1 holds R1 and requests R3: R3 must have number > R1</p>
-<p>And if P3 holds R3 and requests R1: R1 must have number > R3</p>
-<p>CONTRADICTION! Both can't be true!</p>
+<p>For a cycle to exist: P1 ← R1 ← P2 ← R2 ← P3 ← R3 ← P1 But if P1 holds R1 and requests R3: R3 must have number > R1 And if P3 holds R3 and requests R1: R1 must have number > R3 CONTRADICTION! Both can't be true!</p>
 <p>Therefore: No cycle possible!</p>
 <p>Advantages:</p>
-<p> Simple and provably works</p>
-<p> Actually used in real systems!</p>
+<p>Simple and provably works Actually used in real systems!</p>
 <p>Disadvantages:</p>
-<p></p>
 <p>Must define global ordering (complex in large systems)</p>
-<p></p>
 <p>Forces awkward programming (may need higher-numbered resource first)</p>
 <ul>
     <li>Number all resources: R1, R2, R3, ..., Rn</li>
@@ -235,8 +188,7 @@
 
 <h3 id="sub-2-4">2.4 PREVENTION TRADE-OFFS SUMMARY</h3>
 
-<p>Key Insight: Prevention is CONSERVATIVE and PESSIMISTIC</p>
-<p>The Question: Is there a SMARTER way? Next: Enter Deadlock Avoidance! </p>
+<p>Key Insight: Prevention is CONSERVATIVE and PESSIMISTIC The Question: Is there a SMARTER way? Next: Enter Deadlock Avoidance!</p>
 <ul>
     <li>Assumes deadlock could happen</li>
     <li>Restricts system even when deadlock wouldn't occur</li>
@@ -248,11 +200,7 @@
 <h3 id="sub-2-5">2.5 WHEN PREVENTION MAKES SENSE</h3>
 
 <p>When to Use Prevention:</p>
-<p> Safety-Critical Systems</p>
-<p> Simple Systems</p>
-<p> Expensive Recovery</p>
-<p>Example: Kernel locks often use resource ordering</p>
-<p>→ Simple, fast, provably safe!</p>
+<p>Safety-Critical Systems Simple Systems Expensive Recovery Example: Kernel locks often use resource ordering → Simple, fast, provably safe!</p>
 <ul>
     <li>Medical devices (pacemakers, surgery robots)</li>
     <li>Aerospace systems</li>
@@ -288,9 +236,7 @@
 <p>The Key Insight:</p>
 <p>Just because deadlock COULD happen doesn't mean it WILL!</p>
 <p>Avoidance examines each request and asks:</p>
-<p>"If I grant this, could deadlock occur later?"</p>
-<p>If YES: Make process wait (even if resources available!)</p>
-<p>If NO: Grant it immediately</p>
+<p>"If I grant this, could deadlock occur later?" If YES: Make process wait (even if resources available!) If NO: Grant it immediately</p>
 <ul>
     <li>Break the fundamental conditions</li>
     <li>Rigid, restrictive</li>
@@ -305,14 +251,10 @@
 <h3 id="sub-3-2">3.2 SAFE VS UNSAFE STATES</h3>
 
 <p>Key Definitions:</p>
-<p>SAFE STATE:</p>
-<p>processes can finish</p>
-<p>UNSAFE STATE:</p>
+<p>SAFE STATE: processes can finish UNSAFE STATE:</p>
 <p>DEADLOCKED STATE:</p>
 <p>The Relationships:</p>
-<p>[All States] ⊃ [Unsafe States] ⊃ [Deadlocked States]</p>
-<p>Safe ∩ Unsafe = ∅ (mutually exclusive)</p>
-<p>Avoidance Goal: NEVER enter unsafe states!</p>
+<p>[All States] ⊃ [Unsafe States] ⊃ [Deadlocked States] Safe ∩ Unsafe = ∅ (mutually exclusive) Avoidance Goal: NEVER enter unsafe states!</p>
 <ul>
     <li>There exists at least ONE sequence where all</li>
     <li>Even if they all request maximum needs RIGHT NOW</li>
@@ -322,23 +264,18 @@
     <li>Risky territory</li>
     <li>Deadlock has already occurred</li>
     <li>Special case of unsafe state</li>
-</ul>
-
-
+</ul>
+
 <h3 id="sub-3-3">3.3 Is This Safe?</h3>
 
-<p>Scenario: System has 12 tape drives</p>
-<p>Three processes with maximum needs:</p>
+<p>Scenario: System has 12 tape drives Three processes with maximum needs:</p>
 <p>Current state:</p>
 <p>Question: Is this SAFE?</p>
 <p>Let's analyze...</p>
 <p>Analysis:</p>
-<p>Available = 3 drives</p>
-<p>Step 1: Can P1 finish?</p>
-<p>Step 2: After P1 finishes (releases 2)</p>
-<p>Step 3: Can P0 finish?</p>
-<p>Step 4: After P0 finishes (releases 5)</p>
-<p>Step 5: Can P2 finish?</p>
+<p>Available = 3 drives Step 1: Can P1 finish?</p>
+<p>Step 2: After P1 finishes (releases 2) Step 3: Can P0 finish?</p>
+<p>Step 4: After P0 finishes (releases 5) Step 5: Can P2 finish?</p>
 <p>Safe Sequence: <P1, P0, P2></p>
 <p>Verdict: SAFE STATE! </p>
 <ul>
@@ -364,11 +301,7 @@
 
 <p>Same scenario, but we grant P2 one more drive:</p>
 <p>Is the system still SAFE?</p>
-<p>A) Yes, same safe sequence works</p>
-<p>B) No, system is now unsafe</p>
-<p>C) System is deadlocked</p>
-<p>D) Cannot determine without more information</p>
-<p>ANSWER: Let's check together:</p>
+<p>A) Yes, same safe sequence works B) No, system is now unsafe C) System is deadlocked D) Cannot determine without more information ANSWER: Let's check together:</p>
 <p>Result: UNSAFE! No safe sequence exists.</p>
 <ul>
     <li>Available: 3 → 2 drives</li>
@@ -380,15 +313,12 @@
 
 <h3 id="sub-3-5">3.5 INTRODUCING BANKER'S ALGORITHM</h3>
 
-<p>Bank Analogy:</p>
-<p>remaining customers even if all demand at once!</p>
+<p>Bank Analogy: remaining customers even if all demand at once!</p>
 <p>Banker's Algorithm:</p>
 <p>The Promise:</p>
 <p>If we follow Banker's Algorithm, deadlock is IMPOSSIBLE!</p>
 <p>Requirements:</p>
-<p>1. Each process declares maximum resource needs</p>
-<p>2. Processes request incrementally (not all at once)</p>
-<p>3. System checks safety before every grant</p>
+<p>1. Each process declares maximum resource needs 2. Processes request incrementally (not all at once) 3. System checks safety before every grant</p>
 <ul>
     <li>Bank has limited cash (resources)</li>
     <li>Customers have credit limits (max needs)</li>
@@ -416,8 +346,7 @@
                 </div>
                 <div id="content-4" class="collapsible-content">
                     <h3 id="sub-4-1">4.1 </h3>
-<p>The Banker's Ledger</p>
-<p>For n processes, m resource types:</p>
+<p>The Banker's Ledger For n processes, m resource types:</p>
 <p>Available[m]:</p>
 <p>Max[n][m]:</p>
 <p>Allocation[n][m]:</p>
@@ -436,20 +365,12 @@
     <li>How much MORE each process might need</li>
 </ul>
 
-<h3 id="sub-4-2">4.2 Can Everyone Be Satisfied?</h3>
-
-
+<h3 id="sub-4-2">4.2 Can Everyone Be Satisfied?</h3>
+
 <h3 id="sub-4-3">4.3 RESOURCE REQUEST ALGORITHM</h3>
 
 <p>When Process Pi Requests Resources:</p>
-<p>Request[m] = resources being requested</p>
-<p>Step 1: Validate Request</p>
-<p>Step 2: Check Availability</p>
-<p>Step 3: Pretend to Grant (Tentative Allocation)</p>
-<p>Step 4: Run Safety Algorithm</p>
-<p>→ Grant request permanently </p>
-<p>→ Deny request, restore previous state </p>
-<p>→ Make Pi wait (even though resources available!)</p>
+<p>Request[m] = resources being requested Step 1: Validate Request Step 2: Check Availability Step 3: Pretend to Grant (Tentative Allocation) Step 4: Run Safety Algorithm → Grant request permanently → Deny request, restore previous state → Make Pi wait (even though resources available!)</p>
 <ul>
     <li>Check: Request ≤ Need</li>
     <li>If not: ERROR (asking more than declared max!)</li>
@@ -464,25 +385,15 @@
 
 <h3 id="sub-4-4">4.4 BANKER'S ALGORITHM SIMULATION</h3>
 
-<p>Scenario: 3 processes (P0, P1, P2),</p>
-<p>3 resource types (A, B, C)</p>
-<p>Given: Available = [3, 3, 2]</p>
-<p>Tasks:</p>
+<p>Scenario: 3 processes (P0, P1, P2), 3 resource types (A, B, C) Given: Available = [3, 3, 2] Tasks:</p>
 <div class="formula-box">1. Calculate the Need matrix (Need = Max - Allocation)</div>
-<p>2. Determine if current state is SAFE</p>
-<p>3. If safe, find a safe sequence</p>
-<p>4. If unsafe, explain why</p>
-<p>Step 1: Calculate Need Matrix</p>
+<p>2. Determine if current state is SAFE 3. If safe, find a safe sequence 4. If unsafe, explain why Step 1: Calculate Need Matrix</p>
 <div class="formula-box">Need = Max - Allocation</div>
 <p>Now let's check if this state is safe...</p>
-<p>Initial: Work = [3, 3, 2], all Finish = false</p>
-<p>Round 1: Check each process</p>
+<p>Initial: Work = [3, 3, 2], all Finish = false Round 1: Check each process</p>
 <div class="formula-box">→ Finish P1: Work = [3,3,2] + [2,0,0] = [5,3,2]</div>
-<p>→ Finish[1] = true</p>
-<p>Round 2: Check remaining</p>
-<p>STUCK! Cannot finish P0 or P2!</p>
-<p>Result: Finish[0] = false, Finish[2] = false</p>
-<p>Verdict: UNSAFE STATE! </p>
+<p>→ Finish[1] = true Round 2: Check remaining STUCK! Cannot finish P0 or P2!</p>
+<p>Result: Finish[0] = false, Finish[2] = false Verdict: UNSAFE STATE!</p>
 <p>No safe sequence exists!</p>
 <ul>
     <li>P0: Need [7,4,3] ≤ Work [3,3,2]? NO (7>3) </li>
@@ -495,11 +406,7 @@
 
 <p>What if Available was [3, 3, 3] instead of [3, 3, 2]?</p>
 <p>Would the state be SAFE?</p>
-<p>A) Yes, safe sequence exists</p>
-<p>B) No, still unsafe</p>
-<p>C) System is deadlocked</p>
-<p>D) Need more information</p>
-<p>ANSWER: B) No, still unsafe</p>
+<p>A) Yes, safe sequence exists B) No, still unsafe C) System is deadlocked D) Need more information ANSWER: B) No, still unsafe</p>
 <div class="formula-box">Trace: P1 finishes (Work = [5,3,3]), then P0 needs [7,4,3], we have [5,3,3] - still NO.</div>
 <p>But P2 needs [6,0,0] ≤ [5,3,3]? NO (6>5). Still stuck! Actually still UNSAFE.</p>
 
@@ -520,26 +427,17 @@
                     <h3 id="sub-5-1">5.1 Detection Frequency Check</h3>
 
 <p>In Banker's Algorithm, the Need matrix represents:</p>
-<p>A) Total resources each process will ever use</p>
-<p>B) Resources currently allocated to each process</p>
-<p>C) Remaining resources each process may still request</p>
-<p>D) Resources available in the system</p>
-<p>ANSWER: C) Remaining resources each process may still request</p>
+<p>A) Total resources each process will ever use B) Resources currently allocated to each process C) Remaining resources each process may still request D) Resources available in the system ANSWER: C) Remaining resources each process may still request</p>
 <div class="formula-box">Need = Max - Allocation, showing how much MORE each process might</div>
-<p>need to complete. It's not the max (that's Max matrix), not current (that's</p>
-<p>Allocation), and not available (that's Available vector).</p>
+<p>need to complete. It's not the max (that's Max matrix), not current (that's Allocation), and not available (that's Available vector).</p>
 
 <h3 id="sub-5-2">5.2 BANKER'S VS PREVENTION</h3>
 
 <p>Real-World Usage:</p>
 <p>Why Banker's Isn't Used:</p>
-<p></p>
 <p>Processes don't know max needs in advance</p>
-<p></p>
 <p>Number of processes varies dynamically</p>
-<p></p>
 <p>Overhead of safety checks</p>
-<p></p>
 <p>Resources not fixed (devices plug/unplug)</p>
 <ul>
     <li>Prevention: Widely used (resource ordering, especially)</li>
@@ -553,22 +451,14 @@
 <h3 id="sub-5-4">5.4 SAFE STATE CHALLENGE</h3>
 
 <p>Given state with 3 resource types (A, B, C):</p>
-<p>Available = [2, 1, 0]</p>
-<p>Tasks:</p>
-<p>1. Verify the Need matrix is correct</p>
-<p>2. Is this state SAFE?</p>
-<p>3. If safe, provide a safe sequence</p>
-<p>4. If unsafe, explain why</p>
-<p>Solution:</p>
-<p>1. Need matrix verification:  Correct (Max -</p>
-<p>Allocation)</p>
-<p>2. Safety Check:</p>
-<p>Work = [2, 1, 0], all Finish = false</p>
-<p>Round 1:</p>
+<p>Available = [2, 1, 0] Tasks:</p>
+<p>1. Verify the Need matrix is correct 2. Is this state SAFE?</p>
+<p>3. If safe, provide a safe sequence 4. If unsafe, explain why Solution:</p>
+<p>1. Need matrix verification:  Correct (Max - Allocation) 2. Safety Check:</p>
+<p>Work = [2, 1, 0], all Finish = false Round 1:</p>
 <p>STUCK! Cannot finish anyone!</p>
 <p>3. Verdict: UNSAFE! </p>
-<p>4. Why? Not enough of resource C (0 available) to satisfy any</p>
-<p>process's remaining needs. All need at least 1 of C.</p>
+<p>4. Why? Not enough of resource C (0 available) to satisfy any process's remaining needs. All need at least 1 of C.</p>
 <p>This state could lead to deadlock!</p>
 <ul>
     <li>P0: Need [2,2,1] ≤ [2,1,0]? NO (2>1 for B) </li>
@@ -579,10 +469,7 @@
 <h3 id="sub-5-5">5.5 Key Takeaways</h3>
 
 <p>What We've Learned:</p>
-<p>1. Prevention: Break ONE of Four Conditions</p>
-<p>2. Resource Ordering is the Winner</p>
-<p>3. Avoidance: The Smart Approach</p>
-<p>4. Banker's is Beautiful but Impractical</p>
+<p>1. Prevention: Break ONE of Four Conditions 2. Resource Ordering is the Winner 3. Avoidance: The Smart Approach 4. Banker's is Beautiful but Impractical</p>
 <ul>
     <li>Mutual Exclusion - Rarely feasible</li>
     <li>Hold and Wait - Impractical for dynamic systems</li>
@@ -602,28 +489,16 @@
 <h3 id="sub-5-6">5.6 Practical Guidelines</h3>
 
 <p>Modern Best Practices:</p>
-<p>1. Resource ordering for kernel locks</p>
-<p>2. Lock-free data structures when possible</p>
-<p>3. Design patterns that avoid hold-and-wait (GCD!)</p>
-<p>4. Timeouts and watchdogs</p>
-<p>5. User-initiated recovery (force quit)</p>
+<p>1. Resource ordering for kernel locks 2. Lock-free data structures when possible 3. Design patterns that avoid hold-and-wait (GCD!) 4. Timeouts and watchdogs 5. User-initiated recovery (force quit)</p>
 
 <h3 id="sub-5-7">5.7 Final Understanding Check</h3>
 
 <p>What key information must be known in advance for deadlock avoidance to work?</p>
-<p>A) Current CPU utilization</p>
-<p>B) Maximum future resource needs of each process</p>
-<p>C) Priority levels of all processes</p>
-<p>D) Execution time of each process</p>
-<p>ANSWER: B) Maximum future resource needs of each process</p>
-<p>Avoidance (Banker's Algorithm) requires the Max matrix - each process</p>
-<p>must declare its maximum resource needs before execution. This lets the</p>
-<p>algorithm predict worst-case scenarios and maintain safe states.</p>
+<p>A) Current CPU utilization B) Maximum future resource needs of each process C) Priority levels of all processes D) Execution time of each process ANSWER: B) Maximum future resource needs of each process Avoidance (Banker's Algorithm) requires the Max matrix - each process must declare its maximum resource needs before execution. This lets the algorithm predict worst-case scenarios and maintain safe states.</p>
 
 <h3 id="sub-5-8">5.8 Thank You!</h3>
-<p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
-
-
+<p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
+
                     
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>

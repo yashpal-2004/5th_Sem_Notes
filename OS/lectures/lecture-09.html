@@ -111,8 +111,7 @@
                     <h3 id="sub-1-1">1.1 The Scheduler's Dilemma</h3>
 
 <p>You're the OS scheduler. Five processes arrive:</p>
-<p>Question: Which runs first? Can one algorithm rule</p>
-<p>them all?</p>
+<p>Question: Which runs first? Can one algorithm rule them all?</p>
 <ul>
     <li>Emergency System Update (2 seconds, CRITICAL)</li>
     <li>Student's 10-hour Rendering (just started)</li>
@@ -123,28 +122,15 @@
 
 <h3 id="sub-1-2">1.2 Quick Check - Algorithm Selection</h3>
 
-<p>ANSWER: C) Round Robin - ensures fairness and</p>
-<p>good response time for all students. In a shared</p>
-<p>system, preventing any student from monopolizing</p>
-<p>CPU is crucial.</p>
-<p>If you had to choose ONE algorithm for a university's time-sharing</p>
-<p>system with 100 students, which would you pick and why?</p>
-<p>A) FCFS</p>
-<p>B) SJF</p>
-<p>C) Round Robin</p>
-<p>D) Priority</p>
+<p>ANSWER: C) Round Robin - ensures fairness and good response time for all students. In a shared system, preventing any student from monopolizing CPU is crucial.</p>
+<p>If you had to choose ONE algorithm for a university's time-sharing system with 100 students, which would you pick and why?</p>
+<p>A) FCFS B) SJF C) Round Robin D) Priority</p>
 
 <h3 id="sub-1-3">1.3 THE EVALUATION FRAMEWORK</h3>
 
 <p>8 Critical Metrics:</p>
-<p>1. CPU Utilization - Keep the engine running (40-90%)</p>
-<p>2. Throughput - How many jobs completed per time unit?</p>
-<p>3. Turnaround Time - Start to finish duration</p>
-<p>4. Waiting Time - Frustration in the ready queue</p>
-<p>5. Response Time - Time to first acknowledgment (UX critical!)</p>
-<p>6. Fairness - Everyone gets a turn</p>
-<p>7. Predictability - Consistent performance</p>
-<p>8. Overhead - Cost of context switches and management</p>
+<p>1. CPU Utilization - Keep the engine running (40-90%) 2. Throughput - How many jobs completed per time unit?</p>
+<p>3. Turnaround Time - Start to finish duration 4. Waiting Time - Frustration in the ready queue 5. Response Time - Time to first acknowledgment (UX critical!) 6. Fairness - Everyone gets a turn 7. Predictability - Consistent performance 8. Overhead - Cost of context switches and management</p>
 
 <h3 id="sub-1-4">1.4 ALGORITHM QUICK RECAP</h3>
 
@@ -188,13 +174,7 @@
 
 <h3 id="sub-1-6">1.6 WORKLOAD CHARACTERISTICS</h3>
 
-<p>CPU-Bound Processes:</p>
-<p>encoding, 3D rendering</p>
-<p>efficiency</p>
-<p>I/O-Bound Processes:</p>
-<p>database queries</p>
-<p>responsiveness</p>
-<p>Mixed Workload:</p>
+<p>CPU-Bound Processes: encoding, 3D rendering efficiency I/O-Bound Processes: database queries responsiveness Mixed Workload:</p>
 <ul>
     <li>Long CPU bursts, rare I/O</li>
     <li>Examples: Scientific computing, video</li>
@@ -223,13 +203,10 @@
                 <div id="content-2" class="collapsible-content">
                     <h3 id="sub-2-1">2.1 REAL-WORLD SCENARIO</h3>
 
-<p>The Situation: You're on a Zoom call while Netflix buffers in the background</p>
-<p>CPU-Bound Process (Netflix decoder):</p>
-<p>Wrong Choice: Zoom waits 10 seconds for its</p>
-<p>turn → Your video freezes!</p>
+<p>The Situation: You're on a Zoom call while Netflix buffers in the background CPU-Bound Process (Netflix decoder):</p>
+<p>Wrong Choice: Zoom waits 10 seconds for its turn → Your video freezes!</p>
 <p>I/O-Bound Process (Zoom):</p>
-<p>Right Choice: RR or Priority → Zoom gets</p>
-<p>frequent CPU slices → Smooth call</p>
+<p>Right Choice: RR or Priority → Zoom gets frequent CPU slices → Smooth call</p>
 <ul>
     <li>Long CPU bursts (decoding video frames)</li>
     <li>Rarely waits for I/O</li>
@@ -239,21 +216,10 @@
 
 <h3 id="sub-2-2">2.2 COMPREHENSIVE EXAMPLE SETUP</h3>
 
-<p>The Challenge -</p>
-<p>Same Workload, Different Stories:</p>
-<p>Process Arrival Burst Priority</p>
-<p>P1 0 10 3</p>
-<p>P2 1 1 1</p>
-<p>P3 2 2 2</p>
-<p>P4 3 1 4</p>
-<p>P5 4 5 2</p>
-<p>Let's watch these five processes</p>
-<p>compete under different rules!</p>
+<p>The Challenge - Same Workload, Different Stories:</p>
+<p>Process Arrival Burst Priority P1 0 10 3 P2 1 1 1 P3 2 2 2 P4 3 1 4 P5 4 5 2 Let's watch these five processes compete under different rules!</p>
 <p>The Story:</p>
-<p>Waiting Times: P1=0, P2=9, P3=9, P4=10, P5=9</p>
-<p>Turnaround Times: P1=10, P2=10, P3=11, P4=11, P5=15</p>
-<p>Verdict: "Like waiting behind someone with a full shopping</p>
-<p>cart when you only have one item"</p>
+<p>Waiting Times: P1=0, P2=9, P3=9, P4=10, P5=9 Turnaround Times: P1=10, P2=10, P3=11, P4=11, P5=15 Verdict: "Like waiting behind someone with a full shopping cart when you only have one item"</p>
 <ul>
     <li>P2 (1 second job) waits 10 seconds behind P1</li>
     <li>P4 waits 13 seconds for a 1-second job!</li>
@@ -262,20 +228,10 @@
 
 <h3 id="sub-2-3">2.3 COMPREHENSIVE EXAMPLE SETUP</h3>
 
-<p>The Challenge -</p>
-<p>Same Workload, Different Stories:</p>
-<p>Process Arrival Burst Priority</p>
-<p>P1 0 10 3</p>
-<p>P2 1 1 1</p>
-<p>P3 2 2 2</p>
-<p>P4 3 1 4</p>
-<p>P5 4 5 2</p>
-<p>Let's watch these five processes</p>
-<p>compete under different rules!</p>
+<p>The Challenge - Same Workload, Different Stories:</p>
+<p>Process Arrival Burst Priority P1 0 10 3 P2 1 1 1 P3 2 2 2 P4 3 1 4 P5 4 5 2 Let's watch these five processes compete under different rules!</p>
 <p>Results:</p>
-<p>Waiting Times: P1=0, P2=10, P3=11, P4=13, P5=15</p>
-<p>The Insight: Mathematically proven optimal for average</p>
-<p>waiting time!</p>
+<p>Waiting Times: P1=0, P2=10, P3=11, P4=13, P5=15 The Insight: Mathematically proven optimal for average waiting time!</p>
 <ul>
     <li>Avg Waiting: 7.2 seconds  (Better than FCFS!)</li>
     <li>But P1 still suffers (no preemption)</li>
@@ -284,23 +240,10 @@
 
 <h3 id="sub-2-4">2.4 COMPREHENSIVE EXAMPLE SETUP</h3>
 
-<p>The Challenge -</p>
-<p>Same Workload, Different Stories:</p>
-<p>Process Arrival Burst Priority</p>
-<p>P1 0 10 3</p>
-<p>P2 1 1 1</p>
-<p>P3 2 2 2</p>
-<p>P4 3 1 4</p>
-<p>P5 4 5 2</p>
-<p>Let's watch these five processes</p>
-<p>compete under different rules!</p>
+<p>The Challenge - Same Workload, Different Stories:</p>
+<p>Process Arrival Burst Priority P1 0 10 3 P2 1 1 1 P3 2 2 2 P4 3 1 4 P5 4 5 2 Let's watch these five processes compete under different rules!</p>
 <p>The Magic:</p>
-<p>(Best!)</p>
-<p>(Also best!)</p>
-<p>No Starvation: P1 gets multiple turns because it has a long</p>
-<p>burst. Everyone gets regular CPU access</p>
-<p>P1 P2 P3 P4 P1 P5 P1 P5 P1 P5 P1</p>
-<p>0-2 2-3 3-5 5-6 6-8 8-10 10-12 12-14 14-16 16-17 17-19</p>
+<p>(Best!) (Also best!) No Starvation: P1 gets multiple turns because it has a long burst. Everyone gets regular CPU access P1 P2 P3 P4 P1 P5 P1 P5 P1 P5 P1 0-2 2-3 3-5 5-6 6-8 8-10 10-12 12-14 14-16 16-17 17-19</p>
 <ul>
     <li>Avg Response Time: 3.4 seconds </li>
     <li>Avg Waiting: 6.4 seconds </li>
@@ -309,19 +252,10 @@
 
 <h3 id="sub-2-5">2.5 COMPREHENSIVE EXAMPLE SETUP</h3>
 
-<p>The Challenge -</p>
-<p>Same Workload, Different Stories:</p>
-<p>Process Arrival Burst Priority</p>
-<p>P1 0 10 3</p>
-<p>P2 1 1 1</p>
-<p>P3 2 2 2</p>
-<p>P4 3 1 4</p>
-<p>P5 4 5 2</p>
-<p>Let's watch these five processes</p>
-<p>compete under different rules!</p>
+<p>The Challenge - Same Workload, Different Stories:</p>
+<p>Process Arrival Burst Priority P1 0 10 3 P2 1 1 1 P3 2 2 2 P4 3 1 4 P5 4 5 2 Let's watch these five processes compete under different rules!</p>
 <p>The Drama:</p>
-<p>Waiting Times: P1=9, P2=0, P3=0, P4=15, P5=4</p>
-<p>The Lesson: "Efficiency without fairness = starvation"</p>
+<p>Waiting Times: P1=9, P2=0, P3=0, P4=15, P5=4 The Lesson: "Efficiency without fairness = starvation"</p>
 <ul>
     <li>P2 (Priority 1) immediately preempts P1 at t=1!</li>
     <li>P3 (Priority 2) preempts P1 at t=2!</li>
@@ -332,10 +266,7 @@
 <h3 id="sub-2-6">2.6 THE VERDICT</h3>
 
 <p>The Truth: NO SINGLE WINNER! Context matters.</p>
-<p>Key Insight: The "best"</p>
-<p>algorithm depends entirely</p>
-<p>on what you're optimizing</p>
-<p>for.</p>
+<p>Key Insight: The "best" algorithm depends entirely on what you're optimizing for.</p>
 
                     
                     <div class="topic-nav">
@@ -354,13 +285,7 @@
                     <h3 id="sub-3-1">3.1 Test Your Understanding</h3>
 
 <p>Which scheduling algorithm provides optimal average waiting time?</p>
-<p>A) FCFS</p>
-<p>B) SJF</p>
-<p>C) Round Robin</p>
-<p>D) Priority</p>
-<p>ANSWER: B) SJF</p>
-<p>This is mathematically proven - always run the</p>
-<p>shortest job next minimizes average waiting time.</p>
+<p>A) FCFS B) SJF C) Round Robin D) Priority ANSWER: B) SJF This is mathematically proven - always run the shortest job next minimizes average waiting time.</p>
 
 <h3 id="sub-3-2">3.2 What If We Use Them ALL?</h3>
 
@@ -369,16 +294,10 @@
 <h3 id="sub-3-3">3.3 FIXED MULTI-LEVEL QUEUES</h3>
 
 <p>How It Works:</p>
-<p>1. Classify processes on arrival (system/interactive/batch)</p>
-<p>2. Each queue has its own algorithm</p>
-<p>3. Higher priority queues run first</p>
-<p>Example Timeline:</p>
+<p>1. Classify processes on arrival (system/interactive/batch) 2. Each queue has its own algorithm 3. Higher priority queues run first Example Timeline:</p>
 <p>The Problem:</p>
-<p></p>
 <p>Once classified, processes are stuck forever!</p>
-<p></p>
 <p>What if P4 becomes interactive?</p>
-<p></p>
 <p>Batch queue may starve!</p>
 <ul>
     <li>Time 0-2: System queue (P1) runs</li>
@@ -404,22 +323,11 @@
 <h3 id="sub-3-5">3.5 MLFQ - THE ADAPTIVE GENIUS</h3>
 
 <p>The Revolutionary Idea:</p>
-<p></p>
 <p>Start ALL processes at highest priority</p>
-<p></p>
-<p>If you use your full quantum → demoted (CPU-bound</p>
-<p>behavior)</p>
-<p></p>
-<p>If you yield before quantum → stay high (I/O-bound</p>
-<p>behavior)</p>
-<p></p>
-<p>Processes move dynamically based on actual</p>
-<p>behavior</p>
-<p>The Self-Organizing System:</p>
-<p> CPU-bound processes naturally sink to lower</p>
-<p>queues</p>
-<p> I/O-bound processes naturally float to top</p>
-<p>This is brilliant! The system learns automatically!</p>
+<p>If you use your full quantum → demoted (CPU-bound behavior)</p>
+<p>If you yield before quantum → stay high (I/O-bound behavior)</p>
+<p>Processes move dynamically based on actual behavior The Self-Organizing System:</p>
+<p>CPU-bound processes naturally sink to lower queues I/O-bound processes naturally float to top This is brilliant! The system learns automatically!</p>
 <pre class="code-block"><code> NO need to predict - let behavior decide!</code></pre>
 
 <h3 id="sub-3-6">3.6 MLFQ STRUCTURE</h3>
@@ -446,42 +354,15 @@
                 </div>
                 <div id="content-4" class="collapsible-content">
                     <h3 id="sub-4-1">4.1 Process Scheduling Timeline: P1 and P2</h3>
-<p>Time 10-13</p>
-<p>P2 runs 3ms, blocks for</p>
-<p>I/O → STAYS in Q0</p>
-<p>Time 10</p>
-<p>P2 arrives and preempts</p>
-<p>P1</p>
-<p>P1 arrives and placed in</p>
-<p>Q0</p>
-<p>Time 0</p>
-<p>P1 runs 16ms (full</p>
-<p>quantum) → demoted to</p>
-<p>Q2</p>
-<p>Time 13-29</p>
-<p>P1 runs 8ms (full</p>
-<p>quantum) → demoted to</p>
-<p>Q1</p>
-<p>Time 0-8</p>
+<p>Time 10-13 P2 runs 3ms, blocks for I/O → STAYS in Q0 Time 10 P2 arrives and preempts P1 P1 arrives and placed in Q0 Time 0 P1 runs 16ms (full quantum) → demoted to Q2 Time 13-29 P1 runs 8ms (full quantum) → demoted to Q1 Time 0-8</p>
 
-<p>MLFQ IN ACTION</p>
-<p>The System Learned:</p>
-<p> P2 is I/O-bound (didn't use full quantum) → keeps high</p>
-<p>priority</p>
-<p> P1 is CPU-bound (uses full quantum) → moves to lower</p>
-<p>priority</p>
-<p>No programmer hints needed!</p>
+<p>MLFQ IN ACTION The System Learned:</p>
+<p>P2 is I/O-bound (didn't use full quantum) → keeps high priority P1 is CPU-bound (uses full quantum) → moves to lower priority No programmer hints needed!</p>
 
 <h3 id="sub-4-2">4.2 MLFQ Understanding Check</h3>
 
 <p>What is the main advantage of MLFQ over fixed multi-level queues?</p>
-<p>A) Lower overhead</p>
-<p>B) Simpler implementation</p>
-<p>C) Dynamic priority adjustment based on behavior</p>
-<p>D) Guaranteed optimal waiting time</p>
-<p>ANSWER: C) Dynamic priority adjustment based on behavior</p>
-<p>MLFQ automatically moves processes between queues based on</p>
-<p>their actual CPU usage patterns, adapting to changing behavior.</p>
+<p>A) Lower overhead B) Simpler implementation C) Dynamic priority adjustment based on behavior D) Guaranteed optimal waiting time ANSWER: C) Dynamic priority adjustment based on behavior MLFQ automatically moves processes between queues based on their actual CPU usage patterns, adapting to changing behavior.</p>
 
 <h3 id="sub-4-3">4.3 GAMING THE SYSTEM</h3>
 
@@ -506,19 +387,12 @@ yield_cpu();  <span class="code-comment">// Give up just before demotion!</span>
 <h3 id="sub-4-4">4.4 MLFQ - THE MODERN STANDARD</h3>
 
 <p>The Superpowers:</p>
-<p></p>
 <p>No prediction needed - learns from behavior</p>
-<p></p>
 <p>Excellent response for interactive apps</p>
-<p></p>
 <p>High throughput for CPU-bound apps</p>
-<p></p>
 <p>Prevents starvation with priority boost</p>
-<p></p>
 <p>Fair over the long term</p>
-<p></p>
-<p>Adapts to changing process behavior</p>
-<p>Real-World Usage:</p>
+<p>Adapts to changing process behavior Real-World Usage:</p>
 <p>The Verdict: As close as we've come to a "universal" scheduler!</p>
 <ul>
     <li>FreeBSD</li>
@@ -530,11 +404,7 @@ yield_cpu();  <span class="code-comment">// Give up just before demotion!</span>
 <h3 id="sub-4-5">4.5 The Completely Fair Scheduler</h3>
 
 <p>The Philosophy Shift: What if we track FAIRNESS instead of queues?</p>
-<p>Key Concept - Virtual Runtime (vruntime)</p>
-<p>Every process tracks: vruntime (virtual runtime)</p>
-<p>Scheduler rule: Always run process with LOWEST</p>
-<p>vruntime</p>
-<p>Example:</p>
+<p>Key Concept - Virtual Runtime (vruntime) Every process tracks: vruntime (virtual runtime) Scheduler rule: Always run process with LOWEST vruntime Example:</p>
 <p>The Magic: Over time, everyone gets EXACTLY fair CPU share!</p>
 <ul>
     <li>P1 runs for 10ms → vruntime += 10</li>
@@ -546,15 +416,9 @@ yield_cpu();  <span class="code-comment">// Give up just before demotion!</span>
 <h3 id="sub-4-6">4.6 CFS - THE NICE SYSTEM</h3>
 
 <p>Nice Values Control CPU Share:</p>
-<p>Range: -20 (highest priority) to +19 (lowest)</p>
-<p>Default: 0</p>
-<p>The Math:</p>
-<p>Lower nice value → Higher weight → vruntime increases</p>
-<p>SLOWER</p>
-<p>Example:</p>
-<p>P1: nice=0, weight=1024</p>
-<p>P2: nice=5, weight=335</p>
-<p>Both run 10ms of real time:</p>
+<p>Range: -20 (highest priority) to +19 (lowest) Default: 0 The Math:</p>
+<p>Lower nice value → Higher weight → vruntime increases SLOWER Example:</p>
+<p>P1: nice=0, weight=1024 P2: nice=5, weight=335 Both run 10ms of real time:</p>
 <p>Result: P1 gets scheduled 3× more often!</p>
 <ul>
     <li>P1: vruntime += 10 × (1024/1024) = 10</li>
@@ -578,31 +442,15 @@ yield_cpu();  <span class="code-comment">// Give up just before demotion!</span>
                     <h3 id="sub-5-1">5.1 CFS Understanding Check</h3>
 
 <p>Linux CFS aims for:</p>
-<p>A) Strict priority enforcement</p>
-<p>B) Fair CPU share based on weights</p>
-<p>C) Shortest job first optimization</p>
-<p>D) Round robin only</p>
-<p>ANSWER: B) Fair CPU share based on weights</p>
-<p>CFS ensures each process gets its fair share of</p>
-<p>CPU time proportional to its weight (determined</p>
-<p>by nice values).</p>
+<p>A) Strict priority enforcement B) Fair CPU share based on weights C) Shortest job first optimization D) Round robin only ANSWER: B) Fair CPU share based on weights CFS ensures each process gets its fair share of CPU time proportional to its weight (determined by nice values).</p>
 
 <h3 id="sub-5-2">5.2 WINDOWS PRIORITY SCHEDULING</h3>
 
 <p>Priority Structure:</p>
-<p>Level 31-16: Real-time (fixed, never change)</p>
-<p>Level 15-1: Variable priority (dynamic)</p>
-<p>Level 0: System idle (reserved)</p>
-<p>Dynamic Adjustments:</p>
-<p></p>
+<p>Level 31-16: Real-time (fixed, never change) Level 15-1: Variable priority (dynamic) Level 0: System idle (reserved) Dynamic Adjustments:</p>
 <p>I/O completion → Temporary priority boost</p>
-<p></p>
 <p>Foreground window → Priority boost</p>
-<p></p>
-<p>CPU-bound → Gradual priority decay back to base</p>
-<p>Philosophy: Responsiveness for user-facing tasks,</p>
-<p>throughput for background</p>
-<p>Windows uses explicit priorities with dynamic adjustments!</p>
+<p>CPU-bound → Gradual priority decay back to base Philosophy: Responsiveness for user-facing tasks, throughput for background Windows uses explicit priorities with dynamic adjustments!</p>
 
 <h3 id="sub-5-3">5.3 MULTI-PROCESSOR REVOLUTION</h3>
 
@@ -613,16 +461,13 @@ yield_cpu();  <span class="code-comment">// Give up just before demotion!</span>
 <p>3. What about shared caches?</p>
 <p>4. How to synchronize schedulers?</p>
 <p>The Opportunity: True parallelism!</p>
-<p>4 CPUs can run 4 processes SIMULTANEOUSLY</p>
-<p>Single CPU: Who runs next?</p>
+<p>4 CPUs can run 4 processes SIMULTANEOUSLY Single CPU: Who runs next?</p>
 <p>Multi-CPU: Who runs WHERE?</p>
 
 <h3 id="sub-5-4">5.4 LOAD BALANCING</h3>
 
 <p>Two Strategies:</p>
-<p>Push Migration: Overloaded CPU pushes tasks away</p>
-<p>Pull Migration: Idle CPU pulls tasks from busy ones</p>
-<p>When to Balance?</p>
+<p>Push Migration: Overloaded CPU pushes tasks away Pull Migration: Idle CPU pulls tasks from busy ones When to Balance?</p>
 <ul>
     <li>Periodic check (every 100ms)</li>
     <li>On idle detection</li>
@@ -635,9 +480,7 @@ yield_cpu();  <span class="code-comment">// Give up just before demotion!</span>
 <p>P1 runs on CPU 0:</p>
 <p>P1 migrated to CPU 1:</p>
 <p>The Solution - CPU Affinity:</p>
-<p>Soft affinity: Prefer keeping process on same CPU</p>
-<p>Hard affinity: Lock process to specific CPU(s)</p>
-<p>Trade-off: Load balancing vs cache performance</p>
+<p>Soft affinity: Prefer keeping process on same CPU Hard affinity: Lock process to specific CPU(s) Trade-off: Load balancing vs cache performance</p>
 <ul>
     <li>Loads 10 MB of data into CPU 0's cache</li>
     <li>Runs efficiently (cache hits) </li>
@@ -649,14 +492,7 @@ yield_cpu();  <span class="code-comment">// Give up just before demotion!</span>
 <h3 id="sub-5-6">5.6 Multi-Processor Check</h3>
 
 <p>In multi-processor systems, CPU affinity reduces:</p>
-<p>A) Cache misses by keeping process on same CPU</p>
-<p>B) Load balancing effectiveness</p>
-<p>C) Preemption frequency</p>
-<p>D) Starvation risk</p>
-<p>ANSWER: A) Cache misses by keeping process on same CPU</p>
-<p>Affinity keeps the CPU cache "warm" with the process's data,</p>
-<p>avoiding the performance penalty of reloading data from main</p>
-<p>memory.</p>
+<p>A) Cache misses by keeping process on same CPU B) Load balancing effectiveness C) Preemption frequency D) Starvation risk ANSWER: A) Cache misses by keeping process on same CPU Affinity keeps the CPU cache "warm" with the process's data, avoiding the performance penalty of reloading data from main memory.</p>
 
                     
                     <div class="topic-nav">
@@ -696,15 +532,8 @@ yield_cpu();  <span class="code-comment">// Give up just before demotion!</span>
 
 <h3 id="sub-6-2">6.2 Best Algorithm Check</h3>
 
-<p>What is the best algorithm for hard real-time</p>
-<p>systems?</p>
-<p>A) FCFS</p>
-<p>B) Priority scheduling with guarantees</p>
-<p>C) Round Robin</p>
-<p>D) SJF</p>
-<p>ANSWER: B) Priority scheduling with guarantees</p>
-<p>Real-time systems need predictable, priority-based</p>
-<p>scheduling with guaranteed timing constraints.</p>
+<p>What is the best algorithm for hard real-time systems?</p>
+<p>A) FCFS B) Priority scheduling with guarantees C) Round Robin D) SJF ANSWER: B) Priority scheduling with guarantees Real-time systems need predictable, priority-based scheduling with guaranteed timing constraints.</p>
 <p>Missing a deadline could be catastrophic.</p>
 
 <h3 id="sub-6-3">6.3 THE TRADE-OFF TRIANGLE</h3>
@@ -720,54 +549,28 @@ yield_cpu();  <span class="code-comment">// Give up just before demotion!</span>
 <h3 id="sub-6-4">6.4 Overhead Understanding</h3>
 
 <p>Which algorithm has the HIGHEST overhead?</p>
-<p>A) FCFS</p>
-<p>B) SRTF</p>
-<p>C) Non-preemptive priority</p>
-<p>D) Multi-level queues</p>
-<p>ANSWER: B) SRTF (frequent preemption)</p>
-<p>SRTF requires frequent context switches as shorter</p>
-<p>jobs arrive, causing high overhead from</p>
-<p>saving/restoring process state.</p>
+<p>A) FCFS B) SRTF C) Non-preemptive priority D) Multi-level queues ANSWER: B) SRTF (frequent preemption) SRTF requires frequent context switches as shorter jobs arrive, causing high overhead from saving/restoring process state.</p>
 
 <h3 id="sub-6-5">6.5 EVOLUTION OF SCHEDULING</h3>
 
 <p>Scheduling Through the Decades:</p>
 <p>1960s - Batch Systems:</p>
-<p>FCFS, SJF → Maximize throughput</p>
-<p>1970s - Time-Sharing:</p>
-<p>RR → Fair interactive access</p>
-<p>1980s - Personal Computers:</p>
-<p>Priority + RR → Responsive GUI</p>
-<p>1990s - Servers:</p>
-<p>MLFQ → Handle diverse workloads</p>
-<p>2000s - Multi-core Era:</p>
-<p>CFS + Load Balancing → Parallel efficiency</p>
-<p>2010s - Heterogeneous:</p>
-<p>Big.LITTLE, GPU scheduling → Energy + performance</p>
-<p>2020s - Cloud/AI:</p>
+<p>FCFS, SJF → Maximize throughput 1970s - Time-Sharing:</p>
+<p>RR → Fair interactive access 1980s - Personal Computers:</p>
+<p>Priority + RR → Responsive GUI 1990s - Servers:</p>
+<p>MLFQ → Handle diverse workloads 2000s - Multi-core Era:</p>
+<p>CFS + Load Balancing → Parallel efficiency 2010s - Heterogeneous:</p>
+<p>Big.LITTLE, GPU scheduling → Energy + performance 2020s - Cloud/AI:</p>
 <p>Container-aware, ML-predicted → Dynamic optimization</p>
 
 <h3 id="sub-6-6">6.6 Key Takeaways</h3>
 
-<p>1. Context is King</p>
-<p>→ No universal best algorithm</p>
-<p>2. Measure What Matters</p>
-<p>→ Different metrics for different goals</p>
-<p>3. Behavior Over Identity</p>
-<p>→ MLFQ learns by watching</p>
-<p>4. Fair ≠ Equal</p>
-<p>→ CFS gives proportional fairness</p>
-<p>5. Location Matters</p>
-<p>→ Cache aware scheduling</p>
-<p>6. Adapt or Stagnate</p>
-<p>→ Static policies can't handle dynamic workloads</p>
-<p>The Engineer's Question:</p>
+<p>1. Context is King → No universal best algorithm 2. Measure What Matters → Different metrics for different goals 3. Behavior Over Identity → MLFQ learns by watching 4. Fair ≠ Equal → CFS gives proportional fairness 5. Location Matters → Cache aware scheduling 6. Adapt or Stagnate → Static policies can't handle dynamic workloads The Engineer's Question:</p>
 <p>"What am I optimizing for?" determines "Which scheduler should I use?"</p>
 
 <h3 id="sub-6-7">6.7 Thank You!</h3>
-<p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
-
-
+<p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
+
                     
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>

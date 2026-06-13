@@ -90,10 +90,8 @@
                     <h2>Contiguous Allocation Drawbacks</h2>
                 </div>
                 <div id="content-1" class="collapsible-content">
-                    <h3 id="sub-1-1">1.1 Join the lecture online on your dashboard</h3>
-
-
-
+                    <h3 id="sub-1-1">1.1 Join the lecture online on your dashboard</h3>
+
 <h3 id="sub-1-2">1.2 Today’s Agenda</h3>
 
 <ul>
@@ -107,22 +105,12 @@
 
 <h3 id="sub-1-3">1.3 Problems with Contiguous Allocation</h3>
 
-<p></p>
 <p>External Fragmentation</p>
-<p></p>
-<p>Limited Flexibility</p>
-<p>Hard to grow memory dynamically</p>
-<p></p>
+<p>Limited Flexibility Hard to grow memory dynamically</p>
 <p>Poor Memory Utilization</p>
-<p></p>
-<p>Compaction Overhead</p>
-<p>Costly: O(n) time complexity</p>
-<p></p>
-<p>Difficult Memory Sharing</p>
-<p>Wastes memory</p>
-<p></p>
-<p>Key Takeaway</p>
-<p>Contiguous allocation is inefficient and inflexible. Need a non-contiguous memory allocation technique (Paging)</p>
+<p>Compaction Overhead Costly: O(n) time complexity</p>
+<p>Difficult Memory Sharing Wastes memory</p>
+<p>Key Takeaway Contiguous allocation is inefficient and inflexible. Need a non-contiguous memory allocation technique (Paging)</p>
 <ul>
     <li>Free memory split into small holes</li>
     <li>Enough total space, but not contiguous</li>
@@ -155,16 +143,9 @@
                     <h3 id="sub-2-1">2.1 Introduction to Paging</h3>
 
 <p>What is Paging?</p>
-<p></p>
-<p>Core Idea</p>
-<p>Any page can be placed in any free frame</p>
-<p></p>
+<p>Core Idea Any page can be placed in any free frame</p>
 <p>Page / Frame Size</p>
-<p></p>
-<p>Key Advantage</p>
-<p>No External Fragmentation</p>
-<p>Better memory utilization</p>
-<p>Flexible process allocation</p>
+<p>Key Advantage No External Fragmentation Better memory utilization Flexible process allocation</p>
 <ul>
     <li>Paging is a memory management technique</li>
     <li>Allows a process to be stored in non-contiguous physical memory</li>
@@ -182,18 +163,10 @@
 
 <h3 id="sub-2-2">2.2 Paging - Visual Representation</h3>
 
-<p></p>
 <p>Logical Memory (Process)</p>
-<p></p>
 <p>Physical Memory (RAM)</p>
-<p></p>
 <p>Page–Frame Mapping</p>
-<p></p>
-<p>Key Takeaways</p>
-<p>Pages → contiguous (logical view)</p>
-<p>Frames → non-contiguous (physical view)</p>
-<p>No external fragmentation</p>
-<p>Efficient memory utilization</p>
+<p>Key Takeaways Pages → contiguous (logical view) Frames → non-contiguous (physical view) No external fragmentation Efficient memory utilization</p>
 <ul>
     <li>Divided into fixed-size pages</li>
     <li>Pages are contiguous</li>
@@ -212,23 +185,10 @@
 
 <h3 id="sub-2-3">2.3 Frame Table & Page Table</h3>
 
-<p></p>
-<p>1. Frame Table (Maintained by OS)</p>
-<p>One entry per physical frame</p>
-<p>Tracks allocated / free frames</p>
-<p>Stores:</p>
-<p>Frame number</p>
-<p>Status (Free / Used)</p>
-<p>Process ID (owner)</p>
-<p></p>
+<p>1. Frame Table (Maintained by OS) One entry per physical frame Tracks allocated / free frames Stores:</p>
+<p>Frame number Status (Free / Used) Process ID (owner)</p>
 <p>Purpose: Efficient physical memory management</p>
-<p></p>
-<p>2. Page Table (One per Process)</p>
-<p>One entry per logical page</p>
-<p>Maps Page → Frame</p>
-<p>Stored in main memory</p>
-<p>Base address stored in PCB</p>
-<p></p>
+<p>2. Page Table (One per Process) One entry per logical page Maps Page → Frame Stored in main memory Base address stored in PCB</p>
 <p>Purpose: Address translation</p>
 
                     
@@ -247,22 +207,10 @@
                 <div id="content-3" class="collapsible-content">
                     <h3 id="sub-3-1">3.1 Page Table Entry (PTE) Structure</h3>
 
-<p></p>
-<p>PTE – What It Contains</p>
-<p>┌────────┬───────┬─────────┬──────────┬───────────┬───────────┐</p>
-<p>│ Frame  │ Valid │ Protect │  Dirty   │ Referenced│  Cache    │</p>
-<p>│ Number │  Bit  │ (R/W/X) │   Bit    │    Bit    │  Disable  │</p>
-<p>└────────┴───────┴─────────┴──────────┴───────────┴───────────┘</p>
-<p></p>
-<p>Field Overview</p>
-<p>○ Size depends on RAM (e.g., 18 bits for 1GB</p>
-<p>RAM, 4KB frames)</p>
-<p>○ 1 → Page present in memory</p>
-<p>○ 0 → Page fault occurs</p>
+<p>PTE – What It Contains ┌────────┬───────┬─────────┬──────────┬───────────┬───────────┐ │ Frame  │ Valid │ Protect │  Dirty   │ Referenced│  Cache    │ │ Number │  Bit  │ (R/W/X) │   Bit    │    Bit    │  Disable  │ └────────┴───────┴─────────┴──────────┴───────────┴───────────┘</p>
+<p>Field Overview ○ Size depends on RAM (e.g., 18 bits for 1GB RAM, 4KB frames) ○ 1 → Page present in memory ○ 0 → Page fault occurs</p>
 <div class="formula-box">○ Example: 100 = Read-only, 110 = Read–Write</div>
-<p>○ Used during page replacement</p>
-<p>○ Helps replacement algorithms (LRU, Clock)</p>
-<p>○ Used for memory-mapped I/O</p>
+<p>○ Used during page replacement ○ Helps replacement algorithms (LRU, Clock) ○ Used for memory-mapped I/O</p>
 <ul>
     <li>Frame Number</li>
     <li>Valid / Invalid Bit</li>
@@ -274,26 +222,10 @@
 
 <h3 id="sub-3-2">3.2 Address Translation - The Big Picture</h3>
 
-<p></p>
-<p>Logical Address</p>
-<p>┌──────────────────┬──────────────┐</p>
-<p>│ Page Number (p)  │ Offset (d)   │</p>
-<p>└──────────────────┴──────────────┘</p>
-<p>(m − n bits)        (n bits)</p>
-<p></p>
-<p>Example</p>
-<p>Logical Address ( 16 bits)</p>
-<p>→ Page Number: 6 bits</p>
-<p>→ Offset:      10 bits</p>
-<p>Physical Address</p>
-<p>┌──────────────────┬──────────────┐</p>
-<p>│ Frame Number (f) │ Offset (d)   │</p>
-<p>└──────────────────┴──────────────┘</p>
-<p></p>
+<p>Logical Address ┌──────────────────┬──────────────┐ │ Page Number (p)  │ Offset (d)   │ └──────────────────┴──────────────┘ (m − n bits)        (n bits)</p>
+<p>Example Logical Address ( 16 bits) → Page Number: 6 bits → Offset:      10 bits Physical Address ┌──────────────────┬──────────────┐ │ Frame Number (f) │ Offset (d)   │ └──────────────────┴──────────────┘</p>
 <p>Key Rule:</p>
-<p></p>
 <p>Only page → frame is translated</p>
-<p></p>
 <p>Offset is unchanged</p>
 <ul>
     <li>Process generates a logical address (m)</li>
@@ -310,31 +242,12 @@
 
 <h3 id="sub-3-3">3.3 Address Translation - Step by Step</h3>
 
-<p></p>
-<p>Big Flow</p>
-<p>CPU</p>
-<p>Logical Address (p, d)</p>
-<p>↓</p>
-<p>Page Table Lookup (p → f)</p>
-<p>↓</p>
-<p>Physical Address (f, d)</p>
-<p></p>
-<p>Step-by-Step Translation</p>
-<p>1. Extract Page Number (p)</p>
+<p>Big Flow CPU Logical Address (p, d) ↓ Page Table Lookup (p → f) ↓ Physical Address (f, d)</p>
+<p>Step-by-Step Translation 1. Extract Page Number (p)</p>
 <div class="formula-box">○ p = Logical Address bits - d</div>
-<p>2. Extract Offset (d)</p>
-<p>○ d = log₂(Page Size)</p>
-<p>3. Page Table Lookup</p>
-<p>○ Use p to index page table</p>
-<p>○ Check Valid bit</p>
-<p>■ </p>
-<p>Invalid → Page Fault (OS intervention)</p>
-<p>■ </p>
-<p>Valid → Get frame number f</p>
-<p>4. Form Physical Address</p>
+<p>2. Extract Offset (d) ○ d = log₂(Page Size) 3. Page Table Lookup ○ Use p to index page table ○ Check Valid bit ■ Invalid → Page Fault (OS intervention) ■ Valid → Get frame number f 4. Form Physical Address</p>
 <div class="formula-box">○ Physical Address = (f × Page Size) + d</div>
-<p>5. Access Memory</p>
-<p>○ CPU reads/writes at computed physical address</p>
+<p>5. Access Memory ○ CPU reads/writes at computed physical address</p>
 
                     
                     <div class="topic-nav">
@@ -352,28 +265,14 @@
                 <div id="content-4" class="collapsible-content">
                     <h3 id="sub-4-1">4.1 Address Translation Example</h3>
 
-<p></p>
-<p>Given: Logical Address Space: 32 bytes (2⁵). Physical Address Space: 128 bytes (2⁷). Page / Frame Size: 8 bytes (2³)</p>
-<p>1. Binary:</p>
-<p>○ 13 = 01101</p>
-<p>2. Split (Page | Offset):</p>
-<p>01  | 101</p>
-<p>p    d</p>
-<p>3. Page Table Lookup:</p>
+<p>Given: Logical Address Space: 32 bytes (2⁵). Physical Address Space: 128 bytes (2⁷). Page / Frame Size: 8 bytes (2³) 1. Binary:</p>
+<p>○ 13 = 01101 2. Split (Page | Offset):</p>
+<p>01  | 101 p    d 3. Page Table Lookup:</p>
 <p>4. Physical Address:</p>
-<p>Frame | Offset</p>
-<p>1001  | 101</p>
-<p></p>
+<p>Frame | Offset 1001  | 101</p>
 <div class="formula-box">Verification: Frame 9 start = 9 × 8 = 72. 72 + 5 = 77 </div>
-<p></p>
 <p>Derived Values</p>
-<p></p>
-<p>Page Table</p>
-<p>Page 0 → Frame 5</p>
-<p>Page 1 → Frame 9</p>
-<p>Page 2 → Frame 3</p>
-<p>Page 3 → Frame 7</p>
-<p></p>
+<p>Page Table Page 0 → Frame 5 Page 1 → Frame 9 Page 2 → Frame 3 Page 3 → Frame 7</p>
 <p>Translate Logical Address = 13</p>
 <ul>
     <li>Page = 1. Offset = 5</li>
@@ -383,12 +282,10 @@
     <li>Pages: 32 / 8 = 4 pages. Frames: 128 / 8 = 16 frames. Page bits: 2 bits. Offset bits: 3 bits. Frame bits: 4 bits</li>
 </ul>
 
-<h3 id="sub-4-2">4.2 Advantages of Paging</h3>
-
-
-<h3 id="sub-4-3">4.3 Disadvantages of Paging</h3>
-
-
+<h3 id="sub-4-2">4.2 Advantages of Paging</h3>
+
+<h3 id="sub-4-3">4.3 Disadvantages of Paging</h3>
+
                     
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
@@ -405,16 +302,10 @@
                 <div id="content-5" class="collapsible-content">
                     <h3 id="sub-5-1">5.1 Page Table Storage Problem</h3>
 
-<p></p>
 <p>The Challenge (32-bit System)</p>
-<p></p>
 <p>100 processes → 400 MB only for page tables!</p>
-<p></p>
-<p>Even Worse in 64-bit Systems</p>
-<p>Completely impractical</p>
-<p></p>
+<p>Even Worse in 64-bit Systems Completely impractical</p>
 <p>Why This is a Problem</p>
-<p></p>
 <p>Practical Solutions</p>
 <ul>
     <li>Logical address space: 4 GB (2³²)</li>
@@ -435,23 +326,11 @@
 
 <h3 id="sub-5-2">5.2 Multi-Level Paging - Concept</h3>
 
-<p></p>
 <p>Core Idea: Split a huge page table into smaller tables. Allocate page tables only when needed</p>
-<p></p>
 <p>Two-Level Paging Structure</p>
-<p></p>
-<p>Logical Address Format</p>
-<p>┌──────────┬──────────┬──────────┐</p>
-<p>│ P1 ( 10b) │ P2 ( 10b) │ Offset   │</p>
-<p>│          │          │ ( 12b)    │</p>
-<p>└──────────┴──────────┴──────────┘</p>
-<p>Page Dir     Page Table   Byte in</p>
-<p>Index        Index       Page</p>
-<p></p>
+<p>Logical Address Format ┌──────────┬──────────┬──────────┐ │ P1 ( 10b) │ P2 ( 10b) │ Offset   │ │          │          │ ( 12b)    │ └──────────┴──────────┴──────────┘ Page Dir     Page Table   Byte in Index        Index       Page</p>
 <p>Why It Works</p>
-<p></p>
-<p>Key Advantage</p>
-<p>Massive memory savings</p>
+<p>Key Advantage Massive memory savings</p>
 <ul>
     <li>Outer Page Table (Page Directory)</li>
     <li>Inner Page Tables (Second level)</li>
@@ -464,29 +343,10 @@
 
 <h3 id="sub-5-3">5.3 Two-Level Paging Example</h3>
 
-<p></p>
 <p>Configuration: Logical address: 32 bits. Page size: 4 KB (2¹²). PTE size: 4 bytes</p>
-<p></p>
-<p>Address Breakdown</p>
-<p>┌──────────┬──────────┬──────────┐</p>
-<p>│ P1 (10b) │ P2 (10b) │ d (12b)  │</p>
-<p>└──────────┴──────────┴──────────┘</p>
-<p>Page Dir     Page Table   Offset</p>
-<p></p>
-<p>Translation Steps</p>
-<p>1. Index P1 → Outer Page Table</p>
-<p>○ Get base address of inner page table</p>
-<p>2. Index P2 → Inner Page Table</p>
-<p>○ Get frame number</p>
-<p>3. Frame + Offset</p>
-<p>○ Form physical address</p>
-<p></p>
-<p>Memory Savings</p>
-<p>○ Always 4 MB per process</p>
-<p>○ Outer table: 4 KB</p>
-<p>○ Inner tables: 10 × 4 KB = 40 KB</p>
-<p>○ Total = 44 KB</p>
-<p></p>
+<p>Address Breakdown ┌──────────┬──────────┬──────────┐ │ P1 (10b) │ P2 (10b) │ d (12b)  │ └──────────┴──────────┴──────────┘ Page Dir     Page Table   Offset</p>
+<p>Translation Steps 1. Index P1 → Outer Page Table ○ Get base address of inner page table 2. Index P2 → Inner Page Table ○ Get frame number 3. Frame + Offset ○ Form physical address</p>
+<p>Memory Savings ○ Always 4 MB per process ○ Outer table: 4 KB ○ Inner tables: 10 × 4 KB = 40 KB ○ Total = 44 KB</p>
 <p>~99% memory saved</p>
 <ul>
     <li>Single-level paging:</li>
@@ -509,16 +369,9 @@
                 <div id="content-6" class="collapsible-content">
                     <h3 id="sub-6-1">6.1 Shared Pages</h3>
 
-<p></p>
 <p>Core Idea</p>
-<p></p>
-<p>How It Works</p>
-<p>Process P1 PT  Shared Frame Process P2 PT</p>
-<p>Pg1 → Fr15 ───▶ Fr15 ◀─── Pg1 → Fr15</p>
-<p></p>
-<p>Use Cases</p>
-<p>many)</p>
-<p></p>
+<p>How It Works Process P1 PT  Shared Frame Process P2 PT Pg1 → Fr15 ───▶ Fr15 ◀─── Pg1 → Fr15</p>
+<p>Use Cases many)</p>
 <p>Requirements</p>
 <ul>
     <li>Multiple processes share the same physical frame</li>
@@ -536,7 +389,6 @@
 
 <h3 id="sub-6-2">6.2 Page Size Selection</h3>
 
-<p></p>
 <p>Why Page Size Matters</p>
 <ul>
     <li>Affects memory usage, performance, and overhead</li>
@@ -545,21 +397,15 @@
 
 <h3 id="sub-6-3">6.3 Key Takeaways</h3>
 
-<p></p>
 <p>Paging Fundamentals</p>
-<p></p>
 <p>Address Translation</p>
-<p></p>
 <p>Page Table Entry (PTE)</p>
-<p></p>
 <p>Performance Optimization</p>
-<p></p>
 <p>Trade-offs</p>
 
 <h3 id="sub-6-4">6.4 Thank You!</h3>
-<p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
-
-
+<p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
+
                     
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>

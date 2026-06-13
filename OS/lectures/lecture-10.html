@@ -94,10 +94,8 @@
                     <h2>Process Synchronization Overview</h2>
                 </div>
                 <div id="content-1" class="collapsible-content">
-                    <h3 id="sub-1-1">1.1 Join the lecture online on your dashboard</h3>
-
-
-
+                    <h3 id="sub-1-1">1.1 Join the lecture online on your dashboard</h3>
+
 <h3 id="sub-1-2">1.2 Today’s Agenda</h3>
 
 <ul>
@@ -112,14 +110,10 @@
 <h3 id="sub-1-3">1.3 Introduction to Process Synchronization</h3>
 
 <p>What is Process Synchronization?</p>
-<p>A mechanism that ensures multiple concurrent processes</p>
-<p>or threads can safely share resources and coordinate</p>
-<p>their execution without conflicts.</p>
+<p>A mechanism that ensures multiple concurrent processes or threads can safely share resources and coordinate their execution without conflicts.</p>
 <p>Why Do We Need It?</p>
 <p>Real-World Scenario:</p>
-<p>Expected balance: ₹4,000</p>
-<p>Possible actual balance: ₹3,000 or ₹6,000. Without</p>
-<p>proper synchronization, chaos!</p>
+<p>Expected balance: ₹4,000 Possible actual balance: ₹3,000 or ₹6,000. Without proper synchronization, chaos!</p>
 <ul>
     <li>You check your bank balance: ₹5,000</li>
     <li>You withdraw ₹2,000 at ATM</li>
@@ -128,18 +122,7 @@
 
 <h3 id="sub-1-4">1.4 Concurrent vs Parallel Execution</h3>
 
-<p>Two Ways to Run Multiple Processes</p>
-<p>Concurrency (Single CPU)</p>
-<p>Process A: ████░░░░████░░░░</p>
-<p>Process B: ░░░░████░░░░████</p>
-<p>Time →</p>
-<p>Interleaving - taking turns rapidly</p>
-<p>Parallelism (Multi-CPU)</p>
-<p>CPU 1: ████████████████</p>
-<p>CPU 2: ████████████████</p>
-<p>Time →</p>
-<p>Truly simultaneous execution</p>
-<p>Both need synchronization!</p>
+<p>Two Ways to Run Multiple Processes Concurrency (Single CPU) Process A: ████░░░░████░░░░ Process B: ░░░░████░░░░████ Time → Interleaving - taking turns rapidly Parallelism (Multi-CPU) CPU 1: ████████████████ CPU 2: ████████████████ Time → Truly simultaneous execution Both need synchronization!</p>
 
                     
                     <div class="topic-nav">
@@ -158,34 +141,19 @@
                     <h3 id="sub-2-1">2.1 The Critical Section Problem</h3>
 
 <p>What is a Critical Section?</p>
-<p>A critical section is a segment of code where a</p>
-<p>process accesses shared resources (variables, files,</p>
-<p>data structures) that must not be accessed by more</p>
-<p>than one process at a time.</p>
-<p>The Danger Zone </p>
-<p>// </p>
-<p>Entry Section - request permission</p>
-<p>// </p>
-<p>CRITICAL SECTION - danger zone!</p>
-<p>[access shared data]</p>
-<p>// </p>
-<p>Exit Section - release permission</p>
-<p>// </p>
-<p>Remainder Section - safe zone</p>
+<p>A critical section is a segment of code where a process accesses shared resources (variables, files, data structures) that must not be accessed by more than one process at a time.</p>
+<p>The Danger Zone // Entry Section - request permission // CRITICAL SECTION - danger zone!</p>
+<p>[access shared data] // Exit Section - release permission // Remainder Section - safe zone</p>
 <pre class="code-block"><code>do {
 } while (TRUE);</code></pre>
 
 <h3 id="sub-2-2">2.2 Critical Section Example</h3>
 
-<p>CRITICAL SECTION - Multiple threads access</p>
-<p>this!</p>
+<p>CRITICAL SECTION - Multiple threads access this!</p>
 <div class="formula-box">int balance = read_balance();     // </div>
 <p>Read</p>
 <div class="formula-box">balance = balance - amount;       // </div>
-<p>Calculate</p>
-<p>write_balance(balance);           // </p>
-<p>Write</p>
-<p>Why is this critical?</p>
+<p>Calculate write_balance(balance);           // Write Why is this critical?</p>
 <ul>
     <li>Multiple users → Same account</li>
     <li>Simultaneous transactions</li>
@@ -195,18 +163,11 @@
 <h3 id="sub-2-3">2.3 Race Condition - Concept</h3>
 
 <p>What Is It?</p>
-<p>Outcome depends on execution timing</p>
-<p>Key Characteristics:</p>
-<p></p>
+<p>Outcome depends on execution timing Key Characteristics:</p>
 <p>Non-deterministic (unpredictable)</p>
-<p></p>
 <p>Timing-dependent</p>
-<p></p>
 <p>Hard to reproduce & debug</p>
-<p></p>
-<p>Can corrupt data</p>
-<p>Analogy: Two people editing a Google Doc</p>
-<p>without seeing each other's changes</p>
+<p>Can corrupt data Analogy: Two people editing a Google Doc without seeing each other's changes</p>
 <div class="box box-green"><div class="box-title">Analogy</div><p>Analogy: Two people editing a Google Doc</p></div>
 
 <h3 id="sub-2-4">2.4 Race Condition - Classic Example (Bank Account)</h3>
@@ -214,13 +175,10 @@
 <p>For Deposit (Process A):</p>
 <div class="formula-box">int balance = read_balance();  // reads 5000</div>
 <div class="formula-box">balance = balance + 1000;       // calculates 6000</div>
-<p>write_balance(balance);         // writes 6000</p>
-<p>For Withdrawal (Process B):</p>
+<p>write_balance(balance);         // writes 6000 For Withdrawal (Process B):</p>
 <div class="formula-box">int balance = read_balance();  // reads 5000</div>
 <div class="formula-box">balance = balance - 2000;       // calculates 3000</div>
-<p>write_balance(balance);         // writes 3000</p>
-<p>Expected Final Balance: 4000 (5000 + 1000 - 2000)</p>
-<p>The Bank Account Problem:</p>
+<p>write_balance(balance);         // writes 3000 Expected Final Balance: 4000 (5000 + 1000 - 2000) The Bank Account Problem:</p>
 <p>Consider a shared bank account with balance = 5000 Two processes execute simultaneously:</p>
 <ul>
     <li>Process A: Deposits 1000</li>
@@ -244,88 +202,36 @@
                 <div id="content-3" class="collapsible-content">
                     <h3 id="sub-3-1">3.1 Race Condition - Execution Scenarios</h3>
 
-<p>Scenario 1: Sequential Execution (Correct)</p>
-<p>Time    Process A               Process B           Balance</p>
-<p>t1          read(5000)                                  5000</p>
-<p>t2          calc(6000)                                  5000</p>
-<p>t3         write(6000)                                 6000</p>
-<p>t4                                      read(6000)           6000</p>
-<p>t5                                      calc(4000)          6000</p>
-<p>t6                                      write(4000)         4000</p>
-<p> Result: 4000 (Correct)</p>
-<p>Scenario 2: Interleaved Execution (Race Condition)</p>
-<p>Time    Process A               Process B           Balance</p>
-<p>t1         read(5000)                                  5000</p>
-<p>t2                                  read(5000)         5000</p>
-<p>t3         calc(6000)                                  5000</p>
-<p>t4                                         calc(3000)          5000</p>
-<p>t5         write(6000)                                6000</p>
-<p>t6                                         write(3000)         3000</p>
-<p> Result: 3000 (Incorrect! Lost 1000)</p>
+<p>Scenario 1: Sequential Execution (Correct) Time    Process A               Process B           Balance t1          read(5000)                                  5000 t2          calc(6000)                                  5000 t3         write(6000)                                 6000 t4                                      read(6000)           6000 t5                                      calc(4000)          6000 t6                                      write(4000)         4000 Result: 4000 (Correct) Scenario 2: Interleaved Execution (Race Condition) Time    Process A               Process B           Balance t1         read(5000)                                  5000 t2                                  read(5000)         5000 t3         calc(6000)                                  5000 t4                                         calc(3000)          5000 t5         write(6000)                                6000 t6                                         write(3000)         3000 Result: 3000 (Incorrect! Lost 1000)</p>
 
 <h3 id="sub-3-2">3.2 Race Condition - Producer-Consumer Example</h3>
 
 <p>Bounded Buffer Problem Setup:</p>
-<p>Shared buffer with counter variable tracking number of</p>
-<p>items.</p>
-<p>Consumer Code:</p>
-<p>while (counter == 0)</p>
-<p>;  // buffer empty, wait</p>
-<p>item = buffer[out];</p>
+<p>Shared buffer with counter variable tracking number of items.</p>
+<p>Consumer Code: while (counter == 0) ;  // buffer empty, wait item = buffer[out];</p>
 <div class="formula-box">out = (out + 1) % BUFFER_SIZE;</div>
-<p>counter--;  // CRITICAL OPERATION</p>
-<p>The Problem: counter++ and counter-- are NOT</p>
-<p>atomic operations!</p>
+<p>counter--;  // CRITICAL OPERATION The Problem: counter++ and counter-- are NOT atomic operations!</p>
 <p>Producer Code:</p>
-<p>// produce item</p>
-<p>while (counter == BUFFER_SIZE)</p>
-<p>;  // buffer full, wait</p>
-<p>buffer[in] = item;</p>
+<p>// produce item while (counter == BUFFER_SIZE) ;  // buffer full, wait buffer[in] = item;</p>
 <div class="formula-box">in = (in + 1) % BUFFER_SIZE;</div>
 <p>counter++;  // CRITICAL OPERATION</p>
 <pre class="code-block"><code>while ( true) {
 }
 while (true) {
-}</code></pre>
-
-
+}</code></pre>
+
 <h3 id="sub-3-3">3.3 Why counter++ is Dangerous</h3>
 
-<p>Looks Simple, Right?</p>
-<p>counter++;  // Just one line!</p>
-<p>But In Machine Code Assembly</p>
-<p>LOAD    R1, counter      // Step 1: Read</p>
-<p>ADD     R1, R1, 1        // Step 2: Calculate</p>
-<p>STORE   R1, counter      // Step 3: Write</p>
-<p>3 separate instructions = 3 points where</p>
-<p>interruption can occur!</p>
+<p>Looks Simple, Right? counter++;  // Just one line!</p>
+<p>But In Machine Code Assembly LOAD    R1, counter      // Step 1: Read ADD     R1, R1, 1        // Step 2: Calculate STORE   R1, counter      // Step 3: Write 3 separate instructions = 3 points where interruption can occur!</p>
 <p>The Scenario:</p>
-<p>Initial: counter = 5</p>
-<p>Thread 1: counter++  (wants: 6)</p>
-<p>Thread 2: counter++  (wants: 7)</p>
-<p></p>
-<p>Race Condition Execution</p>
-<p>T1: LOAD R1, counter       (R1 = 5)</p>
-<p>T2: LOAD R2, counter       (R2 = 5)</p>
-<p>T1: ADD R1, R1, 1          (R1 = 6)</p>
-<p>T2: ADD R2, R2, 1          (R2 = 6)</p>
-<p>T1: STORE R1, counter      (counter = 6)</p>
-<p>T2: STORE R2, counter      (counter = 6)</p>
-<p>Expected: 7</p>
-<p>Actual: 6</p>
-<p>One increment lost!</p>
+<p>Initial: counter = 5 Thread 1: counter++  (wants: 6) Thread 2: counter++  (wants: 7)</p>
+<p>Race Condition Execution T1: LOAD R1, counter       (R1 = 5) T2: LOAD R2, counter       (R2 = 5) T1: ADD R1, R1, 1          (R1 = 6) T2: ADD R2, R2, 1          (R2 = 6) T1: STORE R1, counter      (counter = 6) T2: STORE R2, counter      (counter = 6) Expected: 7 Actual: 6 One increment lost!</p>
 
 <h3 id="sub-3-4">3.4 Requirements - Critical Section Solutions</h3>
 
 <p>Every Solution MUST Satisfy All Three:</p>
-<p>1⃣ Mutual Exclusion</p>
-<p>> Only ONE process in critical section at a time</p>
-<p>3⃣ Bounded Waiting</p>
-<p>> Everyone gets their turn eventually (no starvation)</p>
-<p>Memory Aid: MPB (Mutual, Progress, Bounded)</p>
-<p>2⃣ Progress</p>
-<p>> If no one's inside, someone waiting MUST get</p>
-<p>in</p>
+<p>1⃣ Mutual Exclusion > Only ONE process in critical section at a time 3⃣ Bounded Waiting > Everyone gets their turn eventually (no starvation) Memory Aid: MPB (Mutual, Progress, Bounded) 2⃣ Progress > If no one's inside, someone waiting MUST get in</p>
 
                     
                     <div class="topic-nav">
@@ -343,13 +249,7 @@ while (true) {
                 <div id="content-4" class="collapsible-content">
                     <h3 id="sub-4-1">4.1 Requirement 1 - Mutual Exclusion</h3>
 
-<p>The Bathroom Rule </p>
-<p>Only ONE person inside at a time</p>
-<p>Process P1: [inside critical section]</p>
-<p>Process P2: [must wait] </p>
-<p>Process P3: [must wait] </p>
-<p>Why It Matters</p>
-<p></p>
+<p>The Bathroom Rule Only ONE person inside at a time Process P1: [inside critical section] Process P2: [must wait] Process P3: [must wait] Why It Matters</p>
 <p>What happens if this is violated?</p>
 <p>Answer: Data corruption!</p>
 <ul>
@@ -360,15 +260,9 @@ while (true) {
 
 <h3 id="sub-4-2">4.2 Requirement 2 - Progress</h3>
 
-<p>No Artificial Delays</p>
-<p>Bad Scenario:</p>
-<p>Critical Section: [EMPTY]</p>
-<p>Process A: Waiting for Process B</p>
-<p>Process B: In remainder section (not even</p>
-<p>interested!)</p>
-<p></p>
-<p>Violation! Selection postponed indefinitely</p>
-<p>The Rule</p>
+<p>No Artificial Delays Bad Scenario:</p>
+<p>Critical Section: [EMPTY] Process A: Waiting for Process B Process B: In remainder section (not even interested!)</p>
+<p>Violation! Selection postponed indefinitely The Rule</p>
 <ul>
     <li>If Critical Section is free AND processes want to enter</li>
     <li>Decision MUST be made in finite time</li>
@@ -377,26 +271,15 @@ while (true) {
 
 <h3 id="sub-4-3">4.3 Requirement 3 - Bounded Waiting</h3>
 
-<p>Fairness Guarantee</p>
-<p>Bad Scenario:</p>
-<p>Process A: Requested entry 1,000 times</p>
-<p>Process B: Keeps entering first</p>
-<p>Process A: Still waiting... (STARVATION)</p>
-<p>The Rule</p>
-<p>There exists a limit on how many times others</p>
-<p>can enter before you</p>
-<p>Not Necessarily FIFO, but no infinite waiting!</p>
+<p>Fairness Guarantee Bad Scenario:</p>
+<p>Process A: Requested entry 1,000 times Process B: Keeps entering first Process A: Still waiting... (STARVATION) The Rule There exists a limit on how many times others can enter before you Not Necessarily FIFO, but no infinite waiting!</p>
 
 <h3 id="sub-4-4">4.4 Additional Desirable Properties</h3>
 
 <p>Beyond the Three Main Requirements</p>
-<p></p>
 <p>Performance</p>
-<p></p>
 <p>Fairness</p>
-<p></p>
 <p>Simplicity</p>
-<p></p>
 <p>Portability</p>
 <ul>
     <li>Low overhead</li>
@@ -429,25 +312,14 @@ while (true) {
                     <h3 id="sub-5-1">5.1 Real-World Consequences of Race Conditions</h3>
 
 <p>Historical Examples</p>
-<p></p>
 <p>Therac-25 (1985–87)</p>
-<p></p>
-<p>Northeast Blackout (2003)</p>
-<p>Modern Examples</p>
-<p></p>
+<p>Northeast Blackout (2003) Modern Examples</p>
 <p>Banking → incorrect balances</p>
-<p></p>
 <p>E-commerce → oversold inventory</p>
-<p></p>
 <p>Gaming → item duplication glitches</p>
-<p></p>
-<p>Social media → data corruption</p>
-<p>Why These Happen</p>
-<p></p>
+<p>Social media → data corruption Why These Happen</p>
 <p>Concurrent access to shared resources</p>
-<p></p>
 <p>Timing-dependent behavior</p>
-<p></p>
 <p>Hard to test & reproduce</p>
 <ul>
     <li>Control software race condition</li>
@@ -460,14 +332,8 @@ while (true) {
 
 <h3 id="sub-5-2">5.2 Concurrency in Modern Systems</h3>
 
-<p>Multi-Core Processors:</p>
-<p>coherency issues)</p>
-<p>Challenges in Modern Systems:</p>
-<p>Cache coherency: Each core has own cache</p>
-<p>Memory ordering: Instructions can be</p>
-<p>reordered</p>
-<p>Scalability: More cores = more contention</p>
-<p>Synchronization is MORE critical now!</p>
+<p>Multi-Core Processors: coherency issues) Challenges in Modern Systems:</p>
+<p>Cache coherency: Each core has own cache Memory ordering: Instructions can be reordered Scalability: More cores = more contention Synchronization is MORE critical now!</p>
 <ul>
     <li>Multiple CPU cores execute truly simultaneously</li>
     <li>Shared memory architecture</li>
@@ -481,11 +347,7 @@ while (true) {
 <h3 id="sub-5-3">5.3 Where OS Uses Synchronization</h3>
 
 <p>Everywhere!</p>
-<p>Process Management</p>
-<p>Memory Management</p>
-<p>File Systems</p>
-<p>Device Management</p>
-<p>Every shared data structure needs protection!</p>
+<p>Process Management Memory Management File Systems Device Management Every shared data structure needs protection!</p>
 <ul>
     <li>Scheduling queues</li>
     <li>Process tables</li>
@@ -500,17 +362,7 @@ while (true) {
 <h3 id="sub-5-4">5.4 Preview of Synchronization Techniques</h3>
 
 <p>We Know the Problem... Now for Solutions!</p>
-<p>Software Solutions</p>
-<p>Peterson's Algorithm (2 processes)</p>
-<p>Dekker’s Algorithm (n processes)</p>
-<p>Hardware Support</p>
-<p>Test-and-Set</p>
-<p>Compare-and-Swap</p>
-<p>Mutex Locks</p>
-<p>High-Level Constructs</p>
-<p>Semaphores</p>
-<p>Monitors</p>
-<p>Modern Approaches</p>
+<p>Software Solutions Peterson's Algorithm (2 processes) Dekker’s Algorithm (n processes) Hardware Support Test-and-Set Compare-and-Swap Mutex Locks High-Level Constructs Semaphores Monitors Modern Approaches</p>
 <ul>
     <li></li>
     <li></li>
@@ -539,16 +391,10 @@ while (true) {
                 <div id="content-6" class="collapsible-content">
                     <h3 id="sub-6-1">6.1 Practice Time! </h3>
 
-<p>Problem 1: Identify the Critical Section</p>
-<p>int shared_counter = 0;</p>
-<p>shared_counter++;</p>
-<p>Problem 2: Thread Operations on Counter</p>
-<p>Given:</p>
+<p>Problem 1: Identify the Critical Section int shared_counter = 0; shared_counter++;</p>
+<p>Problem 2: Thread Operations on Counter Given:</p>
 <p>Question: What are ALL possible final values?</p>
-<p>Shared Resource: shared_counter</p>
-<p>(global variable)</p>
-<p>Critical Section: The line</p>
-<p>shared_counter++;</p>
+<p>Shared Resource: shared_counter (global variable) Critical Section: The line shared_counter++;</p>
 <ul>
     <li>Two threads execute on shared variable</li>
     <li>Thread 1: counter++</li>
@@ -562,14 +408,7 @@ for ( int i = 0; i < 1000; i++) {
 
 <h3 id="sub-6-2">6.2 Key Takeaways</h3>
 
-<p>What You Must Remember </p>
-<p>resources</p>
-<p>(DANGEROUS!)</p>
-<p>○ Mutual Exclusion</p>
-<p>○ Progress</p>
-<p>○ Bounded Waiting</p>
-<p>sophisticated mechanisms</p>
-<p>important</p>
+<p>What You Must Remember resources (DANGEROUS!) ○ Mutual Exclusion ○ Progress ○ Bounded Waiting sophisticated mechanisms important</p>
 <ul>
     <li>Critical sections = code accessing shared</li>
     <li>Race conditions = timing-dependent bugs</li>
@@ -579,9 +418,8 @@ for ( int i = 0; i < 1000; i++) {
 </ul>
 
 <h3 id="sub-6-3">6.3 Thank You!</h3>
-<p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
-
-
+<p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>
+
                     
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
