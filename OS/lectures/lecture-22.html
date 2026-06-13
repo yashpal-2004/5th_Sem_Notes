@@ -375,12 +375,15 @@ M=M+D</code></pre>
 
 <h3 id="sub-5-4">5.4 Memory Management (Jack Style)</h3>
 
-<p>Heap Management: Handled by</p>
-<p>Memory.jack.</p>
-<p>do arr.dispose(); -> Freeing</p>
-<p>the block manually.</p>
-<p>Allocates block.</p>
-<pre class="code-block"><code>let arr = Array.new(10); -></code></pre>
+<p>Heap Management is handled dynamically by the <code>Memory.jack</code> OS module:</p>
+<ul>
+    <li><strong>Allocation:</strong>
+        <pre class="code-block" style="margin: 0.5rem 0 1rem 0;"><code>let arr = Array.new(10); // Allocates a block of size 10 on heap</code></pre>
+    </li>
+    <li><strong>Deallocation:</strong>
+        <pre class="code-block" style="margin: 0.5rem 0 0 0;"><code>do arr.dispose(); // Manually frees the allocated block</code></pre>
+    </li>
+</ul>
 
                     
                     <div class="topic-nav">
@@ -441,20 +444,19 @@ do Output.println();</code></pre>
 
 <h3 id="sub-6-5">6.5 Steps</h3>
 
-<p>○ Run the Jack Compiler script (batch/shell) located in your</p>
-<p>tools folder.</p>
-<p>○ ~/Desktop/nand2tetris/tools/JackCompiler.sh</p>
-<p>○ ~/Desktop/nand2tetris/tools/VMEmulator.sh</p>
-<p>directory containing your new .vm files.</p>
-<p>reloading in the VM Emulator.</p>
-<ul>
-    <li>Create your source files with the .jack extension</li>
-    <li>Translate your high-level Jack code into Virtual Machine language.</li>
-    <li>Open the VMEmulator</li>
-    <li>Select "Load Program" (or Load Folder) and choose the</li>
-    <li>Set animation speed to "Fast" or "No Animation" for complex games.</li>
-    <li>If logic errors occur, revise .jack files and re-compile before</li>
-</ul>
+<p>Steps to compile and execute Jack software suite programs:</p>
+<ol>
+    <li>Create your source files with the <code>.jack</code> extension.</li>
+    <li>Translate your high-level Jack code into VM language by running the compiler script in your tools directory:
+        <pre class="code-block" style="margin: 0.5rem 0 1rem 0;"><code>~/Desktop/nand2tetris/tools/JackCompiler.sh &lt;folder-path&gt;</code></pre>
+    </li>
+    <li>Open the VM Emulator:
+        <pre class="code-block" style="margin: 0.5rem 0 1rem 0;"><code>~/Desktop/nand2tetris/tools/VMEmulator.sh</code></pre>
+    </li>
+    <li>Select "Load Program" (or Load Folder) and choose the directory containing your compiled <code>.vm</code> files.</li>
+    <li>Set animation speed to "Fast" or "No Animation" for complex programs/games.</li>
+    <li>If logic errors occur, revise <code>.jack</code> files, recompile, and reload program.</li>
+</ol>
 
 <h3 id="sub-6-6">6.6 Some Jack Programs</h3>
 
