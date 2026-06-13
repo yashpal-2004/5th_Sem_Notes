@@ -28,63 +28,57 @@
                 <h3>Table of Contents</h3>
                 <div class="topic-count">Total Topics: 6</div>
             </div>
-            <ul>
+            <ul class="index-list" id="indexList">
                 <li>
                     <a href="#topic-1">1. Semaphores Definition<span class="sub-count">4</span></a>
                     <ul class="sub-index">
                          <li><a href="#sub-1-1">1.1 Today's Agenda</a></li>
                          <li><a href="#sub-1-2">1.2 Recap: The Synchronization Hierarchy</a></li>
                          <li><a href="#sub-1-3">1.3 The Problem with Mutexes</a></li>
-                         <li><a href="#sub-1-4">1.4 Enter the Semaphore</a></li>
-                    > class="index-list" id="indexList"</ul>
+                         <li><a href="#sub-1-4">1.4 Enter the Semaphore</a></li></ul>
                 </li>
                 <li>
                     <a href="#topic-2">2. Binary vs. Counting Semaphores<span class="sub-count">4</span></a>
-                    <ul>
+                    <ul class="sub-index">
                          <li><a href="#sub-2-1">2.1 The Semaphore Abstract Data Type</a></li>
                          <li><a href="#sub-2-2">2.2 Binary Semaphore</a></li>
                          <li><a href="#sub-2-3">2.3 Counting Semaphore</a></li>
-                         <li><a href="#sub-2-4">2.4 Visualizing the Difference</a></li>
-                    > class="sub-index"</ul>
+                         <li><a href="#sub-2-4">2.4 Visualizing the Difference</a></li></ul>
                 </li>
                 <li>
                     <a href="#topic-3">3. Wait & Signal Operations<span class="sub-count">4</span></a>
-                    <ul>
+                    <ul class="sub-index">
                          <li><a href="#sub-3-1">3.1 The Two Atomic Operations</a></li>
                          <li><a href="#sub-3-2">3.2 Signal : Pseudo Code</a></li>
                          <li><a href="#sub-3-3">3.3 Simulation Trace</a></li>
-                         <li><a href="#sub-3-4">3.4 Busy Waiting (The Spinlock Approach)</a></li>
-                    > class="sub-index"</ul>
+                         <li><a href="#sub-3-4">3.4 Busy Waiting (The Spinlock Approach)</a></li></ul>
                 </li>
                 <li>
                     <a href="#topic-4">4. OS Kernel Implementation<span class="sub-count">4</span></a>
-                    <ul>
+                    <ul class="sub-index">
                          <li><a href="#sub-4-1">4.1 Blocking (Semaphore)</a></li>
                          <li><a href="#sub-4-2">4.2 Inside the OS Kernel: The Data Structure</a></li>
                          <li><a href="#sub-4-3">4.3 The Atomicity Challenge</a></li>
-                         <li><a href="#sub-4-4">4.4 The "Spinlock Inside" (Implementation Irony)</a></li>
-                    > class="sub-index"</ul>
+                         <li><a href="#sub-4-4">4.4 The "Spinlock Inside" (Implementation Irony)</a></li></ul>
                 </li>
                 <li>
                     <a href="#topic-5">5. POSIX Semaphore API<span class="sub-count">4</span></a>
-                    <ul>
+                    <ul class="sub-index">
                          <li><a href="#sub-5-1">5.1 Modern Optimization: The "Two-Phase" Wait</a></li>
                          <li><a href="#sub-5-2">5.2 Queue Policies & Fairness</a></li>
                          <li><a href="#sub-5-3">5.3 The Standard API (POSIX)</a></li>
-                         <li><a href="#sub-5-4">5.4 The Binary Mutex Pattern</a></li>
-                    > class="sub-index"</ul>
+                         <li><a href="#sub-5-4">5.4 The Binary Mutex Pattern</a></li></ul>
                 </li>
                 <li>
                     <a href="#topic-6">6. Deadlock & Starvation Pitfalls<span class="sub-count">7</span></a>
-                    <ul>
+                    <ul class="sub-index">
                          <li><a href="#sub-6-1">6.1 Pattern: The Resource Pool</a></li>
                          <li><a href="#sub-6-2">6.2 Deep Dive: Mutex vs. Semaphore</a></li>
                          <li><a href="#sub-6-3">6.3 Pitfall 1: Deadlock (The Deadly Embrace)</a></li>
                          <li><a href="#sub-6-4">6.4 Pitfall 2: Starvation & Fairness</a></li>
                          <li><a href="#sub-6-5">6.5 Common Coding Bugs (Logic Errors)</a></li>
                          <li><a href="#sub-6-6">6.6 Best Practices Checklist</a></li>
-                         <li><a href="#sub-6-7">6.7 Thank You!</a></li>
-                    > class="sub-index"</ul>
+                         <li><a href="#sub-6-7">6.7 Thank You!</a></li></ul>
                 </li>
                 <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
             </ul>
