@@ -185,7 +185,7 @@
     <li>Each process waits for another</li>
     <li>Circular wait exists:</li>
 </ul>
-<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
 
 <h3 id="sub-1-5">1.5 Deadlock vs Other Blocking States</h3>
 
@@ -211,7 +211,7 @@
     <li>No real progress</li>
     <li>Overreaction loop</li>
 </ul>
-<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
 
                     
                     <div class="topic-nav">
@@ -294,7 +294,7 @@ Release: close(), free(), signal()</code></pre>
     <li></li>
     <li></li>
 </ul>
-<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
 
 <h3 id="sub-2-4">2.4 Necessary Conditions (Coffman Conditions)</h3>
 
@@ -321,7 +321,7 @@ Release: close(), free(), signal()</code></pre>
     <li>Holding one resource</li>
     <li>Waiting for another</li>
 </ul>
-<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
 
 <h3 id="sub-2-5">2.5 Condition 1 Mutual Exclusion</h3>
 
@@ -416,7 +416,7 @@ Release: close(), free(), signal()</code></pre>
     <li></li>
     <li></li>
 </ul>
-<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
 
 <h3 id="sub-3-4">3.4 Condition 3 No Preemption</h3>
 
@@ -500,7 +500,7 @@ Release: close(), free(), signal()</code></pre>
     <li>P2 holds R2, waits for R3</li>
     <li>P3 holds R3, waits for R1</li>
 </ul>
-<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
 
 <h3 id="sub-4-2">4.2 Code Example - Three-Process Circular Wait</h3>
 
@@ -607,7 +607,7 @@ Release: close(), free(), signal()</code></pre>
     <li></li>
     <li>R3</li>
 </ul>
-<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
 
                     
                     <div class="topic-nav">
@@ -655,7 +655,7 @@ Release: close(), free(), signal()</code></pre>
     <li></li>
     <li>R3</li>
 </ul>
-<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
 
 <h3 id="sub-5-2">5.2 RAG Example 3 Cycle But No Deadlock</h3>
 
@@ -695,7 +695,7 @@ Release: close(), free(), signal()</code></pre>
     <li>R1</li>
     <li></li>
 </ul>
-<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
 
 <h3 id="sub-5-3">5.3 RAG Analysis Summary Rules</h3>
 
@@ -725,7 +725,7 @@ Release: close(), free(), signal()</code></pre>
     <li>Use Banker’s / detection algorithms</li>
     <li>All processes in cycle blocked</li>
 </ul>
-<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
 
 <h3 id="sub-5-4">5.4 Deadlock Example Dining Philosophers</h3>
 
@@ -756,7 +756,7 @@ Release: close(), free(), signal()</code></pre>
     <li></li>
     <li></li>
 </ul>
-<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
 
 <h3 id="sub-5-5">5.5 Consequences of Deadlocks</h3>
 
@@ -785,7 +785,7 @@ Release: close(), free(), signal()</code></pre>
     <li>Lower throughput</li>
     <li>Higher response time</li>
 </ul>
-<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
 
                     
                     <div class="topic-nav">
@@ -826,7 +826,7 @@ Release: close(), free(), signal()</code></pre>
     <li>Each resource has one instance</li>
     <li>Cycle exists in RAG</li>
 </ul>
-<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
 
 <h3 id="sub-6-2">6.2 Practice Problems</h3>
 
@@ -849,7 +849,7 @@ Release: close(), free(), signal()</code></pre>
     <li></li>
     <li>R3</li>
 </ul>
-<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
 
 <h3 id="sub-6-3">6.3 Practice Problems</h3>
 
@@ -887,7 +887,7 @@ Release: close(), free(), signal()</code></pre>
     <li></li>
     <li></li>
 </ul>
-<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
 
 <h3 id="sub-6-4">6.4 Key Takeaways</h3>
 
@@ -898,7 +898,7 @@ Release: close(), free(), signal()</code></pre>
     <li>Resource Allocation Graphs (RAG)</li>
     <li>RAG Analysis</li>
 </ul>
-<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
 
 <h3 id="sub-6-5">6.5 Thank You!</h3>
 <p>Thank you for your attention. Feel free to ask questions or revisit the topics covered.</p>

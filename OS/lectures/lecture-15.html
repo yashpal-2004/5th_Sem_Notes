@@ -291,7 +291,7 @@ signal(chopstick[i]);         // Put left
 signal(chopstick[(i+1) % 5]); // Put right
 }
 }</code></pre>
-<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
 
 <h3 id="sub-2-3">2.3 Solution 1 - Asymmetric Solution</h3>
 
@@ -328,7 +328,7 @@ signal(chopstick[i]);
 signal(chopstick[(i+1) % 5]);
 }
 }</code></pre>
-<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
 
 <h3 id="sub-2-4">2.4 Solution 2 - Allow Maximum N-1 Philosophers</h3>
 
@@ -525,7 +525,7 @@ signal(mutex); ... wait(mutex);   // Mutual exclusion violated
 wait(mutex); ... wait(mutex);     // Deadlock
 wait(mutex); ... /<em> forget signal </em>/ // Deadlock
 ● Incorrect order of wait() calls → deadlock</code></pre>
-<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
 
                     
                     <div class="topic-nav">

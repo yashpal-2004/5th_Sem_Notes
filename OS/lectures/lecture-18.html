@@ -268,7 +268,7 @@
     <li>Nodes: Processes ONLY (no resource nodes!)</li>
     <li>Edge Pi → Pj: "Pi is waiting for a resource held by Pj"</li>
 </ul>
-<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
 
 <h3 id="sub-2-5">2.5 WFG EXAMPLE</h3>
 
@@ -305,7 +305,7 @@
     <li>Terminating P3: Breaks P3→P4</li>
     <li>Terminating P4: Breaks P4→P2</li>
 </ul>
-<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
 
                     
                     <div class="topic-nav">
@@ -339,7 +339,7 @@
     <li>Give them to others</li>
     <li>Requires checkpointing/rollback</li>
 </ul>
-<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
 
 <h3 id="sub-3-2">3.2 PROCESS TERMINATION</h3>
 
@@ -368,7 +368,7 @@
 <p>3. Resources held - How many resources freed?</p>
 <p>4. Resources still needed - Close to completion?</p>
 <p>5. Type - Interactive vs batch (batch easier to restart)</p>
-<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
 
 <h3 id="sub-3-3">3.3 VICTIM SELECTION EXAMPLE</h3>
 
@@ -506,7 +506,7 @@
     <li>Only 10% complete</li>
     <li>Trade-off: Slightly higher priority</li>
 </ul>
-<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
 
 <h3 id="sub-4-2">4.2 Recovery Understanding Check</h3>
 
@@ -522,7 +522,7 @@
 <p>avoidance (which checks for future</p>
 <p>possibilities) or RAGs with multiple instances</p>
 <p>(where cycles don't always mean deadlock).</p>
-<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
 
 <h3 id="sub-4-3">4.3 DETECTION FREQUENCY</h3>
 
@@ -591,7 +591,7 @@
     <li>Early Windows: Relied on user reboots</li>
     <li>macOS: Hybrid - some detection, but users often force quit</li>
 </ul>
-<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
 
                     
                     <div class="topic-nav">
@@ -658,7 +658,7 @@
 <p>hold-and-wait)</p>
 <p> Cannot afford detection or recovery</p>
 <p>complexity</p>
-<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
 
 <h3 id="sub-5-4">5.4 Key Takeaways</h3>
 
@@ -682,7 +682,7 @@
 <p>The Engineer's Question:</p>
 <p>"How often do deadlocks occur, and what's the</p>
 <p>cost if they do?"</p>
-<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
 
 <h3 id="sub-5-5">5.5 Practical Guidelines</h3>
 

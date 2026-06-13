@@ -212,7 +212,7 @@
 <p>t4 CRITICAL SECTION CRITICAL SECTION 1</p>
 <pre class="code-block"><code>t0 while(lock!=0) 0
 t1 while(lock!=0) 0</code></pre>
-<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
 
 <h3 id="sub-2-6">2.6 Checking for Progress:</h3>
 <p>Time Process P0 Process P1 Lock</p>
@@ -235,7 +235,7 @@ t1 while(lock!=0) 0</code></pre>
 <p>P1 interested</p>
 <pre class="code-block"><code>t0 while(lock!=0) 0
 t1 while(lock!=0) 0</code></pre>
-<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
 
                     
                     <div class="topic-nav">
@@ -309,7 +309,7 @@ t8 lock = 0[P0 exits] while(lock!=0) [TRUE] 0</code></pre>
     <li>Success: Guarantees Mutual Exclusion.</li>
     <li>Failure: Violates Progress</li>
 </ul>
-<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
 
 <h3 id="sub-3-5">3.5 . Strict Alternation (Turn Variable) Solution:</h3>
 <p>Mutual Exclusion </p>
@@ -353,7 +353,7 @@ t8 lock = 0[P0 exits] while(lock!=0) [TRUE] 0</code></pre>
 <p>P0 interested</p>
 <p>P1 is NOT interested</p>
 <p>Initially turn = 0</p>
-<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
 
 <h3 id="sub-4-2">4.2 Checking for Bounded Waiting:</h3>
 <p>P0 waiting forever</p>
@@ -394,7 +394,7 @@ t8 lock = 0[P0 exits] while(lock!=0) [TRUE] 0</code></pre>
     <li>The Failure: Deadlock (Progress Violation).</li>
 </ul>
 <pre class="code-block"><code>Instead of a "turn," let each process have its own "interest" flag.</code></pre>
-<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
 
 <h3 id="sub-4-6">4.6 . The Interest Variable (Individual Interest Flags):</h3>
 <div class="formula-box">Flag[0] = True; // I'm interested</div>
@@ -440,7 +440,7 @@ t8 lock = 0[P0 exits] while(lock!=0) [TRUE] 0</code></pre>
     <li>CS remains empty forever</li>
     <li>This violates the purpose of mutual exclusion (ensuring CS is used)</li>
 </ul>
-<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
 
 <h3 id="sub-5-2">5.2 Evaluation of The Interest Variable (Individual Interest Flags):</h3>
 <p>Requirement Status Actual Reason</p>
@@ -452,7 +452,7 @@ t8 lock = 0[P0 exits] while(lock!=0) [TRUE] 0</code></pre>
 <p>can enter - selection postponed indefinitely.</p>
 <p>Bounded Waiting  FAILS Deadlock causes infinite waiting time - no bound exists.</p>
 <p>Processes wait forever without entering CS.</p>
-<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
 
 <h3 id="sub-5-3">5.3 . Dekker's Algorithm: The First Complete Solution:</h3>
 <p>The Logic:</p>
@@ -479,7 +479,7 @@ t8 lock = 0[P0 exits] while(lock!=0) [TRUE] 0</code></pre>
     <li>Why it succeeds: It overcomes the Deadlock (Progress Violation) of the</li>
     <li>The Improvement: It ensures Mutual Exclusion without the "Strict</li>
 </ul>
-<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
 
 <h3 id="sub-5-5">5.5 Evaluation of Dekker's Algorithm:</h3>
 <p>Requirement Status Actual Reason</p>

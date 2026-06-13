@@ -392,7 +392,7 @@ the entire if (count < 0) { ... }</code></pre>
     <li>Phase 1 (Spin): Spin for a tiny limit (e.g., 50</li>
     <li>Phase 2 (Block): If still unavailable, then yield the</li>
 </ul>
-<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
 
 <h3 id="sub-5-2">5.2 Queue Policies & Fairness</h3>
 
@@ -441,7 +441,7 @@ sem_wait(&mutex);  // Lock
 sem_post(&mutex);  // Unlock
 sem_init(&mutex, 0, 0);
 sem_wait(&mutex);  // Blocks immediately!</code></pre>
-<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
 
                     
                     <div class="topic-nav">
@@ -497,7 +497,7 @@ someone calls sem_post.</code></pre>
 <p>gets B. Both block. Game over.</p>
 <pre class="code-block"><code>● Thread 1: wait(A); wait(B);
 ● Thread 2: wait(B); wait(A);</code></pre>
-<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
 
 <h3 id="sub-6-4">6.4 Pitfall 2: Starvation & Fairness</h3>
 
@@ -515,7 +515,7 @@ someone calls sem_post.</code></pre>
 <p>light stays green for the main road</p>
 <p>forever, and the car on the small</p>
 <p>side street never gets a turn.</p>
-<div class="box box-red"><div class="box-title">Critical Issue</div><p>This scenario requires careful synchronization. Uncontrolled concurrent access will violate mutual exclusion, leading to race conditions, data corruption, or deadlocks.</p></div>
+
 
 <h3 id="sub-6-5">6.5 Common Coding Bugs (Logic Errors)</h3>
 
