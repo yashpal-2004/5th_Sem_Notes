@@ -230,9 +230,53 @@
 <h3 id="sub-2-2">2.2 COMPREHENSIVE EXAMPLE SETUP</h3>
 
 <p>The Challenge - Same Workload, Different Stories:</p>
-<p>Process Arrival Burst Priority P1 0 10 3 P2 1 1 1 P3 2 2 2 P4 3 1 4 P5 4 5 2 Let's watch these five processes compete under different rules!</p>
+<table style="width:100%; border-collapse:collapse; margin:1rem 0; font-size:0.95rem;">
+    <thead>
+        <tr style="background:var(--bg-mint); font-weight:600;">
+            <th style="padding:0.5rem 0.75rem; border:1px solid var(--border-light); text-align:left;">Process</th>
+            <th style="padding:0.5rem 0.75rem; border:1px solid var(--border-light); text-align:left;">Arrival</th>
+            <th style="padding:0.5rem 0.75rem; border:1px solid var(--border-light); text-align:left;">Burst</th>
+            <th style="padding:0.5rem 0.75rem; border:1px solid var(--border-light); text-align:left;">Priority</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">P1</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">0</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">10</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">3</td>
+        </tr>
+        <tr>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">P2</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">1</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">1</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">1</td>
+        </tr>
+        <tr>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">P3</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">2</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">2</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">2</td>
+        </tr>
+        <tr>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">P4</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">3</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">1</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">4</td>
+        </tr>
+        <tr>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">P5</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">4</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">5</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">2</td>
+        </tr>
+    </tbody>
+</table>
+<p>Let's watch these five processes compete under different rules!</p>
 <p>The Story:</p>
-<p>Waiting Times: P1=0, P2=9, P3=9, P4=10, P5=9 Turnaround Times: P1=10, P2=10, P3=11, P4=11, P5=15 Verdict: "Like waiting behind someone with a full shopping cart when you only have one item"</p>
+<p>Waiting Times: P1=0, P2=9, P3=9, P4=10, P5=9</p>
+<p>Turnaround Times: P1=10, P2=10, P3=11, P4=11, P5=15</p>
+<p class="box box-orange" style="padding:0.75rem 1rem;">Verdict: "Like waiting behind someone with a full shopping cart when you only have one item"</p>
 <ul>
     <li>P2 (1 second job) waits 10 seconds behind P1</li>
     <li>P4 waits 13 seconds for a 1-second job!</li>
@@ -242,9 +286,52 @@
 <h3 id="sub-2-3">2.3 COMPREHENSIVE EXAMPLE SETUP</h3>
 
 <p>The Challenge - Same Workload, Different Stories:</p>
-<p>Process Arrival Burst Priority P1 0 10 3 P2 1 1 1 P3 2 2 2 P4 3 1 4 P5 4 5 2 Let's watch these five processes compete under different rules!</p>
+<table style="width:100%; border-collapse:collapse; margin:1rem 0; font-size:0.95rem;">
+    <thead>
+        <tr style="background:var(--bg-mint); font-weight:600;">
+            <th style="padding:0.5rem 0.75rem; border:1px solid var(--border-light); text-align:left;">Process</th>
+            <th style="padding:0.5rem 0.75rem; border:1px solid var(--border-light); text-align:left;">Arrival</th>
+            <th style="padding:0.5rem 0.75rem; border:1px solid var(--border-light); text-align:left;">Burst</th>
+            <th style="padding:0.5rem 0.75rem; border:1px solid var(--border-light); text-align:left;">Priority</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">P1</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">0</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">10</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">3</td>
+        </tr>
+        <tr>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">P2</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">1</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">1</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">1</td>
+        </tr>
+        <tr>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">P3</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">2</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">2</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">2</td>
+        </tr>
+        <tr>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">P4</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">3</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">1</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">4</td>
+        </tr>
+        <tr>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">P5</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">4</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">5</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">2</td>
+        </tr>
+    </tbody>
+</table>
+<p>Let's watch these five processes compete under different rules!</p>
 <p>Results:</p>
-<p>Waiting Times: P1=0, P2=10, P3=11, P4=13, P5=15 The Insight: Mathematically proven optimal for average waiting time!</p>
+<p>Waiting Times: P1=0, P2=10, P3=11, P4=13, P5=15</p>
+<p><strong>The Insight:</strong> Mathematically proven optimal for average waiting time!</p>
 <ul>
     <li>Avg Waiting: 7.2 seconds  (Better than FCFS!)</li>
     <li>But P1 still suffers (no preemption)</li>
@@ -254,9 +341,52 @@
 <h3 id="sub-2-4">2.4 COMPREHENSIVE EXAMPLE SETUP</h3>
 
 <p>The Challenge - Same Workload, Different Stories:</p>
-<p>Process Arrival Burst Priority P1 0 10 3 P2 1 1 1 P3 2 2 2 P4 3 1 4 P5 4 5 2 Let's watch these five processes compete under different rules!</p>
+<table style="width:100%; border-collapse:collapse; margin:1rem 0; font-size:0.95rem;">
+    <thead>
+        <tr style="background:var(--bg-mint); font-weight:600;">
+            <th style="padding:0.5rem 0.75rem; border:1px solid var(--border-light); text-align:left;">Process</th>
+            <th style="padding:0.5rem 0.75rem; border:1px solid var(--border-light); text-align:left;">Arrival</th>
+            <th style="padding:0.5rem 0.75rem; border:1px solid var(--border-light); text-align:left;">Burst</th>
+            <th style="padding:0.5rem 0.75rem; border:1px solid var(--border-light); text-align:left;">Priority</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">P1</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">0</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">10</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">3</td>
+        </tr>
+        <tr>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">P2</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">1</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">1</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">1</td>
+        </tr>
+        <tr>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">P3</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">2</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">2</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">2</td>
+        </tr>
+        <tr>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">P4</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">3</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">1</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">4</td>
+        </tr>
+        <tr>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">P5</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">4</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">5</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">2</td>
+        </tr>
+    </tbody>
+</table>
+<p>Let's watch these five processes compete under different rules!</p>
 <p>The Magic:</p>
-<p>(Best!) (Also best!) No Starvation: P1 gets multiple turns because it has a long burst. Everyone gets regular CPU access P1 P2 P3 P4 P1 P5 P1 P5 P1 P5 P1 0-2 2-3 3-5 5-6 6-8 8-10 10-12 12-14 14-16 16-17 17-19</p>
+<p>No Starvation: P1 gets multiple turns because it has a long burst. Everyone gets regular CPU access.</p>
+<p style="font-family:'Consolas',monospace; background:var(--bg-mint); padding:0.75rem 1rem; border-radius:6px; font-size:0.9rem;">P1 → P2 → P3 → P4 → P1 → P5 → P1 → P5 → P1 → P5 → P1<br>0-2 &nbsp;2-3 &nbsp;3-5 &nbsp;5-6 &nbsp;6-8 &nbsp;8-10 10-12 12-14 14-16 16-17 17-19</p>
 <ul>
     <li>Avg Response Time: 3.4 seconds </li>
     <li>Avg Waiting: 6.4 seconds </li>
@@ -266,9 +396,52 @@
 <h3 id="sub-2-5">2.5 COMPREHENSIVE EXAMPLE SETUP</h3>
 
 <p>The Challenge - Same Workload, Different Stories:</p>
-<p>Process Arrival Burst Priority P1 0 10 3 P2 1 1 1 P3 2 2 2 P4 3 1 4 P5 4 5 2 Let's watch these five processes compete under different rules!</p>
+<table style="width:100%; border-collapse:collapse; margin:1rem 0; font-size:0.95rem;">
+    <thead>
+        <tr style="background:var(--bg-mint); font-weight:600;">
+            <th style="padding:0.5rem 0.75rem; border:1px solid var(--border-light); text-align:left;">Process</th>
+            <th style="padding:0.5rem 0.75rem; border:1px solid var(--border-light); text-align:left;">Arrival</th>
+            <th style="padding:0.5rem 0.75rem; border:1px solid var(--border-light); text-align:left;">Burst</th>
+            <th style="padding:0.5rem 0.75rem; border:1px solid var(--border-light); text-align:left;">Priority</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">P1</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">0</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">10</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">3</td>
+        </tr>
+        <tr>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">P2</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">1</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">1</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">1</td>
+        </tr>
+        <tr>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">P3</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">2</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">2</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">2</td>
+        </tr>
+        <tr>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">P4</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">3</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">1</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">4</td>
+        </tr>
+        <tr>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">P5</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">4</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">5</td>
+            <td style="padding:0.5rem 0.75rem; border:1px solid var(--border-light);">2</td>
+        </tr>
+    </tbody>
+</table>
+<p>Let's watch these five processes compete under different rules!</p>
 <p>The Drama:</p>
-<p>Waiting Times: P1=9, P2=0, P3=0, P4=15, P5=4 The Lesson: "Efficiency without fairness = starvation"</p>
+<p>Waiting Times: P1=9, P2=0, P3=0, P4=15, P5=4</p>
+<p><strong>The Lesson:</strong> "Efficiency without fairness = starvation"</p>
 <ul>
     <li>P2 (Priority 1) immediately preempts P1 at t=1!</li>
     <li>P3 (Priority 2) preempts P1 at t=2!</li>
@@ -302,8 +475,9 @@
     <li><strong>A)</strong> FCFS</li>
     <li><strong>B)</strong> SJF</li>
     <li><strong>C)</strong> Round Robin</li>
-    <li><strong>D)</strong> Priority ANSWER:</li>
-    <li><strong>B)</strong> SJF This is mathematically proven - always run the shortest job next minimizes average waiting time.</li>
+    <li><strong>D)</strong> Priority</li>
+</ul>
+<div class="box box-green"><div class="box-title">Answer</div><p><strong>B) SJF</strong> — Mathematically proven: always running the shortest job next minimizes average waiting time.</p></div>
 </ul>
 
 <h3 id="sub-3-2">3.2 What If We Use Them ALL?</h3>
@@ -316,7 +490,9 @@
 <ol>
     <li>Classify processes on arrival (system/interactive/batch)</li>
     <li>Each queue has its own algorithm</li>
-    <li>Higher priority queues run first Example Timeline:</li>
+    <li>Higher priority queues run first.</li>
+</ol>
+<p><strong>Example Timeline:</strong></p>
 </ol>
 <p>The Problem:</p>
 <p>Once classified, processes are stuck forever!</p>
