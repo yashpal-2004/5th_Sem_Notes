@@ -187,13 +187,13 @@
 <h3 id="sub-1-6">1.6 TAS IN ACTION - THE SPINLOCK</h3>
 
 <p>Implementing a Spinlock:</p>
-<p>// Shared lock variable</p>
-<p>boolean lock = false;</p>
-<p>// Acquire lock</p>
-<p>while (TestAndSet(&lock))</p>
-<p>; // Keep spinning if lock was already true</p>
-<p>// Release lock</p>
-<p>lock = false;</p>
+<pre class="code-block"><code><span class="code-comment">// Shared lock variable</span>
+boolean lock = false;
+<span class="code-comment">// Acquire lock</span>
+while (TestAndSet(&amp;lock))
+    ; <span class="code-comment">// Keep spinning if lock was already true</span>
+<span class="code-comment">// Release lock</span>
+lock = false;</code></pre>
 <p>The Magic:</p>
 <p> Only ONE thread sees false and sets it to true</p>
 <p> All others see true and keep spinning</p>

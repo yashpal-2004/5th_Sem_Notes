@@ -486,9 +486,9 @@
 <h3 id="sub-4-3">4.3 GAMING THE SYSTEM</h3>
 
 <p>The Problem - Smart Processes Try to Cheat:</p>
-<p>// Gaming attempt:</p>
-<p>do_work_for(quantum - 1ms);</p>
-<p>yield_cpu();  // Give up just before demotion!</p>
+<pre class="code-block"><code><span class="code-comment">// Gaming attempt:</span>
+do_work_for(quantum - 1ms);
+yield_cpu();  <span class="code-comment">// Give up just before demotion!</span></code></pre>
 <p>Result: Stay in high priority queue forever!</p>
 <p>The Solutions:</p>
 <p>1. Priority Boost:</p>

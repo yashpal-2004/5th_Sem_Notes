@@ -519,26 +519,30 @@ t8 lock = 0[P0 exits] while(lock!=0) [TRUE] 0</code></pre>
                 </div>
                 <div id="content-6" class="collapsible-content">
                     <h3 id="sub-6-1">6.1 . Peterson's Algorithm - The First Correct Solution:</h3>
-<p>// Indicate that Process P0 wants to enter the critical section</p>
-<p>Flag[0] = True;</p>
-<p>//Give priority to process P1 in case both want to enter</p>
-<p>Turn = j</p>
-<p>//Busy wait while P1 is interested/ready and it is P1’s turn</p>
-<p>while (Flag[1] == True && Turn == j);</p>
-<p>CRITICAL SECTION</p>
-<p>// Indicate that Process P0 has exited the critical section</p>
-<p>Flag[0] = False;</p>
-<p>Process P0</p>
-<p>// Indicate that Process P1 wants to enter the critical section</p>
-<p>Flag[1] = True;</p>
-<p>//Give priority to process P0 in case both want to enter</p>
-<p>Turn = i</p>
-<p>//Busy wait while P0 is interested/ready and it is P0’s turn</p>
-<p>while (Flag[0] == True && Turn == i);</p>
-<p>CRITICAL SECTION</p>
-<p>// Indicate that Process P1 has exited the critical section</p>
-<p>Flag[1] = False;</p>
-<p>Process P1</p>
+<pre class="code-block"><code><span class="code-comment">// Process P0</span>
+<span class="code-comment">// Indicate that Process P0 wants to enter the critical section</span>
+Flag[0] = True;
+<span class="code-comment">// Give priority to process P1 in case both want to enter</span>
+Turn = j;
+<span class="code-comment">// Busy wait while P1 is interested/ready and it is P1’s turn</span>
+while (Flag[1] == True && Turn == j);
+
+// CRITICAL SECTION
+
+<span class="code-comment">// Indicate that Process P0 has exited the critical section</span>
+Flag[0] = False;</code></pre>
+<pre class="code-block"><code><span class="code-comment">// Process P1</span>
+<span class="code-comment">// Indicate that Process P1 wants to enter the critical section</span>
+Flag[1] = True;
+<span class="code-comment">// Give priority to process P0 in case both want to enter</span>
+Turn = i;
+<span class="code-comment">// Busy wait while P0 is interested/ready and it is P0’s turn</span>
+while (Flag[0] == True && Turn == i);
+
+// CRITICAL SECTION
+
+<span class="code-comment">// Indicate that Process P1 has exited the critical section</span>
+Flag[1] = False;</code></pre>
 
 <h3 id="sub-6-2">6.2 Checking for Mutual exclusion:</h3>
 <p>The `Turn` variable acts as a <strong>tiebreaker</strong>!</p>
