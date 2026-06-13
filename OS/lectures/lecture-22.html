@@ -111,30 +111,19 @@
 
 <h3 id="sub-1-2">1.2 The Journey So Far</h3>
 
-<p>Processes and scheduling: How the</p>
-<p>conductor manages the orchestra.</p>
-<p>Memory management and paging: How</p>
-<p>the library organizes its books.</p>
-<p>I/O systems and device management: How</p>
-<p>the manager interacts with staff and external</p>
-<p>resources.</p>
-<p>How do these components actually get built</p>
-<p>from the ground up?</p>
+<p>Processes and scheduling: How the conductor manages the orchestra.</p>
+<p>Memory management and paging: How the library organizes its books.</p>
+<p>I/O systems and device management: How the manager interacts with staff and external resources.</p>
+<p>How do these components actually get built from the ground up?</p>
 
 <h3 id="sub-1-3">1.3 The "Missing Link"</h3>
 
-<p>(the blueprints).</p>
-<p>house's function).</p>
-<p>implemented?</p>
-<p>running processes?</p>
-<p>Have you ever wondered what happens</p>
-<p>between writing int main() and the</p>
-<p>CPU executing instructions?</p>
+<p>Have you ever wondered what happens between writing <code>int main()</code> and the CPU executing instructions?</p>
 <ul>
-    <li>We've studied OS concepts abstractly</li>
-    <li>We understand what an OS does (the</li>
-    <li>But: How is an OS actually</li>
-    <li>How do high-level programs become</li>
+    <li>We've studied OS concepts abstractly (the blueprints).</li>
+    <li>We understand what an OS does (the house's function).</li>
+    <li>But: How is an OS actually implemented?</li>
+    <li>How do high-level programs become running processes?</li>
 </ul>
 
 <h3 id="sub-1-4">1.4 The Grand Vision</h3>
@@ -228,39 +217,35 @@
 
 <h3 id="sub-3-2">3.2 Assembly Language (Layer 1)</h3>
 
-<p>Symbolic Representation: @sum instead of @16.</p>
+<p>Symbolic Representation: <code>@sum</code> instead of <code>@16</code>.</p>
 <p>The Assembler’s Job:</p>
-<p>Like using a contact name (e.g., "Mom") in your</p>
-<p>phone instead of memorizing her 10-digit phone</p>
-<p>number.</p>
 <ul>
     <li>Translate symbols to addresses.</li>
-    <li>Convert mnemonics (D=M) to binary.</li>
-    <li>Resolve labels and output .hack files.</li>
+    <li>Convert mnemonics (e.g., <code>D=M</code>) to binary.</li>
+    <li>Resolve labels and output <code>.hack</code> files.</li>
 </ul>
+<div class="box box-green">
+    <div class="box-title">Analogy</div>
+    <p>Using symbolic labels (like <code>@sum</code>) in assembly is like using a contact name (e.g., "Mom") in your phone contact list instead of memorizing her 10-digit phone number.</p>
+</div>
 
 <h3 id="sub-3-3">3.3 Virtual Machine (Layer 4)</h3>
 
 <p>Intermediate Abstraction: A stack-based model.</p>
-<p>VM Commands: push constant 5,</p>
-<p>add, pop local 0.</p>
+<p>VM Commands: <code>push constant 5</code>, <code>add</code>, <code>pop local 0</code>.</p>
 <p>Why VM?</p>
-<p>Platform Independence: Write</p>
-<p>once, run on any hardware with a</p>
-<p>VM translator.</p>
-<p>Simplifies Compiler: The Jack</p>
-<p>compiler only needs to know how to</p>
-<p>talk to the VM.</p>
+<ul>
+    <li><strong>Platform Independence:</strong> Write once, run on any hardware with a VM translator.</li>
+    <li><strong>Simplifies Compiler:</strong> The Jack compiler only needs to know how to translate high-level constructs into VM instructions.</li>
+</ul>
 
 <h3 id="sub-3-4">3.4 The Jack Compiler (Layer 5)</h3>
 
 <p>Compilation Pipeline:</p>
-<p>(keywords, symbols).</p>
-<p>tree).</p>
 <ul>
-    <li>Tokenizer: Breaking text into "words"</li>
-    <li>Parser: Understanding the "grammar" (syntax</li>
-    <li>Code Generator: Emitting the VM instructions.</li>
+    <li><strong>Tokenizer:</strong> Breaking text into "words" (keywords, symbols).</li>
+    <li><strong>Parser:</strong> Understanding the "grammar" (syntax tree).</li>
+    <li><strong>Code Generator:</strong> Emitting the VM instructions.</li>
 </ul>
 
                     
@@ -284,12 +269,12 @@
 <p>static variables.</p>
 <p>Role: The bridge between human logic and</p>
 <p>the VM translator.</p>
-<p>var int result;</p>
-<p>return result;</p>
 <pre class="code-block"><code>class Main {
-function int addPair(int x, int y) {
-let result = x + y;
-}
+    function int addPair(int x, int y) {
+        var int result;
+        let result = x + y;
+        return result;
+    }
 }</code></pre>
 
 <h3 id="sub-4-2">4.2 The Operating System (Layer 6)</h3>
@@ -382,12 +367,11 @@ M=M+D</code></pre>
 
 <h3 id="sub-5-3">5.3 Variable Types & Scope</h3>
 
-<p>Field: One per object instance</p>
-<p>(State).</p>
-<p>Static: Shared by all instances of a</p>
-<p>class.</p>
-<p>Local: Exists only during</p>
-<p>subroutine execution (Stack).</p>
+<ul>
+    <li><strong>Field:</strong> One per object instance (State).</li>
+    <li><strong>Static:</strong> Shared by all instances of a class.</li>
+    <li><strong>Local:</strong> Exists only during subroutine execution (Stack).</li>
+</ul>
 
 <h3 id="sub-5-4">5.4 Memory Management (Jack Style)</h3>
 
@@ -414,10 +398,14 @@ M=M+D</code></pre>
                 <div id="content-6" class="collapsible-content">
                     <h3 id="sub-6-1">6.1 Basic Statement: let and do</h3>
 
-<p>do: Used for subroutine calls when you</p>
-<p>ignore the return value.</p>
-<p>do Screen.drawPixel(x, y);.</p>
-<pre class="code-block"><code>let: Used for assignments. let x = 5;</code></pre>
+<ul>
+    <li><strong>let:</strong> Used for assignments.
+        <pre class="code-block" style="margin: 0.5rem 0 1rem 0;"><code>let x = 5;</code></pre>
+    </li>
+    <li><strong>do:</strong> Used for subroutine calls when you ignore the return value.
+        <pre class="code-block" style="margin: 0.5rem 0 0 0;"><code>do Screen.drawPixel(x, y);</code></pre>
+    </li>
+</ul>
 
 <h3 id="sub-6-2">6.2 Control Flow: If-Else</h3>
 
