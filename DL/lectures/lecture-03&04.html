@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Deep Learning Foundations - Lecture 03 &amp; 04</title>
+<meta content="Study notes for Deep Learning Foundations, Lecture 03 &amp; 04 covering Probability Theory, Bayes' Theorem, Expectations, Discriminative vs. Generative Models, Entropy, Cross-Entropy, and KL Divergence." name="description"/>
+<link class="favicon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjIwIiBmaWxsPSIjMTMyMjE5Ii8+PHRleHQgeD0iNTAiIHk9IjUwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iNDAiIGZpbGw9IndoaXRlIiBmb250LXdlaWdodD0iYm9sZCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPjMmYW1wOzQ8L3RleHQ+PC9zdmc+" rel="icon"/>
+<link href="../css/style.css" rel="stylesheet"/>
+</head>
+<body>
+<header>
+<div class="header-titles">
+<h1>Deep Learning Foundations</h1>
+<p>Lecture 03 &amp; 04 - Probability Theory &amp; Information Theory</p>
+<a href="../index.html" style="color: var(--text-dark); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+<span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+<a href="../pdfs/3&amp;4.pdf" style="color: var(--text-dark); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+</div>
+<div class="search-container">
+<input id="searchInput" placeholder="Search notes..." type="text"/>
+</div>
+</header>
+<div class="container">
+<!-- Sidebar Index -->
+<aside>
+<div class="aside-header">
+<h3>Table of Contents</h3>
+<div class="topic-count">Total Topics: 4</div>
+</div>
+<ul class="index-list" id="indexList">
+<li>
+<a href="#topic-1">1. Probability Foundations<span class="sub-count">4</span></a>
+<ul class="sub-index">
+<li><a href="#sub-1-1">1.1 Why Probability in Deep Learning?</a></li>
+<li><a href="#sub-1-2">1.2 Probability Terminology</a></li>
+<li><a href="#sub-1-3">1.3 Joint &amp; Conditional Probability</a></li>
+<li><a href="#sub-1-4">1.4 Bayes' Theorem &amp; Diagnosis</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-2">2. Expectation &amp; Statistical Metrics<span class="sub-count">3</span></a>
+<ul class="sub-index">
+<li><a href="#sub-2-1">2.1 Expected Value (Expectation)</a></li>
+<li><a href="#sub-2-2">2.2 Variance &amp; Covariance</a></li>
+<li><a href="#sub-2-3">2.3 Correlation</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-3">3. Classification Paradigms &amp; LLMs<span class="sub-count">2</span></a>
+<ul class="sub-index">
+<li><a href="#sub-3-1">3.1 Discriminative vs. Generative Models</a></li>
+<li><a href="#sub-3-2">3.2 Language Models as Generative Systems</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-4">4. Information Theory &amp; Divergences<span class="sub-count">4</span></a>
+<ul class="sub-index">
+<li><a href="#sub-4-1">4.1 Information Content &amp; Surprise</a></li>
+<li><a href="#sub-4-2">4.2 Shannon Entropy</a></li>
+<li><a href="#sub-4-3">4.3 Cross-Entropy Loss</a></li>
+<li><a href="#sub-4-4">4.4 Kullback-Leibler (KL) Divergence</a></li>
+</ul>
+</li>
+
+<li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+</ul>
+</aside>
+<!-- Main Content -->
+<main id="notesContent">
+<!-- Topic 1 -->
+<section class="topic-section" id="topic-1">
+<div class="topic-header" onclick="toggleSection('content-1')">
+<div class="topic-number">1</div>
+<h2>Probability Foundations</h2>
+</div>
+<div class="collapsible-content" id="content-1">
+<h3 id="sub-1-1">1.1 Why Probability in Deep Learning?</h3>
+<p>Machine learning models must make decisions under uncertainty. Probability theory provides a formal framework to model and reason about incomplete information. In deep learning, uncertainty arises from three distinct sources:</p>
+<div class="box box-blue">
+<div class="box-title">Three Sources of Uncertainty</div>
+<ol>
+<li><strong>Incomplete Modeling:</strong> Occurs when we discard details for simplicity (<em>Jo abhi jaan-na nahi chahte</em>). For example, a coin toss can be predicted deterministically using aerodynamics and wind force, but we treat it as random to simplify the model.</li>
+<li><strong>Incomplete Observability:</strong> Occurs when we cannot observe all variables (<em>Jo abhi nahi jaante</em>). For example, estimating the health of a second-hand car/bike/phone without seeing its complete internal usage history.</li>
+<li><strong>Inherent Stochasticity:</strong> Occurs when the system itself is fundamentally random (<em>Jo jaana nahi jaa sakta</em>). For example, the behavior of subatomic particles in quantum mechanics.</li>
+</ol>
+</div>
+<h3 id="sub-1-2">1.2 Probability Terminology</h3>
+<p>To mathematically model random processes, we define standard building blocks:</p>
+<ul>
+<li><strong>Random Experiment:</strong> A process that leads to one of several possible outcomes, where the exact outcome is uncertain beforehand (e.g., rolling a fair 6-sided die).</li>
+<li><strong>Outcomes:</strong> The individual results of an experiment (e.g., landing on 1, 2, 3, 4, 5, or 6).</li>
+<li><strong>Sample Space (S):</strong> The collection of all possible outcomes (e.g., S = {1, 2, 3, 4, 5, 6}).</li>
+<li><strong>Events:</strong> A subset of the sample space containing one or more outcomes (e.g., getting an even number, E = {2, 4, 6}).</li>
+<li><strong>Probability of an Event P(E):</strong> A value from 0 to 1 indicating the likelihood of that event. For example, P(rolling an even number) = |{2, 4, 6}| / |{1, 2, 3, 4, 5, 6}| = 3/6 = 0.5.</li>
+</ul>
+<h3 id="sub-1-3">1.3 Joint &amp; Conditional Probability</h3>
+<p>In deep learning, we typically analyze multiple random variables simultaneously:</p>
+<ul>
+<li><strong>Random Variable (X):</strong> A variable whose value is determined by the outcome of a random experiment.</li>
+<li><strong>Joint Probability P(X=x, Y=y):</strong> The probability that event X equals x AND event Y equals y simultaneously.</li>
+<li><strong>Conditional Probability P(A|B):</strong> The probability of event A occurring given that event B has already occurred:
+                            <div class="formula-box">P(A|B) = P(A ∩ B) / P(B)   [where P(B) &gt; 0]</div>
+</li>
+<li><strong>Chain Rule of Probability:</strong> Joint probabilities can be decomposed into a product of several conditional probabilities:
+                            <div class="formula-box">P(A, B) = P(A|B)P(B)</div>
+                            For n variables, the chain rule generalizes to:
+                            <div class="formula-box">P(X<sub>1</sub>, ..., X<sub>n</sub>) = ∏<sub>i=1</sub><sup>n</sup> P(X<sub>i</sub> | X<sub>1</sub>, ..., X<sub>i-1</sub>)</div>
+</li>
+</ul>
+<h3 id="sub-1-4">1.4 Bayes' Theorem &amp; Diagnosis</h3>
+<p>Bayes' Theorem updates the probability of a hypothesis (A) based on new evidence (B):</p>
+<div class="box box-beige">
+<div class="box-title">Bayes' Theorem Formula</div>
+<div style="font-family: monospace; font-size: 1.2rem; text-align: center; margin: 0.5rem 0;">P(A|B) = ( P(B|A) × P(A) ) / P(B)</div>
+<p>Where:</p>
+<ul>
+<li><strong>P(A):</strong> Prior probability (initial belief in hypothesis A).</li>
+<li><strong>P(B|A):</strong> Likelihood (probability of seeing evidence B if hypothesis A is true).</li>
+<li><strong>P(B):</strong> Marginal evidence (overall probability of seeing evidence B).</li>
+<li><strong>P(A|B):</strong> Posterior probability (updated belief in A after seeing evidence B).</li>
+</ul>
+</div>
+<div class="box box-orange">
+<div class="box-title">Example: Medical Diagnosis</div>
+<p>Suppose 2% of the population has Typhoid (Prior: P(A) = 0.02). The natural rate of fever in the population is 5% (Evidence: P(B) = 0.05). If someone has Typhoid, their chance of having a fever is 50% (Likelihood: P(B|A) = 0.50).</p>
+<p>What is the probability that someone with a fever has Typhoid?</p>
+<p style="font-family: monospace;">P(Typhoid | Fever) = ( P(Fever | Typhoid) × P(Typhoid) ) / P(Fever)</p>
+<p style="font-family: monospace;">P(A|B) = (0.50 × 0.02) / 0.05 = 0.01 / 0.05 = 0.20 (20%)</p>
+</div>
+<div class="topic-nav">
+<button class="btn" disabled="">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 2 -->
+<section class="topic-section" id="topic-2">
+<div class="topic-header" onclick="toggleSection('content-2')">
+<div class="topic-number">2</div>
+<h2>Expectation &amp; Statistical Metrics</h2>
+</div>
+<div class="collapsible-content" id="content-2">
+<h3 id="sub-2-1">2.1 Expected Value (Expectation)</h3>
+<p>The <strong>Expected Value</strong> of a random variable is the probability-weighted average of all its possible values over many trials. For a discrete random variable X with values x<sub>i</sub> and probabilities p<sub>i</sub>:</p>
+<div class="formula-box">E[X] = ∑ x<sub>i</sub> p<sub>i</sub></div>
+<h3 id="sub-2-2">2.2 Variance &amp; Covariance</h3>
+<p>To analyze the distribution spread and relationships between variables, we use variance and covariance:</p>
+<ul>
+<li><strong>Variance Var(X):</strong> Measures the dispersion of a random variable around its mean. It indicates how much the values fluctuate:
+                            <div class="formula-box">Var(X) = E[(X - E[X])<sup>2</sup>] = E[X<sup>2</sup>] - (E[X])<sup>2</sup></div>
+</li>
+<li><strong>Covariance Cov(X, Y):</strong> Measures the linear relationship between two random variables:
+                            <div class="formula-box">Cov(X, Y) = E[(X - E[X])(Y - E[Y])]</div>
+<ul>
+<li><strong>Positive Covariance:</strong> X and Y tend to increase or decrease together.</li>
+<li><strong>Negative Covariance:</strong> When X increases, Y tends to decrease, and vice versa.</li>
+<li><strong>Zero Covariance:</strong> No linear association exists between X and Y.</li>
+</ul>
+</li>
+</ul>
+<h3 id="sub-2-3">2.3 Correlation</h3>
+<p>Covariance is scale-dependent. To get a standardized measure of the linear relationship between variables, we use the <strong>correlation coefficient (ρ)</strong>, which restricts values to the range [-1, 1]:</p>
+<div class="formula-box">ρ<sub>X,Y</sub> = Cov(X, Y) / ( σ<sub>X</sub> × σ<sub>Y</sub> )</div>
+<p>Where σ<sub>X</sub> and σ<sub>Y</sub> are the standard deviations of X and Y respectively.</p>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 3 -->
+<section class="topic-section" id="topic-3">
+<div class="topic-header" onclick="toggleSection('content-3')">
+<div class="topic-number">3</div>
+<h2>Classification Paradigms &amp; LLMs</h2>
+</div>
+<div class="collapsible-content" id="content-3">
+<h3 id="sub-3-1">3.1 Discriminative vs. Generative Models</h3>
+<p>In machine learning classification, algorithms are split into two primary paradigms:</p>
+<div class="box box-green">
+<div class="box-title">Paradigm Comparison</div>
+<ul>
+<li><strong>Discriminative Models:</strong> Learn the decision boundary directly by estimating the conditional probability <strong>P(Class | Evidence)</strong> from the training data.
+                                <ul>
+<li><em>Goal:</em> Predict the class label of new data points based on feature boundaries.</li>
+<li><em>Examples:</em> Logistic Regression, Support Vector Machines (SVMs), Multi-Layer Perceptrons (MLPs).</li>
+<li><em>Observation:</em> Discriminative models make predictions using patterns without needing to understand the underlying distribution of the input features.</li>
+</ul>
+</li>
+<li><strong>Generative Models:</strong> Estimate the joint probability distribution <strong>P(Class, Evidence)</strong> of the training data and labels.
+                                <ul>
+<li><em>Goal:</em> Model the complete distribution of the data. This allows sampling/generating new instances distributed identically to the training set.</li>
+<li><em>Examples:</em> Naive Bayes, Hidden Markov Models (HMMs), GANs, Variational Autoencoders (VAEs).</li>
+</ul>
+</li>
+</ul>
+</div>
+<h3 id="sub-3-2">3.2 Language Models as Generative Systems</h3>
+<p>Large Language Models (LLMs) operate as generative sequence models by predicting the probability of the next word given a context of preceding words:</p>
+<ul>
+<li><strong>Sample Space:</strong> The entire set of words in the model's vocabulary.</li>
+<li><strong>Autoregressive Factoring:</strong> Using the chain rule of conditional probability, the overall probability of a sentence is computed as:
+                            <pre class="code-block"><code>P(w1, w2, w3, ..., wn) = P(w1) × P(w2|w1) × P(w3|w1,w2) × ... × P(wn|w1,...,wn-1)</code></pre>
+</li>
+</ul>
+<div class="box box-beige">
+<div class="box-title">Real-world Context Counts: Emma by Jane Austen</div>
+<p>Consider estimating word probabilities sequentially in a text corpus:</p>
+<ul>
+<li><strong>Prior Probability P(word):</strong> The general probability of seeing a word in isolation (e.g., common words like "the", "and").</li>
+<li><strong>Conditional Probability P(word | "I"):</strong> The probability of the next word given the context "I".</li>
+<li><strong>P(word | "I have"):</strong> The context narrows down the likely candidates.</li>
+<li><strong>P(word | "I have no"):</strong> The context creates a highly specific distribution focusing on nouns (like "idea", "doubt").</li>
+</ul>
+</div>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 4 -->
+<section class="topic-section" id="topic-4">
+<div class="topic-header" onclick="toggleSection('content-4')">
+<div class="topic-number">4</div>
+<h2>Information Theory &amp; Divergences</h2>
+</div>
+<div class="collapsible-content" id="content-4">
+<h3 id="sub-4-1">4.1 Information Content &amp; Surprise</h3>
+<p>Information theory formalizes the concept of "surprise." An event with a high probability of occurring provides very little information when it happens. Conversely, a low-probability event provides significant new information (high surprise):</p>
+<div class="formula-box">I(x<sub>i</sub>) = -log<sub>2</sub>(p<sub>i</sub>)</div>
+<p>Where p<sub>i</sub> is the probability of outcome x<sub>i</sub>. The unit of measurement is the <strong>bit</strong> (the information gained from a single fair coin flip, where p = 0.5 and I(x) = -log<sub>2</sub>(0.5) = 1 bit).</p>
+<h3 id="sub-4-2">4.2 Shannon Entropy</h3>
+<p>The <strong>Entropy H(X)</strong> of an experiment is the expected value of the information content across all possible outcomes. It measures the average uncertainty of the random variable:</p>
+<div class="formula-box">H(X) = - ∑ p<sub>i</sub> log<sub>2</sub>(p<sub>i</sub>)</div>
+<div class="box box-blue">
+<div class="box-title">Example: Biased Coin Flip</div>
+<p>Consider a coin with a 90% chance of landing on Heads (p = 0.9) and 10% on Tails (p = 0.1):</p>
+<ul>
+<li>Information in Heads: I(Heads) = -log<sub>2</sub>(0.9) ≈ 0.152 bits</li>
+<li>Information in Tails: I(Tails) = -log<sub>2</sub>(0.1) ≈ 3.322 bits</li>
+<li><strong>Entropy H(X):</strong> 0.9 × 0.152 + 0.1 × 3.322 ≈ 0.469 bits</li>
+</ul>
+<p>Since the outcome is highly predictable, the average uncertainty (0.469 bits) is much lower than that of a fair coin (1.00 bit).</p>
+</div>
+<h3 id="sub-4-3">4.3 Cross-Entropy Loss</h3>
+<p>When modeling, we estimate a target distribution P using an estimated distribution Q. The <strong>Cross-Entropy H(P, Q)</strong> measures the average surprise when we receive events from true distribution P but evaluate them under our assumed distribution Q:</p>
+<div class="formula-box">H(P, Q) = - ∑ p<sub>i</sub> log<sub>2</sub>(q<sub>i</sub>)</div>
+<div class="box box-red">
+<div class="box-title">Example: Deceived Coin Toss</div>
+<p>Suppose you are given a 90% biased coin (true P: heads = 0.9, tails = 0.1) but are told it is a fair coin (assumed Q: heads = 0.5, tails = 0.5):</p>
+<ul>
+<li>Your assumed surprise for Heads: -log<sub>2</sub>(0.5) = 1.0 bit</li>
+<li>Your assumed surprise for Tails: -log<sub>2</sub>(0.5) = 1.0 bit</li>
+<li><strong>Expected surprise (Cross-Entropy):</strong> (0.9 × 1.0) + (0.1 × 1.0) = 1.0 bit</li>
+</ul>
+<p>Because the estimate was incorrect, the expected surprise (1.00 bit) is higher than the true entropy (0.469 bits). This excess surprise forms the basis of Cross-Entropy Loss in classification training.</p>
+</div>
+<h3 id="sub-4-4">4.4 Kullback-Leibler (KL) Divergence</h3>
+<p>The <strong>KL Divergence</strong> measures the exact amount of additional surprise introduced by estimating P using Q. It represents the distance between the two distributions:</p>
+<div class="formula-box">D<sub>KL</sub>(P || Q) = H(P, Q) - H(P) = ∑ p<sub>i</sub> log<sub>2</sub>( p<sub>i</sub> / q<sub>i</sub> )</div>
+<div class="box box-beige">
+<div class="box-title">KL Divergence and Asymmetry</div>
+<p>For the deceived coin example above:</p>
+<p style="font-family: monospace; padding-left: 1rem;">D<sub>KL</sub>(P || Q) = 1.00 - 0.469 = 0.531 bits</p>
+<p><strong>Asymmetry Warning:</strong> KL divergence is not a true distance metric because it is asymmetric. The direction matters:</p>
+<div class="formula-box">D<sub>KL</sub>(P || Q) ≠ D<sub>KL</sub>(Q || P)</div>
+</div>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+<button class="btn" disabled="True">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 5 -->
+
+<!-- Original PDF -->
+<section class="topic-section" id="original-pdf">
+<div class="topic-header" onclick="toggleSection('content-pdf')">
+<div class="topic-number" style="background:transparent; color: var(--text-dark); width: auto; margin-right: 0.5rem;">
+<svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+</div>
+<h2>Original PDF Notes</h2>
+</div>
+<div class="collapsible-content" id="content-pdf">
+<p>Below is the original PDF document for your reference:</p>
+<button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+<div id="pdfContainer" style="margin-top: 1rem;"></div>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+<button class="btn" disabled="">Next Topic</button>
+</div>
+</div>
+</section>
+</main>
+</div>
+<button id="backToTop" onclick="scrollToTop()">↑</button>
+<script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/3%264.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--border-light); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+<script src="../js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Deep Learning Foundations - Lecture 24</title>
+    <meta content="Study notes for Deep Learning Foundations, Lecture 24 covering Vision Transformers & Contrastive Embeddings." name="description"/>
+    <link class="favicon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>24</text></svg>" rel="icon"/>
+    <link href="../css/style.css" rel="stylesheet"/>
+</head>
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Deep Learning Foundations</h1>
+            <p>Lecture 24 - Vision Transformers & Contrastive Embeddings</p>
+            <a href="../index.html" style="color: var(--text-dark); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/24.pdf" style="color: var(--text-dark); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text"/>
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 5</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li>
+                    <a href="#topic-1">1. CNN Limitations vs. ViT<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-1-1">1.1 Inductive Bias vs. Global Context</a></li>
+                         <li><a href="#sub-1-2">1.2 Computational Complexity Comparison</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Vision Transformer (ViT) Architecture<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-2-1">2.1 Patch Extraction & Linear Projection</a></li>
+                         <li><a href="#sub-2-2">2.2 The [CLS] Token</a></li>
+                         <li><a href="#sub-2-3">2.3 Positional Embeddings in Images</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. DeiT (Data-efficient Image Transformers)<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-3-1">3.1 Distillation Tokens</a></li>
+                         <li><a href="#sub-3-2">3.2 Teacher-Student Training for Vision</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. CLIP (Contrastive Language-Image Pretraining)<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-4-1">4.1 Joint Image-Text Embeddings Space</a></li>
+                         <li><a href="#sub-4-2">4.2 Contrastive Loss Matrix</a></li>
+                         <li><a href="#sub-4-3">4.3 Zero-Shot Inference</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Introduction to Autoencoders<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-5-1">5.1 The High-Dimensionality Bottleneck</a></li>
+                         <li><a href="#sub-5-2">5.2 Reconstruction Loss Function</a></li>
+                         <li><a href="#sub-5-3">5.3 Autoencoders vs. PCA</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Topic 1 -->
+            <section id="topic-1" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>CNN Limitations vs. ViT</h2>
+                </div>
+                <div id="content-1" class="collapsible-content">
+                    
+        <h3 id="sub-1-1">1.1 Inductive Bias vs. Global Context</h3>
+        <p>CNNs rely on strong <strong>inductive biases</strong>: translation invariance and local receptive fields (pixels close together are related). While this is efficient for training on small datasets, it restricts CNNs from modeling long-range global relationships. Vision Transformers (ViTs) drop these inductive biases, allowing the model to learn global context from the first layer using self-attention.</p>
+        
+        <h3 id="sub-1-2">1.2 Computational Complexity Comparison</h3>
+        <p>CNN convolution scales linearly with the number of pixels. Self-attention scales quadratically with sequence length, which presents a challenge when translating images to token sequences since an image has a large number of pixels.</p>
+    
+                    
+                    <div class="topic-nav">
+                        <button class="btn" disabled="">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 2 -->
+            <section id="topic-2" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>Vision Transformer (ViT) Architecture</h2>
+                </div>
+                <div id="content-2" class="collapsible-content">
+                    
+        <h3 id="sub-2-1">2.1 Patch Extraction & Linear Projection</h3>
+        <p>To apply Transformers to images, ViT splits an image into a grid of non-overlapping patches (e.g. 16&times;16 pixels). Each patch is flattened and projected into a vector embedding using a linear layer, treating image patches similarly to word tokens.</p>
+        
+        <h3 id="sub-2-2">2.2 The [CLS] Token</h3>
+        <p>Following the BERT architecture, a learnable <strong>class [CLS] token</strong> is prepended to the patch embeddings. The final state of this token serves as the aggregate representation for image classification tasks.</p>
+        
+        <h3 id="sub-2-3">2.3 Positional Embeddings in Images</h3>
+        <p>To preserve spatial location, 1D learnable positional embeddings are added to the patch vectors, allowing the Transformer blocks to resolve spatial relationships.</p>
+    
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 3 -->
+            <section id="topic-3" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>DeiT (Data-efficient Image Transformers)</h2>
+                </div>
+                <div id="content-3" class="collapsible-content">
+                    
+        <h3 id="sub-3-1">3.1 Distillation Tokens</h3>
+        <p>ViT models require massive datasets (like JFT-300M) to train because they lack CNN inductive biases. <strong>DeiT</strong> solves this by using a new <strong>distillation token</strong> alongside the [CLS] token, allowing the model to learn efficiently from smaller datasets (like ImageNet-1k).</p>
+        
+        <h3 id="sub-3-2">3.2 Teacher-Student Training for Vision</h3>
+        <p>The distillation token interacts with the patch tokens and [CLS] token via self-attention, learning to match the predictions of a strong teacher CNN, which injects inductive biases into the Transformer model.</p>
+    
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 4 -->
+            <section id="topic-4" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>CLIP (Contrastive Language-Image Pretraining)</h2>
+                </div>
+                <div id="content-4" class="collapsible-content">
+                    
+        <h3 id="sub-4-1">4.1 Joint Image-Text Embeddings Space</h3>
+        <p>CLIP trains an image encoder and a text encoder to project both modalities into a shared embedding space. It aligns descriptions with corresponding images by maximizing their cosine similarity.</p>
+        
+        <h3 id="sub-4-2">4.2 Contrastive Loss Matrix</h3>
+        <p>For a batch of <code>N</code> image-text pairs, the model calculates an <code>N &times; N</code> similarity matrix. The contrastive loss maximizes the similarity of the <code>N</code> correct pairs along the diagonal while minimizing the similarity of the <code>N<sup>2</sup> - N</code> incorrect pairs off the diagonal.</p>
+        
+        <h3 id="sub-4-3">4.3 Zero-Shot Inference</h3>
+        <p>By comparing an image embedding against text embeddings of target labels (e.g. "a photo of a cat", "a photo of a plane"), CLIP performs <strong>zero-shot classification</strong> without training on specific downstream target datasets.</p>
+    
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 5 -->
+            <section id="topic-5" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>Introduction to Autoencoders</h2>
+                </div>
+                <div id="content-5" class="collapsible-content">
+                    
+        <h3 id="sub-5-1">5.1 The High-Dimensionality Bottleneck</h3>
+        <p>Real-world data exists in high-dimensional spaces, but the underlying information often lies on a lower-dimensional manifold. Autoencoders find this manifold by compressing inputs into a bottleneck layer before reconstruction.</p>
+        
+        <h3 id="sub-5-2">5.2 Reconstruction Loss Function</h3>
+        <p>We train autoencoders to minimize <strong>reconstruction loss</strong> (the difference between the input <code>x</code> and reconstructed output <code>x̂</code>) using Mean Squared Error (MSE) or Binary Cross-Entropy:</p>
+        <div class="formula-box">L(x, x̂) = ||x - x̂||<sup>2</sup></div>
+        
+        <h3 id="sub-5-3">5.3 Autoencoders vs. PCA</h3>
+        <p>PCA is limited to linear projection directions. Autoencoders use non-linear activation functions in their networks to learn complex non-linear coordinate mappings, projecting data onto complex manifolds.</p>
+    
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--text-dark); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for your reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/24.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--border-light); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Deep Learning Foundations - Lecture 22</title>
+    <meta content="Study notes for Deep Learning Foundations, Lecture 22 covering Training Transformers & Scaling Laws." name="description"/>
+    <link class="favicon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>22</text></svg>" rel="icon"/>
+    <link href="../css/style.css" rel="stylesheet"/>
+</head>
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Deep Learning Foundations</h1>
+            <p>Lecture 22 - Training Transformers & Scaling Laws</p>
+            <a href="../index.html" style="color: var(--text-dark); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/22.pdf" style="color: var(--text-dark); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text"/>
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 4</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li>
+                    <a href="#topic-1">1. Training Lifecycle<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-1-1">1.1 Pretraining (Unsupervised)</a></li>
+                         <li><a href="#sub-1-2">1.2 Supervised Fine-Tuning (SFT)</a></li>
+                         <li><a href="#sub-1-3">1.3 RLHF & Alignment</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Scaling Laws & Chinchilla Law<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-2-1">2.1 Power Laws of Compute, Data, and Parameters</a></li>
+                         <li><a href="#sub-2-2">2.2 Chinchilla Scaling Formula</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Training Infrastructure<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-3-1">3.1 GPU Memory Bottlenecks</a></li>
+                         <li><a href="#sub-3-2">3.2 Data Parallelism vs. Model Parallelism</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Zero Redundancy Optimizer (ZeRO)<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-4-1">4.1 Optimizer Memory Redundancy</a></li>
+                         <li><a href="#sub-4-2">4.2 ZeRO Stage 1, Stage 2, and Stage 3 Partitioning</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Topic 1 -->
+            <section id="topic-1" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>Training Lifecycle</h2>
+                </div>
+                <div id="content-1" class="collapsible-content">
+                    
+        <h3 id="sub-1-1">1.1 Pretraining (Unsupervised)</h3>
+        <p>Large language models start with <strong>Pretraining</strong>. The model is trained on terabytes of raw text to predict the next token (causal language modeling). This step allows the model to learn syntax, facts, and reasoning representations from web-scale data in an unsupervised manner.</p>
+        
+        <h3 id="sub-1-2">1.2 Supervised Fine-Tuning (SFT)</h3>
+        <p>After pretraining, the model is a text-completer. To make it a useful assistant, we apply <strong>Supervised Fine-Tuning (SFT)</strong>. We train the model on curated datasets of instruction-response pairs (e.g. "Explain gravity" -> "Gravity is..."), teaching it to act as an assistant.</p>
+        
+        <h3 id="sub-1-3">1.3 RLHF & Alignment</h3>
+        <p>To align the model's outputs with human preferences regarding helpfulness and safety, we use <strong>Reinforcement Learning from Human Feedback (RLHF)</strong>. We train a reward model on human comparisons of outputs, and use algorithms like PPO (Proximal Policy Optimization) to adjust the model's weights.</p>
+    
+                    
+                    <div class="topic-nav">
+                        <button class="btn" disabled="">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 2 -->
+            <section id="topic-2" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>Scaling Laws & Chinchilla Law</h2>
+                </div>
+                <div id="content-2" class="collapsible-content">
+                    
+        <h3 id="sub-2-1">2.1 Power Laws of Compute, Data, and Parameters</h3>
+        <p>Kaplan et al. showed that model performance follows power-law relationships with respect to compute budget, model parameter count, and training dataset size. Scaling these three variables in concert leads to predictable increases in model capacity.</p>
+        
+        <h3 id="sub-2-2">2.2 Chinchilla Scaling Formula</h3>
+        <p>Hoffmann et al. (the Chinchilla paper) identified that previous models were over-parameterized and under-trained. They found that for an optimal training budget, <strong>the parameter count and the number of training tokens should scale in a 1:1 ratio</strong>. For every doubling of compute budget, both model size and training tokens should double, yielding the optimal Chinchilla scaling law.</p>
+    
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 3 -->
+            <section id="topic-3" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>Training Infrastructure</h2>
+                </div>
+                <div id="content-3" class="collapsible-content">
+                    
+        <h3 id="sub-3-1">3.1 GPU Memory Bottlenecks</h3>
+        <p>Modern models with billions of parameters exceed the memory limits of a single GPU. Memory is consumed by model weights, optimizer states (like Adam's momentum/variance vectors), gradients, and intermediate activations, creating GPU memory bottlenecks.</p>
+        
+        <h3 id="sub-3-2">3.2 Data Parallelism vs. Model Parallelism</h3>
+        <p>To scale training across multiple GPUs, we split the workload:
+            <ul>
+                <li><strong>Data Parallelism (DP):</strong> The model is replicated on every GPU, and each GPU processes a different slice of the batch. Gradients are averaged across GPUs at each step.</li>
+                <li><strong>Model Parallelism (MP):</strong> The model's layers are split across multiple GPUs. This is necessary when model weights alone exceed a single GPU's memory.</li>
+            </ul>
+        </p>
+    
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 4 -->
+            <section id="topic-4" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>Zero Redundancy Optimizer (ZeRO)</h2>
+                </div>
+                <div id="content-4" class="collapsible-content">
+                    
+        <h3 id="sub-4-1">4.1 Optimizer Memory Redundancy</h3>
+        <p>Standard Data Parallelism replicates optimizer states, gradients, and parameters across all GPUs, leading to significant memory redundancy. In fact, Adam optimizer states consume about 4 times more memory than the model weights themselves.</p>
+        
+        <h3 id="sub-4-2">4.2 ZeRO Stage 1, Stage 2, and Stage 3 Partitioning</h3>
+        <p>The <strong>Zero Redundancy Optimizer (ZeRO)</strong> eliminates memory redundancy by partitioning states across GPUs:
+            <ul>
+                <li><strong>ZeRO-1:</strong> Partitions optimizer states across GPUs. Each GPU only updates a slice of the parameters.</li>
+                <li><strong>ZeRO-2:</strong> Partitions both optimizer states and gradients across GPUs.</li>
+                <li><strong>ZeRO-3:</strong> Partitions optimizer states, gradients, and the model parameters themselves. Parameters are gathered via communication calls only when needed for forward/backward steps, enabling the training of extremely large models.</li>
+            </ul>
+        </p>
+    
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--text-dark); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for your reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/22.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--border-light); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>

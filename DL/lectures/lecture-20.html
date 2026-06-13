@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Deep Learning Foundations - Lecture 20</title>
+    <meta content="Study notes for Deep Learning Foundations, Lecture 20 covering Positional Encoding & Encoder Blocks." name="description"/>
+    <link class="favicon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>20</text></svg>" rel="icon"/>
+    <link href="../css/style.css" rel="stylesheet"/>
+</head>
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Deep Learning Foundations</h1>
+            <p>Lecture 20 - Positional Encoding & Encoder Blocks</p>
+            <a href="../index.html" style="color: var(--text-dark); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/20.pdf" style="color: var(--text-dark); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text"/>
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 5</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li>
+                    <a href="#topic-1">1. Positional Encoding Mechanics<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-1-1">1.1 Sine/Cosine Curves Injection</a></li>
+                         <li><a href="#sub-1-2">1.2 Vector Addition Advantages</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Layer Normalization<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-2-1">2.1 Internal Covariate Shift</a></li>
+                         <li><a href="#sub-2-2">2.2 LayerNorm vs. BatchNorm</a></li>
+                         <li><a href="#sub-2-3">2.3 Step-by-Step Numerical Walkthrough</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Encoder Architecture<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-3-1">3.1 Tokenization & Embeddings</a></li>
+                         <li><a href="#sub-3-2">3.2 Stacking Encoder Blocks</a></li>
+                         <li><a href="#sub-3-3">3.3 Attention and Normalization Pipelines</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Feed-Forward Networks in Encoder<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-4-1">4.1 Two-Layer MLP</a></li>
+                         <li><a href="#sub-4-2">4.2 Dimensionality Expansion-Contraction</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Training vs. Inference: Teacher Forcing<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-5-1">5.1 Autoregressive Inference</a></li>
+                         <li><a href="#sub-5-2">5.2 Teacher Forcing in Parallel Training</a></li>
+                         <li><a href="#sub-5-3">5.3 The Danger of Data Leakage</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Topic 1 -->
+            <section id="topic-1" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>Positional Encoding Mechanics</h2>
+                </div>
+                <div id="content-1" class="collapsible-content">
+                    
+        <h3 id="sub-1-1">1.1 Sine/Cosine Curves Injection</h3>
+        <p>Instead of adding a single incrementing integer (which could grow infinitely for long sentences and dominate the input), Transformers use sine and cosine functions of different frequencies to generate unique positional signatures:</p>
+        <div style="font-family: monospace; font-size: 1.05rem; text-align: center; margin: 0.5rem 0;">PE<sub>(pos, 2i)</sub> = sin( pos / 10000<sup>2i/d<sub>model</sub></sup> )</div>
+        <div style="font-family: monospace; font-size: 1.05rem; text-align: center; margin: 0.5rem 0;">PE<sub>(pos, 2i+1)</sub> = cos( pos / 10000<sup>2i/d<sub>model</sub></sup> )</div>
+        <p>This formulation creates a geometric progression of wave frequencies, allowing the model to represent both absolute positions and relative distances between tokens.</p>
+        
+        <h3 id="sub-1-2">1.2 Vector Addition Advantages</h3>
+        <p>We combine the positional encoding directly with the word embedding via vector addition: <code>v<sub>final</sub> = v<sub>word</sub> + PE<sub>pos</sub></code>. In a high-dimensional space (e.g. 512 dimensions), adding these vectors does not destroy the semantic information of the word. The model can easily learn to project the vector into orthogonal subspaces, extracting the semantic meaning and the position watermark independently.</p>
+    
+                    
+                    <div class="topic-nav">
+                        <button class="btn" disabled="">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 2 -->
+            <section id="topic-2" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>Layer Normalization</h2>
+                </div>
+                <div id="content-2" class="collapsible-content">
+                    
+        <h3 id="sub-2-1">2.1 Internal Covariate Shift</h3>
+        <p>As activations pass through numerous deep layers of matrix multiplications, their scale can shift dramatically (vanishing/exploding activations). This change in activation distributions is known as <strong>internal covariate shift</strong>, which slows down training and destabilizes learning.</p>
+        
+        <h3 id="sub-2-2">2.2 LayerNorm vs. BatchNorm</h3>
+        <p>While <strong>Batch Normalization</strong> normalizes activations across a batch of samples for each feature independently, <strong>Layer Normalization</strong> normalizes activations across all features of a single word vector. This makes LayerNorm independent of the batch size and highly effective for processing variable-length sequences, making it standard for Transformers.</p>
+        
+        <h3 id="sub-2-3">2.3 Step-by-Step Numerical Walkthrough</h3>
+        <p>Let's walk through LayerNorm for a single word vector <code>x = [3.0, 5.0, 2.0, 8.0]</code>:</p>
+        <ol>
+            <li><strong>Calculate Mean (&mu;):</strong> &mu; = (3 + 5 + 2 + 8) / 4 = 18 / 4 = 4.5</li>
+            <li><strong>Calculate Variance (&sigma;<sup>2</sup>):</strong> &sigma;<sup>2</sup> = [ (3 - 4.5)<sup>2</sup> + (5 - 4.5)<sup>2</sup> + (2 - 4.5)<sup>2</sup> + (8 - 4.5)<sup>2</sup> ] / 4 = [ 2.25 + 0.25 + 6.25 + 12.25 ] / 4 = 21 / 4 = 5.25. (Standard Deviation &sigma; &asymp; 2.291)</li>
+            <li><strong>Normalize:</strong> <code>x̂ = (x - &mu;) / &radic;(&sigma;<sup>2</sup> + &epsilon;)</code>. For x<sub>1</sub>: (3 - 4.5) / 2.291 &asymp; -0.654</li>
+            <li><strong>Scale and Shift:</strong> <code>y = &gamma; x̂ + &beta;</code>. Using learnable vectors &gamma; (initialized to ones) and &beta; (initialized to zeros) to yield the normalized output.</li>
+        </ol>
+    
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 3 -->
+            <section id="topic-3" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>Encoder Architecture</h2>
+                </div>
+                <div id="content-3" class="collapsible-content">
+                    
+        <h3 id="sub-3-1">3.1 Tokenization & Embeddings</h3>
+        <p>Before entering the encoder, the raw sentence is split into tokens (subwords). Each token is mapped to a static 512-dimensional vector embedding, representing its basic lexical identity.</p>
+        
+        <h3 id="sub-3-2">3.2 Stacking Encoder Blocks</h3>
+        <p>The standard Transformer stack contains 6 identical encoder blocks. The output vectors from one block become the input vectors for the next block, incrementally refining the context of each word vector.</p>
+        
+        <h3 id="sub-3-3">3.3 Attention and Normalization Pipelines</h3>
+        <p>Each block contains two main sub-layers: a Multi-Head Attention layer and a Position-wise Feed-Forward network. Both sub-layers are wrapped in residual skip connections followed by Layer Normalization (often referred to as the <code>Add & Norm</code> step).</p>
+    
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 4 -->
+            <section id="topic-4" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>Feed-Forward Networks in Encoder</h2>
+                </div>
+                <div id="content-4" class="collapsible-content">
+                    
+        <h3 id="sub-4-1">4.1 Two-Layer MLP</h3>
+        <p>Each encoder block features a Position-wise Feed-Forward Network (FFN) applied to every token vector independently and identically. It consists of two linear transformations with a ReLU activation in between:</p>
+        <div class="formula-box">FFN(x) = max(0, x W<sub>1</sub> + b<sub>1</sub>) W<sub>2</sub> + b<sub>2</sub></div>
+        
+        <h3 id="sub-4-2">4.2 Dimensionality Expansion-Contraction</h3>
+        <p>The FFN acts as a projection tunnel: the first layer expands the token vector's dimension from 512 to 2048, allowing the model to learn complex non-linear combinations. The second layer contracts it back to 512 dimensions to match the residual path.</p>
+    
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 5 -->
+            <section id="topic-5" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>Training vs. Inference: Teacher Forcing</h2>
+                </div>
+                <div id="content-5" class="collapsible-content">
+                    
+        <h3 id="sub-5-1">5.1 Autoregressive Inference</h3>
+        <p>During inference (generation), the model generates tokens one-by-one. Each generated token is appended to the input sequence to predict the next token. If the model makes an error early in the generation, that error cascades, affecting all subsequent predictions.</p>
+        
+        <h3 id="sub-5-2">5.2 Teacher Forcing in Parallel Training</h3>
+        <p>To avoid slow sequential processing during training, we use <strong>Teacher Forcing</strong>. Since the ground truth target sequence is already known, we pass the entire correct target sequence into the decoder at once, calculating the gradients for all token positions in parallel.</p>
+        
+        <h3 id="sub-5-3">5.3 The Danger of Data Leakage</h3>
+        <p>Passing the complete target sequence to the decoder simultaneously presents a risk: the self-attention mechanism at token 1 would naturally inspect tokens 2, 3, and 4 (the future). This <strong>data leakage</strong> allows the model to cheat during training, rendering it incapable of performing actual step-by-step generation during inference. We solve this using causal masking.</p>
+    
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--text-dark); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for your reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/20.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--border-light); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Deep Learning Foundations - Lecture 23</title>
+    <meta content="Study notes for Deep Learning Foundations, Lecture 23 covering Flash Attention & Parameter Fine-Tuning." name="description"/>
+    <link class="favicon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>23</text></svg>" rel="icon"/>
+    <link href="../css/style.css" rel="stylesheet"/>
+</head>
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Deep Learning Foundations</h1>
+            <p>Lecture 23 - Flash Attention & Parameter Fine-Tuning</p>
+            <a href="../index.html" style="color: var(--text-dark); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/23.pdf" style="color: var(--text-dark); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text"/>
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 4</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li>
+                    <a href="#topic-1">1. Flash Attention<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-1-1">1.1 Memory Hierarchy Bottlenecks (HBM vs. SRAM)</a></li>
+                         <li><a href="#sub-1-2">1.2 Tiling and Block Loading</a></li>
+                         <li><a href="#sub-1-3">1.3 Online Softmax Updates</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Supervised Fine-Tuning (SFT)<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-2-1">2.1 Instruct Tuning Protocols</a></li>
+                         <li><a href="#sub-2-2">2.2 Data Quality vs. Quantity</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Low-Rank Adaptation (LoRA)<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-3-1">3.1 Low-Rank Hypothesis</a></li>
+                         <li><a href="#sub-3-2">3.2 Adapter Matrices Decomposition (A and B)</a></li>
+                         <li><a href="#sub-3-3">3.3 Parameter and Memory Savings</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Knowledge Distillation<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-4-1">4.1 Teacher-Student Compression</a></li>
+                         <li><a href="#sub-4-2">4.2 Soft Targets and Entropy Transfer</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Topic 1 -->
+            <section id="topic-1" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>Flash Attention</h2>
+                </div>
+                <div id="content-1" class="collapsible-content">
+                    
+        <h3 id="sub-1-1">1.1 Memory Hierarchy Bottlenecks (HBM vs. SRAM)</h3>
+        <p>Standard attention is memory-bound rather than compute-bound. Calculating and storing the intermediate <code>N &times; N</code> attention matrix requires frequent read/write operations to High Bandwidth Memory (HBM), which is much slower than the GPU's internal SRAM cache. This memory transfer bottleneck limits training speed.</p>
+        
+        <h3 id="sub-1-2">1.2 Tiling and Block Loading</h3>
+        <p><strong>Flash Attention</strong> resolves this bottleneck by loading inputs in small blocks (tiles) from HBM directly into SRAM. Attention is computed block-by-block without writing the intermediate <code>N &times; N</code> matrix back to HBM, reducing memory read/writes and accelerating the attention step.</p>
+        
+        <h3 id="sub-1-3">1.3 Online Softmax Updates</h3>
+        <p>Because softmax requires a global normalization factor, computing it block-by-block is challenging. Flash Attention uses an <strong>online softmax</strong> algorithm, dynamically updating scaling factors as blocks are processed, ensuring exact attention calculation with minimal memory overhead.</p>
+    
+                    
+                    <div class="topic-nav">
+                        <button class="btn" disabled="">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 2 -->
+            <section id="topic-2" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>Supervised Fine-Tuning (SFT)</h2>
+                </div>
+                <div id="content-2" class="collapsible-content">
+                    
+        <h3 id="sub-2-1">2.1 Instruct Tuning Protocols</h3>
+        <p>SFT or instruct tuning aligns pretrained base models with task formats. The model is trained on formatted datasets (input prompt, output response) using standard cross-entropy loss, teaching the model to follow instructions and act as an assistant.</p>
+        
+        <h3 id="sub-2-2">2.2 Data Quality vs. Quantity</h3>
+        <p>Recent research highlights that SFT is highly sensitive to instruction quality rather than instruction count. A dataset of 1,000 highly curated, diverse, and clean instructions often yields better alignment than 100,000 noisy, machine-generated prompt pairs.</p>
+    
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 3 -->
+            <section id="topic-3" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>Low-Rank Adaptation (LoRA)</h2>
+                </div>
+                <div id="content-3" class="collapsible-content">
+                    
+        <h3 id="sub-3-1">3.1 Low-Rank Hypothesis</h3>
+        <p>Aghajanyan et al. showed that weight updates during adaptation have a low "intrinsic dimension". Consequently, we do not need to update all parameters of a weight matrix during fine-tuning. Instead, we can represent the update matrix <code>&Delta;W</code> in a lower-rank subspace.</p>
+        
+        <h3 id="sub-3-2">3.2 Adapter Matrices Decomposition (A and B)</h3>
+        <p>For a pretrained weight matrix <code>W<sub>0</sub> &in; ℝ<sup>d &times; k</sup></code>, we freeze its weights and represent the update <code>&Delta;W</code> using two low-rank matrices <code>B &in; ℝ<sup>d &times; r</sup></code> and <code>A &in; ℝ<sup>r &times; k</sup></code>, where rank <code>r &lt;&lt; min(d, k)</code>:</p>
+        <div class="formula-box">W = W<sub>0</sub> + &Delta;W = W<sub>0</sub> + B A</div>
+        <p>Matrix A is initialized with random Gaussian values, and B is initialized to zero, ensuring that <code>&Delta;W</code> is zero at the start of training.</p>
+        
+        <h3 id="sub-3-3">3.3 Parameter and Memory Savings</h3>
+        <p>Using a rank <code>r=8</code> reduces the number of trained parameters by over 99%, lowering optimizer memory requirements and saving significant compute resources during fine-tuning.</p>
+    
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 4 -->
+            <section id="topic-4" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>Knowledge Distillation</h2>
+                </div>
+                <div id="content-4" class="collapsible-content">
+                    
+        <h3 id="sub-4-1">4.1 Teacher-Student Compression</h3>
+        <p><strong>Knowledge Distillation</strong> is a model compression method where a small model (student) is trained to replicate the behavior and outputs of a larger, pretrained model (teacher).</p>
+        
+        <h3 id="sub-4-2">4.2 Soft Targets and Entropy Transfer</h3>
+        <p>Instead of training the student only on hard labels (ones and zeros), we train it using the <strong>soft targets</strong> (probability distributions) produced by the teacher's softmax. These soft targets contain valuable dark knowledge (e.g. telling the student that a picture of a dog is 10% similar to a cat, but 0.001% similar to a car), transferring the teacher's entropy and behavior to the smaller model.</p>
+    
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--text-dark); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for your reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/23.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--border-light); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>

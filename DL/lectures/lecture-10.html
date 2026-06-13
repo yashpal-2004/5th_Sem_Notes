@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Deep Learning Foundations - Lecture 10</title>
+<meta content="Study notes for Deep Learning Foundations, Lecture 10 covering Backpropagation, Parameter Initialization strategies, Double Descent, Error sources, and Hyperparameter search." name="description"/>
+<link class="favicon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjIwIiBmaWxsPSIjMTMyMjE5Ii8+PHRleHQgeD0iNTAiIHk9IjUwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iNTUiIGZpbGw9IndoaXRlIiBmb250LXdlaWdodD0iYm9sZCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPjEwPC90ZXh0Pjwvc3ZnPg==" rel="icon"/>
+<link href="../css/style.css" rel="stylesheet"/>
+</head>
+<body>
+<header>
+<div class="header-titles">
+<h1>Deep Learning Foundations</h1>
+<p>Lecture 10 - Backpropagation, Initialization &amp; Double Descent</p>
+<a href="../index.html" style="color: var(--text-dark); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+<span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+<a href="../pdfs/10.pdf" style="color: var(--text-dark); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+</div>
+<div class="search-container">
+<input id="searchInput" placeholder="Search notes..." type="text"/>
+</div>
+</header>
+<div class="container">
+<!-- Sidebar Index -->
+<aside>
+<div class="aside-header">
+<h3>Table of Contents</h3>
+<div class="topic-count">Total Topics: 5</div>
+</div>
+<ul class="index-list" id="indexList">
+<li>
+<a href="#topic-1">1. Backpropagation Principles<span class="sub-count">2</span></a>
+<ul class="sub-index">
+<li><a href="#sub-1-1">1.1 Computational Graphs &amp; Chain Rule</a></li>
+<li><a href="#sub-1-2">1.2 Forward vs. Backward Pass</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-2">2. Parameter Initialization<span class="sub-count">2</span></a>
+<ul class="sub-index">
+<li><a href="#sub-2-1">2.1 The Need for Symmetry Breaking</a></li>
+<li><a href="#sub-2-2">2.2 Xavier vs. Kaiming/He Methods</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-3">3. Double Descent Phenomenon<span class="sub-count">2</span></a>
+<ul class="sub-index">
+<li><a href="#sub-3-1">3.1 MNIST-1D Experimental Observations</a></li>
+<li><a href="#sub-3-2">3.2 The Inductive Bias in Over-parameterization</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-4">4. Generalization Regimes<span class="sub-count">1</span></a>
+<ul class="sub-index">
+<li><a href="#sub-4-1">4.1 Three Regimes of Model Capacity</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-5">5. Error Analysis &amp; Workflow<span class="sub-count">2</span></a>
+<ul class="sub-index">
+<li><a href="#sub-5-1">5.1 Noise, Bias, and Variance Errors</a></li>
+<li><a href="#sub-5-2">5.2 Hyperparameter Splits &amp; Search</a></li>
+</ul>
+</li>
+<li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+</ul>
+</aside>
+<!-- Main Content -->
+<main id="notesContent">
+<!-- Topic 1 -->
+<section class="topic-section" id="topic-1">
+<div class="topic-header" onclick="toggleSection('content-1')">
+<div class="topic-number">1</div>
+<h2>Backpropagation Principles</h2>
+</div>
+<div class="collapsible-content" id="content-1">
+<h3 id="sub-1-1">1.1 Computational Graphs &amp; Chain Rule</h3>
+<p>Backpropagation is the core algorithm used to compute gradients of the loss function with respect to the network weights and biases. It represents mathematical equations as a <strong>computational graph</strong> where nodes are operations (e.g., addition, multiplication) and edges are variables. By applying the <strong>chain rule of calculus</strong>, the gradient of the final output (loss) is backpropagated through intermediate nodes:</p>
+<div class="formula-box">∂L / ∂x = (∂L / ∂y) × (∂y / ∂x)</div>
+<p>Where y is an intermediate variable calculated from x, and L is the loss.</p>
+<h3 id="sub-1-2">1.2 Forward vs. Backward Pass</h3>
+<p>The calculation of gradients involves two sequential passes:</p>
+<ul>
+<li><strong>Forward Pass:</strong> We input data and compute activations layer-by-layer to calculate intermediate node values and the final loss.</li>
+<li><strong>Backward Pass:</strong> We start at the final loss and move backward, calculating local derivatives at each node and multiplying them by incoming gradients from downstream nodes. This pass evaluates parameter gradients efficiently in O(N) operations.</li>
+</ul>
+<div class="topic-nav">
+<button class="btn" disabled="">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 2 -->
+<section class="topic-section" id="topic-2">
+<div class="topic-header" onclick="toggleSection('content-2')">
+<div class="topic-number">2</div>
+<h2>Parameter Initialization</h2>
+</div>
+<div class="collapsible-content" id="content-2">
+<h3 id="sub-2-1">2.1 The Need for Symmetry Breaking</h3>
+<p>Choosing proper initial parameter values is critical for optimization convergence:</p>
+<ul>
+<li><strong>Zero Initialization Failure:</strong> If we initialize all weights to zero, every hidden unit in a layer receives the exact same inputs and computes the same outputs. Consequently, their gradients are identical, and they update in the same way, failing to break symmetry and represent complex features.</li>
+<li><strong>Random Initialization:</strong> Small random values break symmetry but risk vanishing or exploding activations/gradients in deep architectures.</li>
+</ul>
+<h3 id="sub-2-2">2.2 Xavier vs. Kaiming/He Methods</h3>
+<p>Standard initialization strategies scale initial weights by the number of inputs (n<sub>in</sub>) and outputs (n<sub>out</sub>) to keep activation variance constant across layers:</p>
+<table style="width: 100%; border-collapse: collapse; margin: 1rem 0; text-align: left;">
+<thead>
+<tr style="border-bottom: 2px solid var(--border-light);">
+<th style="padding: 0.5rem;">Method</th>
+<th style="padding: 0.5rem;">Target Activation</th>
+<th style="padding: 0.5rem;">Weight Variance (σ<sup>2</sup>)</th>
+<th style="padding: 0.5rem;">Core Idea</th>
+</tr>
+</thead>
+<tbody>
+<tr style="border-bottom: 1px solid var(--border-light);">
+<td style="padding: 0.5rem;"><strong>Xavier (Glorot)</strong></td>
+<td style="padding: 0.5rem;">Sigmoid / Tanh</td>
+<td style="padding: 0.5rem;">2 / (n<sub>in</sub> + n<sub>out</sub>)</td>
+<td style="padding: 0.5rem;">Balances input/output scaling. Assumes linear activation regions.</td>
+</tr>
+<tr>
+<td style="padding: 0.5rem;"><strong>Kaiming (He)</strong></td>
+<td style="padding: 0.5rem;">ReLU / Leaky ReLU</td>
+<td style="padding: 0.5rem;">2 / n<sub>in</sub></td>
+<td style="padding: 0.5rem;">Compensates for ReLU setting half of the activations to 0.</td>
+</tr>
+</tbody>
+</table>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 3 -->
+<section class="topic-section" id="topic-3">
+<div class="topic-header" onclick="toggleSection('content-3')">
+<div class="topic-number">3</div>
+<h2>Double Descent Phenomenon</h2>
+</div>
+<div class="collapsible-content" id="content-3">
+<h3 id="sub-3-1">3.1 MNIST-1D Experimental Observations</h3>
+<p>Classical statistical learning theory dictates a U-shaped generalization curve where test error increases as model capacity exceeds the dataset complexity (overfitting). However, modern deep learning exhibits <strong>Double Descent</strong>:</p>
+<ul>
+<li><strong>Standard Clean Data:</strong> Test error drops, spikes near the point where the model capacity exactly matches the number of training samples, and then drops again in the highly over-parameterized regime.</li>
+<li><strong>Noisy Labels (15% Noise):</strong> The double descent effect is highly pronounced. The test error climbs to a massive peak at the interpolation threshold before dropping to a new, lower global minimum.</li>
+</ul>
+<h3 id="sub-3-2">3.2 The Inductive Bias in Over-parameterization</h3>
+<p>Once model capacity is large enough to drive training loss to near zero (the interpolation threshold), the model fits all training points perfectly. As we add more parameters, the training error remains at zero, but the model has extra capacity to configure the spaces between data points. Its <strong>inductive bias</strong> forces it to select the smoothest possible interpolating function, reducing test variance and improving generalization.</p>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 4 -->
+<section class="topic-section" id="topic-4">
+<div class="topic-header" onclick="toggleSection('content-4')">
+<div class="topic-number">4</div>
+<h2>Generalization Regimes</h2>
+</div>
+<div class="collapsible-content" id="content-4">
+<h3 id="sub-4-1">4.1 Three Regimes of Model Capacity</h3>
+<p>Double descent divides the parameter/capacity spectrum into three distinct regimes:</p>
+<div class="box box-blue">
+<div class="box-title">Capacity Regimes Summary</div>
+<ul>
+<li><strong>Under-parameterized Regime:</strong> Classical statistical zone. Adding parameters increases representation capacity, reducing bias and lowering test error.</li>
+<li><strong>Critical Regime:</strong> The interpolation threshold. The model has just enough capacity to fit the training set, meaning it must warp its function to fit noise, leading to high variance and peak test error.</li>
+<li><strong>Over-parameterized Regime:</strong> The deep learning zone. The model has far more parameters than training samples. Optimization methods select smooth interpolations, reducing variance and yielding superior test performance.</li>
+</ul>
+</div>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 5 -->
+<section class="topic-section" id="topic-5">
+<div class="topic-header" onclick="toggleSection('content-5')">
+<div class="topic-number">5</div>
+<h2>Error Analysis &amp; Workflow</h2>
+</div>
+<div class="collapsible-content" id="content-5">
+<h3 id="sub-5-1">5.1 Noise, Bias, and Variance Errors</h3>
+<p>Generalization error is decomposed into three components:</p>
+<ul>
+<li><strong>Noise (Irreducible Error):</strong> Inherent uncertainty in the task or dataset (e.g. overlapping classes). It cannot be removed by optimization.</li>
+<li><strong>Bias:</strong> Systematic error due to incorrect model assumptions. Can be reduced by increasing model size or depth.</li>
+<li><strong>Variance:</strong> Sensitivity to variations in the specific training dataset. Can be reduced by adding more data, applying regularization, or moving deeper into the over-parameterized regime.</li>
+</ul>
+<h3 id="sub-5-2">5.2 Hyperparameter Splits &amp; Search</h3>
+<p>Hyperparameters cannot be optimized via gradient descent. To search the parameter space, we split data into three separate partitions:</p>
+<ul>
+<li><strong>Training Set:</strong> Used to compute gradients and optimize network parameters (weights/biases).</li>
+<li><strong>Validation Set:</strong> Used to evaluate different hyperparameter settings (learning rates, layer sizes) and select the best candidate configuration.</li>
+<li><strong>Test Set:</strong> Kept hidden until the end of all developments to report final, unbiased generalization metrics.</li>
+</ul>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+<button class="btn" disabled="">Next Topic</button>
+</div>
+</div>
+</section>
+
+<!-- Original PDF -->
+<section class="topic-section" id="original-pdf">
+<div class="topic-header" onclick="toggleSection('content-pdf')">
+<div class="topic-number" style="background:transparent; color: var(--text-dark); width: auto; margin-right: 0.5rem;">
+<svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+</div>
+<h2>Original PDF Notes</h2>
+</div>
+<div class="collapsible-content" id="content-pdf">
+<p>Below is the original PDF document for your reference:</p>
+<button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+<div id="pdfContainer" style="margin-top: 1rem;"></div>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+<button class="btn" disabled="">Next Topic</button>
+</div>
+</div>
+</section>
+</main>
+</div>
+<button id="backToTop" onclick="scrollToTop()">↑</button>
+<script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/10.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--border-light); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+<script src="../js/script.js"></script>
+</body>
+</html>

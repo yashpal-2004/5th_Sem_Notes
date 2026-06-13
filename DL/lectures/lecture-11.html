@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Deep Learning Foundations - Lecture 11</title>
+<meta content="Study notes for Deep Learning Foundations, Lecture 11 covering Convolutional Neural Networks, biological motivation, invariance vs. equivariance, convolution knobs, padding, pooling, and receptive fields." name="description"/>
+<link class="favicon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjIwIiBmaWxsPSIjMTMyMjE5Ii8+PHRleHQgeD0iNTAiIHk9IjUwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iNTUiIGZpbGw9IndoaXRlIiBmb250LXdlaWdodD0iYm9sZCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPjExPC90ZXh0Pjwvc3ZnPg==" rel="icon"/>
+<link href="../css/style.css" rel="stylesheet"/>
+</head>
+<body>
+<header>
+<div class="header-titles">
+<h1>Deep Learning Foundations</h1>
+<p>Lecture 11 - Convolutional Neural Networks (CNNs)</p>
+<a href="../index.html" style="color: var(--text-dark); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+<span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+<a href="../pdfs/11.pdf" style="color: var(--text-dark); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+</div>
+<div class="search-container">
+<input id="searchInput" placeholder="Search notes..." type="text"/>
+</div>
+</header>
+<div class="container">
+<!-- Sidebar Index -->
+<aside>
+<div class="aside-header">
+<h3>Table of Contents</h3>
+<div class="topic-count">Total Topics: 5</div>
+</div>
+<ul class="index-list" id="indexList">
+<li>
+<a href="#topic-1">1. Limitations of ANNs for Vision<span class="sub-count">2</span></a>
+<ul class="sub-index">
+<li><a href="#sub-1-1">1.1 Loss of Spatial Relationships</a></li>
+<li><a href="#sub-1-2">1.2 Parameter Explosion</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-2">2. Biological Motivation<span class="sub-count">2</span></a>
+<ul class="sub-index">
+<li><a href="#sub-2-1">2.1 Hubel &amp; Wiesel Experiments</a></li>
+<li><a href="#sub-2-2">2.2 Simple vs. Complex Cells</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-3">3. Invariance vs. Equivariance<span class="sub-count">1</span></a>
+<ul class="sub-index">
+<li><a href="#sub-3-1">3.1 Spatial Properties in Image Tasks</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-4">4. Convolution Mechanics<span class="sub-count">3</span></a>
+<ul class="sub-index">
+<li><a href="#sub-4-1">4.1 Kernel Size, Stride, and Dilation</a></li>
+<li><a href="#sub-4-2">4.2 Grayscale vs. RGB Convolutions</a></li>
+<li><a href="#sub-4-3">4.3 Receptive Field Growth</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-5">5. Padding &amp; Pooling<span class="sub-count">2</span></a>
+<ul class="sub-index">
+<li><a href="#sub-5-1">5.1 Zero Padding and Boundary Checks</a></li>
+<li><a href="#sub-5-2">5.2 Max Pooling &amp; Subsampling</a></li>
+</ul>
+</li>
+<li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+</ul>
+</aside>
+<!-- Main Content -->
+<main id="notesContent">
+<!-- Topic 1 -->
+<section class="topic-section" id="topic-1">
+<div class="topic-header" onclick="toggleSection('content-1')">
+<div class="topic-number">1</div>
+<h2>Limitations of ANNs for Vision</h2>
+</div>
+<div class="collapsible-content" id="content-1">
+<h3 id="sub-1-1">1.1 Loss of Spatial Relationships</h3>
+<p>Standard Artificial Neural Networks (ANNs) process images by flattening the 2D or 3D pixel grid into a 1D vector. This has severe limitations for vision tasks:</p>
+<ul>
+<li><strong>Disregard of Neighborhood:</strong> Flattening treats pixels that were adjacent vertically or diagonally in the 2D grid as completely independent features, failing to exploit the spatial correlations inherent in images.</li>
+<li><strong>Lack of Translation Invariance:</strong> If a visual pattern (like a cat) shifts by a few pixels, the flattened vector changes completely. A standard ANN has to relearn the pattern for every possible location in the image.</li>
+</ul>
+<h3 id="sub-1-2">1.2 Parameter Explosion</h3>
+<p>In a fully connected layer, every input pixel connects to every hidden neuron. For a modest color image of size 256 × 256 × 3, the input size is 196,608. Connecting this to a hidden layer of 1,000 units requires over 196 million weights for a single layer, leading to massive memory costs and high overfitting risks.</p>
+<div class="topic-nav">
+<button class="btn" disabled="">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 2 -->
+<section class="topic-section" id="topic-2">
+<div class="topic-header" onclick="toggleSection('content-2')">
+<div class="topic-number">2</div>
+<h2>Biological Motivation</h2>
+</div>
+<div class="collapsible-content" id="content-2">
+<h3 id="sub-2-1">2.1 Hubel &amp; Wiesel Experiments</h3>
+<p>In the 1950s/60s, neuroscientists Hubel and Wiesel studied the visual cortex of cats and made key discoveries about biological vision:</p>
+<ul>
+<li><strong>Local Receptive Fields:</strong> Neurons do not process the entire visual scene simultaneously. Instead, each neuron responds only to a tiny, localized region of the visual input (receptive field).</li>
+<li><strong>Orientation Selectivity:</strong> Neurons fire selectively in response to edges and lines oriented at specific angles, rather than individual raw pixels.</li>
+</ul>
+<h3 id="sub-2-2">2.2 Simple vs. Complex Cells</h3>
+<p>The visual cortex utilizes two primary classes of cells to build translational invariance:</p>
+<ul>
+<li><strong>Simple Cells:</strong> Fire only when they observe a line/edge at a specific angle in a specific, fixed spot within the receptive field.</li>
+<li><strong>Complex Cells:</strong> Have larger receptive fields. They fire when they observe a line/edge at a specific angle anywhere in their receptive field, establishing translation invariance.</li>
+<li><strong>Hierarchical System:</strong> Subsequent layers combine outputs from complex cells to detect more complicated shapes (curves, textures) and eventually entire objects.</li>
+</ul>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 3 -->
+<section class="topic-section" id="topic-3">
+<div class="topic-header" onclick="toggleSection('content-3')">
+<div class="topic-number">3</div>
+<h2>Invariance vs. Equivariance</h2>
+</div>
+<div class="collapsible-content" id="content-3">
+<h3 id="sub-3-1">3.1 Spatial Properties in Image Tasks</h3>
+<p>We describe the relationship between input translations and output targets using two mathematical properties:</p>
+<div class="box box-green">
+<div class="box-title">Definitions</div>
+<ul>
+<li><strong>Invariance:</strong> A function f(x) is invariant to translation g if applying translation to the input does not alter the output:
+                                <div style="font-family: monospace; font-size: 1.05rem; margin: 0.25rem 0;">f(g(x)) = f(x)</div>
+                                Useful for classification (e.g. classifying "cat" regardless of where the cat is located in the image).
+                            </li>
+<li><strong>Equivariance:</strong> A function f(x) is equivariant to translation g if translating the input translates the output in the exact same way:
+                                <div style="font-family: monospace; font-size: 1.05rem; margin: 0.25rem 0;">f(g(x)) = g(f(x))</div>
+                                Useful for semantic segmentation or object detection (where we expect boundary overlays to shift as the image shifts).
+                            </li>
+</ul>
+</div>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 4 -->
+<section class="topic-section" id="topic-4">
+<div class="topic-header" onclick="toggleSection('content-4')">
+<div class="topic-number">4</div>
+<h2>Convolution Mechanics</h2>
+</div>
+<div class="collapsible-content" id="content-4">
+<h3 id="sub-4-1">4.1 Kernel Size, Stride, and Dilation</h3>
+<p>Convolutional layers slide a weight matrix (filter or kernel) over the input. They compress fully connected layers by using <strong>sparse connectivity</strong> (each hidden unit only looks at a small input patch) and <strong>weight sharing</strong> (the same filter weights are reused across the entire image). The knobs that control this sliding operation include:</p>
+<ul>
+<li><strong>Kernel Size (F):</strong> Spatial dimensions of the filter patch (e.g. 3 × 3 or 5 × 5).</li>
+<li><strong>Stride (S):</strong> Number of pixels the filter shifts between updates (e.g. stride S=1 slides continuously; stride S=2 skips every other pixel, downsampling the output).</li>
+<li><strong>Dilation (D):</strong> Spacing between weights in the filter. Dilation D=1 is normal convolution. Dilation D=2 inserts a zero weight between each kernel weight, expanding the receptive area of the filter without adding learnable parameters.</li>
+</ul>
+<h3 id="sub-4-2">4.2 Grayscale vs. RGB Convolutions</h3>
+<ul>
+<li><strong>Grayscale Images:</strong> Inputs are 2D grids (height × width). Filters are 2D (e.g. 3 × 3).</li>
+<li><strong>Color Images:</strong> Inputs are 3D volumes (height × width × channels (RGB)). The filter must match the input depth, having dimensions height × width × 3. The 3D filter is basically three stacked 2D filters that calculate a single combined output value for each receptive field.</li>
+</ul>
+<h3 id="sub-4-3">4.3 Receptive Field Growth</h3>
+<p>The <strong>receptive field (RF)</strong> is the size of the region in the original input that contributes to the calculation of a hidden unit activation. In fully connected layers, the receptive field is always 100% of the input. In CNNs, the receptive field grows larger in deeper layers:</p>
+<ul>
+<li>Layer 1: (Kernel size 3) → Receptive field = 3.</li>
+<li>Layer 2: (Kernel size 3, Stride 1) → Receptive field = 5.</li>
+<li>Layer 3: (Kernel size 3, Stride 2) → Receptive field = 7.</li>
+<li>As layers stack, the high-level units eventually cover the entire image, allowing the network to synthesize global context.</li>
+</ul>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 5 -->
+<section class="topic-section" id="topic-5">
+<div class="topic-header" onclick="toggleSection('content-5')">
+<div class="topic-number">5</div>
+<h2>Padding &amp; Pooling</h2>
+</div>
+<div class="collapsible-content" id="content-5">
+<h3 id="sub-5-1">5.1 Zero Padding and Boundary Checks</h3>
+<p>Performing convolutions repeatedly causes the spatial dimensions of the outputs to shrink. If the input is N × N and the filter is F × F, the output size is (N - F + 1) × (N - F + 1). To address this, we use <strong>zero padding (P)</strong> to add zero pixels around the image borders:</p>
+<div class="formula-box">Output Width = [ (N - F + 2P) / S ] + 1</div>
+<div class="box box-blue">
+<div class="box-title">Why Use Padding?</div>
+<ul>
+<li><strong>Size Preservation:</strong> Selecting padding P = (F - 1) / 2 for filter size F and stride S = 1 keeps the output spatial dimensions identical to the input.</li>
+<li><strong>Edge Preservation:</strong> Without padding, the corners of the image are only visited once by the corner of the filter, while central pixels are calculated repeatedly. The network becomes "blind" to border information. Padding lets the filter slide past borders, evaluating edges equally.</li>
+</ul>
+</div>
+<h3 id="sub-5-2">5.2 Max Pooling &amp; Subsampling</h3>
+<p><strong>Max Pooling</strong> is a non-learnable downsampling operation that takes a local patch (e.g. 2 × 2) of a feature map and outputs only the maximum activation value:</p>
+<ul>
+<li><strong>Dimensionality Reduction:</strong> Reduces the height and width of feature maps, lowering parameter count and computing cost in subsequent layers.</li>
+<li><strong>Translation Invariance:</strong> Because max pooling only cares about the maximum value in the patch, a small shift in the input activations does not change the pool output.</li>
+</ul>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+<button class="btn" disabled="">Next Topic</button>
+</div>
+</div>
+</section>
+
+<!-- Original PDF -->
+<section class="topic-section" id="original-pdf">
+<div class="topic-header" onclick="toggleSection('content-pdf')">
+<div class="topic-number" style="background:transparent; color: var(--text-dark); width: auto; margin-right: 0.5rem;">
+<svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+</div>
+<h2>Original PDF Notes</h2>
+</div>
+<div class="collapsible-content" id="content-pdf">
+<p>Below is the original PDF document for your reference:</p>
+<button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+<div id="pdfContainer" style="margin-top: 1rem;"></div>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+<button class="btn" disabled="">Next Topic</button>
+</div>
+</div>
+</section>
+</main>
+</div>
+<button id="backToTop" onclick="scrollToTop()">↑</button>
+<script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/11.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--border-light); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+<script src="../js/script.js"></script>
+</body>
+</html>

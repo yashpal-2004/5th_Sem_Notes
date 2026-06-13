@@ -1,393 +1,293 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deep Learning Foundations - Lecture 01</title>
-    <meta name="description" content="Study notes for Deep Learning Foundations, Lecture 01 covering Linear Algebra basics: Scalars, Vectors, Tensors, Matrices, Dot Products, Vector Norms, Matrix Properties, and Determinants.">
-    <link class="favicon" rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>01</text></svg>">
-    <link rel="stylesheet" href="../css/style.css">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Deep Learning Foundations - Lecture 01</title>
+<meta content="Study notes for Deep Learning Foundations, Lecture 01 covering Linear Algebra basics: Scalars, Vectors, Tensors, Matrices, Dot Products, Vector Norms, Matrix Properties, and Determinants." name="description"/>
+<link class="favicon" href="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/&gt;&lt;text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22&gt;01&lt;/text&gt;&lt;/svg&gt;" rel="icon"/>
+<link href="../css/style.css" rel="stylesheet"/>
 </head>
 <body>
+<header>
+<div class="header-titles">
+<h1>Deep Learning Foundations</h1>
+<p>Lecture 01 - Linear Algebra Foundations for Deep Learning</p>
+<a href="../index.html" style="color: var(--text-dark); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+<span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+<a href="../pdfs/1.pdf" style="color: var(--text-dark); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+</div>
+<div class="search-container">
+<input id="searchInput" placeholder="Search notes..." type="text"/>
+</div>
+</header>
+<div class="container">
+<!-- Sidebar Index -->
+<aside>
+<div class="aside-header">
+<h3>Table of Contents</h3>
+<div class="topic-count">Total Topics: 4</div>
+</div>
+<ul class="index-list" id="indexList">
+<li>
+<a href="#topic-1">1. Scalars, Vectors &amp; Matrices<span class="sub-count">4</span></a>
+<ul class="sub-index">
+<li><a href="#sub-1-1">1.1 Scalars</a></li>
+<li><a href="#sub-1-2">1.2 Vectors</a></li>
+<li><a href="#sub-1-3">1.3 Matrices</a></li>
+<li><a href="#sub-1-4">1.4 Types of Matrices</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-2">2. Multi-Dimensional Tensors<span class="sub-count">2</span></a>
+<ul class="sub-index">
+<li><a href="#sub-2-1">2.1 Generalization &amp; Ranks</a></li>
+<li><a href="#sub-2-2">2.2 Common Tensor Operations</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-3">3. Inner Products &amp; Similarity<span class="sub-count">3</span></a>
+<ul class="sub-index">
+<li><a href="#sub-3-1">3.1 Dot Product &amp; Similarity</a></li>
+<li><a href="#sub-3-2">3.2 Matrix Multiplication &amp; Properties</a></li>
+<li><a href="#sub-3-3">3.3 Determinants &amp; Inverses</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-4">4. Vector Norms &amp; Regularization<span class="sub-count">3</span></a>
+<ul class="sub-index">
+<li><a href="#sub-4-1">4.1 Norm Types: L1, L2, and Max Norm</a></li>
+<li><a href="#sub-4-2">4.2 Regularization (L1 vs. L2)</a></li>
+<li><a href="#sub-4-3">4.3 Gradient Norms &amp; Stability</a></li>
+</ul>
+</li>
 
-    <header>
-        <div class="header-titles">
-            <h1>Deep Learning Foundations</h1>
-            <p>Lecture 01 - Linear Algebra Foundations for Deep Learning</p>
-            <a href="../index.html" style="color: var(--text-dark); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
-            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
-            <a href="../pdfs/1.pdf" target="_blank" style="color: var(--text-dark); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">Open PDF in New Tab ↗</a>
-        </div>
-        <div class="search-container">
-            <input type="text" id="searchInput" placeholder="Search notes...">
-        </div>
-    </header>
-
-    <div class="container">
-        <!-- Sidebar Index -->
-        <aside>
-            <div class="aside-header">
-                <h3>Table of Contents</h3>
-                <div class="topic-count">Total Topics: 5</div>
-            </div>
-            <ul class="index-list" id="indexList">
-                <li>
-                    <a href="#topic-1">1. Scalars, Vectors & Matrices<span class="sub-count">4</span></a>
-                    <ul class="sub-index">
-                         <li><a href="#sub-1-1">1.1 Scalars</a></li>
-                         <li><a href="#sub-1-2">1.2 Vectors</a></li>
-                         <li><a href="#sub-1-3">1.3 Matrices</a></li>
-                         <li><a href="#sub-1-4">1.4 Types of Matrices</a></li>
-                    </ul>
-                </li>
-                <li>
-                    <a href="#topic-2">2. Multi-Dimensional Tensors<span class="sub-count">2</span></a>
-                    <ul class="sub-index">
-                         <li><a href="#sub-2-1">2.1 Generalization & Ranks</a></li>
-                         <li><a href="#sub-2-2">2.2 Common Tensor Operations</a></li>
-                    </ul>
-                </li>
-                <li>
-                    <a href="#topic-3">3. Inner Products & Similarity<span class="sub-count">3</span></a>
-                    <ul class="sub-index">
-                         <li><a href="#sub-3-1">3.1 Dot Product & Similarity</a></li>
-                         <li><a href="#sub-3-2">3.2 Matrix Multiplication & Properties</a></li>
-                         <li><a href="#sub-3-3">3.3 Determinants & Inverses</a></li>
-                    </ul>
-                </li>
-                <li>
-                    <a href="#topic-4">4. Vector Norms & Regularization<span class="sub-count">3</span></a>
-                    <ul class="sub-index">
-                         <li><a href="#sub-4-1">4.1 Norm Types: L1, L2, and Max Norm</a></li>
-                         <li><a href="#sub-4-2">4.2 Regularization (L1 vs. L2)</a></li>
-                         <li><a href="#sub-4-3">4.3 Gradient Norms & Stability</a></li>
-                    </ul>
-                </li>
-                <li>
-                    <a href="#topic-5">5. 5-Minute Quiz & Solutions<span class="sub-count">6</span></a>
-                    <ul class="sub-index">
-                         <li><a href="#sub-5-1">5.1 Vector vs. Tensor</a></li>
-                         <li><a href="#sub-5-2">5.2 Matrix Non-Commutativity</a></li>
-                         <li><a href="#sub-5-3">5.3 Dot Product Practice</a></li>
-                         <li><a href="#sub-5-4">5.4 Matrix Multiplication Shapes</a></li>
-                         <li><a href="#sub-5-5">5.5 Outer Product Analysis</a></li>
-                         <li><a href="#sub-5-6">5.6 CNN Tensor Input Requirement</a></li>
-                    </ul>
-                </li>
-                <li><a href="#original-pdf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
-            </ul>
-        </aside>
-
-        <!-- Main Content -->
-        <main id="notesContent">
-
-            <!-- Topic 1 -->
-            <section id="topic-1" class="topic-section">
-                <div class="topic-header" onclick="toggleSection('content-1')">
-                    <div class="topic-number">1</div>
-                    <h2>Scalars, Vectors & Matrices</h2>
-                </div>
-                <div id="content-1" class="collapsible-content">
-                    <h3 id="sub-1-1">1.1 Scalars</h3>
-                    <p>A scalar is a single number representing magnitude with no direction. It has zero dimensions. In deep learning, scalars serve as tuning hyper-parameters and thresholds.</p>
-                    
-                    <div class="box box-blue">
-                        <div class="box-title">Scalar Examples in Deep Learning</div>
-                        <ul>
-                            <li><strong>Learning Rate (&eta;):</strong> e.g., 0.001</li>
-                            <li><strong>Loss Value:</strong> e.g., 2.57</li>
-                            <li><strong>Bias Term (b):</strong> e.g., 3.5</li>
-                            <li><strong>Pixel Intensity:</strong> e.g., 255</li>
-                        </ul>
-                    </div>
-
-                    <h3 id="sub-1-2">1.2 Vectors</h3>
-                    <p>A vector is a one-dimensional array of numbers. It represents both magnitude and direction. Vectors bundle multiple related features of a single data point into a single object.</p>
-                    <ul>
-                        <li><strong>Feature Vectors:</strong> A student profile vector: [height_cm, weight_kg, age_years].</li>
-                        <li><strong>Embeddings:</strong> High-dimensional representation vectors (e.g., 300D word embeddings).</li>
-                        <li><strong>Gradients:</strong> Direct vector paths indicating the optimal adjustment rate of neural parameters.</li>
-                    </ul>
-
-                    <h3 id="sub-1-3">1.3 Matrices</h3>
-                    <p>A matrix is a two-dimensional grid of numbers (rows × columns). Rows represent independent observations (e.g., students, images), while columns represent attributes (e.g., scores, pixel values). A matrix acts as a linear transformation operator that maps input vectors to outputs: y = Wx + b.</p>
-
-                    <div class="box box-beige">
-                        <div class="box-title">Dimensions & Orders</div>
-                        <p>An m × n matrix has m rows and n columns. For instance, a matrix with 8 elements can be structured as: 1×8, 8×1, 4×2, or 2×4.</p>
-                        <p><strong>Matrix Transpose (A<sup>T</sup>):</strong> Swaps rows and columns. If A is of order m × n, A<sup>T</sup> is of order n × m. Note that applying transpose twice returns the original matrix: (A<sup>T</sup>)<sup>T</sup> = A.</p>
-                    </div>
-
-                    <h3 id="sub-1-4">1.4 Types of Matrices</h3>
-                    <p>Understanding structural patterns in matrices is essential for optimization and neural computational efficiency:</p>
-                    <ul>
-                        <li><strong>Row Vector:</strong> A matrix of size 1 × n (e.g., temporal step series: <code>[0, 1, 2, 3, 4, 5]</code> of size 1 × 6).</li>
-                        <li><strong>Column Vector:</strong> A matrix of size m × 1. Generally, deep learning default representations assume vectors are column vectors.</li>
-                        <li><strong>Square Matrix:</strong> A matrix with equal rows and columns (m = n).</li>
-                        <li><strong>Diagonal Matrix:</strong> A square matrix where all non-diagonal elements are zero (a<sub>ij</sub> = 0 for all i &ne; j).</li>
-                        <li><strong>Scalar Matrix:</strong> A diagonal matrix whose main diagonal elements are all equal.</li>
-                        <li><strong>Identity Matrix (I):</strong> A square matrix with ones on the main diagonal and zeros elsewhere (a<sub>ii</sub> = 1, a<sub>ij</sub> = 0 for i &ne; j). It leaves any matrix unchanged: AI = IA = A.</li>
-                        <li><strong>Zero Matrix (Null Matrix):</strong> A matrix of any dimension where all elements are zero.</li>
-                        <li><strong>Symmetric Matrix:</strong> A square matrix that is its own transpose (A = A<sup>T</sup>). The element at row i, column j equals the element at row j, column i (a<sub>ij</sub> = a<sub>ji</sub>).</li>
-                    </ul>
-
-                    <div class="box box-orange">
-                        <div class="box-title">Equality of Matrices</div>
-                        <p>Two matrices A and B are equal (A = B) if and only if:</p>
-                        <ol>
-                            <li>They have the exact same order (dimensions m &times; n).</li>
-                            <li>Each element of A is equal to its corresponding element in B (a<sub>ij</sub> = b<sub>ij</sub> for all i, j).</li>
-                        </ol>
-                    </div>
-
-                    <div class="topic-nav">
-                        <button class="btn" disabled>Previous Topic</button>
-                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Topic 2 -->
-            <section id="topic-2" class="topic-section">
-                <div class="topic-header" onclick="toggleSection('content-2')">
-                    <div class="topic-number">2</div>
-                    <h2>Multi-Dimensional Tensors</h2>
-                </div>
-                <div id="content-2" class="collapsible-content">
-                    <h3 id="sub-2-1">2.1 Generalization & Ranks</h3>
-                    <p>A tensor is a multi-dimensional array of numbers that generalizes scalars, vectors, and matrices to higher dimensions. The number of axes/dimensions of a tensor is called its <strong>Rank</strong>:</p>
-                    <ul>
-                        <li><strong>Rank-0 Tensor:</strong> Scalar (single value)</li>
-                        <li><strong>Rank-1 Tensor:</strong> Vector (1D list)</li>
-                        <li><strong>Rank-2 Tensor:</strong> Matrix (2D table)</li>
-                        <li><strong>Rank-3 Tensor:</strong> 3D array (e.g., RGB image: Height × Width × Color Channels)</li>
-                        <li><strong>Rank-4 Tensor:</strong> 4D array (e.g., Batch of RGB images: Batch Size × Channels × Height × Width)</li>
-                    </ul>
-
-                    <div style="text-align: center; margin: 1.5rem 0;">
-                        <img src="../images/image_tensors.png" alt="Batch of Images as Tensors" style="max-width: 100%;">
-                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; font-style: italic;">Visual mapping of a batch of color images represented as a Rank-4 tensor structure.</p>
-                    </div>
-
-                    <h3 id="sub-2-2">2.2 Common Tensor Operations</h3>
-                    <p>Deep learning models rotate, reshape, and reduce dimensions of tensors continuously:</p>
-                    <ul>
-                        <li><strong>Reshape:</strong> Alters the dimension parameters (e.g., flattening a 2D image matrix into a 1D vector) without changing the underlying data.</li>
-                        <li><strong>Broadcasting:</strong> Automatically replicates and expands smaller arrays (like adding a 1&times;4 bias vector to a 5&times;4 feature matrix) to make their shapes compatible for element-wise operations.</li>
-                        <li><strong>Reduction:</strong> Summing or averaging along a specific axis (e.g., calculating batch mean in Batch Normalization).</li>
-                    </ul>
-
-                    <div style="text-align: center; margin: 1.5rem 0;">
-                        <img src="../images/convolutional_operations.png" alt="Convolutional Tensor Operations" style="max-width: 100%;">
-                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; font-style: italic;">How kernels shift over image matrices in Rank-3 tensors during convolutional neural layers.</p>
-                    </div>
-
-                    <div class="topic-nav">
-                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
-                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Topic 3 -->
-            <section id="topic-3" class="topic-section">
-                <div class="topic-header" onclick="toggleSection('content-3')">
-                    <div class="topic-number">3</div>
-                    <h2>Inner Products & Similarity</h2>
-                </div>
-                <div id="content-3" class="collapsible-content">
-                    <h3 id="sub-3-1">3.1 Dot Product & Similarity</h3>
-                    <p>The dot product between two vectors (x · y = &Sigma; x<sub>i</sub>y<sub>i</sub>) computes their similarity, alignment, and projections. Geometric relation: v · w = ||v|| ||w|| cos(&theta;).</p>
-                    
-                    <div class="box box-orange">
-                        <div class="box-title">Dot Product Interpretations</div>
-                        <ul>
-                            <li><strong>cos(&theta;) &asymp; 1:</strong> Vectors point in similar directions (highly correlated).</li>
-                            <li><strong>cos(&theta;) = 0:</strong> Vectors are orthogonal (90-degree angle, completely independent, zero correlation).</li>
-                            <li><strong>cos(&theta;) &lt; 0:</strong> Vectors point in opposite directions (negatively correlated).</li>
-                        </ul>
-                    </div>
-
-                    <h3 id="sub-3-2">3.2 Matrix Multiplication & Properties</h3>
-                    <p>If A is m × n and B is n × p, then their product C = AB has shape m × p. Each element c<sub>ij</sub> is the dot product of row <em>i</em> of A with column <em>j</em> of B.</p>
-                    
-                    <div class="box box-red">
-                        <div class="box-title">Matrix Properties Warning</div>
-                        <p><strong>Matrix multiplication is NOT commutative: AB &ne; BA.</strong></p>
-                        <p>Other matrix multiplication laws:</p>
-                        <ul>
-                            <li>Associative: A(BC) = (AB)C</li>
-                            <li>Distributive: A(B + C) = AB + AC</li>
-                            <li>Scalar multiplication properties: A(k B) = k(AB)</li>
-                            <li>Product Transpose: (AB)<sup>T</sup> = B<sup>T</sup>A<sup>T</sup></li>
-                        </ul>
-                    </div>
-
-                    <h3 id="sub-3-3">3.3 Determinants & Inverses</h3>
-                    <p>Determinants offer geometric understanding of scaling factors. If a matrix has a zero determinant, it collapses the space, making inverse transformations impossible.</p>
-                    
-                    <div class="box box-blue">
-                        <div class="box-title">Determinant of Order 2</div>
-                        <p>For a 2 &times; 2 matrix:</p>
-                        <pre class="code-block"><code>A = [a  b]
+<li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+</ul>
+</aside>
+<!-- Main Content -->
+<main id="notesContent">
+<!-- Topic 1 -->
+<section class="topic-section" id="topic-1">
+<div class="topic-header" onclick="toggleSection('content-1')">
+<div class="topic-number">1</div>
+<h2>Scalars, Vectors &amp; Matrices</h2>
+</div>
+<div class="collapsible-content" id="content-1">
+<h3 id="sub-1-1">1.1 Scalars</h3>
+<p>A scalar is a single number representing magnitude with no direction. It has zero dimensions. In deep learning, scalars serve as tuning hyper-parameters and thresholds.</p>
+<div class="box box-blue">
+<div class="box-title">Scalar Examples in Deep Learning</div>
+<ul>
+<li><strong>Learning Rate (η):</strong> e.g., 0.001</li>
+<li><strong>Loss Value:</strong> e.g., 2.57</li>
+<li><strong>Bias Term (b):</strong> e.g., 3.5</li>
+<li><strong>Pixel Intensity:</strong> e.g., 255</li>
+</ul>
+</div>
+<h3 id="sub-1-2">1.2 Vectors</h3>
+<p>A vector is a one-dimensional array of numbers. It represents both magnitude and direction. Vectors bundle multiple related features of a single data point into a single object.</p>
+<ul>
+<li><strong>Feature Vectors:</strong> A student profile vector: [height_cm, weight_kg, age_years].</li>
+<li><strong>Embeddings:</strong> High-dimensional representation vectors (e.g., 300D word embeddings).</li>
+<li><strong>Gradients:</strong> Direct vector paths indicating the optimal adjustment rate of neural parameters.</li>
+</ul>
+<h3 id="sub-1-3">1.3 Matrices</h3>
+<p>A matrix is a two-dimensional grid of numbers (rows × columns). Rows represent independent observations (e.g., students, images), while columns represent attributes (e.g., scores, pixel values). A matrix acts as a linear transformation operator that maps input vectors to outputs: y = Wx + b.</p>
+<div class="box box-beige">
+<div class="box-title">Dimensions &amp; Orders</div>
+<p>An m × n matrix has m rows and n columns. For instance, a matrix with 8 elements can be structured as: 1×8, 8×1, 4×2, or 2×4.</p>
+<p><strong>Matrix Transpose (A<sup>T</sup>):</strong> Swaps rows and columns. If A is of order m × n, A<sup>T</sup> is of order n × m. Note that applying transpose twice returns the original matrix: (A<sup>T</sup>)<sup>T</sup> = A.</p>
+</div>
+<h3 id="sub-1-4">1.4 Types of Matrices</h3>
+<p>Understanding structural patterns in matrices is essential for optimization and neural computational efficiency:</p>
+<ul>
+<li><strong>Row Vector:</strong> A matrix of size 1 × n (e.g., temporal step series: <code>[0, 1, 2, 3, 4, 5]</code> of size 1 × 6).</li>
+<li><strong>Column Vector:</strong> A matrix of size m × 1. Generally, deep learning default representations assume vectors are column vectors.</li>
+<li><strong>Square Matrix:</strong> A matrix with equal rows and columns (m = n).</li>
+<li><strong>Diagonal Matrix:</strong> A square matrix where all non-diagonal elements are zero (a<sub>ij</sub> = 0 for all i ≠ j).</li>
+<li><strong>Scalar Matrix:</strong> A diagonal matrix whose main diagonal elements are all equal.</li>
+<li><strong>Identity Matrix (I):</strong> A square matrix with ones on the main diagonal and zeros elsewhere (a<sub>ii</sub> = 1, a<sub>ij</sub> = 0 for i ≠ j). It leaves any matrix unchanged: AI = IA = A.</li>
+<li><strong>Zero Matrix (Null Matrix):</strong> A matrix of any dimension where all elements are zero.</li>
+<li><strong>Symmetric Matrix:</strong> A square matrix that is its own transpose (A = A<sup>T</sup>). The element at row i, column j equals the element at row j, column i (a<sub>ij</sub> = a<sub>ji</sub>).</li>
+</ul>
+<div class="box box-orange">
+<div class="box-title">Equality of Matrices</div>
+<p>Two matrices A and B are equal (A = B) if and only if:</p>
+<ol>
+<li>They have the exact same order (dimensions m × n).</li>
+<li>Each element of A is equal to its corresponding element in B (a<sub>ij</sub> = b<sub>ij</sub> for all i, j).</li>
+</ol>
+</div>
+<div class="topic-nav">
+<button class="btn" disabled="">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 2 -->
+<section class="topic-section" id="topic-2">
+<div class="topic-header" onclick="toggleSection('content-2')">
+<div class="topic-number">2</div>
+<h2>Multi-Dimensional Tensors</h2>
+</div>
+<div class="collapsible-content" id="content-2">
+<h3 id="sub-2-1">2.1 Generalization &amp; Ranks</h3>
+<p>A tensor is a multi-dimensional array of numbers that generalizes scalars, vectors, and matrices to higher dimensions. The number of axes/dimensions of a tensor is called its <strong>Rank</strong>:</p>
+<ul>
+<li><strong>Rank-0 Tensor:</strong> Scalar (single value)</li>
+<li><strong>Rank-1 Tensor:</strong> Vector (1D list)</li>
+<li><strong>Rank-2 Tensor:</strong> Matrix (2D table)</li>
+<li><strong>Rank-3 Tensor:</strong> 3D array (e.g., RGB image: Height × Width × Color Channels)</li>
+<li><strong>Rank-4 Tensor:</strong> 4D array (e.g., Batch of RGB images: Batch Size × Channels × Height × Width)</li>
+</ul>
+<div style="text-align: center; margin: 1.5rem 0;">
+<img alt="Batch of Images as Tensors" src="../images/image_tensors.png" style="max-width: 100%;"/>
+<p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; font-style: italic;">Visual mapping of a batch of color images represented as a Rank-4 tensor structure.</p>
+</div>
+<h3 id="sub-2-2">2.2 Common Tensor Operations</h3>
+<p>Deep learning models rotate, reshape, and reduce dimensions of tensors continuously:</p>
+<ul>
+<li><strong>Reshape:</strong> Alters the dimension parameters (e.g., flattening a 2D image matrix into a 1D vector) without changing the underlying data.</li>
+<li><strong>Broadcasting:</strong> Automatically replicates and expands smaller arrays (like adding a 1×4 bias vector to a 5×4 feature matrix) to make their shapes compatible for element-wise operations.</li>
+<li><strong>Reduction:</strong> Summing or averaging along a specific axis (e.g., calculating batch mean in Batch Normalization).</li>
+</ul>
+<div style="text-align: center; margin: 1.5rem 0;">
+<img alt="Convolutional Tensor Operations" src="../images/convolutional_operations.png" style="max-width: 100%;"/>
+<p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; font-style: italic;">How kernels shift over image matrices in Rank-3 tensors during convolutional neural layers.</p>
+</div>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 3 -->
+<section class="topic-section" id="topic-3">
+<div class="topic-header" onclick="toggleSection('content-3')">
+<div class="topic-number">3</div>
+<h2>Inner Products &amp; Similarity</h2>
+</div>
+<div class="collapsible-content" id="content-3">
+<h3 id="sub-3-1">3.1 Dot Product &amp; Similarity</h3>
+<p>The dot product between two vectors (x · y = Σ x<sub>i</sub>y<sub>i</sub>) computes their similarity, alignment, and projections. Geometric relation: v · w = ||v|| ||w|| cos(θ).</p>
+<div class="box box-orange">
+<div class="box-title">Dot Product Interpretations</div>
+<ul>
+<li><strong>cos(θ) ≈ 1:</strong> Vectors point in similar directions (highly correlated).</li>
+<li><strong>cos(θ) = 0:</strong> Vectors are orthogonal (90-degree angle, completely independent, zero correlation).</li>
+<li><strong>cos(θ) &lt; 0:</strong> Vectors point in opposite directions (negatively correlated).</li>
+</ul>
+</div>
+<h3 id="sub-3-2">3.2 Matrix Multiplication &amp; Properties</h3>
+<p>If A is m × n and B is n × p, then their product C = AB has shape m × p. Each element c<sub>ij</sub> is the dot product of row <em>i</em> of A with column <em>j</em> of B.</p>
+<div class="box box-red">
+<div class="box-title">Matrix Properties Warning</div>
+<p><strong>Matrix multiplication is NOT commutative: AB ≠ BA.</strong></p>
+<p>Other matrix multiplication laws:</p>
+<ul>
+<li>Associative: A(BC) = (AB)C</li>
+<li>Distributive: A(B + C) = AB + AC</li>
+<li>Scalar multiplication properties: A(k B) = k(AB)</li>
+<li>Product Transpose: (AB)<sup>T</sup> = B<sup>T</sup>A<sup>T</sup></li>
+</ul>
+</div>
+<h3 id="sub-3-3">3.3 Determinants &amp; Inverses</h3>
+<p>Determinants offer geometric understanding of scaling factors. If a matrix has a zero determinant, it collapses the space, making inverse transformations impossible.</p>
+<div class="box box-blue">
+<div class="box-title">Determinant of Order 2</div>
+<p>For a 2 × 2 matrix:</p>
+<pre class="code-block"><code>A = [a  b]
     [c  d]</code></pre>
-                        <p>The determinant is: <strong>|A| = ad - bc</strong>.</p>
-                    </div>
-
-                    <div class="box box-beige">
-                        <div class="box-title">Determinant of Order 3</div>
-                        <p>For a 3 &times; 3 matrix:</p>
-                        <pre class="code-block"><code>A = [a  b  c]
+<p>The determinant is: <strong>|A| = ad - bc</strong>.</p>
+</div>
+<div class="box box-beige">
+<div class="box-title">Determinant of Order 3</div>
+<p>For a 3 × 3 matrix:</p>
+<pre class="code-block"><code>A = [a  b  c]
     [d  e  f]
     [g  h  i]</code></pre>
-                        <p>The determinant is: <strong>|A| = a(ei - fh) - b(di - fg) + c(dh - eg)</strong>.</p>
-                    </div>
+<p>The determinant is: <strong>|A| = a(ei - fh) - b(di - fg) + c(dh - eg)</strong>.</p>
+</div>
+<h4>Key Determinant Properties</h4>
+<ul>
+<li>If any row or column of A is entirely zeros, then <strong>|A| = 0</strong>.</li>
+<li>The determinant of a matrix equals its transpose: <strong>|A<sup>T</sup>| = |A|</strong>.</li>
+<li>Multiplicative property: <strong>|AB| = |A||B|</strong>.</li>
+</ul>
+<h4>Matrix Inverse</h4>
+<p>A square matrix A is called <strong>nonsingular</strong> or <strong>invertible</strong> if there exists a matrix A<sup>-1</sup> such that:</p>
+<p style="text-align: center; font-weight: bold; margin: 1rem 0;">A A<sup>-1</sup> = A<sup>-1</sup> A = I</p>
+<p>If |A| = 0, the matrix is <strong>singular</strong> and has no inverse. For a 2 × 2 matrix A, the inverse is calculated as:</p>
+<p style="text-align: center; font-weight: bold; margin: 1rem 0;">A<sup>-1</sup> = (1 / |A|) * [d  -b; -c  a]</p>
+<p>We represent matrix division using the inverse: <strong>A / B = A · B<sup>-1</sup></strong>. A property of transposes and inverses: <strong>(A<sup>T</sup>)<sup>-1</sup> = (A<sup>-1</sup>)<sup>T</sup></strong>.</p>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 4 -->
+<section class="topic-section" id="topic-4">
+<div class="topic-header" onclick="toggleSection('content-4')">
+<div class="topic-number">4</div>
+<h2>Vector Norms &amp; Regularization</h2>
+</div>
+<div class="collapsible-content" id="content-4">
+<h3 id="sub-4-1">4.1 Norm Types: L1, L2, and Max Norm</h3>
+<p>Vector norms are mathematical functions that measure the size or magnitude of vectors. They are used in deep learning to measure and restrict weight vectors and gradients:</p>
+<div style="text-align: center; margin: 1.5rem 0;">
+<img alt="Vector Norms in Geometry" src="../images/vector_norms.png" style="max-width: 100%;"/>
+<p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; font-style: italic;">Visual shapes of distances in 2D space: L1 norm (diamond), L2 norm (circle), and Max norm (square).</p>
+</div>
+<ul>
+<li><strong>L1 Norm (Manhattan Distance):</strong> Sum of absolute values: ||x||<sub>1</sub> = Σ |x<sub>i</sub>|. It draws a diamond shape in 2D space.</li>
+<li><strong>L2 Norm (Euclidean Distance):</strong> Straight-line distance: ||x||<sub>2</sub> = √Σ x<sub>i</sub><sup>2</sup>. It draws a circular boundary in 2D space.</li>
+<li><strong>Max Norm (Infinity Norm):</strong> Cares only about the absolute maximum value: ||x||<sub>∞</sub> = max(|x<sub>i</sub>|). It draws a square boundary.</li>
+</ul>
+<h3 id="sub-4-2">4.2 Regularization (L1 vs. L2)</h3>
+<p>Regularization terms are added to the loss function to prevent overfitting by penalizing large weights:</p>
+<ul>
+<li><strong>L1 Regularization (Lasso):</strong> Penalizes the L1 norm. It acts as a feature selector by forcing unimportant feature weights to become exactly zero (promoting <strong>Sparsity</strong>).</li>
+<li><strong>L2 Regularization (Ridge / Weight Decay):</strong> Penalizes the squared L2 norm. It shrinks all weights towards zero but rarely hits exactly zero. It keeps weights small and spread out, ensuring model stability.</li>
+</ul>
+<h3 id="sub-4-3">4.3 Gradient Norms &amp; Stability</h3>
+<p>Gradient norms are monitored to ensure stable training:</p>
+<div class="box box-green">
+<div class="box-title">Gradient Clipping</div>
+<p>To prevent <strong>Exploding Gradients</strong>, we calculate the L2 norm of the gradients. If it exceeds a threshold, we scale the gradients down. Similarly, <strong>Max-Norm Regularization</strong> acts as a hard ceiling to keep weights from growing past defined boundaries.</p>
+</div>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+<button class="btn" disabled="True">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 5 -->
 
-                    <h4>Key Determinant Properties</h4>
-                    <ul>
-                        <li>If any row or column of A is entirely zeros, then <strong>|A| = 0</strong>.</li>
-                        <li>The determinant of a matrix equals its transpose: <strong>|A<sup>T</sup>| = |A|</strong>.</li>
-                        <li>Multiplicative property: <strong>|AB| = |A||B|</strong>.</li>
-                    </ul>
-
-                    <h4>Matrix Inverse</h4>
-                    <p>A square matrix A is called <strong>nonsingular</strong> or <strong>invertible</strong> if there exists a matrix A<sup>-1</sup> such that:</p>
-                    <p style="text-align: center; font-weight: bold; margin: 1rem 0;">A A<sup>-1</sup> = A<sup>-1</sup> A = I</p>
-                    <p>If |A| = 0, the matrix is <strong>singular</strong> and has no inverse. For a 2 &times; 2 matrix A, the inverse is calculated as:</p>
-                    <p style="text-align: center; font-weight: bold; margin: 1rem 0;">A<sup>-1</sup> = (1 / |A|) * [d  -b; -c  a]</p>
-                    <p>We represent matrix division using the inverse: <strong>A / B = A &middot; B<sup>-1</sup></strong>. A property of transposes and inverses: <strong>(A<sup>T</sup>)<sup>-1</sup> = (A<sup>-1</sup>)<sup>T</sup></strong>.</p>
-
-                    <div class="topic-nav">
-                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
-                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Topic 4 -->
-            <section id="topic-4" class="topic-section">
-                <div class="topic-header" onclick="toggleSection('content-4')">
-                    <div class="topic-number">4</div>
-                    <h2>Vector Norms & Regularization</h2>
-                </div>
-                <div id="content-4" class="collapsible-content">
-                    <h3 id="sub-4-1">4.1 Norm Types: L1, L2, and Max Norm</h3>
-                    <p>Vector norms are mathematical functions that measure the size or magnitude of vectors. They are used in deep learning to measure and restrict weight vectors and gradients:</p>
-
-                    <div style="text-align: center; margin: 1.5rem 0;">
-                        <img src="../images/vector_norms.png" alt="Vector Norms in Geometry" style="max-width: 100%;">
-                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; font-style: italic;">Visual shapes of distances in 2D space: L1 norm (diamond), L2 norm (circle), and Max norm (square).</p>
-                    </div>
-
-                    <ul>
-                        <li><strong>L1 Norm (Manhattan Distance):</strong> Sum of absolute values: ||x||<sub>1</sub> = &Sigma; |x<sub>i</sub>|. It draws a diamond shape in 2D space.</li>
-                        <li><strong>L2 Norm (Euclidean Distance):</strong> Straight-line distance: ||x||<sub>2</sub> = &radic;&Sigma; x<sub>i</sub><sup>2</sup>. It draws a circular boundary in 2D space.</li>
-                        <li><strong>Max Norm (Infinity Norm):</strong> Cares only about the absolute maximum value: ||x||<sub>&infin;</sub> = max(|x<sub>i</sub>|). It draws a square boundary.</li>
-                    </ul>
-
-                    <h3 id="sub-4-2">4.2 Regularization (L1 vs. L2)</h3>
-                    <p>Regularization terms are added to the loss function to prevent overfitting by penalizing large weights:</p>
-                    <ul>
-                        <li><strong>L1 Regularization (Lasso):</strong> Penalizes the L1 norm. It acts as a feature selector by forcing unimportant feature weights to become exactly zero (promoting <strong>Sparsity</strong>).</li>
-                        <li><strong>L2 Regularization (Ridge / Weight Decay):</strong> Penalizes the squared L2 norm. It shrinks all weights towards zero but rarely hits exactly zero. It keeps weights small and spread out, ensuring model stability.</li>
-                    </ul>
-
-                    <h3 id="sub-4-3">4.3 Gradient Norms & Stability</h3>
-                    <p>Gradient norms are monitored to ensure stable training:</p>
-                    <div class="box box-green">
-                        <div class="box-title">Gradient Clipping</div>
-                        <p>To prevent <strong>Exploding Gradients</strong>, we calculate the L2 norm of the gradients. If it exceeds a threshold, we scale the gradients down. Similarly, <strong>Max-Norm Regularization</strong> acts as a hard ceiling to keep weights from growing past defined boundaries.</p>
-                    </div>
-
-                    <div class="topic-nav">
-                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
-                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Topic 5 -->
-            <section id="topic-5" class="topic-section">
-                <div class="topic-header" onclick="toggleSection('content-5')">
-                    <div class="topic-number">5</div>
-                    <h2>5-Minute Quiz & Solutions</h2>
-                </div>
-                <div id="content-5" class="collapsible-content">
-                    <p>Test your understanding of the concepts covered in Lecture 01. Click on the headings to reveal step-by-step solutions.</p>
-
-                    <!-- Quiz Item 1 -->
-                    <h3 id="sub-5-1" onclick="toggleSection('quiz-1-sol')" style="cursor: pointer; color: var(--blue);">5.1 What is the difference between a vector and a tensor?</h3>
-                    <div id="quiz-1-sol" class="collapsible-content" style="padding-left: 1rem; border-left: 3px solid var(--border-light); margin-bottom: 1.5rem;">
-                        <p>A <strong>vector</strong> is specifically a 1D array of numbers (a Rank-1 tensor). A <strong>tensor</strong> is a generalized multi-dimensional array representing data of any rank (e.g., Rank-0 is a scalar, Rank-2 is a matrix, Rank-3 is a volume block like an RGB image). Thus, all vectors are tensors, but not all tensors are vectors.</p>
-                    </div>
-
-                    <!-- Quiz Item 2 -->
-                    <h3 id="sub-5-2" onclick="toggleSection('quiz-2-sol')" style="cursor: pointer; color: var(--blue);">5.2 Why can matrix multiplication not be commutative?</h3>
-                    <div id="quiz-2-sol" class="collapsible-content" style="padding-left: 1rem; border-left: 3px solid var(--border-light); margin-bottom: 1.5rem;">
-                        <p>Matrix multiplication represents a sequence of linear transformations applied in a specific order. Geometrically, rotating a space then shearing it is not the same as shearing first then rotating. Algebraically, the dimensions must match (AB is defined if columns of A match rows of B, but BA might be completely undefined if columns of B do not match rows of A). Even if both are square matrices, the output cells depend on different row-column combinations, leading to AB &ne; BA.</p>
-                    </div>
-
-                    <!-- Quiz Item 3 -->
-                    <h3 id="sub-5-3" onclick="toggleSection('quiz-3-sol')" style="cursor: pointer; color: var(--blue);">5.3 Compute the dot product: x = [1, 2, 3], y = [4, 5, 6]</h3>
-                    <div id="quiz-3-sol" class="collapsible-content" style="padding-left: 1rem; border-left: 3px solid var(--border-light); margin-bottom: 1.5rem;">
-                        <p>The dot product is the sum of element-wise products:</p>
-                        <p style="font-family: monospace; padding-left: 1rem;">x · y = (1 &times; 4) + (2 &times; 5) + (3 &times; 6) = 4 + 10 + 18 = 32</p>
-                    </div>
-
-                    <!-- Quiz Item 4 -->
-                    <h3 id="sub-5-4" onclick="toggleSection('quiz-4-sol')" style="cursor: pointer; color: var(--blue);">5.4 Find the shape of AB: A is 3&times;4 and B is 4&times;2</h3>
-                    <div id="quiz-4-sol" class="collapsible-content" style="padding-left: 1rem; border-left: 3px solid var(--border-light); margin-bottom: 1.5rem;">
-                        <p>Since the inner dimensions match (columns of A = 4, rows of B = 4), multiplication is valid. The resulting matrix shape takes the outer dimensions:</p>
-                        <p style="font-weight: bold; padding-left: 1rem;">Output Shape: 3 &times; 2</p>
-                    </div>
-
-                    <!-- Quiz Item 5 -->
-                    <h3 id="sub-5-5" onclick="toggleSection('quiz-5-sol')" style="cursor: pointer; color: var(--blue);">5.5 Outer Product Analysis: &delta; is 3&times;1, x is 5&times;1. Find shape of &delta; x<sup>T</sup></h3>
-                    <div id="quiz-5-sol" class="collapsible-content" style="padding-left: 1rem; border-left: 3px solid var(--border-light); margin-bottom: 1.5rem;">
-                        <p>Since &delta; has shape 3&times;1 and x has shape 5&times;1, the transpose x<sup>T</sup> has shape 1&times;5. We perform matrix multiplication between a 3&times;1 matrix and a 1&times;5 matrix:</p>
-                        <p style="font-weight: bold; padding-left: 1rem;">Output Shape: 3 &times; 5</p>
-                        <p>This is called the <strong>outer product</strong> of two vectors, commonly used in calculating gradient updates for weight matrices during backpropagation.</p>
-                    </div>
-
-                    <!-- Quiz Item 6 -->
-                    <h3 id="sub-5-6" onclick="toggleSection('quiz-6-sol')" style="cursor: pointer; color: var(--blue);">5.6 Why does CNN convolution require tensors instead of matrices?</h3>
-                    <div id="quiz-6-sol" class="collapsible-content" style="padding-left: 1rem; border-left: 3px solid var(--border-light); margin-bottom: 1.5rem;">
-                        <p>A standard 2D grayscale image can be represented as a matrix, but color images have a third dimension (Red, Green, Blue channels). Furthermore, deep learning models process multiple images simultaneously in batches to utilize GPU parallelism. Therefore, input shapes must support 4 dimensions: <strong>(Batch Size &times; Channels &times; Height &times; Width)</strong>, which requires Rank-4 tensors rather than standard Rank-2 matrices.</p>
-                    </div>
-
-                    <div class="topic-nav">
-                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
-                        <button class="btn" disabled>Next Topic</button>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Original PDF -->
-            <section id="original-pdf" class="topic-section">
-                <div class="topic-header" onclick="toggleSection('content-pdf')">
-                    <div class="topic-number" style="background:transparent; color: var(--text-dark); width: auto; margin-right: 0.5rem;">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                    </div>
-                    <h2>Original PDF Notes</h2>
-                </div>
-                <div id="content-pdf" class="collapsible-content">
-                    <p>Below is the original PDF document for your reference:</p>
-                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
-                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
-                    
-                    <div class="topic-nav">
-                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
-                        <button class="btn" disabled>Next Topic</button>
-                    </div>
-                </div>
-            </section>
-
-        </main>
-    </div>
-
-    <button id="backToTop" onclick="scrollToTop()">↑</button>
-
-    <script>
+<!-- Original PDF -->
+<section class="topic-section" id="original-pdf">
+<div class="topic-header" onclick="toggleSection('content-pdf')">
+<div class="topic-number" style="background:transparent; color: var(--text-dark); width: auto; margin-right: 0.5rem;">
+<svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+</div>
+<h2>Original PDF Notes</h2>
+</div>
+<div class="collapsible-content" id="content-pdf">
+<p>Below is the original PDF document for your reference:</p>
+<button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+<div id="pdfContainer" style="margin-top: 1rem;"></div>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+<button class="btn" disabled="">Next Topic</button>
+</div>
+</div>
+</section>
+</main>
+</div>
+<button id="backToTop" onclick="scrollToTop()">↑</button>
+<script>
         function loadPDF() {
             const container = document.getElementById('pdfContainer');
             const btn = document.getElementById('loadPdfBtn');
@@ -400,6 +300,6 @@
             }
         }
     </script>
-    <script src="../js/script.js"></script>
+<script src="../js/script.js"></script>
 </body>
 </html>

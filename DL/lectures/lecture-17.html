@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Deep Learning Foundations - Lecture 17</title>
+<meta content="Study notes for Deep Learning Foundations, Lecture 17 covering Seq2Seq architectures, Teacher Forcing, Information Bottlenecks, and Bahdanau vs. Luong Attention mechanisms." name="description"/>
+<link class="favicon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjIwIiBmaWxsPSIjMTMyMjE5Ii8+PHRleHQgeD0iNTAiIHk9IjUwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iNTUiIGZpbGw9IndoaXRlIiBmb250LXdlaWdodD0iYm9sZCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPjE3PC90ZXh0Pjwvc3ZnPg==" rel="icon"/>
+<link href="../css/style.css" rel="stylesheet"/>
+</head>
+<body>
+<header>
+<div class="header-titles">
+<h1>Deep Learning Foundations</h1>
+<p>Lecture 17 - Seq2Seq &amp; Attention Mechanisms</p>
+<a href="../index.html" style="color: var(--text-dark); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+<span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+<a href="../pdfs/17.pdf" style="color: var(--text-dark); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+</div>
+<div class="search-container">
+<input id="searchInput" placeholder="Search notes..." type="text"/>
+</div>
+</header>
+<div class="container">
+<!-- Sidebar Index -->
+<aside>
+<div class="aside-header">
+<h3>Table of Contents</h3>
+<div class="topic-count">Total Topics: 5</div>
+</div>
+<ul class="index-list" id="indexList">
+<li>
+<a href="#topic-1">1. Seq2Seq Architecture<span class="sub-count">2</span></a>
+<ul class="sub-index">
+<li><a href="#sub-1-1">1.1 Encoder-Decoder Separation</a></li>
+<li><a href="#sub-1-2">1.2 Special Alignment Tokens</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-2">2. Teacher Forcing Mechanics<span class="sub-count">2</span></a>
+<ul class="sub-index">
+<li><a href="#sub-2-1">2.1 Training ground truth feeding</a></li>
+<li><a href="#sub-2-2">2.2 Prediction autoregressive loops</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-3">3. The Information Bottleneck<span class="sub-count">1</span></a>
+<ul class="sub-index">
+<li><a href="#sub-3-1">3.1 Fixed Context Vector limits</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-4">4. Bahdanau Additive Attention<span class="sub-count">2</span></a>
+<ul class="sub-index">
+<li><a href="#sub-4-1">4.1 Feedforward alignment models</a></li>
+<li><a href="#sub-4-2">4.2 Dynamic context updates</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-5">5. Luong Multiplicative Attention<span class="sub-count">2</span></a>
+<ul class="sub-index">
+<li><a href="#sub-5-1">5.1 Dot-product scaling scoring</a></li>
+<li><a href="#sub-5-2">5.2 Comparison with Bahdanau</a></li>
+</ul>
+</li>
+<li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+</ul>
+</aside>
+<!-- Main Content -->
+<main id="notesContent">
+<!-- Topic 1 -->
+<section class="topic-section" id="topic-1">
+<div class="topic-header" onclick="toggleSection('content-1')">
+<div class="topic-number">1</div>
+<h2>Seq2Seq Architecture</h2>
+</div>
+<div class="collapsible-content" id="content-1">
+<h3 id="sub-1-1">1.1 Encoder-Decoder Separation</h3>
+<p>Standard RNNs require a 1-to-1 mapping between input and output tokens, making them unable to handle tasks like translation where sentences have different lengths and grammar ordering (e.g. "I love India" translates to "Mujhe Bharat pasand hai"). To solve this, Sutskever et al. (2014) introduced the <strong>Sequence-to-Sequence (Seq2Seq)</strong> architecture:</p>
+<ul>
+<li><strong>Encoder:</strong> An RNN that reads the entire input sequence step-by-step, compressing it into a final hidden state vector (context vector) containing global semantic context.</li>
+<li><strong>Decoder:</strong> A separate RNN that takes the context vector as its initial state and generates the output sequence one token at a time.</li>
+</ul>
+<h3 id="sub-1-2">1.2 Special Alignment Tokens</h3>
+<p>Seq2Seq models use special tokens to coordinate translation boundaries:</p>
+<ul>
+<li><strong>START:</strong> A special token fed to the decoder's first step to trigger the generation process.</li>
+<li><strong>EOS (End of Sequence) / END:</strong> Appended to the end of sentences during training. When the decoder predicts this token during inference, it stops generating.</li>
+</ul>
+<div class="topic-nav">
+<button class="btn" disabled="">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 2 -->
+<section class="topic-section" id="topic-2">
+<div class="topic-header" onclick="toggleSection('content-2')">
+<div class="topic-number">2</div>
+<h2>Teacher Forcing Mechanics</h2>
+</div>
+<div class="collapsible-content" id="content-2">
+<h3 id="sub-2-1">2.1 Training ground truth feeding</h3>
+<p>During training, the decoder makes predictions step-by-step. If it predicts a wrong word at step t, feeding this incorrect word into step t+1 would cause errors to cascade, making training slow and unstable. To solve this, we use <strong>Teacher Forcing</strong>: we feed the actual ground truth word from the training set into the decoder at step t+1, regardless of whether its prediction at step t was correct. This ensures faster convergence.</p>
+<h3 id="sub-2-2">2.2 Prediction autoregressive loops</h3>
+<p>During the prediction (inference) phase, ground truth outputs are unavailable. The decoder operates in an autoregressive loop: the token predicted at step t is fed as the input to step t+1. Under this setup, early prediction errors propagate forward, sometimes degrading output quality on long sentences.</p>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 3 -->
+<section class="topic-section" id="topic-3">
+<div class="topic-header" onclick="toggleSection('content-3')">
+<div class="topic-number">3</div>
+<h2>The Information Bottleneck</h2>
+</div>
+<div class="collapsible-content" id="content-3">
+<h3 id="sub-3-1">3.1 Fixed Context Vector limits</h3>
+<p>A key limitation of standard Seq2Seq models is the <strong>information bottleneck problem</strong>. The encoder compresses the entire input sequence into a single, fixed-size context vector. As the input sentence length increases, the amount of information lost grows, causing translation performance to drop on sentences longer than ~20 words. Compressing a whole paragraph into one vector is like summarizing a page in a single word—loss of detail is inevitable.</p>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 4 -->
+<section class="topic-section" id="topic-4">
+<div class="topic-header" onclick="toggleSection('content-4')">
+<div class="topic-number">4</div>
+<h2>Bahdanau Additive Attention</h2>
+</div>
+<div class="collapsible-content" id="content-4">
+<h3 id="sub-4-1">4.1 Feedforward alignment models</h3>
+<p>To solve the bottleneck, Bahdanau et al. (2014) introduced the <strong>Attention Mechanism</strong>. Instead of relying on a single context vector, the decoder dynamically accesses all encoder hidden states at each step. Bahdanau (Additive) attention uses a learnable feed-forward neural network to calculate alignment scores between the current decoder state s<sub>t-1</sub> and each encoder state h<sub>i</sub>:</p>
+<div class="formula-box">score(s<sub>t-1</sub>, h<sub>i</sub>) = v<sub>a</sub><sup>T</sup> tanh(W<sub>a</sub> s<sub>t-1</sub> + U<sub>a</sub> h<sub>i</sub>)</div>
+<p>Where v<sub>a</sub><sup>T</sup>, W<sub>a</sub>, and U<sub>a</sub> are learnable weight parameters.</p>
+<h3 id="sub-4-2">4.2 Dynamic context updates</h3>
+<p>These alignment scores are passed through a softmax function to produce attention weights α<sub>ti</sub>, which sum to 1. The model computes a dynamic context vector c<sub>t</sub> as the weighted sum of all encoder states:</p>
+<div class="formula-box">c<sub>t</sub> = ∑<sub>i</sub> α<sub>ti</sub> h<sub>i</sub></div>
+<p>This allows the decoder to "attend" directly to relevant parts of the input sentence (e.g. focusing on the word "cats" when generating "billi").</p>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 5 -->
+<section class="topic-section" id="topic-5">
+<div class="topic-header" onclick="toggleSection('content-5')">
+<div class="topic-number">5</div>
+<h2>Luong Multiplicative Attention</h2>
+</div>
+<div class="collapsible-content" id="content-5">
+<h3 id="sub-5-1">5.1 Dot-product scaling scoring</h3>
+<p>Luong et al. (2015) proposed a simpler, faster alternative called <strong>Luong (Multiplicative) Attention</strong>. Instead of using a feed-forward network, it calculates alignment scores using dot products or matrix multiplications between the current decoder state s<sub>t</sub> and encoder states h<sub>i</sub>:</p>
+<ul>
+<li><strong>Dot Score:</strong> The simplest form:
+                            <div style="font-family: monospace; font-size: 1.05rem; margin: 0.25rem 0;">score(s<sub>t</sub>, h<sub>i</sub>) = s<sub>t</sub><sup>T</sup> h<sub>i</sub></div>
+</li>
+<li><strong>General Score:</strong> Uses a learnable weight matrix W to align different dimensional spaces:
+                            <div style="font-family: monospace; font-size: 1.05rem; margin: 0.25rem 0;">score(s<sub>t</sub>, h<sub>i</sub>) = s<sub>t</sub><sup>T</sup> W h<sub>i</sub></div>
+</li>
+</ul>
+<h3 id="sub-5-2">5.2 Comparison with Bahdanau</h3>
+<table style="width: 100%; border-collapse: collapse; margin: 1rem 0; text-align: left;">
+<thead>
+<tr style="border-bottom: 2px solid var(--border-light);">
+<th style="padding: 0.5rem;">Feature</th>
+<th style="padding: 0.5rem;">Bahdanau (Additive)</th>
+<th style="padding: 0.5rem;">Luong (Multiplicative)</th>
+</tr>
+</thead>
+<tbody>
+<tr style="border-bottom: 1px solid var(--border-light);">
+<td style="padding: 0.5rem;"><strong>Alignment Score</strong></td>
+<td style="padding: 0.5rem;">v<sub>a</sub><sup>T</sup> tanh(W<sub>a</sub> s<sub>t-1</sub> + U<sub>a</sub> h<sub>i</sub>)</td>
+<td style="padding: 0.5rem;">s<sub>t</sub><sup>T</sup> h<sub>i</sub>  or  s<sub>t</sub><sup>T</sup> W h<sub>i</sub></td>
+</tr>
+<tr style="border-bottom: 1px solid var(--border-light);">
+<td style="padding: 0.5rem;"><strong>Decoder State</strong></td>
+<td style="padding: 0.5rem;">Uses previous state s<sub>t-1</sub></td>
+<td style="padding: 0.5rem;">Uses current state s<sub>t</sub></td>
+</tr>
+<tr>
+<td style="padding: 0.5rem;"><strong>Complexity</strong></td>
+<td style="padding: 0.5rem;">Higher (trains FFNN parameters)</td>
+<td style="padding: 0.5rem;">Lower (matrix multiplication)</td>
+</tr>
+</tbody>
+</table>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+<button class="btn" disabled="">Next Topic</button>
+</div>
+</div>
+</section>
+
+<!-- Original PDF -->
+<section class="topic-section" id="original-pdf">
+<div class="topic-header" onclick="toggleSection('content-pdf')">
+<div class="topic-number" style="background:transparent; color: var(--text-dark); width: auto; margin-right: 0.5rem;">
+<svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+</div>
+<h2>Original PDF Notes</h2>
+</div>
+<div class="collapsible-content" id="content-pdf">
+<p>Below is the original PDF document for your reference:</p>
+<button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+<div id="pdfContainer" style="margin-top: 1rem;"></div>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+<button class="btn" disabled="">Next Topic</button>
+</div>
+</div>
+</section>
+</main>
+</div>
+<button id="backToTop" onclick="scrollToTop()">↑</button>
+<script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/17.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--border-light); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+<script src="../js/script.js"></script>
+</body>
+</html>

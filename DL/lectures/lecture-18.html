@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Deep Learning Foundations - Lecture 18</title>
+<meta content="Study notes for Deep Learning Foundations, Lecture 18 covering the Transformer Architecture, Self-Attention, Multi-Head Attention, and Positional Encodings." name="description"/>
+<link class="favicon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjIwIiBmaWxsPSIjMTMyMjE5Ii8+PHRleHQgeD0iNTAiIHk9IjUwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iNTUiIGZpbGw9IndoaXRlIiBmb250LXdlaWdodD0iYm9sZCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPjE4PC90ZXh0Pjwvc3ZnPg==" rel="icon"/>
+<link href="../css/style.css" rel="stylesheet"/>
+</head>
+<body>
+<header>
+<div class="header-titles">
+<h1>Deep Learning Foundations</h1>
+<p>Lecture 18 - Transformers &amp; Self-Attention Architecture</p>
+<a href="../index.html" style="color: var(--text-dark); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+<span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+<a href="../pdfs/18.pdf" style="color: var(--text-dark); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+</div>
+<div class="search-container">
+<input id="searchInput" placeholder="Search notes..." type="text"/>
+</div>
+</header>
+<div class="container">
+<!-- Sidebar Index -->
+<aside>
+<div class="aside-header">
+<h3>Table of Contents</h3>
+<div class="topic-count">Total Topics: 5</div>
+</div>
+<ul class="index-list" id="indexList">
+<li>
+<a href="#topic-1">1. Attention Is All You Need<span class="sub-count">2</span></a>
+<ul class="sub-index">
+<li><a href="#sub-1-1">1.1 Dispensing with Recurrence</a></li>
+<li><a href="#sub-1-2">1.2 Massive Parallelization Benefits</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-2">2. Query, Key, and Value Vectors<span class="sub-count">1</span></a>
+<ul class="sub-index">
+<li><a href="#sub-2-1">2.1 Database analogy QKV mapping</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-3">3. Scaled Dot-Product Attention<span class="sub-count">2</span></a>
+<ul class="sub-index">
+<li><a href="#sub-3-1">3.1 Attention Equation</a></li>
+<li><a href="#sub-3-2">3.2 The Scaling Factor derivation</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-4">4. Multi-Head Attention Blocks<span class="sub-count">2</span></a>
+<ul class="sub-index">
+<li><a href="#sub-4-1">4.1 Parallel representation spaces</a></li>
+<li><a href="#sub-4-2">4.2 Encoder vs. Decoder Blocks</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-5">5. Positional Encoding &amp; Context<span class="sub-count">2</span></a>
+<ul class="sub-index">
+<li><a href="#sub-5-1">5.1 Sine and Cosine coordinate injections</a></li>
+<li><a href="#sub-5-2">5.2 Contextual enrichment of embeddings</a></li>
+</ul>
+</li>
+<li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+</ul>
+</aside>
+<!-- Main Content -->
+<main id="notesContent">
+<!-- Topic 1 -->
+<section class="topic-section" id="topic-1">
+<div class="topic-header" onclick="toggleSection('content-1')">
+<div class="topic-number">1</div>
+<h2>Attention Is All You Need</h2>
+</div>
+<div class="collapsible-content" id="content-1">
+<h3 id="sub-1-1">1.1 Dispensing with Recurrence</h3>
+<p>In 2017, Vaswani et al. published the paper <em>"Attention Is All You Need"</em>, introducing a radical architectural shift: the <strong>Transformer</strong>. Standard sequence models (RNNs, LSTMs, GRUs) rely on recurrence, processing tokens sequentially one-by-one. The Transformer dispenses with recurrence entirely, relying solely on self-attention mechanisms to model relationships between tokens in a single step.</p>
+<h3 id="sub-1-2">1.2 Massive Parallelization Benefits</h3>
+<p>Because RNNs must process tokens sequentially, they cannot be parallelized during training—calculating hidden state h<sub>t</sub> requires waiting for h<sub>t-1</sub>. The Transformer processes all tokens in a sequence simultaneously. This massive parallelization allows models to train significantly faster on modern GPU hardware, enabling the training of Large Language Models (LLMs) on massive datasets.</p>
+<div class="topic-nav">
+<button class="btn" disabled="">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 2 -->
+<section class="topic-section" id="topic-2">
+<div class="topic-header" onclick="toggleSection('content-2')">
+<div class="topic-number">2</div>
+<h2>Query, Key, and Value Vectors</h2>
+</div>
+<div class="collapsible-content" id="content-2">
+<h3 id="sub-2-1">2.1 Database analogy QKV mapping</h3>
+<p>Self-attention operates similarly to a database retrieval system. Each input token embedding is projected into three distinct vectors using trained weight matrices (W<sub>Q</sub>, W<sub>K</sub>, W<sub>V</sub>):</p>
+<ul>
+<li><strong>Query (Q):</strong> Represents the current token searching for related context.</li>
+<li><strong>Key (K):</strong> Represents what information a token holds, matching against queries.</li>
+<li><strong>Value (V):</strong> Contains the actual semantic content of the token, retrieved when queries and keys match.</li>
+</ul>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 3 -->
+<section class="topic-section" id="topic-3">
+<div class="topic-header" onclick="toggleSection('content-3')">
+<div class="topic-number">3</div>
+<h2>Scaled Dot-Product Attention</h2>
+</div>
+<div class="collapsible-content" id="content-3">
+<h3 id="sub-3-1">3.1 Attention Equation</h3>
+<p>To calculate self-attention across an entire sequence, we bundle the Q, K, and V vectors into matrices and compute <strong>Scaled Dot-Product Attention</strong>:</p>
+<div class="formula-box">Attention(Q, K, V) = softmax( [ Q K<sup>T</sup> / √(d<sub>k</sub>) ] ) V</div>
+<p>Where Q K<sup>T</sup> calculates raw similarity scores between all queries and keys, and d<sub>k</sub> is the dimensionality of the key vectors.</p>
+<h3 id="sub-3-2">3.2 The Scaling Factor derivation</h3>
+<p>If key dimension d<sub>k</sub> is large, the dot product values grow large. Passing these large values through a softmax function concentrates the probability distribution, leading to extremely small gradients (vanishing gradients) during training. Scaling the dot products by <strong>1 / √(d<sub>k</sub>)</strong> keeps the variance of the dot products at 1, preventing softmax saturation and ensuring stable training.</p>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 4 -->
+<section class="topic-section" id="topic-4">
+<div class="topic-header" onclick="toggleSection('content-4')">
+<div class="topic-number">4</div>
+<h2>Multi-Head Attention Blocks</h2>
+</div>
+<div class="collapsible-content" id="content-4">
+<h3 id="sub-4-1">4.1 Parallel representation spaces</h3>
+<p>Instead of performing a single attention pass, the model projects Q, K, and V vectors into multiple lower-dimensional representation subspaces in parallel. This is <strong>Multi-Head Attention (MHA)</strong>. Each "head" focuses on different types of relationships (e.g. one head links subject-verb agreements, while another associates pronouns). The outputs of all heads are concatenated and projected back to the original dimension.</p>
+<h3 id="sub-4-2">4.2 Encoder vs. Decoder Blocks</h3>
+<p>The standard Transformer architecture consists of stacked blocks:</p>
+<ul>
+<li><strong>Encoder Block:</strong> Multi-Head Self-Attention + Position-wise Feed Forward Network (FFN). It uses residual skip connections and Layer Normalization (LayerNorm) around each sub-layer.</li>
+<li><strong>Decoder Block:</strong> Similar to the encoder but contains a third sub-layer:
+                            <ul>
+<li><em>Masked Multi-Head Self-Attention:</em> Masks future tokens during training (setting attention scores to -∞ before softmax) to maintain causality during autoregressive generation.</li>
+<li><em>Encoder-Decoder Cross-Attention:</em> Computes queries Q from the decoder, while keys K and values V come from the encoder's output representations, aligning the target sequence with the source.</li>
+</ul>
+</li>
+</ul>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 5 -->
+<section class="topic-section" id="topic-5">
+<div class="topic-header" onclick="toggleSection('content-5')">
+<div class="topic-number">5</div>
+<h2>Positional Encoding &amp; Context</h2>
+</div>
+<div class="collapsible-content" id="content-5">
+<h3 id="sub-5-1">5.1 Sine and Cosine coordinate injections</h3>
+<p>Since the Transformer processes all tokens simultaneously, it has no inherent sense of word order. To address this, we inject positional information directly into the input embeddings using <strong>Positional Encodings (PE)</strong>. We compute coordinate offsets using sine and cosine functions of different frequencies:</p>
+<div style="font-family: monospace; font-size: 1.05rem; text-align: center; margin: 0.5rem 0;">PE<sub>(pos, 2i)</sub> = sin( pos / 10000<sup>2i/d<sub>model</sub></sup> )</div>
+<div style="font-family: monospace; font-size: 1.05rem; text-align: center; margin: 0.5rem 0;">PE<sub>(pos, 2i+1)</sub> = cos( pos / 10000<sup>2i/d<sub>model</sub></sup> )</div>
+<p>Where pos is the token's position and i is the dimension index. Adding these vectors to the word embeddings allows the model to learn relative distances between tokens.</p>
+<h3 id="sub-5-2">5.2 Contextual enrichment of embeddings</h3>
+<p>Self-attention dynamically updates static word embeddings. In models like BERT and GPT, the representation of a word (e.g. "bank") changes dynamically depending on the other tokens in the sentence. This <strong>contextual enrichment</strong> resolves polysemy, allowing the model to represent different meanings of the same word in vector space.</p>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+<button class="btn" disabled="">Next Topic</button>
+</div>
+</div>
+</section>
+
+<!-- Original PDF -->
+<section class="topic-section" id="original-pdf">
+<div class="topic-header" onclick="toggleSection('content-pdf')">
+<div class="topic-number" style="background:transparent; color: var(--text-dark); width: auto; margin-right: 0.5rem;">
+<svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+</div>
+<h2>Original PDF Notes</h2>
+</div>
+<div class="collapsible-content" id="content-pdf">
+<p>Below is the original PDF document for your reference:</p>
+<button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+<div id="pdfContainer" style="margin-top: 1rem;"></div>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+<button class="btn" disabled="">Next Topic</button>
+</div>
+</div>
+</section>
+</main>
+</div>
+<button id="backToTop" onclick="scrollToTop()">↑</button>
+<script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/18.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--border-light); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+<script src="../js/script.js"></script>
+</body>
+</html>

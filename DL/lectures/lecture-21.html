@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Deep Learning Foundations - Lecture 21</title>
+    <meta content="Study notes for Deep Learning Foundations, Lecture 21 covering Decoder Architecture & Transformer Inference." name="description"/>
+    <link class="favicon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>21</text></svg>" rel="icon"/>
+    <link href="../css/style.css" rel="stylesheet"/>
+</head>
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Deep Learning Foundations</h1>
+            <p>Lecture 21 - Decoder Architecture & Transformer Inference</p>
+            <a href="../index.html" style="color: var(--text-dark); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/21.pdf" style="color: var(--text-dark); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text"/>
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 5</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li>
+                    <a href="#topic-1">1. Masked Self-Attention<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-1-1">1.1 Causal Masking Implementation</a></li>
+                         <li><a href="#sub-1-2">1.2 Attention Matrix Modification</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Cross-Attention Mechanics<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-2-1">2.1 Encoder-Decoder Information Flow</a></li>
+                         <li><a href="#sub-2-2">2.2 Q, K, V Role Assignments</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Decoder Architecture Stack<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-3-1">3.1 The 3 Sub-layer Pipeline</a></li>
+                         <li><a href="#sub-3-2">3.2 Generative Linear Head</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Autoregressive Inference<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-4-1">4.1 Step-by-Step Auto-Regression</a></li>
+                         <li><a href="#sub-4-2">4.2 End-of-Sequence (EOS) Control</a></li>
+                         <li><a href="#sub-4-3">4.3 Error Cascading Analysis</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Applications & Transfer Learning<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-5-1">5.1 NLP & Vision Modalities</a></li>
+                         <li><a href="#sub-5-2">5.2 Task vs. Data Transfer</a></li>
+                         <li><a href="#sub-5-3">5.3 Model Fine-Tuning</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Topic 1 -->
+            <section id="topic-1" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>Masked Self-Attention</h2>
+                </div>
+                <div id="content-1" class="collapsible-content">
+                    
+        <h3 id="sub-1-1">1.1 Causal Masking Implementation</h3>
+        <p>To resolve the parallel data leakage problem, the decoder uses <strong>Masked Self-Attention</strong>. We apply a causal mask to the raw attention scores before the softmax operation. This ensures that the representation for the token at position <code>t</code> can only attend to tokens at positions <code>&le; t</code>.</p>
+        
+        <h3 id="sub-1-2">1.2 Attention Matrix Modification</h3>
+        <p>Mathematically, we create an upper-triangular masking matrix where future positions are filled with <code>-&infin;</code>, while allowed positions are 0. Adding this mask to the raw query-key dot products results in:</p>
+        <div class="formula-box">MaskedAttention(Q, K, V) = softmax( [ Q K<sup>T</sup> / &radic;(d<sub>k</sub>) ] + M ) V</div>
+        <p>When passed to softmax, the <code>-&infin;</code> values evaluate to exactly 0 probability, blocking any attention flow from future tokens.</p>
+    
+                    
+                    <div class="topic-nav">
+                        <button class="btn" disabled="">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 2 -->
+            <section id="topic-2" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>Cross-Attention Mechanics</h2>
+                </div>
+                <div id="content-2" class="collapsible-content">
+                    
+        <h3 id="sub-2-1">2.1 Encoder-Decoder Information Flow</h3>
+        <p>Cross-attention acts as the bridge connecting the encoder and the decoder. It allows the decoder to query the rich context-aware vectors produced by the encoder, extracting the relevant source details needed to generate the next target token.</p>
+        
+        <h3 id="sub-2-2">2.2 Q, K, V Role Assignments</h3>
+        <p>Unlike self-attention, the inputs to the cross-attention layer are split:
+            <ul>
+                <li>The <strong>Query (Q)</strong> matrix is projected from the decoder's preceding masked attention layer.</li>
+                <li>The <strong>Key (K)</strong> and <strong>Value (V)</strong> matrices are projected from the final output of the encoder stack.</li>
+            </ul>
+            This allows each decoder position to scan across all encoder output positions to retrieve relevant context.
+        </p>
+    
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 3 -->
+            <section id="topic-3" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>Decoder Architecture Stack</h2>
+                </div>
+                <div id="content-3" class="collapsible-content">
+                    
+        <h3 id="sub-3-1">3.1 The 3 Sub-layer Pipeline</h3>
+        <p>A standard decoder block consists of three sub-layers wrapped in residual connections and LayerNorm:
+            <ol>
+                <li><strong>Masked Multi-Head Self-Attention:</strong> Captures context from previously generated target tokens.</li>
+                <li><strong>Multi-Head Cross-Attention:</strong> Connects the decoder to the encoder's source context.</li>
+                <li><strong>Position-wise Feed-Forward Network:</strong> Processes each token vector independently.</li>
+            </ol>
+        </p>
+        
+        <h3 id="sub-3-2">3.2 Generative Linear Head</h3>
+        <p>At the top of the decoder stack, the output vectors are mapped to a vocabulary space using a final Linear layer. A softmax function transforms these values into probability distributions over the entire vocabulary, identifying the most likely next token.</p>
+    
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 4 -->
+            <section id="topic-4" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>Autoregressive Inference</h2>
+                </div>
+                <div id="content-4" class="collapsible-content">
+                    
+        <h3 id="sub-4-1">4.1 Step-by-Step Auto-Regression</h3>
+        <p>During inference, the model runs auto-regressively:
+            <ol>
+                <li>Input begins with a start token (e.g. <code>&lt;SOS&gt;</code>).</li>
+                <li>The model predicts the first word.</li>
+                <li>This predicted word is appended to the input to predict the second word, repeating the process.</li>
+            </ol>
+        </p>
+        
+        <h3 id="sub-4-2">4.2 End-of-Sequence (EOS) Control</h3>
+        <p>The generation loop continues until the model outputs a special end-of-sequence token (e.g. <code>&lt;EOS&gt;</code>) or reaches a predefined maximum token limit, terminating the process.</p>
+        
+        <h3 id="sub-4-3">4.3 Error Cascading Analysis</h3>
+        <p>Because predictions feed back into the input sequence, an incorrect selection at step 2 alters the context for all subsequent steps. This cascading error propagation can lead to drifts or repetitive loops during generation.</p>
+    
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 5 -->
+            <section id="topic-5" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>Applications & Transfer Learning</h2>
+                </div>
+                <div id="content-5" class="collapsible-content">
+                    
+        <h3 id="sub-5-1">5.1 NLP & Vision Modalities</h3>
+        <p>Transformer decoders power large language models (like GPT) and text-to-image systems (like DALL-E), treating text sequences and image patches as tokenized generation sequences.</p>
+        
+        <h3 id="sub-5-2">5.2 Task vs. Data Transfer</h3>
+        <p>Transfer learning leverages representations learned on a source task to improve learning on a target task:
+            <ul>
+                <li><strong>Task Transfer:</strong> Reusing representations when the task changes (e.g. pretraining on language modeling, then adapting to classification).</li>
+                <li><strong>Data Transfer:</strong> Reusing representations when the data domain changes but the task remains similar.</li>
+            </ul>
+        </p>
+        
+        <h3 id="sub-5-3">5.3 Model Fine-Tuning</h3>
+        <p>Instead of training models from scratch, we pretrain a large model on massive datasets (unsupervised learning) and then <strong>fine-tune</strong> it by training on a smaller, task-specific dataset, adapting the weights to the target domain.</p>
+    
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--text-dark); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for your reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/21.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--border-light); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>

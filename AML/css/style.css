@@ -483,3 +483,20 @@ img {
     transition: max-height 0.3s ease-out;
     overflow: hidden;
 }
+
+/* Formula Border Box style */
+.formula-box {
+    font-family: 'Consolas', 'Courier New', Courier, monospace;
+    font-size: 1.1rem;
+    text-align: center;
+    margin: 1.5rem auto;
+    padding: 0.8rem 1.5rem;
+    border: 2px solid var(--black);
+    border-radius: 8px;
+    background-color: rgba(229, 57, 53, 0.02); /* very light red tint */
+    color: var(--red);
+    width: fit-content;
+    max-width: 100%;
+    overflow-x: auto;
+}
+

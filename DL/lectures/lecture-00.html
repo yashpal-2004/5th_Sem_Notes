@@ -1,306 +1,274 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deep Learning Foundations - Study Notes</title>
-    <meta name="description" content="Study notes for Deep Learning Foundations, Lecture 00 covering course overview, representation learning, AlexNet, and the Bitter Lesson.">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%231E88E5%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>00</text></svg>">
-    <link rel="stylesheet" href="../css/style.css">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Deep Learning Foundations - Study Notes</title>
+<meta content="Study notes for Deep Learning Foundations, Lecture 00 covering course overview, representation learning, AlexNet, and the Bitter Lesson." name="description"/>
+<link href="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/&gt;&lt;text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22&gt;00&lt;/text&gt;&lt;/svg&gt;" rel="icon"/>
+<link href="../css/style.css" rel="stylesheet"/>
 </head>
 <body>
-
-    <header>
-        <div class="header-titles">
-            <h1>Deep Learning Foundations</h1>
-            <p>Lecture 00 - Introduction to Deep Learning: From Foundations to Frontiers</p>
-            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
-            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
-            <a href="../pdfs/0.pdf" target="_blank" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">Open PDF in New Tab ↗</a>
-        </div>
-        <div class="search-container">
-            <input type="text" id="searchInput" placeholder="Search notes...">
-        </div>
-    </header>
-
-    <div class="container">
-        <!-- Sidebar Index -->
-        <aside>
-            <div class="aside-header">
-                <h3>Table of Contents</h3>
-                <div class="topic-count">Total Topics: 5</div>
-            </div>
-            <ul class="index-list" id="indexList">
-                <li>
-                    <a href="#topic-1">1. Welcome & The Probability Connection<span class="sub-count">2</span></a>
-                    <ul class="sub-index">
-                        <li><a href="#sub-1-1">1.1 Meet the Instructors</a></li>
-                        <li><a href="#sub-1-2">1.2 Moving from Statistics to Deep Learning</a></li>
-                    </ul>
-                </li>
-                <li>
-                    <a href="#topic-2">2. What is Deep Learning?<span class="sub-count">2</span></a>
-                    <ul class="sub-index">
-                        <li><a href="#sub-2-1">2.1 Representation Learning</a></li>
-                        <li><a href="#sub-2-2">2.2 The Feature Hierarchy</a></li>
-                    </ul>
-                </li>
-                <li>
-                    <a href="#topic-3">3. The Unsung Architect: AlexNet (2012)<span class="sub-count">3</span></a>
-                    <ul class="sub-index">
-                        <li><a href="#sub-3-1">3.1 The 2012 AI Big Bang</a></li>
-                        <li><a href="#sub-3-2">3.2 Pioneers & Divergent Paths</a></li>
-                        <li><a href="#sub-3-3">3.3 The Anonymity of Alex Krizhevsky</a></li>
-                    </ul>
-                </li>
-                <li>
-                    <a href="#topic-4">4. The Bitter Lesson (Richard Sutton)<span class="sub-count">3</span></a>
-                    <ul class="sub-index">
-                        <li><a href="#sub-4-1">4.1 Human Knowledge vs. Raw Computation</a></li>
-                        <li><a href="#sub-4-2">4.2 Historic Case Studies</a></li>
-                        <li><a href="#sub-4-3">4.3 Why the Lesson is Bitter</a></li>
-                    </ul>
-                </li>
-                <li>
-                    <a href="#topic-5">5. Course Architecture & Pillars<span class="sub-count">2</span></a>
-                    <ul class="sub-index">
-                        <li><a href="#sub-5-1">5.1 The Pillars: Math & Code</a></li>
-                        <li><a href="#sub-5-2">5.2 Syllabus & Evaluation Details</a></li>
-                    </ul>
-                </li>
-                <li><a href="#original-pdf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
-            </ul>
-        </aside>
-
-        <!-- Main Content -->
-        <main id="notesContent">
-
-            <!-- Topic 1 -->
-            <section id="topic-1" class="topic-section">
-                <div class="topic-header" onclick="toggleSection('content-1')">
-                    <div class="topic-number">1</div>
-                    <h2>Welcome & The Probability Connection</h2>
-                </div>
-                <div id="content-1" class="collapsible-content">
-                    <h3 id="sub-1-1">1.1 Meet the Instructors</h3>
-                    <p>The Deep Learning course is led by a team of experienced data scientists and educators:</p>
-                    <ul>
-                        <li><strong>Shreyash Tiwari:</strong> Senior Data Scientist and NFL Consultant. Alumnus of IIT Kanpur (Bachelor's and Master's in Economics with AI/ML minor), former Data Scientist at Amazon. Taught Probability and Statistics in the 5th semester.</li>
-                        <li><strong>Ashwin Tewary:</strong> Public Sector Data Scientist for the Australian Government, specialising in Computational Data Science. Dalyell Scholar from the University of Sydney, pursuing AI studies at IIT Bombay.</li>
-                        <li><strong>Sparsh Bansal:</strong> Data Engineer and Educator. Formerly with Microchip Technology, alumnus of NIT Kurukshetra, specializing in Applied AI and practical deployment.</li>
-                    </ul>
-
-                    <h3 id="sub-1-2">1.2 Moving from Statistics to Deep Learning</h3>
-                    <p>In previous courses like Probability & Statistics, we asked the question: <em>"Given the data, what is the likelihood?"</em> In Deep Learning, we shift from measuring uncertainty to modeling complexity.</p>
-                    
-                    <div class="box box-blue">
-                        <div class="box-title">The Mathematical Engine</div>
-                        <p>Deep learning is not magic; it is an extension of foundational mathematics. The calculus, Bayes' Theorem, and probability distributions you mastered are the primary engines under the hood of every model we will build.</p>
-                    </div>
-
-                    <div class="topic-nav">
-                        <button class="btn" disabled>Previous Topic</button>
-                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Topic 2 -->
-            <section id="topic-2" class="topic-section">
-                <div class="topic-header" onclick="toggleSection('content-2')">
-                    <div class="topic-number">2</div>
-                    <h2>What is Deep Learning?</h2>
-                </div>
-                <div id="content-2" class="collapsible-content">
-                    <h3 id="sub-2-1">2.1 Representation Learning</h3>
-                    <p>The core distinction between traditional Machine Learning and Deep Learning lies in feature curation:</p>
-                    <ul>
-                        <li><strong>Traditional ML:</strong> Humans manually engineer and select features (e.g., color intensity, roundness, texture descriptors). The human tells the machine what to look for.</li>
-                        <li><strong>Representation Learning (DL):</strong> We do not design features; we design architectures that automatically learn features directly from raw data.</li>
-                    </ul>
-
-                    <h3 id="sub-2-2">2.2 The Feature Hierarchy</h3>
-                    <p>Deep neural networks learn abstract representations through a nested hierarchy of concepts:</p>
-                    <ol>
-                        <li><strong>Low-level features:</strong> Simple edges and color gradients.</li>
-                        <li><strong>Mid-level features:</strong> Textures, corners, and basic shapes.</li>
-                        <li><strong>High-level features:</strong> Complex objects (e.g., faces, wheels, text).</li>
-                    </ol>
-
-                    <div class="box box-green">
-                        <div class="box-title">Key Insight: Optimization over Heuristics</div>
-                        <p>By using deep representation learning, we replace human heuristics with mathematical optimization. The network independently discovers the optimal representations for the target task.</p>
-                    </div>
-
-                    <div class="topic-nav">
-                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
-                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Topic 3 -->
-            <section id="topic-3" class="topic-section">
-                <div class="topic-header" onclick="toggleSection('content-3')">
-                    <div class="topic-number">3</div>
-                    <h2>The Unsung Architect: AlexNet (2012)</h2>
-                </div>
-                <div id="content-3" class="collapsible-content">
-                    <h3 id="sub-3-1">3.1 The 2012 AI Big Bang</h3>
-                    <p>The year 2012 marked the "Big Bang" of modern Artificial Intelligence during the ImageNet Large Scale Visual Recognition Challenge (ILSVRC). Before 2012, computer vision progress was slow and incremental. In 2012, a deep convolutional neural network named <strong>AlexNet</strong> shattered all previous records.</p>
-                    
-                    <div class="box box-orange">
-                        <div class="box-title">ILSVRC 2012 Top-5 Error Rate</div>
-                        <ul>
-                            <li><strong>Runner-up (Traditional CV):</strong> 26.2% error rate</li>
-                            <li><strong>AlexNet (Deep Learning):</strong> 15.3% error rate</li>
-                        </ul>
-                        <p>This massive gap was a paradigm shift that sent shockwaves through the scientific community, ushering in the Third Golden Age of AI.</p>
-                    </div>
-
-                    <h3 id="sub-3-2">3.2 Pioneers & Divergent Paths</h3>
-                    <p>The AlexNet breakthrough was created by a team at the University of Toronto: <strong>Alex Krizhevsky, Ilya Sutskever, and Geoffrey Hinton</strong>. Following their ImageNet victory, their startup <em>DNN Research Inc.</em> was acquired by Google, and their paths began to diverge:</p>
-                    <ul>
-                        <li><strong>Geoffrey Hinton & Ilya Sutskever:</strong> Took public-facing leadership and media roles. Hinton became known as the "Godfather of AI" and a major voice on AI risk. Sutskever co-founded OpenAI in 2015, served as its Chief Scientist, and later co-founded Safe Superintelligence Inc. in 2024.</li>
-                        <li><strong>Alex Krizhevsky:</strong> Opted for a career focused purely on technical innovation, largely staying out of the public spotlight. He remained at Google until 2017, later joining smaller firms like Dessa and Two Bear Capital.</li>
-                    </ul>
-
-                    <h3 id="sub-3-3">3.3 The Anonymity of Alex Krizhevsky</h3>
-                    <p>Despite being the first author of the paper and the primary architect who engineered the GPU code critical for training the massive model, Krizhevsky remains relatively unknown to the general public compared to his co-authors.</p>
-                    
-                    <div class="box box-beige">
-                        <div class="box-title">Reflections on Success</div>
-                        <p>His story highlights fundamental questions about career success: Is it measured by public acclaim or by private impact? Is it better to be the face of a revolution, or the one building its engine? There is no right answer, but it shows a deliberate preference for deep technical work over the demands of management and public life.</p>
-                    </div>
-
-                    <div class="topic-nav">
-                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
-                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Topic 4 -->
-            <section id="topic-4" class="topic-section">
-                <div class="topic-header" onclick="toggleSection('content-4')">
-                    <div class="topic-number">4</div>
-                    <h2>The Bitter Lesson (Richard Sutton)</h2>
-                </div>
-                <div id="content-4" class="collapsible-content">
-                    <h3 id="sub-4-1">4.1 Human Knowledge vs. Raw Computation</h3>
-                    <p>In his famous essay, <em>The Bitter Lesson</em>, AI pioneer Richard Sutton outlines a core pattern in the history of AI research: general-purpose methods that leverage computation always defeat methods based on human-engineered domain knowledge.</p>
-                    
-                    <div class="box box-red">
-                        <div class="box-title">The Two Paths of AI</div>
-                        <ul>
-                            <li><strong>The Path of Human Knowledge:</strong> Build in our own clever insights and domain-specific structures. This approach is intuitive and satisfying for the researcher in the short term, but it inevitably plateaus.</li>
-                            <li><strong>The Path of Raw Computation:</strong> Rely on general methods (search and learning) that scale directly with processing power. Let the machine discover its own representations.</li>
-                        </ul>
-                    </div>
-
-                    <h3 id="sub-4-2">4.3 Historic Case Studies</h3>
-                    <p>The lesson has repeated across multiple fields over seven decades:</p>
-                    <ul>
-                        <li><strong>Computer Chess:</strong> Researchers initially tried to encode grandmaster strategic knowledge (openings, endgames). In 1997, IBM's <em>Deep Blue</em> defeated Garry Kasparov using massive, brute-force search.</li>
-                        <li><strong>Computer Go:</strong> Go was believed to be too complex for pure search. Researchers spent decades encoding human positional heuristics. In 2016, <em>AlphaGo</em> defeated Lee Sedol by combining massive search with learning from self-play.</li>
-                        <li><strong>Speech Recognition:</strong> Early systems engineered vocal tract and phoneme models. They were easily outperformed by statistical methods (Hidden Markov Models) and later by deep neural networks that learned directly from raw audio waveforms.</li>
-                        <li><strong>Computer Vision:</strong> Hand-crafted feature descriptors (like SIFT, Gabor filters, and edge detectors) were abandoned once deep convolutional networks (like AlexNet) learned representations automatically.</li>
-                    </ul>
-
-                    <h3 id="sub-4-3">4.3 Why the Lesson is Bitter</h3>
-                    <p>The lesson is "bitter" because it is a humbling one for researchers. We naturally want our own clever insights to be the key to machine intelligence. Accepting that simply scaling computation, search, and learning performs significantly better forces us to abandon our psychological commitment to building systems that "think the way we think."</p>
-
-                    <div class="box box-beige">
-                        <div class="box-title">Core Takeaways</div>
-                        <ul>
-                            <li>The future belongs to general-purpose methods that scale with computation.</li>
-                            <li>We must stop trying to hardcode the contents of our minds (space, objects, grammar) into agents.</li>
-                            <li>We should focus on building <strong>meta-methods</strong> that enable machines to discover knowledge for themselves.</li>
-                        </ul>
-                    </div>
-
-                    <div class="topic-nav">
-                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
-                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Topic 5 -->
-            <section id="topic-5" class="topic-section">
-                <div class="topic-header" onclick="toggleSection('content-5')">
-                    <div class="topic-number">5</div>
-                    <h2>Course Architecture & Pillars</h2>
-                </div>
-                <div id="content-5" class="collapsible-content">
-                    <h3 id="sub-5-1">5.1 The Pillars: Math & Code</h3>
-                    <p>Success in this course requires mastering two interconnected pillars:</p>
-                    <ul>
-                        <li><strong>The Math (The Physics):</strong> Deep learning is calculus and linear algebra acting on data. We will open the "black box" and derive concepts like Backpropagation by hand so that when models fail, you understand the mathematical reason why.</li>
-                        <li><strong>The Code (The Engineering):</strong> We build what we derive. You will gain proficiency in PyTorch/TensorFlow by implementing computational graphs from scratch rather than just calling black-box library APIs.</li>
-                    </ul>
-
-                    <h3 id="sub-5-2">5.2 Syllabus & Evaluation Details</h3>
-                    <p>The course is structured into five core modules:</p>
-                    <ul>
-                        <li><strong>Module 1:</strong> Core Probability Theory, Bayes' Rule, Information Theory, and Linear Algebra operations.</li>
-                        <li><strong>Module 2:</strong> Deep Feedforward Networks (XOR example, Hidden Units), Backpropagation mechanics, and Regularization.</li>
-                        <li><strong>Module 3:</strong> Optimization for deep models and Convolutional Neural Networks (CNNs).</li>
-                        <li><strong>Module 4:</strong> Sequence Modeling, Recurrent Neural Networks (RNNs/LSTMs), NLP applications, and Autoencoder foundations.</li>
-                        <li><strong>Module 5:</strong> Advanced Autoencoders, Attention Mechanisms, Transformer Architecture, and Large Language Models (LLMs).</li>
-                    </ul>
-
-                    <div class="box box-orange">
-                        <div class="box-title">Evaluation Weightage</div>
-                        <ul>
-                            <li>Attendance & Class Participation: 5%</li>
-                            <li>In-Class & Post-Class Assignments: 10%</li>
-                            <li>Mini-projects: 25%</li>
-                            <li>Mid Semester Exam: 20%</li>
-                            <li>End Semester Exam: 40%</li>
-                        </ul>
-                    </div>
-
-                    <h3>Deep Learning Resources</h3>
-                    <ul>
-                        <li><em>Deep Learning</em> (Ian Goodfellow, Yoshua Bengio, and Aaron Courville)</li>
-                        <li><em>Pattern Recognition and Machine Learning</em> (Christopher M. Bishop)</li>
-                        <li>Online platforms: 3Blue1Brown, Khan Academy, and deeplearning.ai</li>
-                    </ul>
-
-                    <div class="topic-nav">
-                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
-                        <button class="btn" disabled>Next Topic</button>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Original PDF -->
-            <section id="original-pdf" class="topic-section">
-                <div class="topic-header" onclick="toggleSection('content-pdf')">
-                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                    </div>
-                    <h2>Original PDF Notes</h2>
-                </div>
-                <div id="content-pdf" class="collapsible-content">
-                    <p>Below is the original PDF document for your reference:</p>
-                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
-                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
-                    
-                    <div class="topic-nav">
-                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
-                        <button class="btn" disabled>Next Topic</button>
-                    </div>
-                </div>
-            </section>
-
-        </main>
-    </div>
-
-    <button id="backToTop" onclick="scrollToTop()">↑</button>
-
-    <script>
+<header>
+<div class="header-titles">
+<h1>Deep Learning Foundations</h1>
+<p>Lecture 00 - Introduction to Deep Learning: From Foundations to Frontiers</p>
+<a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+<span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+<a href="../pdfs/0.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+</div>
+<div class="search-container">
+<input id="searchInput" placeholder="Search notes..." type="text"/>
+</div>
+</header>
+<div class="container">
+<!-- Sidebar Index -->
+<aside>
+<div class="aside-header">
+<h3>Table of Contents</h3>
+<div class="topic-count">Total Topics: 5</div>
+</div>
+<ul class="index-list" id="indexList">
+<li>
+<a href="#topic-1">1. Welcome &amp; The Probability Connection<span class="sub-count">2</span></a>
+<ul class="sub-index">
+<li><a href="#sub-1-1">1.1 Meet the Instructors</a></li>
+<li><a href="#sub-1-2">1.2 Moving from Statistics to Deep Learning</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-2">2. What is Deep Learning?<span class="sub-count">2</span></a>
+<ul class="sub-index">
+<li><a href="#sub-2-1">2.1 Representation Learning</a></li>
+<li><a href="#sub-2-2">2.2 The Feature Hierarchy</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-3">3. The Unsung Architect: AlexNet (2012)<span class="sub-count">3</span></a>
+<ul class="sub-index">
+<li><a href="#sub-3-1">3.1 The 2012 AI Big Bang</a></li>
+<li><a href="#sub-3-2">3.2 Pioneers &amp; Divergent Paths</a></li>
+<li><a href="#sub-3-3">3.3 The Anonymity of Alex Krizhevsky</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-4">4. The Bitter Lesson (Richard Sutton)<span class="sub-count">3</span></a>
+<ul class="sub-index">
+<li><a href="#sub-4-1">4.1 Human Knowledge vs. Raw Computation</a></li>
+<li><a href="#sub-4-2">4.2 Historic Case Studies</a></li>
+<li><a href="#sub-4-3">4.3 Why the Lesson is Bitter</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-5">5. Course Architecture &amp; Pillars<span class="sub-count">2</span></a>
+<ul class="sub-index">
+<li><a href="#sub-5-1">5.1 The Pillars: Math &amp; Code</a></li>
+<li><a href="#sub-5-2">5.2 Syllabus &amp; Evaluation Details</a></li>
+</ul>
+</li>
+<li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+</ul>
+</aside>
+<!-- Main Content -->
+<main id="notesContent">
+<!-- Topic 1 -->
+<section class="topic-section" id="topic-1">
+<div class="topic-header" onclick="toggleSection('content-1')">
+<div class="topic-number">1</div>
+<h2>Welcome &amp; The Probability Connection</h2>
+</div>
+<div class="collapsible-content" id="content-1">
+<h3 id="sub-1-1">1.1 Meet the Instructors</h3>
+<p>The Deep Learning course is led by a team of experienced data scientists and educators:</p>
+<ul>
+<li><strong>Shreyash Tiwari:</strong> Senior Data Scientist and NFL Consultant. Alumnus of IIT Kanpur (Bachelor's and Master's in Economics with AI/ML minor), former Data Scientist at Amazon. Taught Probability and Statistics in the 5th semester.</li>
+<li><strong>Ashwin Tewary:</strong> Public Sector Data Scientist for the Australian Government, specialising in Computational Data Science. Dalyell Scholar from the University of Sydney, pursuing AI studies at IIT Bombay.</li>
+<li><strong>Sparsh Bansal:</strong> Data Engineer and Educator. Formerly with Microchip Technology, alumnus of NIT Kurukshetra, specializing in Applied AI and practical deployment.</li>
+</ul>
+<h3 id="sub-1-2">1.2 Moving from Statistics to Deep Learning</h3>
+<p>In previous courses like Probability &amp; Statistics, we asked the question: <em>"Given the data, what is the likelihood?"</em> In Deep Learning, we shift from measuring uncertainty to modeling complexity.</p>
+<div class="box box-blue">
+<div class="box-title">The Mathematical Engine</div>
+<p>Deep learning is not magic; it is an extension of foundational mathematics. The calculus, Bayes' Theorem, and probability distributions you mastered are the primary engines under the hood of every model we will build.</p>
+</div>
+<div class="topic-nav">
+<button class="btn" disabled="">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 2 -->
+<section class="topic-section" id="topic-2">
+<div class="topic-header" onclick="toggleSection('content-2')">
+<div class="topic-number">2</div>
+<h2>What is Deep Learning?</h2>
+</div>
+<div class="collapsible-content" id="content-2">
+<h3 id="sub-2-1">2.1 Representation Learning</h3>
+<p>The core distinction between traditional Machine Learning and Deep Learning lies in feature curation:</p>
+<ul>
+<li><strong>Traditional ML:</strong> Humans manually engineer and select features (e.g., color intensity, roundness, texture descriptors). The human tells the machine what to look for.</li>
+<li><strong>Representation Learning (DL):</strong> We do not design features; we design architectures that automatically learn features directly from raw data.</li>
+</ul>
+<h3 id="sub-2-2">2.2 The Feature Hierarchy</h3>
+<p>Deep neural networks learn abstract representations through a nested hierarchy of concepts:</p>
+<ol>
+<li><strong>Low-level features:</strong> Simple edges and color gradients.</li>
+<li><strong>Mid-level features:</strong> Textures, corners, and basic shapes.</li>
+<li><strong>High-level features:</strong> Complex objects (e.g., faces, wheels, text).</li>
+</ol>
+<div class="box box-green">
+<div class="box-title">Key Insight: Optimization over Heuristics</div>
+<p>By using deep representation learning, we replace human heuristics with mathematical optimization. The network independently discovers the optimal representations for the target task.</p>
+</div>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 3 -->
+<section class="topic-section" id="topic-3">
+<div class="topic-header" onclick="toggleSection('content-3')">
+<div class="topic-number">3</div>
+<h2>The Unsung Architect: AlexNet (2012)</h2>
+</div>
+<div class="collapsible-content" id="content-3">
+<h3 id="sub-3-1">3.1 The 2012 AI Big Bang</h3>
+<p>The year 2012 marked the "Big Bang" of modern Artificial Intelligence during the ImageNet Large Scale Visual Recognition Challenge (ILSVRC). Before 2012, computer vision progress was slow and incremental. In 2012, a deep convolutional neural network named <strong>AlexNet</strong> shattered all previous records.</p>
+<div class="box box-orange">
+<div class="box-title">ILSVRC 2012 Top-5 Error Rate</div>
+<ul>
+<li><strong>Runner-up (Traditional CV):</strong> 26.2% error rate</li>
+<li><strong>AlexNet (Deep Learning):</strong> 15.3% error rate</li>
+</ul>
+<p>This massive gap was a paradigm shift that sent shockwaves through the scientific community, ushering in the Third Golden Age of AI.</p>
+</div>
+<h3 id="sub-3-2">3.2 Pioneers &amp; Divergent Paths</h3>
+<p>The AlexNet breakthrough was created by a team at the University of Toronto: <strong>Alex Krizhevsky, Ilya Sutskever, and Geoffrey Hinton</strong>. Following their ImageNet victory, their startup <em>DNN Research Inc.</em> was acquired by Google, and their paths began to diverge:</p>
+<ul>
+<li><strong>Geoffrey Hinton &amp; Ilya Sutskever:</strong> Took public-facing leadership and media roles. Hinton became known as the "Godfather of AI" and a major voice on AI risk. Sutskever co-founded OpenAI in 2015, served as its Chief Scientist, and later co-founded Safe Superintelligence Inc. in 2024.</li>
+<li><strong>Alex Krizhevsky:</strong> Opted for a career focused purely on technical innovation, largely staying out of the public spotlight. He remained at Google until 2017, later joining smaller firms like Dessa and Two Bear Capital.</li>
+</ul>
+<h3 id="sub-3-3">3.3 The Anonymity of Alex Krizhevsky</h3>
+<p>Despite being the first author of the paper and the primary architect who engineered the GPU code critical for training the massive model, Krizhevsky remains relatively unknown to the general public compared to his co-authors.</p>
+<div class="box box-beige">
+<div class="box-title">Reflections on Success</div>
+<p>His story highlights fundamental questions about career success: Is it measured by public acclaim or by private impact? Is it better to be the face of a revolution, or the one building its engine? There is no right answer, but it shows a deliberate preference for deep technical work over the demands of management and public life.</p>
+</div>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 4 -->
+<section class="topic-section" id="topic-4">
+<div class="topic-header" onclick="toggleSection('content-4')">
+<div class="topic-number">4</div>
+<h2>The Bitter Lesson (Richard Sutton)</h2>
+</div>
+<div class="collapsible-content" id="content-4">
+<h3 id="sub-4-1">4.1 Human Knowledge vs. Raw Computation</h3>
+<p>In his famous essay, <em>The Bitter Lesson</em>, AI pioneer Richard Sutton outlines a core pattern in the history of AI research: general-purpose methods that leverage computation always defeat methods based on human-engineered domain knowledge.</p>
+<div class="box box-red">
+<div class="box-title">The Two Paths of AI</div>
+<ul>
+<li><strong>The Path of Human Knowledge:</strong> Build in our own clever insights and domain-specific structures. This approach is intuitive and satisfying for the researcher in the short term, but it inevitably plateaus.</li>
+<li><strong>The Path of Raw Computation:</strong> Rely on general methods (search and learning) that scale directly with processing power. Let the machine discover its own representations.</li>
+</ul>
+</div>
+<h3 id="sub-4-2">4.3 Historic Case Studies</h3>
+<p>The lesson has repeated across multiple fields over seven decades:</p>
+<ul>
+<li><strong>Computer Chess:</strong> Researchers initially tried to encode grandmaster strategic knowledge (openings, endgames). In 1997, IBM's <em>Deep Blue</em> defeated Garry Kasparov using massive, brute-force search.</li>
+<li><strong>Computer Go:</strong> Go was believed to be too complex for pure search. Researchers spent decades encoding human positional heuristics. In 2016, <em>AlphaGo</em> defeated Lee Sedol by combining massive search with learning from self-play.</li>
+<li><strong>Speech Recognition:</strong> Early systems engineered vocal tract and phoneme models. They were easily outperformed by statistical methods (Hidden Markov Models) and later by deep neural networks that learned directly from raw audio waveforms.</li>
+<li><strong>Computer Vision:</strong> Hand-crafted feature descriptors (like SIFT, Gabor filters, and edge detectors) were abandoned once deep convolutional networks (like AlexNet) learned representations automatically.</li>
+</ul>
+<h3 id="sub-4-3">4.3 Why the Lesson is Bitter</h3>
+<p>The lesson is "bitter" because it is a humbling one for researchers. We naturally want our own clever insights to be the key to machine intelligence. Accepting that simply scaling computation, search, and learning performs significantly better forces us to abandon our psychological commitment to building systems that "think the way we think."</p>
+<div class="box box-beige">
+<div class="box-title">Core Takeaways</div>
+<ul>
+<li>The future belongs to general-purpose methods that scale with computation.</li>
+<li>We must stop trying to hardcode the contents of our minds (space, objects, grammar) into agents.</li>
+<li>We should focus on building <strong>meta-methods</strong> that enable machines to discover knowledge for themselves.</li>
+</ul>
+</div>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 5 -->
+<section class="topic-section" id="topic-5">
+<div class="topic-header" onclick="toggleSection('content-5')">
+<div class="topic-number">5</div>
+<h2>Course Architecture &amp; Pillars</h2>
+</div>
+<div class="collapsible-content" id="content-5">
+<h3 id="sub-5-1">5.1 The Pillars: Math &amp; Code</h3>
+<p>Success in this course requires mastering two interconnected pillars:</p>
+<ul>
+<li><strong>The Math (The Physics):</strong> Deep learning is calculus and linear algebra acting on data. We will open the "black box" and derive concepts like Backpropagation by hand so that when models fail, you understand the mathematical reason why.</li>
+<li><strong>The Code (The Engineering):</strong> We build what we derive. You will gain proficiency in PyTorch/TensorFlow by implementing computational graphs from scratch rather than just calling black-box library APIs.</li>
+</ul>
+<h3 id="sub-5-2">5.2 Syllabus &amp; Evaluation Details</h3>
+<p>The course is structured into five core modules:</p>
+<ul>
+<li><strong>Module 1:</strong> Core Probability Theory, Bayes' Rule, Information Theory, and Linear Algebra operations.</li>
+<li><strong>Module 2:</strong> Deep Feedforward Networks (XOR example, Hidden Units), Backpropagation mechanics, and Regularization.</li>
+<li><strong>Module 3:</strong> Optimization for deep models and Convolutional Neural Networks (CNNs).</li>
+<li><strong>Module 4:</strong> Sequence Modeling, Recurrent Neural Networks (RNNs/LSTMs), NLP applications, and Autoencoder foundations.</li>
+<li><strong>Module 5:</strong> Advanced Autoencoders, Attention Mechanisms, Transformer Architecture, and Large Language Models (LLMs).</li>
+</ul>
+<div class="box box-orange">
+<div class="box-title">Evaluation Weightage</div>
+<ul>
+<li>Attendance &amp; Class Participation: 5%</li>
+<li>In-Class &amp; Post-Class Assignments: 10%</li>
+<li>Mini-projects: 25%</li>
+<li>Mid Semester Exam: 20%</li>
+<li>End Semester Exam: 40%</li>
+</ul>
+</div>
+<h3>Deep Learning Resources</h3>
+<ul>
+<li><em>Deep Learning</em> (Ian Goodfellow, Yoshua Bengio, and Aaron Courville)</li>
+<li><em>Pattern Recognition and Machine Learning</em> (Christopher M. Bishop)</li>
+<li>Online platforms: 3Blue1Brown, Khan Academy, and deeplearning.ai</li>
+</ul>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+<button class="btn" disabled="">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Original PDF -->
+<section class="topic-section" id="original-pdf">
+<div class="topic-header" onclick="toggleSection('content-pdf')">
+<div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+<svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+</div>
+<h2>Original PDF Notes</h2>
+</div>
+<div class="collapsible-content" id="content-pdf">
+<p>Below is the original PDF document for your reference:</p>
+<button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+<div id="pdfContainer" style="margin-top: 1rem;"></div>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+<button class="btn" disabled="">Next Topic</button>
+</div>
+</div>
+</section>
+</main>
+</div>
+<button id="backToTop" onclick="scrollToTop()">↑</button>
+<script>
         function loadPDF() {
             const container = document.getElementById('pdfContainer');
             const btn = document.getElementById('loadPdfBtn');
@@ -313,6 +281,6 @@
             }
         }
     </script>
-    <script src="../js/script.js"></script>
+<script src="../js/script.js"></script>
 </body>
 </html>

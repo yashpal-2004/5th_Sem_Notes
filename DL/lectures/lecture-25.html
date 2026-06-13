@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Deep Learning Foundations - Lecture 25</title>
+    <meta content="Study notes for Deep Learning Foundations, Lecture 25 covering Autoencoders & Variational Autoencoders." name="description"/>
+    <link class="favicon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>25</text></svg>" rel="icon"/>
+    <link href="../css/style.css" rel="stylesheet"/>
+</head>
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Deep Learning Foundations</h1>
+            <p>Lecture 25 - Autoencoders & Variational Autoencoders</p>
+            <a href="../index.html" style="color: var(--text-dark); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/25.pdf" style="color: var(--text-dark); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text"/>
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 4</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li>
+                    <a href="#topic-1">1. Under-Complete Autoencoders<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-1-1">1.1 Bottleneck Dimension Constraints</a></li>
+                         <li><a href="#sub-1-2">1.2 Linear Autoencoders and PCA Connection</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Over-Complete Autoencoders<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-2-1">2.1 Sparsity Penalties</a></li>
+                         <li><a href="#sub-2-2">2.2 Denoising Autoencoders (DAE)</a></li>
+                         <li><a href="#sub-2-3">2.3 Tied Weights Regularization</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Variational Autoencoders (VAEs)<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-3-1">3.1 Generative Latent Spaces</a></li>
+                         <li><a href="#sub-3-2">3.2 Reparameterization Trick Math</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. VAE Loss Function<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                         <li><a href="#sub-4-1">4.1 Reconstruction Error vs. KL Divergence</a></li>
+                         <li><a href="#sub-4-2">4.2 Mathematical Balancing of Divergence</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Topic 1 -->
+            <section id="topic-1" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>Under-Complete Autoencoders</h2>
+                </div>
+                <div id="content-1" class="collapsible-content">
+                    
+        <h3 id="sub-1-1">1.1 Bottleneck Dimension Constraints</h3>
+        <p>An <strong>under-complete autoencoder</strong> has a latent bottleneck dimension <code>h</code> that is smaller than the input dimension <code>x</code>. This bottleneck forces the network to capture only the most salient features of the data to perform reconstruction.</p>
+        
+        <h3 id="sub-1-2">1.2 Linear Autoencoders and PCA Connection</h3>
+        <p>If an under-complete autoencoder uses linear activation functions, the latent space span matches the subspace found by <strong>Principal Component Analysis (PCA)</strong>. Introducing non-linear activations allows the autoencoder to model non-linear manifolds.</p>
+    
+                    
+                    <div class="topic-nav">
+                        <button class="btn" disabled="">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 2 -->
+            <section id="topic-2" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>Over-Complete Autoencoders</h2>
+                </div>
+                <div id="content-2" class="collapsible-content">
+                    
+        <h3 id="sub-2-1">2.1 Sparsity Penalties</h3>
+        <p>An <strong>over-complete autoencoder</strong> has a latent bottleneck dimension larger than the input dimension. To prevent the model from learning a simple identity mapping, we apply a <strong>sparsity penalty</strong> (e.g. L1 regularization on the activations) to ensure only a small fraction of latent neurons fire for any given sample.</p>
+        
+        <h3 id="sub-2-2">2.2 Denoising Autoencoders (DAE)</h3>
+        <p><strong>Denoising Autoencoders</strong> prevent identity mapping by corrupting the input data (adding noise or masking pixels) before passing it to the encoder. The model is trained to reconstruct the original, clean input, forcing it to learn the underlying structure of the data manifold.</p>
+        
+        <h3 id="sub-2-3">2.3 Tied Weights Regularization</h3>
+        <p>To reduce parameters and regularize the model, we can use <strong>tied weights</strong>, setting the decoder weight matrix to the transpose of the encoder weight matrix: <code>W<sub>decoder</sub> = W<sub>encoder</sub><sup>T</sup></code>.</p>
+    
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 3 -->
+            <section id="topic-3" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>Variational Autoencoders (VAEs)</h2>
+                </div>
+                <div id="content-3" class="collapsible-content">
+                    
+        <h3 id="sub-3-1">3.1 Generative Latent Spaces</h3>
+        <p>Standard autoencoders map inputs to discrete coordinates in latent space, which can result in gaps that produce gibberish when decoding. <strong>Variational Autoencoders (VAEs)</strong> resolve this by mapping inputs to probability distributions, ensuring a continuous and generative latent space.</p>
+        
+        <h3 id="sub-3-2">3.2 Reparameterization Trick Math</h3>
+        <p>To backpropagate through the random sampling step, we use the <strong>reparameterization trick</strong>. Instead of sampling directly from the latent distribution <code>N(&mu;, &sigma;<sup>2</sup>)</code>, we sample a random noise vector <code>&epsilon; &sim; N(0, I)</code> and calculate the latent vector as:</p>
+        <div class="formula-box">z = &mu; + &sigma; &target; &epsilon;</div>
+        <p>This formulation shifts the stochastic component to an input node, allowing gradients to flow back through <code>&mu;</code> and <code>&sigma;</code>.</p>
+    
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 4 -->
+            <section id="topic-4" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>VAE Loss Function</h2>
+                </div>
+                <div id="content-4" class="collapsible-content">
+                    
+        <h3 id="sub-4-1">4.1 Reconstruction Error vs. KL Divergence</h3>
+        <p>The VAE loss function contains two components:
+            <ul>
+                <li><strong>Reconstruction Loss:</strong> Minimizes the difference between input and output, ensuring reconstruction quality.</li>
+                <li><strong>KL Divergence Regularization:</strong> Measures how much the predicted latent distribution <code>q(z|x)</code> deviates from a standard normal prior <code>p(z) = N(0, I)</code>, keeping the latent space structured.</li>
+            </ul>
+        </p>
+        
+        <h3 id="sub-4-2">4.2 Mathematical Balancing of Divergence</h3>
+        <p>The total loss minimizes the negative Evidence Lower Bound (ELBO):</p>
+        <div class="formula-box">Loss = E<sub>q(z|x)</sub>[ log p(x|z) ] - D<sub>KL</sub>( q(z|x) || p(z) )</div>
+        <p>Balancing these terms prevents the latent space from collapsing while maintaining reconstruction quality.</p>
+    
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--text-dark); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for your reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/25.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--border-light); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Deep Learning Foundations - Lecture 12</title>
+<meta content="Study notes for Deep Learning Foundations, Lecture 12 covering CNN Evolution, Upsampling techniques, AlexNet, VGG, Shattered Gradients, Residual blocks, and ResNet variance explosion solutions." name="description"/>
+<link class="favicon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjIwIiBmaWxsPSIjMTMyMjE5Ii8+PHRleHQgeD0iNTAiIHk9IjUwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iNTUiIGZpbGw9IndoaXRlIiBmb250LXdlaWdodD0iYm9sZCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPjEyPC90ZXh0Pjwvc3ZnPg==" rel="icon"/>
+<link href="../css/style.css" rel="stylesheet"/>
+</head>
+<body>
+<header>
+<div class="header-titles">
+<h1>Deep Learning Foundations</h1>
+<p>Lecture 12 - CNN Evolution: ResNet &amp; Deep Architectures</p>
+<a href="../index.html" style="color: var(--text-dark); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+<span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+<a href="../pdfs/12.pdf" style="color: var(--text-dark); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+</div>
+<div class="search-container">
+<input id="searchInput" placeholder="Search notes..." type="text"/>
+</div>
+</header>
+<div class="container">
+<!-- Sidebar Index -->
+<aside>
+<div class="aside-header">
+<h3>Table of Contents</h3>
+<div class="topic-count">Total Topics: 5</div>
+</div>
+<ul class="index-list" id="indexList">
+<li>
+<a href="#topic-1">1. Upsampling Techniques<span class="sub-count">2</span></a>
+<ul class="sub-index">
+<li><a href="#sub-1-1">1.1 Interpolation vs. Max Unpooling</a></li>
+<li><a href="#sub-1-2">1.2 Transposed Convolution</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-2">2. Classical Vision Networks<span class="sub-count">2</span></a>
+<ul class="sub-index">
+<li><a href="#sub-2-1">2.1 AlexNet Architecture (2012)</a></li>
+<li><a href="#sub-2-2">2.2 VGG Networks &amp; Depth Limits</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-3">3. Sequential Limits &amp; Shattered Gradients<span class="sub-count">2</span></a>
+<ul class="sub-index">
+<li><a href="#sub-3-1">3.1 The Degradation Problem</a></li>
+<li><a href="#sub-3-2">3.2 Shattered Gradient Phenomenon</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-4">4. Residual Connections<span class="sub-count">2</span></a>
+<ul class="sub-index">
+<li><a href="#sub-4-1">4.1 Residual Blocks &amp; Skip Formulation</a></li>
+<li><a href="#sub-4-2">4.2 Skip Path Ensemble Interpretations</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-5">5. ResNet Variance Explosion<span class="sub-count">2</span></a>
+<ul class="sub-index">
+<li><a href="#sub-5-1">5.1 Exponential Variance Growth</a></li>
+<li><a href="#sub-5-2">5.2 Scaling and Batch Norm Solutions</a></li>
+</ul>
+</li>
+<li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+</ul>
+</aside>
+<!-- Main Content -->
+<main id="notesContent">
+<!-- Topic 1 -->
+<section class="topic-section" id="topic-1">
+<div class="topic-header" onclick="toggleSection('content-1')">
+<div class="topic-number">1</div>
+<h2>Upsampling Techniques</h2>
+</div>
+<div class="collapsible-content" id="content-1">
+<h3 id="sub-1-1">1.1 Interpolation vs. Max Unpooling</h3>
+<p>Standard CNNs reduce spatial size (height/width) using pooling or strides. Generative tasks (like image generation, autoencoders, or semantic segmentation) require <strong>upsampling</strong> to reconstruct spatial details:</p>
+<ul>
+<li><strong>Nearest Neighbor / Bilinear Interpolation:</strong> Non-learnable techniques that fill in new pixel coordinates based on the nearest values or weighted averages of surrounding values.</li>
+<li><strong>Max Unpooling:</strong> Reconstructs shape by distributing activations back into the specific coordinates they originated from, using saved max pooling indices from the corresponding downsampling step. Other elements are filled with zero.</li>
+</ul>
+<h3 id="sub-1-2">1.2 Transposed Convolution</h3>
+<p><strong>Transposed Convolution (sometimes called Deconvolution)</strong> is a learnable upsampling operation. Instead of sliding a filter to calculate a weighted sum, we project a single input activation through a filter, distributing values over a larger output area. The weight matrix of this operation is mathematically the transpose of a normal downsampling convolution matrix.</p>
+<div class="topic-nav">
+<button class="btn" disabled="">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 2 -->
+<section class="topic-section" id="topic-2">
+<div class="topic-header" onclick="toggleSection('content-2')">
+<div class="topic-number">2</div>
+<h2>Classical Vision Networks</h2>
+</div>
+<div class="collapsible-content" id="content-2">
+<h3 id="sub-2-1">2.1 AlexNet Architecture (2012)</h3>
+<p>AlexNet kick-started the modern deep learning era by winning the 2012 ImageNet competition with a 16.4% top-5 error rate:</p>
+<ul>
+<li><strong>Structure:</strong> 8 hidden layers (first 5 convolutional, last 3 fully connected).</li>
+<li><strong>Key Details:</strong> First large-scale use of ReLU activations, Dropout regularizers to prevent overfitting, and extensive Data Augmentation (crops, flips).</li>
+</ul>
+<h3 id="sub-2-2">2.2 VGG Networks &amp; Depth Limits</h3>
+<p>The Visual Geometry Group (VGG) established that network depth is a critical driver of representation capacity:</p>
+<ul>
+<li><strong>Key Innovation:</strong> Replaced large filters (like AlexNet's 11 × 11) with stacks of smaller 3 × 3 convolutional filters. Stacking two 3 × 3 filters yields the same receptive field as one 5 × 5 filter but uses fewer parameters and introduces more non-linear activations.</li>
+<li><strong>Depth:</strong> Scaled up to 19 layers (VGG-19) with 144 million parameters, achieving a 6.8% top-5 error rate.</li>
+</ul>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 3 -->
+<section class="topic-section" id="topic-3">
+<div class="topic-header" onclick="toggleSection('content-3')">
+<div class="topic-number">3</div>
+<h2>Sequential Limits &amp; Shattered Gradients</h2>
+</div>
+<div class="collapsible-content" id="content-3">
+<h3 id="sub-3-1">3.1 The Degradation Problem</h3>
+<p>For several years, researchers assumed that adding more layers would always improve performance. However, scaling sequential networks past ~20 layers caused classification accuracy to degrade. This <strong>degradation problem</strong> affects both training and test error, proving it is caused by training/optimization difficulties, not overfitting.</p>
+<h3 id="sub-3-2">3.2 Shattered Gradient Phenomenon</h3>
+<p>In deep sequential networks, backpropagation gradients must pass through many layers. As depth increases, the gradient of the output with respect to the input changes rapidly with tiny changes in the input. The autocorrelation of gradients drops to zero. This is the <strong>shattered gradient problem</strong>: the loss landscape resembles a jagged range of tiny mountains rather than a smooth valley, making gradient descent extremely difficult.</p>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 4 -->
+<section class="topic-section" id="topic-4">
+<div class="topic-header" onclick="toggleSection('content-4')">
+<div class="topic-number">4</div>
+<h2>Residual Connections</h2>
+</div>
+<div class="collapsible-content" id="content-4">
+<h3 id="sub-4-1">4.1 Residual Blocks &amp; Skip Formulation</h3>
+<p><strong>Residual Networks (ResNets)</strong> resolve the degradation problem by introducing parallel skip connections (residual branches) that add the input directly back to the output of a layer block:</p>
+<div class="formula-box">y = x + f(x, φ)</div>
+<p>Where x is the input, and f(x, φ) represents the convolutional transformations of the block. Instead of learning an entirely new output mapping, the layers only need to learn an additive change (residual) to the identity representation.</p>
+<h3 id="sub-4-2">4.2 Skip Path Ensemble Interpretations</h3>
+<p>Unraveling the recursive equations of a ResNet reveals that it acts like an <strong>ensemble of networks</strong> of varying depths. A network with D residual blocks contains 2<sup>D</sup> potential computational paths from the input to the output. This ensemble structure prevents gradients from vanishing or shattering, keeping the loss landscape smooth.</p>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 5 -->
+<section class="topic-section" id="topic-5">
+<div class="topic-header" onclick="toggleSection('content-5')">
+<div class="topic-number">5</div>
+<h2>ResNet Variance Explosion</h2>
+</div>
+<div class="collapsible-content" id="content-5">
+<h3 id="sub-5-1">5.1 Exponential Variance Growth</h3>
+<p>We use weight initialization methods (like He initialization) to keep activation variance constant across layers. However, in ResNets, adding the input x back to the block output f(x) causes a problem: since the signal from f(x) has uncorrelated variability, combining them increases the overall variance. The variance doubles at each residual block, growing exponentially (2<sup>D</sup>) with network depth D, leading to instability.</p>
+<h3 id="sub-5-2">5.2 Scaling and Batch Norm Solutions</h3>
+<p>Two methods prevent this variance explosion in deep ResNets:</p>
+<ol>
+<li><strong>Bilinear Scaling:</strong> Scaling the signal by 1 / √2 between each residual block keeps the variance constant, but degrades the identity representation of the skip connection.</li>
+<li><strong>Batch Normalization placement (Standard):</strong> Placing a Batch Norm layer as the first step within the residual block, and initializing its scale γ to 1 and offset β to 0. This forces the input of each block to have unit variance. Under He initialization, the output variance of the block is also 1, causing the total variance to grow <strong>linearly</strong> with the number of blocks (1, 2, 3...) rather than exponentially. Additionally, at initialization, later layers are dominated by the skip connection, computing a clean identity function.</li>
+</ol>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+<button class="btn" disabled="">Next Topic</button>
+</div>
+</div>
+</section>
+
+<!-- Original PDF -->
+<section class="topic-section" id="original-pdf">
+<div class="topic-header" onclick="toggleSection('content-pdf')">
+<div class="topic-number" style="background:transparent; color: var(--text-dark); width: auto; margin-right: 0.5rem;">
+<svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+</div>
+<h2>Original PDF Notes</h2>
+</div>
+<div class="collapsible-content" id="content-pdf">
+<p>Below is the original PDF document for your reference:</p>
+<button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+<div id="pdfContainer" style="margin-top: 1rem;"></div>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+<button class="btn" disabled="">Next Topic</button>
+</div>
+</div>
+</section>
+</main>
+</div>
+<button id="backToTop" onclick="scrollToTop()">↑</button>
+<script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/12.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--border-light); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+<script src="../js/script.js"></script>
+</body>
+</html>

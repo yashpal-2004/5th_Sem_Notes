@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Deep Learning Foundations - Lecture 16</title>
+<meta content="Study notes for Deep Learning Foundations, Lecture 16 covering NLP evolution, tokenization, one-hot encoding, Bag of Words, TF-IDF, Word2Vec CBOW/Skip-gram, and GloVe." name="description"/>
+<link class="favicon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjIwIiBmaWxsPSIjMTMyMjE5Ii8+PHRleHQgeD0iNTAiIHk9IjUwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iNTUiIGZpbGw9IndoaXRlIiBmb250LXdlaWdodD0iYm9sZCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPjE2PC90ZXh0Pjwvc3ZnPg==" rel="icon"/>
+<link href="../css/style.css" rel="stylesheet"/>
+</head>
+<body>
+<header>
+<div class="header-titles">
+<h1>Deep Learning Foundations</h1>
+<p>Lecture 16 - NLP Foundations &amp; Word Embeddings</p>
+<a href="../index.html" style="color: var(--text-dark); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+<span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+<a href="../pdfs/16.pdf" style="color: var(--text-dark); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+</div>
+<div class="search-container">
+<input id="searchInput" placeholder="Search notes..." type="text"/>
+</div>
+</header>
+<div class="container">
+<!-- Sidebar Index -->
+<aside>
+<div class="aside-header">
+<h3>Table of Contents</h3>
+<div class="topic-count">Total Topics: 5</div>
+</div>
+<ul class="index-list" id="indexList">
+<li>
+<a href="#topic-1">1. Tokenization Strategies<span class="sub-count">2</span></a>
+<ul class="sub-index">
+<li><a href="#sub-1-1">1.1 Character vs. Word Tokenization</a></li>
+<li><a href="#sub-1-2">1.2 n-gram Contextual Tokenization</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-2">2. Discrete Sparse Representations<span class="sub-count">3</span></a>
+<ul class="sub-index">
+<li><a href="#sub-2-1">2.1 One-Hot Encoding Limitations</a></li>
+<li><a href="#sub-2-2">2.2 Bag of Words (BoW) Models</a></li>
+<li><a href="#sub-2-3">2.3 TF-IDF Term Weighting Formula</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-3">3. Word2Vec: CBOW Architecture<span class="sub-count">2</span></a>
+<ul class="sub-index">
+<li><a href="#sub-3-1">3.1 Predicting Target from Context</a></li>
+<li><a href="#sub-3-2">3.2 The Softmax Computational Bottleneck</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-4">4. Word2Vec: Skip-gram Architecture<span class="sub-count">2</span></a>
+<ul class="sub-index">
+<li><a href="#sub-4-1">4.1 Predicting Context from Target</a></li>
+<li><a href="#sub-4-2">4.2 Optimization via Negative Sampling</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-5">5. GloVe Global Embeddings<span class="sub-count">2</span></a>
+<ul class="sub-index">
+<li><a href="#sub-5-1">5.1 Global Co-occurrence Matrix</a></li>
+<li><a href="#sub-5-2">5.2 Log Co-occurrence Dot Product</a></li>
+</ul>
+</li>
+<li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+</ul>
+</aside>
+<!-- Main Content -->
+<main id="notesContent">
+<!-- Topic 1 -->
+<section class="topic-section" id="topic-1">
+<div class="topic-header" onclick="toggleSection('content-1')">
+<div class="topic-number">1</div>
+<h2>Tokenization Strategies</h2>
+</div>
+<div class="collapsible-content" id="content-1">
+<h3 id="sub-1-1">1.1 Character vs. Word Tokenization</h3>
+<p>Tokenization is the first step in NLP, breaking raw text into digestible units. We evaluate the trade-offs of different approaches:</p>
+<ul>
+<li><strong>Character-Level:</strong> Treats each letter as a token.
+                            <ul>
+<li><em>Pros:</em> Small vocabulary size, robust to typos, and eliminates out-of-vocabulary (OOV) issues.</li>
+<li><em>Cons:</em> Greatly increases sequence length, raising computational costs and training complexity. It also struggles to capture higher-level semantic concepts.</li>
+</ul>
+</li>
+<li><strong>Word-Level:</strong> Treats each unique word as a token.
+                            <ul>
+<li><em>Pros:</em> Efficiently maps distinct semantic concepts as individual units.</li>
+<li><em>Cons:</em> Requires massive vocabularies, cannot handle morphological variations, and struggles with out-of-vocabulary words.</li>
+</ul>
+</li>
+</ul>
+<h3 id="sub-1-2">1.2 n-gram Contextual Tokenization</h3>
+<p>n-grams group n consecutive words into a single token (e.g. unigram "good", bigram "not good"). This preserves local context and phrase meaning. It is particularly useful for distinguishing negations from root words, preventing opposite meanings from collapsing into the same vector space coordinates. However, n-grams lead to a combinatorial vocabulary explosion.</p>
+<div class="topic-nav">
+<button class="btn" disabled="">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 2 -->
+<section class="topic-section" id="topic-2">
+<div class="topic-header" onclick="toggleSection('content-2')">
+<div class="topic-number">2</div>
+<h2>Discrete Sparse Representations</h2>
+</div>
+<div class="collapsible-content" id="content-2">
+<h3 id="sub-2-1">2.1 One-Hot Encoding Limitations</h3>
+<p>Early NLP models represented words as discrete symbols. <strong>One-Hot Encoding</strong> creates a vector of vocabulary size |V|, setting a 1 at the word's unique index and 0 elsewhere. This approach faces two key limitations:</p>
+<ol>
+<li><strong>Storage and Scaling (Sparsity):</strong> A vocabulary of 50,000 words yields vectors with 50,000 dimensions, where 99.9% of the cells are zero. This is highly inefficient.</li>
+<li><strong>The Similarity Problem (Orthogonality):</strong> The dot product between any two distinct one-hot vectors is exactly zero. The model has no geometric way to recognize that "king" and "queen" are semantically closer than "king" and "table".</li>
+</ol>
+<h3 id="sub-2-2">2.2 Bag of Words (BoW) Models</h3>
+<p>To represent complete documents, the <strong>Bag-of-Words</strong> model sums the one-hot vectors of all words in the text, creating a fixed-size vector of vocabulary length |V| containing word counts. While simple and fast, BoW has major drawbacks: it completely ignores word order and grammar, and fails to capture semantic meaning (e.g. "I like AI" and "AI likes me" yield identical representations).</p>
+<h3 id="sub-2-3">2.3 TF-IDF Term Weighting Formula</h3>
+<p>To address the issue of common words (like "the", "is") dominating frequency counts, <strong>TF-IDF</strong> reweights BoW vectors by multiplying a term's local frequency by its global rarity across the corpus:</p>
+<div class="box box-green">
+<div class="box-title">TF-IDF Math</div>
+<ul>
+<li><strong>Term Frequency (TF):</strong> How often a term appears in the current document.</li>
+<li><strong>Inverse Document Frequency (IDF):</strong> Measures term uniqueness across all N documents:
+                                <div style="font-family: monospace; font-size: 1.05rem; margin: 0.25rem 0;">IDF = log( N / Docs with Term )</div>
+</li>
+<li><strong>TF-IDF Score:</strong> TF × IDF. High scores highlight terms that are frequent in a specific document but rare across the corpus, dimming common words.</li>
+</ul>
+</div>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 3 -->
+<section class="topic-section" id="topic-3">
+<div class="topic-header" onclick="toggleSection('content-3')">
+<div class="topic-number">3</div>
+<h2>Word2Vec: CBOW Architecture</h2>
+</div>
+<div class="collapsible-content" id="content-3">
+<h3 id="sub-3-1">3.1 Predicting Target from Context</h3>
+<p>Mikolov et al. (Google, 2013) introduced <strong>Word2Vec</strong>, transitioning from word counting to prediction-based models based on the <em>Distributional Hypothesis</em> (words used in similar contexts share similar meanings). The <strong>Continuous Bag of Words (CBOW)</strong> architecture predicts a missing target word from its surrounding context words:</p>
+<ul>
+<li><strong>Input Layer:</strong> One-hot vectors for context words within a sliding window.</li>
+<li><strong>Hidden Layer (Projection):</strong> Computes the linear average of the context word vectors. Crucially, there is no non-linear activation function.</li>
+<li><strong>Output Layer:</strong> Applies a softmax function to generate a probability distribution over the vocabulary.</li>
+</ul>
+<h3 id="sub-3-2">3.2 The Softmax Computational Bottleneck</h3>
+<p>Evaluating the softmax function at each step requires computing an exponent and summing over the entire vocabulary |V|:</p>
+<div class="formula-box">P(w | context) = exp(v′<sub>w</sub><sup>T</sup> v<sub>context</sub>) / ∑<sub>u ∈ V</sub> exp(v′<sub>u</sub><sup>T</sup> v<sub>context</sub>)</div>
+<p>For large vocabularies (e.g. |V| = 100,000+), computing this denominator at every iteration is highly expensive, creating a severe training bottleneck.</p>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 4 -->
+<section class="topic-section" id="topic-4">
+<div class="topic-header" onclick="toggleSection('content-4')">
+<div class="topic-number">4</div>
+<h2>Word2Vec: Skip-gram Architecture</h2>
+</div>
+<div class="collapsible-content" id="content-4">
+<h3 id="sub-4-1">4.1 Predicting Context from Target</h3>
+<p>The <strong>Skip-gram</strong> architecture flips the CBOW task: it takes a single target word and predicts the surrounding context words. While slower to train, Skip-gram excels at representing rare words because it receives multiple training signals for each target word instance.</p>
+<h3 id="sub-4-2">4.2 Optimization via Negative Sampling</h3>
+<p>To solve the softmax bottleneck, Word2Vec uses <strong>Negative Sampling (SGNS)</strong>. Instead of predicting a target word from the entire vocabulary, the model frames optimization as binary logistic regression:</p>
+<ul>
+<li>For each positive word pair (target, context), the model updates the weights to maximize their similarity.</li>
+<li>It also samples a small set of k random "negative" words from a noise distribution (typically k ∈ [5, 20]) and updates the weights to minimize their similarity.</li>
+<li>This reduces the computational complexity from O(|V|) to O(k), making training on large vocabularies highly scalable.</li>
+</ul>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 5 -->
+<section class="topic-section" id="topic-5">
+<div class="topic-header" onclick="toggleSection('content-5')">
+<div class="topic-number">5</div>
+<h2>GloVe Global Embeddings</h2>
+</div>
+<div class="collapsible-content" id="content-5">
+<h3 id="sub-5-1">5.1 Global Co-occurrence Matrix</h3>
+<p>While Word2Vec captures semantic details, it relies on local sliding windows, failing to exploit global corpus statistics. Conversely, count-based decomposition methods exploit global statistics but struggle with local context. <strong>GloVe (Global Vectors)</strong> (Pennington et al., 2014) combines these approaches by constructing a global co-occurrence matrix X first:</p>
+<p>Where X<sub>ij</sub> counts how many times word j appears in the context of word i across the entire training corpus.</p>
+<h3 id="sub-5-2">5.2 Log Co-occurrence Dot Product</h3>
+<p>GloVe optimizes word vectors such that their dot product approximates the log co-occurrence probability of the words:</p>
+<div class="formula-box">w<sub>i</sub><sup>T</sup> w̃<sub>j</sub> + b<sub>i</sub> + b̃<sub>j</sub> ≈ log( X<sub>ij</sub> )</div>
+<p>Where w<sub>i</sub> and w̃<sub>j</sub> are the word vectors, and b<sub>i</sub>, b̃<sub>j</sub> are bias terms. Taking the logarithm converts multiplication into addition, improving numerical stability. This objective encodes semantic relationships directly into the geometry of the vector space, enabling vector arithmetic like <em>King − Man + Woman ≈ Queen</em>.</p>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+<button class="btn" disabled="">Next Topic</button>
+</div>
+</div>
+</section>
+
+<!-- Original PDF -->
+<section class="topic-section" id="original-pdf">
+<div class="topic-header" onclick="toggleSection('content-pdf')">
+<div class="topic-number" style="background:transparent; color: var(--text-dark); width: auto; margin-right: 0.5rem;">
+<svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+</div>
+<h2>Original PDF Notes</h2>
+</div>
+<div class="collapsible-content" id="content-pdf">
+<p>Below is the original PDF document for your reference:</p>
+<button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+<div id="pdfContainer" style="margin-top: 1rem;"></div>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+<button class="btn" disabled="">Next Topic</button>
+</div>
+</div>
+</section>
+</main>
+</div>
+<button id="backToTop" onclick="scrollToTop()">↑</button>
+<script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/16.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--border-light); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+<script src="../js/script.js"></script>
+</body>
+</html>

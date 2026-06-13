@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Deep Learning Foundations - Lecture 08</title>
+<meta content="Study notes for Deep Learning Foundations, Lecture 08 covering Underfitting vs. Overfitting, L1/L2 Regularization, Early Stopping, Ensemble Bagging, Dropout, Batch Normalization, and Data Augmentation." name="description"/>
+<link class="favicon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjIwIiBmaWxsPSIjMTMyMjE5Ii8+PHRleHQgeD0iNTAiIHk9IjUwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iNTUiIGZpbGw9IndoaXRlIiBmb250LXdlaWdodD0iYm9sZCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPjA4PC90ZXh0Pjwvc3ZnPg==" rel="icon"/>
+<link href="../css/style.css" rel="stylesheet"/>
+</head>
+<body>
+<header>
+<div class="header-titles">
+<h1>Deep Learning Foundations</h1>
+<p>Lecture 08 - Regularization &amp; Model Generalization</p>
+<a href="../index.html" style="color: var(--text-dark); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+<span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+<a href="../pdfs/8.pdf" style="color: var(--text-dark); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+</div>
+<div class="search-container">
+<input id="searchInput" placeholder="Search notes..." type="text"/>
+</div>
+</header>
+<div class="container">
+<!-- Sidebar Index -->
+<aside>
+<div class="aside-header">
+<h3>Table of Contents</h3>
+<div class="topic-count">Total Topics: 5</div>
+</div>
+<ul class="index-list" id="indexList">
+<li>
+<a href="#topic-1">1. Model Fitting &amp; Pitfalls<span class="sub-count">3</span></a>
+<ul class="sub-index">
+<li><a href="#sub-1-1">1.1 Underfitting vs. Overfitting</a></li>
+<li><a href="#sub-1-2">1.2 Bias-Variance Decomposition</a></li>
+<li><a href="#sub-1-3">1.3 Countering Pitfalls</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-2">2. L1 &amp; L2 Weight Penalties<span class="sub-count">3</span></a>
+<ul class="sub-index">
+<li><a href="#sub-2-1">2.2 L1 Regularization (Lasso)</a></li>
+<li><a href="#sub-2-2">2.2 L2 Regularization (Ridge)</a></li>
+<li><a href="#sub-2-3">2.3 Robustness &amp; Sparsity</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-3">3. Early Stopping &amp; Bagging<span class="sub-count">2</span></a>
+<ul class="sub-index">
+<li><a href="#sub-3-1">3.1 Early Stopping Mechanics</a></li>
+<li><a href="#sub-3-2">3.2 Ensemble Models &amp; Bagging</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-4">4. Dropout Ensembling<span class="sub-count">2</span></a>
+<ul class="sub-index">
+<li><a href="#sub-4-1">4.1 Random Unit Deactivation</a></li>
+<li><a href="#sub-4-2">4.2 Implicit Weight Sharing</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-5">5. Batch Norm &amp; Data Augmentation<span class="sub-count">2</span></a>
+<ul class="sub-index">
+<li><a href="#sub-5-1">5.1 Batch Normalization</a></li>
+<li><a href="#sub-5-2">5.2 Data Augmentation</a></li>
+</ul>
+</li>
+
+<li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+</ul>
+</aside>
+<!-- Main Content -->
+<main id="notesContent">
+<!-- Topic 1 -->
+<section class="topic-section" id="topic-1">
+<div class="topic-header" onclick="toggleSection('content-1')">
+<div class="topic-number">1</div>
+<h2>Model Fitting &amp; Pitfalls</h2>
+</div>
+<div class="collapsible-content" id="content-1">
+<h3 id="sub-1-1">1.1 Underfitting vs. Overfitting</h3>
+<p>Training a deep learning model requires finding a balance where it adapts well to the training data while generalizing to new, unseen evaluation samples:</p>
+<div class="box box-blue">
+<div class="box-title">Model Fitting Summary</div>
+<table style="width: 100%; border-collapse: collapse; margin-top: 0.5rem; text-align: center;">
+<thead>
+<tr style="border-bottom: 2px solid var(--border-light);">
+<th style="padding: 0.5rem;">Fitting State</th>
+<th style="padding: 0.5rem;">Training Performance</th>
+<th style="padding: 0.5rem;">Evaluation Performance</th>
+</tr>
+</thead>
+<tbody>
+<tr style="border-bottom: 1px solid var(--border-light);">
+<td style="padding: 0.5rem;"><strong>Underfit</strong></td>
+<td style="padding: 0.5rem; color: var(--red);">Poor</td>
+<td style="padding: 0.5rem; color: var(--red);">Very Poor</td>
+</tr>
+<tr style="border-bottom: 1px solid var(--border-light);">
+<td style="padding: 0.5rem;"><strong>Overfit</strong></td>
+<td style="padding: 0.5rem; color: var(--green);">Very Good</td>
+<td style="padding: 0.5rem; color: var(--red);">Poor</td>
+</tr>
+<tr>
+<td style="padding: 0.5rem;"><strong>Good Fit</strong></td>
+<td style="padding: 0.5rem; color: var(--green);">Good</td>
+<td style="padding: 0.5rem; color: var(--green);">Good</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3 id="sub-1-2">1.2 Bias-Variance Decomposition</h3>
+<p>Generalization errors can be decomposed into two main types of prediction errors:</p>
+<ul>
+<li><strong>Bias:</strong> The difference between the model's average prediction and the true target function. High bias indicates that the model capacity is too low to fit the patterns in the data, leading to underfitting.</li>
+<li><strong>Variance:</strong> The sensitivity of the model's predictions to the specific training dataset. High variance indicates that the model is highly sensitive to statistical noise in the training set, leading to overfitting.</li>
+</ul>
+<h3 id="sub-1-3">1.3 Countering Pitfalls</h3>
+<p>To fix these issues, we adjust the capacity of the model:</p>
+<ul>
+<li><strong>To Fix Underfitting (High Bias):</strong> Increase the model capacity (e.g., add more hidden layers, increase the number of neurons per layer). This lowers bias but increases the risk of overfitting.</li>
+<li><strong>To Fix Overfitting (High Variance):</strong> Apply <strong>Regularization</strong>.
+                            <div class="box box-beige">
+<div class="box-title">Regularization Definition</div>
+<p>Regularization is any modification we make to a learning algorithm that is intended to reduce its generalization error but not its training error.</p>
+</div>
+</li>
+</ul>
+<div class="topic-nav">
+<button class="btn" disabled="">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 2 -->
+<section class="topic-section" id="topic-2">
+<div class="topic-header" onclick="toggleSection('content-2')">
+<div class="topic-number">2</div>
+<h2>L1 &amp; L2 Weight Penalties</h2>
+</div>
+<div class="collapsible-content" id="content-2">
+<p>Weight decay methods add a penalty term to the cost function to discourage weights from growing too large, keeping the model simpler.</p>
+<h3 id="sub-2-1">2.1 L1 Regularization (Lasso)</h3>
+<p>L1 regularization adds the absolute value of the weights as a penalty term to the loss function:</p>
+<div class="formula-box">J(θ) = J<sub>0</sub>(θ) + λ ∑ |w<sub>i</sub>|</div>
+<p>Where J<sub>0</sub>(θ) is the original loss, and λ is the regularization strength hyperparameter.</p>
+<h3 id="sub-2-2">2.2 L2 Regularization (Ridge / Weight Decay)</h3>
+<p>L2 regularization adds the squared magnitude of the weights as a penalty term to the loss function:</p>
+<div class="formula-box">J(θ) = J<sub>0</sub>(θ) + λ ∑ w<sub>i</sub><sup>2</sup></div>
+<h3 id="sub-2-3">2.3 Robustness &amp; Sparsity</h3>
+<p>L1 and L2 regularization behave differently due to the shape of their penalties:</p>
+<div class="box box-green">
+<div class="box-title">L1 vs. L2 Differences</div>
+<ul>
+<li><strong>Sparsity (L1 &gt; L2):</strong> L1 drives unimportant weights exactly to 0 because its gradient is constant (always 1 or -1). This results in a sparse model, performing automatic feature selection. L2 drives weights to be very small, but rarely zero.</li>
+<li><strong>Robustness to Outliers (L1 &gt; L2):</strong> The penalty for large outlier errors increases linearly in L1, but exponentially in L2. Thus, L2 focuses more effort on correcting outliers, making it less robust to noisy data.</li>
+</ul>
+</div>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 3 -->
+<section class="topic-section" id="topic-3">
+<div class="topic-header" onclick="toggleSection('content-3')">
+<div class="topic-number">3</div>
+<h2>Early Stopping &amp; Bagging</h2>
+</div>
+<div class="collapsible-content" id="content-3">
+<h3 id="sub-3-1">3.1 Early Stopping Mechanics</h3>
+<p>As training progresses, the model eventually stops learning general features and starts memorizing noise in the training set (overfitting). Early stopping resolves this by tracking the model's accuracy on a validation set:</p>
+<ul>
+<li><strong>Implementation:</strong> Stop the training process as soon as the validation error begins to rise, even if the training error continues to decrease.</li>
+<li><strong>Pros:</strong> Very simple to implement; saves the model parameters at the optimal validation point (e.g., Keras `save_best_only` callback).</li>
+<li><strong>Cons:</strong> May not work well if validation error fluctuates or is noisy.</li>
+</ul>
+<h3 id="sub-3-2">3.2 Ensemble Models &amp; Bagging</h3>
+<p><strong>Ensemble Learning</strong> averages the predictions of multiple separately trained models to reduce prediction variance and improve generalization:</p>
+<ul>
+<li><strong>Bagging (Bootstrap Aggregating):</strong> Multiple models are trained independently on different random subsets of the training data. While each individual model might overfit, averaging their outputs reduces the overall variance.</li>
+<li><strong>Limitation:</strong> Training multiple independent deep neural networks is computationally expensive, making standard bagging impractical for large deep learning models.</li>
+</ul>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 4 -->
+<section class="topic-section" id="topic-4">
+<div class="topic-header" onclick="toggleSection('content-4')">
+<div class="topic-number">4</div>
+<h2>Dropout Ensembling</h2>
+</div>
+<div class="collapsible-content" id="content-4">
+<h3 id="sub-4-1">4.1 Random Unit Deactivation</h3>
+<p><strong>Dropout</strong> is a highly effective regularization technique designed specifically for neural networks to approximate ensembling at a low computational cost:</p>
+<ul>
+<li>During each training step, randomly selected hidden neurons are deactivated (ignored) with a probability p (typically 0.5 for hidden layers).</li>
+<li>Deactivated neurons do not contribute to the forward pass and do not receive updates during the backward pass.</li>
+</ul>
+<h3 id="sub-4-2">4.2 Implicit Weight Sharing</h3>
+<p>By randomly dropping neurons, we create a different subnetwork at each step. This has a powerful ensembling effect:</p>
+<div class="box box-blue">
+<div class="box-title">Why Dropout Works</div>
+<ul>
+<li><strong>Co-adaptation Prevention:</strong> Neurons cannot rely on the presence of specific other neurons to make predictions, forcing each neuron to learn robust, independent features.</li>
+<li><strong>Implicit Weight Sharing:</strong> We implicitly train an ensemble of 2<sup>N</sup> subnetworks (where N is the number of neurons) while sharing the same parameter weights.</li>
+<li><strong>Inference Scaling:</strong> During testing, all neurons are kept active, but their outputs are scaled down by multiplying by (1 - p) to match the expected activation values from training.</li>
+</ul>
+</div>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 5 -->
+<section class="topic-section" id="topic-5">
+<div class="topic-header" onclick="toggleSection('content-5')">
+<div class="topic-number">5</div>
+<h2>Batch Norm &amp; Data Augmentation</h2>
+</div>
+<div class="collapsible-content" id="content-5">
+<h3 id="sub-5-1">5.1 Batch Normalization</h3>
+<p><strong>Batch Normalization (Batch Norm)</strong> scales activation inputs within each training batch to have zero mean and unit variance. While primarily used to speed up training, it also acts as a regularizer:</p>
+<ul>
+<li><strong>Regularization Effect:</strong> Because the mean and variance are calculated over mini-batches, they introduce slight statistical noise. This noise prevents overfitting, sometimes making Dropout unnecessary.</li>
+<li><strong>Pros:</strong> Speeds up optimization, allows higher learning rates, and reduces sensitivity to parameter initialization.</li>
+<li><strong>Cons:</strong> Difficult to apply to recurrent models (RNNs/LSTMs) or online learning tasks where batch sizes are small.</li>
+<li><strong>Alternatives:</strong> Layer Normalization (normalizing across features instead of batch), Weight Normalization.</li>
+</ul>
+<h3 id="sub-5-2">5.2 Data Augmentation</h3>
+<p>The most effective way to prevent overfitting is to increase the training dataset size. If new data cannot be collected, we apply <strong>Data Augmentation</strong>:</p>
+<ul>
+<li>Create synthetic training samples by applying random transformations to existing inputs (e.g., rotating, flipping, scaling, cropping, or adding noise to images).</li>
+<li>This forces the model to learn invariant features (e.g., recognizing an object regardless of its orientation or position).</li>
+</ul>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+<button class="btn" disabled="True">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 6 -->
+
+<!-- Original PDF -->
+<section class="topic-section" id="original-pdf">
+<div class="topic-header" onclick="toggleSection('content-pdf')">
+<div class="topic-number" style="background:transparent; color: var(--text-dark); width: auto; margin-right: 0.5rem;">
+<svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+</div>
+<h2>Original PDF Notes</h2>
+</div>
+<div class="collapsible-content" id="content-pdf">
+<p>Below is the original PDF document for your reference:</p>
+<button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+<div id="pdfContainer" style="margin-top: 1rem;"></div>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+<button class="btn" disabled="">Next Topic</button>
+</div>
+</div>
+</section>
+</main>
+</div>
+<button id="backToTop" onclick="scrollToTop()">↑</button>
+<script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/8.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--border-light); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+<script src="../js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Deep Learning Foundations - Lecture 15</title>
+<meta content="Study notes for Deep Learning Foundations, Lecture 15 covering Gradient Clipping, Bidirectional RNNs, LSTMs, and GRUs." name="description"/>
+<link class="favicon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjIwIiBmaWxsPSIjMTMyMjE5Ii8+PHRleHQgeD0iNTAiIHk9IjUwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iNTUiIGZpbGw9IndoaXRlIiBmb250LXdlaWdodD0iYm9sZCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPjE1PC90ZXh0Pjwvc3ZnPg==" rel="icon"/>
+<link href="../css/style.css" rel="stylesheet"/>
+</head>
+<body>
+<header>
+<div class="header-titles">
+<h1>Deep Learning Foundations</h1>
+<p>Lecture 15 - Gated RNNs: LSTMs &amp; GRUs</p>
+<a href="../index.html" style="color: var(--text-dark); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+<span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+<a href="../pdfs/15.pdf" style="color: var(--text-dark); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+</div>
+<div class="search-container">
+<input id="searchInput" placeholder="Search notes..." type="text"/>
+</div>
+</header>
+<div class="container">
+<!-- Sidebar Index -->
+<aside>
+<div class="aside-header">
+<h3>Table of Contents</h3>
+<div class="topic-count">Total Topics: 5</div>
+</div>
+<ul class="index-list" id="indexList">
+<li>
+<a href="#topic-1">1. Gradient Clipping &amp; BiRNNs<span class="sub-count">2</span></a>
+<ul class="sub-index">
+<li><a href="#sub-1-1">1.1 Exploding Gradients &amp; Clipping</a></li>
+<li><a href="#sub-1-2">1.2 Bidirectional Recurrent Nets (BiRNN)</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-2">2. LSTM Gate Mechanics<span class="sub-count">2</span></a>
+<ul class="sub-index">
+<li><a href="#sub-2-1">2.1 Forget and Input Gates</a></li>
+<li><a href="#sub-2-2">2.2 Candidate and Output Gates</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-3">3. LSTM Memory Architecture<span class="sub-count">1</span></a>
+<ul class="sub-index">
+<li><a href="#sub-3-1">3.1 Cell State Information Superhighway</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-4">4. Gated Recurrent Units (GRU)<span class="sub-count">2</span></a>
+<ul class="sub-index">
+<li><a href="#sub-4-1">4.1 Reset and Update Gates</a></li>
+<li><a href="#sub-4-2">4.2 GRU Candidate State &amp; Updates</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-5">5. LSTM vs. GRU Comparison<span class="sub-count">1</span></a>
+<ul class="sub-index">
+<li><a href="#sub-5-1">5.1 Parameter &amp; Computation Trade-offs</a></li>
+</ul>
+</li>
+<li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+</ul>
+</aside>
+<!-- Main Content -->
+<main id="notesContent">
+<!-- Topic 1 -->
+<section class="topic-section" id="topic-1">
+<div class="topic-header" onclick="toggleSection('content-1')">
+<div class="topic-number">1</div>
+<h2>Gradient Clipping &amp; BiRNNs</h2>
+</div>
+<div class="collapsible-content" id="content-1">
+<h3 id="sub-1-1">1.1 Exploding Gradients &amp; Clipping</h3>
+<p>To prevent gradients from growing exponentially (exploding gradient problem) during BPTT on long sequences, we apply <strong>Gradient Clipping</strong>. When the norm of the gradient vector g exceeds a predefined threshold c, we rescale the gradient before updating weights:</p>
+<div class="formula-box">if ||g|| &gt; c:   g = c × [ g / ||g|| ]</div>
+<p>This operation scales down the gradient magnitude to fit within the threshold while keeping the direction of descent unchanged, ensuring training stability.</p>
+<h3 id="sub-1-2">1.2 Bidirectional Recurrent Nets (BiRNN)</h3>
+<p>Standard RNNs process sequences in chronological order (left-to-right), meaning the hidden state at step t only contains context from the past. However, tasks like translation or word disambiguation often require future context (e.g. classifying the word "bank" in "He sat by the bank to watch the water" vs. "He went to the bank to withdraw money"):</p>
+<ul>
+<li><strong>Structure:</strong> A <strong>Bidirectional RNN (BiRNN)</strong> uses two separate hidden layers. One layer processes the sequence forward (past context), and the other processes the sequence backward (future context). Their outputs are concatenated at each step.</li>
+<li><strong>Streaming Limitation:</strong> Since the backward pass requires reading the entire input, BiRNNs cannot be deployed for real-time streaming tasks where the future is unavailable.</li>
+</ul>
+<div class="topic-nav">
+<button class="btn" disabled="">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 2 -->
+<section class="topic-section" id="topic-2">
+<div class="topic-header" onclick="toggleSection('content-2')">
+<div class="topic-number">2</div>
+<h2>LSTM Gate Mechanics</h2>
+</div>
+<div class="collapsible-content" id="content-2">
+<h3 id="sub-2-1">2.1 Forget and Input Gates</h3>
+<p>The <strong>Long Short-Term Memory (LSTM)</strong> network (Hochreiter &amp; Schmidhuber, 1997) addresses the vanishing gradient problem by separating memory storage from output generation. LSTMs regulate information flow using multiplicative gates:</p>
+<ul>
+<li><strong>Forget Gate (f<sub>t</sub>):</strong> Decides what information to discard from the long-term memory (cell state). Outputs values between 0 (forget completely) and 1 (keep completely) using a sigmoid activation:
+                            <div style="font-family: monospace; font-size: 1.05rem; margin: 0.5rem 0;">f<sub>t</sub> = σ(W<sub>f</sub> [h<sub>t-1</sub>, x<sub>t</sub>] + b<sub>f</sub>)</div>
+</li>
+<li><strong>Input Gate (i<sub>t</sub>):</strong> Decides which new features to write into the cell state:
+                            <div style="font-family: monospace; font-size: 1.05rem; margin: 0.5rem 0;">i<sub>t</sub> = σ(W<sub>i</sub> [h<sub>t-1</sub>, x<sub>t</sub>] + b<sub>i</sub>)</div>
+</li>
+</ul>
+<h3 id="sub-2-2">2.2 Candidate and Output Gates</h3>
+<ul>
+<li><strong>Candidate Cell State (C̃<sub>t</sub>):</strong> Computes new candidate values to add to the memory using a tanh activation:
+                            <div style="font-family: monospace; font-size: 1.05rem; margin: 0.5rem 0;">C̃<sub>t</sub> = tanh(W<sub>c</sub> [h<sub>t-1</sub>, x<sub>t</sub>] + b<sub>c</sub>)</div>
+</li>
+<li><strong>Output Gate (o<sub>t</sub>):</strong> Decides what information to read from the cell state to produce the short-term memory (hidden state h<sub>t</sub>):
+                            <div style="font-family: monospace; font-size: 1.05rem; margin: 0.5rem 0;">o<sub>t</sub> = σ(W<sub>o</sub> [h<sub>t-1</sub>, x<sub>t</sub>] + b<sub>o</sub>)</div>
+<div style="font-family: monospace; font-size: 1.05rem; margin: 0.5rem 0;">h<sub>t</sub> = o<sub>t</sub> ⊙ tanh(C<sub>t</sub>)</div>
+</li>
+</ul>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 3 -->
+<section class="topic-section" id="topic-3">
+<div class="topic-header" onclick="toggleSection('content-3')">
+<div class="topic-number">3</div>
+<h2>LSTM Memory Architecture</h2>
+</div>
+<div class="collapsible-content" id="content-3">
+<h3 id="sub-3-1">3.1 Cell State Information Superhighway</h3>
+<p>The core innovation of the LSTM is the <strong>cell state (C<sub>t</sub>)</strong>, which runs linearly through the entire sequence chain. The cell state update is computed as:</p>
+<div class="formula-box">C<sub>t</sub> = f<sub>t</sub> ⊙ C<sub>t-1</sub> + i<sub>t</sub> ⊙ C̃<sub>t</sub></div>
+<p>Where ⊙ represents element-wise (Hadamard) multiplication. Because the update is additive rather than multiplicative, backpropagating errors along the cell state does not require repeated matrix multiplications by W<sub>hh</sub>. The cell state acts as an <strong>information superhighway</strong>, allowing gradients to flow backward through time without vanishing.</p>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 4 -->
+<section class="topic-section" id="topic-4">
+<div class="topic-header" onclick="toggleSection('content-4')">
+<div class="topic-number">4</div>
+<h2>Gated Recurrent Units (GRU)</h2>
+</div>
+<div class="collapsible-content" id="content-4">
+<h3 id="sub-4-1">4.1 Reset and Update Gates</h3>
+<p>Introduced by Cho et al. (2014), the <strong>Gated Recurrent Unit (GRU)</strong> is a simplified alternative to the LSTM. It merges the cell state and hidden state into a single state h<sub>t</sub> and uses only two gates:</p>
+<ul>
+<li><strong>Reset Gate (r<sub>t</sub>):</strong> Decides how much of the past hidden state to forget when computing the new candidate state:
+                            <div style="font-family: monospace; font-size: 1.05rem; margin: 0.5rem 0;">r<sub>t</sub> = σ(W<sub>r</sub> [h<sub>t-1</sub>, x<sub>t</sub>] + b<sub>r</sub>)</div>
+</li>
+<li><strong>Update Gate (z<sub>t</sub>):</strong> Acts as a combined forget and input gate, determining how much of the previous state h<sub>t-1</sub> to keep versus how much new content to write:
+                            <div style="font-family: monospace; font-size: 1.05rem; margin: 0.5rem 0;">z<sub>t</sub> = σ(W<sub>z</sub> [h<sub>t-1</sub>, x<sub>t</sub>] + b<sub>z</sub>)</div>
+</li>
+</ul>
+<h3 id="sub-4-2">4.2 GRU Candidate State &amp; Updates</h3>
+<p>The candidate state and hidden state updates are computed as follows:</p>
+<div class="box box-blue">
+<div class="box-title">GRU Equations</div>
+<ul>
+<li><strong>Candidate State (h̃<sub>t</sub>):</strong> Applies the reset gate to the previous hidden state:
+                                <div style="font-family: monospace; font-size: 1.05rem; margin: 0.25rem 0;">h̃<sub>t</sub> = tanh(W<sub>h</sub> [r<sub>t</sub> ⊙ h<sub>t-1</sub>, x<sub>t</sub>] + b<sub>h</sub>)</div>
+</li>
+<li><strong>Hidden State Update (h<sub>t</sub>):</strong> Linearly interpolates between the previous state and candidate state using the update gate:
+                                <div style="font-family: monospace; font-size: 1.05rem; margin: 0.25rem 0;">h<sub>t</sub> = (1 - z<sub>t</sub>) ⊙ h<sub>t-1</sub> + z<sub>t</sub> ⊙ h̃<sub>t</sub></div>
+</li>
+</ul>
+</div>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 5 -->
+<section class="topic-section" id="topic-5">
+<div class="topic-header" onclick="toggleSection('content-5')">
+<div class="topic-number">5</div>
+<h2>LSTM vs. GRU Comparison</h2>
+</div>
+<div class="collapsible-content" id="content-5">
+<h3 id="sub-5-1">5.1 Parameter &amp; Computation Trade-offs</h3>
+<p>When selecting between LSTMs and GRUs, engineers evaluate the following trade-offs:</p>
+<ul>
+<li><strong>Parameters &amp; Compute:</strong> GRUs have only two gates, while LSTMs have three. GRUs use fewer parameters (roughly 3/4 the weight matrices of LSTMs), making them faster to train and computationally cheaper.</li>
+<li><strong>Capacity:</strong> LSTMs maintain separate short-term and long-term memory states, which can perform better on large datasets with complex, long-range dependencies.</li>
+<li><strong>Heuristic Rule:</strong> Start with LSTM as the default choice. If training speed, parameter constraints, or hardware limits are key, switch to GRUs. Both models yield similar performance in practice.</li>
+</ul>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+<button class="btn" disabled="">Next Topic</button>
+</div>
+</div>
+</section>
+
+<!-- Original PDF -->
+<section class="topic-section" id="original-pdf">
+<div class="topic-header" onclick="toggleSection('content-pdf')">
+<div class="topic-number" style="background:transparent; color: var(--text-dark); width: auto; margin-right: 0.5rem;">
+<svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+</div>
+<h2>Original PDF Notes</h2>
+</div>
+<div class="collapsible-content" id="content-pdf">
+<p>Below is the original PDF document for your reference:</p>
+<button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+<div id="pdfContainer" style="margin-top: 1rem;"></div>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+<button class="btn" disabled="">Next Topic</button>
+</div>
+</div>
+</section>
+</main>
+</div>
+<button id="backToTop" onclick="scrollToTop()">↑</button>
+<script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/15.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--border-light); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+<script src="../js/script.js"></script>
+</body>
+</html>

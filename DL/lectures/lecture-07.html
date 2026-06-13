@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Deep Learning Foundations - Lecture 07</title>
+<meta content="Study notes for Deep Learning Foundations, Lecture 07 covering network composition, space folding, depth vs. width trade-offs, probability distributions, Maximum Likelihood Estimation, and loss function derivations." name="description"/>
+<link class="favicon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjIwIiBmaWxsPSIjMTMyMjE5Ii8+PHRleHQgeD0iNTAiIHk9IjUwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iNTUiIGZpbGw9IndoaXRlIiBmb250LXdlaWdodD0iYm9sZCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiPjA3PC90ZXh0Pjwvc3ZnPg==" rel="icon"/>
+<link href="../css/style.css" rel="stylesheet"/>
+</head>
+<body>
+<header>
+<div class="header-titles">
+<h1>Deep Learning Foundations</h1>
+<p>Lecture 07 - Network Composition, Capacity, &amp; Loss Recipes</p>
+<a href="../index.html" style="color: var(--text-dark); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+<span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+<a href="../pdfs/7.pdf" style="color: var(--text-dark); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+</div>
+<div class="search-container">
+<input id="searchInput" placeholder="Search notes..." type="text"/>
+</div>
+</header>
+<div class="container">
+<!-- Sidebar Index -->
+<aside>
+<div class="aside-header">
+<h3>Table of Contents</h3>
+<div class="topic-count">Total Topics: 5</div>
+</div>
+<ul class="index-list" id="indexList">
+<li>
+<a href="#topic-1">1. Space Folding &amp; Composition<span class="sub-count">2</span></a>
+<ul class="sub-index">
+<li><a href="#sub-1-1">1.1 Geometric Composition</a></li>
+<li><a href="#sub-1-2">1.2 Folding the Input Space</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-2">2. Depth vs. Width Capacity<span class="sub-count">3</span></a>
+<ul class="sub-index">
+<li><a href="#sub-2-1">2.1 Role of Width</a></li>
+<li><a href="#sub-2-2">2.2 Role of Depth</a></li>
+<li><a href="#sub-2-3">2.3 Depth/Width Trade-offs</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-3">3. Predicting Probability Distributions<span class="sub-count">2</span></a>
+<ul class="sub-index">
+<li><a href="#sub-3-1">3.1 Shift from Single Values</a></li>
+<li><a href="#sub-3-2">3.2 Distribution Modeling</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-4">4. MLE &amp; Negative Log-Likelihood<span class="sub-count">2</span></a>
+<ul class="sub-index">
+<li><a href="#sub-4-1">4.1 Likelihood Maximization</a></li>
+<li><a href="#sub-4-2">4.2 Floating-Point Underflow</a></li>
+</ul>
+</li>
+<li>
+<a href="#topic-5">5. Universal Loss Recipe Derivations<span class="sub-count">2</span></a>
+<ul class="sub-index">
+<li><a href="#sub-5-1">5.1 Binary Cross-Entropy Derivation</a></li>
+<li><a href="#sub-5-2">5.2 Mean Squared Error Derivation</a></li>
+</ul>
+</li>
+
+<li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+</ul>
+</aside>
+<!-- Main Content -->
+<main id="notesContent">
+<!-- Topic 1 -->
+<section class="topic-section" id="topic-1">
+<div class="topic-header" onclick="toggleSection('content-1')">
+<div class="topic-number">1</div>
+<h2>Space Folding &amp; Composition</h2>
+</div>
+<div class="collapsible-content" id="content-1">
+<h3 id="sub-1-1">1.1 Geometric Composition</h3>
+<p>Stacking layers in deep networks can be interpreted geometrically as a sequence of function compositions. Each layer transforms the coordinate space, modifying the data before passing it to subsequent layers.</p>
+<h3 id="sub-1-2">1.2 Folding the Input Space</h3>
+<p>An intuitive way to visualize deep networks is through the concept of <strong>space folding</strong>:</p>
+<ul>
+<li>The first hidden layer "folds" the input space x back onto itself along activation boundaries.</li>
+<li>This folding maps multiple distinct coordinates in the input space to the same post-activation location.</li>
+<li>Subsequent layers perform additional folds, allowing a simple linear output function to be replicated across all folded regions.</li>
+</ul>
+<div class="box box-blue">
+<div class="box-title">Space Folding Advantages</div>
+<p>Folding allows deep neural networks to represent complex, highly oscillatory, or symmetric patterns with a tiny fraction of the parameters that a flat, unfolded boundary would require.</p>
+</div>
+<div class="topic-nav">
+<button class="btn" disabled="">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 2 -->
+<section class="topic-section" id="topic-2">
+<div class="topic-header" onclick="toggleSection('content-2')">
+<div class="topic-number">2</div>
+<h2>Depth vs. Width Capacity</h2>
+</div>
+<div class="collapsible-content" id="content-2">
+<p>The expressiveness and capacity of a neural network are determined by its dimensions: width and depth.</p>
+<h3 id="sub-2-1">2.1 Role of Width</h3>
+<p><strong>Width (D):</strong> The number of neurons in a hidden layer. Width represents <strong>memory and capacity</strong>:</p>
+<ul>
+<li>Increasing layer width allows the model to capture fine-grained variations and independent features simultaneously.</li>
+<li>Wide networks perform well on simpler tasks (e.g., shallow classification or regression with less complex relationships) where a few wide layers can detect all necessary patterns without hierarchical composition.</li>
+</ul>
+<h3 id="sub-2-2">2.2 Role of Depth</h3>
+<p><strong>Depth (K):</strong> The number of sequential hidden layers. Depth represents <strong>abstraction</strong> and provides <strong>compositional efficiency</strong>:</p>
+<ul>
+<li>A deep network can represent complex functions using only <strong>O(N)</strong> parameters, whereas a shallow network would require <strong>O(2<sup>N</sup>)</strong> parameters to capture the same complexity.</li>
+<li><strong>Face Analogy:</strong> It is much simpler to define a face abstractly as a composition of high-level features (Eyes + Nose + Mouth) than to describe the color values of every pixel coordinate independently.</li>
+</ul>
+<h3 id="sub-2-3">2.3 Depth/Width Trade-offs</h3>
+<p>When designing model architectures, we must balance these metrics:</p>
+<div class="box box-green">
+<div class="box-title">Architecture Trade-off Summary</div>
+<ul>
+<li><strong>Go Deeper (Modern Trend):</strong>
+<ul>
+<li><em>Pros:</em> Higher parameter efficiency, captures hierarchical features, matches real-world compositionality.</li>
+<li><em>Cons:</em> Harder to train (susceptible to vanishing/exploding gradients).</li>
+</ul>
+</li>
+<li><strong>Go Wider:</strong>
+<ul>
+<li><em>Pros:</em> Easier to optimize (produces a smoother loss landscape), highly parallelizable on GPUs.</li>
+<li><em>Cons:</em> High risk of overfitting, low parameter efficiency for hierarchical patterns.</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 3 -->
+<section class="topic-section" id="topic-3">
+<div class="topic-header" onclick="toggleSection('content-3')">
+<div class="topic-number">3</div>
+<h2>Predicting Probability Distributions</h2>
+</div>
+<div class="collapsible-content" id="content-3">
+<h3 id="sub-3-1">3.1 Shift from Single Values</h3>
+<p>A major perspective shift in deep learning is treating the network as a system that predicts <strong>probability distributions</strong> rather than isolated raw values. Instead of predicting a label directly, the network estimates the parameters of a conditional probability distribution, P(y | x; θ).</p>
+<h3 id="sub-3-2">3.2 Distribution Modeling</h3>
+<p>By mapping network outputs to parameters of standard distributions, we unify regression and classification:</p>
+<ul>
+<li><strong>Binary Classification:</strong> We assume the targets follow a <strong>Bernoulli distribution</strong>. The network predicts the parameter φ (probability of class 1) using a Sigmoid output activation.</li>
+<li><strong>Regression:</strong> We assume the targets follow a <strong>Gaussian (Normal) distribution</strong>. The network predicts the mean μ of the distribution using a Linear output activation.</li>
+</ul>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 4 -->
+<section class="topic-section" id="topic-4">
+<div class="topic-header" onclick="toggleSection('content-4')">
+<div class="topic-number">4</div>
+<h2>MLE &amp; Negative Log-Likelihood</h2>
+</div>
+<div class="collapsible-content" id="content-4">
+<h3 id="sub-4-1">4.1 Likelihood Maximization</h3>
+<p>Under Maximum Likelihood Estimation (MLE), we optimize the network parameters θ to maximize the probability (likelihood) of observing the actual training labels given our input data:</p>
+<div class="formula-box">L(θ) = ∏ P(y<sub>i</sub> | x<sub>i</sub>; θ)</div>
+<h3 id="sub-4-2">4.2 Floating-Point Underflow</h3>
+<p>We do not maximize the likelihood function directly for two reasons:</p>
+<ol>
+<li><strong>Underflow:</strong> Individual probability values are small (between 0 and 1). Multiplying thousands of these probabilities repeatedly yields extremely small numbers that trigger floating-point underflow errors in computer hardware.</li>
+<li><strong>Mathematical Convenience:</strong> Maximizing products is mathematically complex. By taking the logarithm, we convert the product of probabilities into a summation:
+                            <div class="formula-box">log L(θ) = ∑ log P(y<sub>i</sub> | x<sub>i</sub>; θ)</div>
+</li>
+</ol>
+<p>Because optimization libraries are designed to minimize functions (rather than maximize them), we multiply by -1. This yields the <strong>Negative Log-Likelihood (NLL)</strong> loss function, which we minimize:</p>
+<div class="formula-box">J(θ) = - ∑ log P(y<sub>i</sub> | x<sub>i</sub>; θ)</div>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+<button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 5 -->
+<section class="topic-section" id="topic-5">
+<div class="topic-header" onclick="toggleSection('content-5')">
+<div class="topic-number">5</div>
+<h2>Universal Loss Recipe Derivations</h2>
+</div>
+<div class="collapsible-content" id="content-5">
+<p>By applying Negative Log-Likelihood to different output probability distributions, we can derive standard loss functions:</p>
+<h3 id="sub-5-1">5.1 Binary Cross-Entropy Derivation</h3>
+<p>For binary classification where targets y ∈ {0, 1}, we assume a Bernoulli trial with probability φ predicted by the network:</p>
+<div class="formula-box">P(y | x; θ) = φ<sup>y</sup> (1 - φ)<sup>1-y</sup></div>
+<p>Taking the negative logarithm of this probability for a single data point:</p>
+<div class="formula-box">-log P(y | x; θ) = -log( φ<sup>y</sup> (1 - φ)<sup>1-y</sup> )</div>
+<div class="formula-box">= - ( y log(φ) + (1 - y) log(1 - φ) )</div>
+<p>This is exactly the formula for <strong>Binary Cross-Entropy (BCE)</strong> loss.</p>
+<h3 id="sub-5-2">5.2 Mean Squared Error Derivation</h3>
+<p>For regression, we assume the targets follow a Gaussian distribution centered at the predicted value μ with variance σ<sup>2</sup>:</p>
+<div class="formula-box">P(y | x; θ) = [ 1 / √(2πσ<sup>2</sup>) ] × exp( - (y - μ)<sup>2</sup> / (2σ<sup>2</sup>) )</div>
+<p>Taking the negative logarithm:</p>
+<div class="formula-box">-log P(y | x; θ) = -log( 1 / √(2πσ<sup>2</sup>) ) + (y - μ)<sup>2</sup> / (2σ<sup>2</sup>)</div>
+<p>Assuming constant variance σ<sup>2</sup>, the first term is a constant. Minimizing this negative log-likelihood is equivalent to minimizing the remaining term:</p>
+<div class="formula-box">Loss ∝ (y - μ)<sup>2</sup></div>
+<p>This is the <strong>Mean Squared Error (MSE)</strong> / L2 loss. This proves that MSE is a direct mathematical consequence of assuming Gaussian noise under Maximum Likelihood Estimation.</p>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+<button class="btn" disabled="True">Next Topic</button>
+</div>
+</div>
+</section>
+<!-- Topic 6 -->
+
+<!-- Original PDF -->
+<section class="topic-section" id="original-pdf">
+<div class="topic-header" onclick="toggleSection('content-pdf')">
+<div class="topic-number" style="background:transparent; color: var(--text-dark); width: auto; margin-right: 0.5rem;">
+<svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+</div>
+<h2>Original PDF Notes</h2>
+</div>
+<div class="collapsible-content" id="content-pdf">
+<p>Below is the original PDF document for your reference:</p>
+<button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+<div id="pdfContainer" style="margin-top: 1rem;"></div>
+<div class="topic-nav">
+<button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+<button class="btn" disabled="">Next Topic</button>
+</div>
+</div>
+</section>
+</main>
+</div>
+<button id="backToTop" onclick="scrollToTop()">↑</button>
+<script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/7.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--border-light); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+<script src="../js/script.js"></script>
+</body>
+</html>

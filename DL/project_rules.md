@@ -54,6 +54,7 @@ Every new lecture page MUST be an exact structural clone of `lecture-01.html`.
 - **Favicons:** Use an SVG data URI in the `<head>` representing the lecture number (e.g., a blue rounded square with "01" in the center).
 
 ### Content Formatting
+- **No Markdown Syntax:** Do NOT use markdown syntax (such as **text** or *text*) in HTML files for formatting bold or italic text. Use standard HTML tags like <strong> or <em> instead.
 - **Information Boxes:** Use the predefined CSS classes to highlight information:
   - `.box-blue`: For Definitions and standard data.
   - `.box-green`: For Analogies and positive points.
