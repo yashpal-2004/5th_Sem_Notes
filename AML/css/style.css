@@ -94,20 +94,90 @@ header {
     margin: 0 auto;
     padding: 3rem 4rem;
     display: grid;
-    grid-template-columns: 320px 1fr;
+    grid-template-columns: 56px 1fr;
     gap: 4rem;
+    position: relative;
 }
 
-/* Sidebar Index */
+/* Sidebar Index - Hover Expand */
 aside {
     position: sticky;
     top: 120px;
-    height: calc(100vh - 160px);
+    height: auto;
+    max-height: 145px;
+    width: 56px;
     overflow-y: auto;
+    overflow-x: hidden;
     background: var(--bg-mint);
-    padding: 1.75rem;
+    padding: 0.85rem 0.5rem;
     border-radius: 12px;
     border: 1px solid var(--border-light);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), max-height 0.3s ease, padding 0.3s ease, box-shadow 0.3s ease;
+    z-index: 100;
+}
+
+aside:hover {
+    width: 320px;
+    height: calc(100vh - 160px);
+    max-height: calc(100vh - 160px);
+    padding: 1.75rem;
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.18);
+}
+
+.aside-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-light);
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    white-space: nowrap;
+}
+
+/* Hide content when collapsed, fade in on hover */
+aside .aside-header h3,
+aside .aside-header .topic-count,
+aside .index-list {
+    opacity: 0;
+    visibility: hidden;
+    height: 0;
+    overflow: hidden;
+    transition: opacity 0.2s ease 0.05s, visibility 0.2s ease;
+}
+
+aside:hover .aside-header h3,
+aside:hover .aside-header .topic-count,
+aside:hover .index-list {
+    opacity: 1;
+    visibility: visible;
+    height: auto;
+    overflow: visible;
+}
+
+/* Collapsed indicator icon & label */
+.sidebar-hover-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: var(--text-dark);
+    padding: 0.25rem 0;
+    transition: opacity 0.2s ease;
+}
+
+.sidebar-hover-icon span {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+}
+
+aside:hover .sidebar-hover-icon {
+    display: none;
 }
 
 /* Custom scrollbar for sidebar */
