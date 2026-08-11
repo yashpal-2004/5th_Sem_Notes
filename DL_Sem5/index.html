@@ -3,49 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>5th Sem Notes Dashboard</title>
-    <meta name="description" content="Central Hub for Newton School of Technology 5th Semester Course Notes (OS, Advanced Machine Learning, Deep Learning).">
+    <title>Deep Learning (Sem 5) - Lectures</title>
+    <meta name="description" content="Dashboard for Deep Learning (Sem 5) lecture notes.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/home.css?v=1.1">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23000000%22/><circle cx=%2250%22 cy=%2228%22 r=%2214%22 fill=%22white%22/><circle cx=%2226%22 cy=%2270%22 r=%2214%22 fill=%22white%22/><circle cx=%2274%22 cy=%2270%22 r=%2214%22 fill=%22white%22/></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2240%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>DL</text></svg>">
 </head>
 <body>
 
     <!-- Navigation Bar -->
     <nav>
-        <a href="index.html" class="logo-container">
+        <a href="../index.html" class="logo-container">
             <svg class="logo-symbol" viewBox="0 0 24 24">
                 <circle cx="12" cy="6" r="3"/>
                 <circle cx="6" cy="16" r="3"/>
                 <circle cx="18" cy="16" r="3"/>
             </svg>
-            <span class="logo-text">NST Notes</span>
+            <span class="logo-text">DL Notes</span>
         </a>
         <ul class="nav-menu">
-            <li><a href="DL_Sem5/index.html">Deep Learning (Sem 5)</a></li>
-            <li><a href="archive.html">Archive</a></li>
+            <li><a href="../index.html">Main Hub</a></li>
+            <li><a href="../archive.html">Archive</a></li>
         </ul>
         <div class="nav-stats">1 Lecture &bull; 5 Topics</div>
     </nav>
 
-
-
-    <!-- Coursework / Solutions Section -->
+    <!-- Lectures Section -->
     <section class="coursework-section">
         <div class="coursework-container">
-            <h3 class="section-label">Our Coursework</h3>
-            <div class="subject-grid">
+            <h3 class="section-label">Compiled Lectures</h3>
+            <div class="lectures-grid">
                 
-                <!-- Deep Learning Sem 5 -->
-                <a href="DL_Sem5/index.html" class="subject-card">
-                    <div class="subject-number">01</div>
-                    <h2 class="subject-title">Deep Learning</h2>
-                    <p class="subject-desc">Master neural networks from first principles: biological neurons, McCulloch-Pitts logic gates, forward/backward propagation, linear separation limits, and the XOR problem.</p>
-                    <div class="subject-meta">
-                        <span class="subject-tag">DL Foundations (Sem 5)</span>
-                        <span class="subject-stats">1 Lecture</span>
+                <!-- Lecture 01 -->
+                <a href="lectures/lecture-01.html" class="lecture-card">
+                    <div class="lecture-number">01</div>
+                    <h2>Where it Begins: The Neuron & Decision Boundaries</h2>
+                    <p>Biological neurons, McCulloch & Pitts threshold logic gates (AND, OR, NOT), perceptron forward/backward propagation, linear separation, and the XOR limitation.</p>
+                    <div class="lecture-card-header">
+                        <span class="lecture-tag">Foundations</span>
+                        <span class="lecture-stats">5 Topics</span>
                     </div>
                 </a>
 
@@ -55,23 +53,23 @@
 
     <!-- Statistics Section -->
     <section id="metrics" class="stats-section">
-        <h3 class="stats-title">Browse compile metrics</h3>
+        <h3 class="stats-title">DL Notes Metrics</h3>
         <div class="stats-grid">
             <div class="stat-item">
                 <div class="stat-val">1</div>
-                <div class="stat-label">Total Lectures</div>
+                <div class="stat-label">Lecture Compiled</div>
             </div>
             <div class="stat-item">
                 <div class="stat-val">5</div>
-                <div class="stat-label">Topics Compiled</div>
+                <div class="stat-label">Topics</div>
             </div>
             <div class="stat-item">
-                <div class="stat-val">1</div>
-                <div class="stat-label">Subjects Managed</div>
+                <div class="stat-val">0</div>
+                <div class="stat-label">Diagrams Embedded</div>
             </div>
             <div class="stat-item">
                 <div class="stat-val">100%</div>
-                <div class="stat-label">Completion Rate</div>
+                <div class="stat-label">Completed</div>
             </div>
         </div>
     </section>
