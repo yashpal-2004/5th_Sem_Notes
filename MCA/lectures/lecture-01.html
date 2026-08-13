@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Modern Computer Architecture - Lecture 01</title>
+    <meta content="Study notes for Modern Computer Architecture (CS222), Lecture 01 covering the abstraction stack, architecture vs organization, Boolean algebra, logic gates, and NAND/NOR universality." name="description"/>
+    <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>01</text></svg>" rel="icon"/>
+    <link href="../css/style.css" rel="stylesheet"/>
+</head>
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Modern Computer Architecture</h1>
+            <p>Lecture 01 - Course Intro & Boolean Algebra</p>
+            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/1.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text"/>
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 5</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>Short Notes</a></li>
+                <li>
+                    <a href="#topic-1">1. Welcome to Computer Architecture<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 The Promise and the Goal</a></li>
+                        <li><a href="#sub-1-2">1.2 Why Architecture Matters</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Architecture vs. Organization<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 Core Definitions</a></li>
+                        <li><a href="#sub-2-2">2.2 The Programmer Contract</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. The Abstraction Stack<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 Layer-by-layer Breakdown</a></li>
+                        <li><a href="#sub-3-2">3.2 Tracing a Single Line of Code</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Boolean Basics & Logic Gates<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 Voltage Representation of 1 and 0</a></li>
+                        <li><a href="#sub-4-2">4.2 Fundamental Logic Gates</a></li>
+                        <li><a href="#sub-4-3">4.3 NAND & NOR: Universal Gates</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Boolean Laws & Simplification<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 Core Algebraic Laws</a></li>
+                        <li><a href="#sub-5-2">5.2 Worked Algebraic Minimization</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Short Notes -->
+            <section id="short-notes" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-short-notes')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                    </div>
+                    <h2>Short Notes &amp; Visual Summary</h2>
+                </div>
+                <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
+                    <p style="margin-bottom: 1rem;">Handwritten / quick summary notes for Lecture 01:</p>
+                    <div style="text-align: center; background: var(--bg-secondary, #f8f9fa); padding: 1rem; border-radius: 8px; border: 1px solid var(--gray-border);">
+                        <a href="../images/1.png" target="_blank" title="Click to view full size">
+                            <img src="../images/1.png" alt="Lecture 01 Short Notes" style="max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
+                        </a>
+                        <p style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-muted);">Click image to open high-resolution version in new tab</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 1 -->
+            <section class="topic-section" id="topic-1">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>Welcome to Computer Architecture</h2>
+                </div>
+                <div class="collapsible-content" id="content-1">
+                    <h3 id="sub-1-1">1.1 The Promise and the Goal</h3>
+                    <p>Computer Architecture is the course that reveals what is happening beneath every line of code you have ever written. By the end of this course, you will understand from the ground up how a computer actually executes a program—moving beyond vague explanations to trace instructions directly from transistors, through logic gates, registers, and datapaths, up to assembly language and Python.</p>
+                    
+                    <h3 id="sub-1-2">1.2 Why Architecture Matters</h3>
+                    <p>Understanding the hardware layer is critical for several reasons:</p>
+                    <ul>
+                        <li><strong>Performance:</strong> Knowing how caches and pipelines work is the difference between writing slow loops and code that runs 100x faster.</li>
+                        <li><strong>AI / ML Optimization:</strong> GPUs, TPUs, and tensor cores are pure hardware architecture. You cannot optimize neural network execution without understanding the underlying hardware constraints.</li>
+                        <li><strong>Systems Depth:</strong> Fields like operating systems, compilers, and databases rest entirely on the hardware execution model.</li>
+                    </ul>
+                    <div class="box box-blue">
+                        <div class="box-title">Key Insight</div>
+                        <p>Computer architecture separates software engineers who merely use computers from systems engineers who deeply understand how computation is physically carried out.</p>
+                    </div>
+                    <div class="topic-nav">
+                        <button class="btn" disabled="">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section class="topic-section" id="topic-2">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>Architecture vs. Organization</h2>
+                </div>
+                <div class="collapsible-content" id="content-2">
+                    <h3 id="sub-2-1">2.1 Core Definitions</h3>
+                    <p>Computer design is split into two complementary fields:</p>
+                    <ul>
+                        <li><strong>Computer Architecture:</strong> Refers to the attributes of a system visible to a programmer. It acts as the interface—defining what instructions a CPU offers, what registers are available, and how memory is addressed.</li>
+                        <li><strong>Computer Organization:</strong> Refers to the operational units and their interconnections that realize the architectural specifications. It acts as the implementation—dealing with pipelines, caches, control signals, and clock speeds, all of which are hidden from the programmer.</li>
+                    </ul>
+
+                    <h3 id="sub-2-2">2.2 The Programmer Contract</h3>
+                    <p>Architecture defines the programmer's contract. For example, a contract specifies: <em>"This CPU supports an ADD instruction."</em> Organization describes how that instruction is physically implemented: <em>"The ADD is executed in 1 clock cycle using a carry-lookahead adder."</em></p>
+                    <div class="box box-green">
+                        <div class="box-title">Analogy</div>
+                        <p>Think of computer architecture as the driver's interface in a car (steering wheel, pedals, dashboard metrics), while organization represents the engineering under the hood (engine pistons, fuel injection systems, transmission gears).</p>
+                    </div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section class="topic-section" id="topic-3">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>The Abstraction Stack</h2>
+                </div>
+                <div class="collapsible-content" id="content-3">
+                    <h3 id="sub-3-1">3.1 Layer-by-layer Breakdown</h3>
+                    <p>Computing is managed through a layered stack of abstractions, where each layer hides the implementation details of the layer below it:</p>
+                    <ol>
+                        <li><strong>AI / ML Models:</strong> Neural networks and training algorithms.</li>
+                        <li><strong>Applications &amp; Languages:</strong> Python programs, C++ source code.</li>
+                        <li><strong>Operating System:</strong> Coordinates processes, memory management, and file systems.</li>
+                        <li><strong>Instruction Set Architecture (ISA):</strong> The CPU's vocabulary (machine instructions).</li>
+                        <li><strong>Datapath &amp; Control:</strong> Registers, Arithmetic Logic Units (ALUs), and Finite State Machines (FSMs).</li>
+                        <li><strong>Logic Gates:</strong> AND, OR, NOT, XOR gates.</li>
+                        <li><strong>Transistors:</strong> Physical silicon switches.</li>
+                    </ol>
+
+                    <h3 id="sub-3-2">3.2 Tracing a Single Line of Code</h3>
+                    <p>Let's trace how the statement <strong>A[i] = B[i] + C[i]</strong> travels down the abstraction stack to the physical silicon:</p>
+                    <ul>
+                        <li><strong>Python:</strong> You write one line: <code>A[i] = B[i] + C[i]</code>.</li>
+                        <li><strong>Machine Code:</strong> The compiler converts it into instructions like load-word (<code>lw</code>), addition (<code>add</code>), and store-word (<code>sw</code>).</li>
+                        <li><strong>Datapath:</strong> Registers feed data into the ALU, which performs the addition and writes the result back.</li>
+                        <li><strong>Gates &amp; Transistors:</strong> The addition is executed by gates constructed from silicon switches turning on and off.</li>
+                    </ul>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section class="topic-section" id="topic-4">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>Boolean Basics &amp; Logic Gates</h2>
+                </div>
+                <div class="collapsible-content" id="content-4">
+                    <h3 id="sub-4-1">4.1 Voltage Representation of 1 and 0</h3>
+                    <p>At the physical layer, everything is represented by two values:</p>
+                    <ul>
+                        <li><strong>1 (TRUE / HIGH):</strong> Represents the presence of voltage (e.g., ~3.3V or 5V).</li>
+                        <li><strong>0 (FALSE / LOW):</strong> Represents the absence of voltage (~0V, or ground).</li>
+                    </ul>
+                    <p>Computers achieve high reliability because they only need to distinguish between these two discrete voltage thresholds.</p>
+
+                    <h3 id="sub-4-2">4.2 Fundamental Logic Gates</h3>
+                    <p>The core gates are described completely by their truth tables, which specify outputs for all input combinations:</p>
+                    
+                    <div class="box box-orange">
+                        <div class="box-title">Gate Truth Tables</div>
+                        <ul>
+                            <li><strong>NOT Gate:</strong> Output is the inverse of the input.
+                                <p style="font-family: monospace;">Y = A' (NOT A)</p>
+                            </li>
+                            <li><strong>AND Gate:</strong> Output is 1 only when BOTH inputs are 1.
+                                <p style="font-family: monospace;">Y = A &middot; B</p>
+                            </li>
+                            <li><strong>OR Gate:</strong> Output is 1 when AT LEAST ONE input is 1.
+                                <p style="font-family: monospace;">Y = A + B</p>
+                            </li>
+                            <li><strong>XOR Gate:</strong> Output is 1 when the inputs DIFFER.
+                                <p style="font-family: monospace;">Y = A &oplus; B</p>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <h3 id="sub-4-3">4.3 NAND &amp; NOR: Universal Gates</h3>
+                    <p>NAND (NOT-AND) and NOR (NOT-OR) gates are **universal gates**. This means that using only NAND gates (or only NOR gates), you can build AND, OR, and NOT gates—and therefore any logic circuit whatsoever.</p>
+                    <p>For example, a NOT gate can be constructed using a single NAND gate by tying its inputs together:</p>
+                    <p style="text-align: center; font-family: monospace; font-size: 1.1rem; font-weight: bold;">NOT A = A NAND A</p>
+                    <div class="box box-beige">
+                        <div class="box-title">Silicon Optimization</div>
+                        <p>Universal gates are a major advantage for silicon manufacturing. Fabrication plants can focus on optimizing a single gate type (like NAND) to make it extremely cheap, fast, and dense in silicon, using it to construct all CPU operations.</p>
+                    </div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 5 -->
+            <section class="topic-section" id="topic-5">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>Boolean Laws &amp; Simplification</h2>
+                </div>
+                <div class="collapsible-content" id="content-5">
+                    <h3 id="sub-5-1">5.1 Core Algebraic Laws</h3>
+                    <p>We use algebraic laws to simplify logical expressions, reducing the number of physical gates required to implement a circuit:</p>
+                    <ul>
+                        <li><strong>Identity Laws:</strong> A + 0 = A &nbsp;|&nbsp; A &middot; 1 = A</li>
+                        <li><strong>Null / Dominance Laws:</strong> A + 1 = 1 &nbsp;|&nbsp; A &middot; 0 = 0</li>
+                        <li><strong>Idempotent Laws:</strong> A + A = A &nbsp;|&nbsp; A &middot; A = A</li>
+                        <li><strong>Complement Laws:</strong> A + A' = 1 &nbsp;|&nbsp; A &middot; A' = 0</li>
+                        <li><strong>Absorption Law:</strong> A + A &middot; B = A</li>
+                        <li><strong>De Morgan's Laws:</strong> (A &middot; B)' = A' + B' &nbsp;|&nbsp; (A + B)' = A' &middot; B'</li>
+                    </ul>
+
+                    <h3 id="sub-5-2">5.2 Worked Algebraic Minimization</h3>
+                    <p>Let's simplify the expression <strong>Y = A &middot; B + A &middot; B'</strong> using these laws:</p>
+                    <div class="box box-orange">
+                        <div class="box-title">Simplification Steps</div>
+                        <ol>
+                            <li>Starting expression: <code>Y = A &middot; B + A &middot; B'</code></li>
+                            <li>Factor out A (Distributive Law): <code>Y = A &middot; (B + B')</code></li>
+                            <li>Apply Complement Law (B + B' = 1): <code>Y = A &middot; (1)</code></li>
+                            <li>Apply Identity Law (A &middot; 1 = A): <code>Y = A</code></li>
+                        </ol>
+                    </div>
+                    <div class="box box-red" style="margin-top: 1rem;">
+                        <div class="box-title">Silicon Saved</div>
+                        <p>We started with two AND gates, one OR gate, and an inverter. By simplifying the expression, we reduced it to a single wire (Y = A), saving physical gates, reducing heat output, and speeding up circuit execution.</p>
+                    </div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for your reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/1.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>

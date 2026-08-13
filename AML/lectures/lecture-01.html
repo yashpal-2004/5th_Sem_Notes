@@ -1,149 +1,159 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Machine Learning</title>
-    <meta name="description" content="Study notes for Advanced Machine Learning, Lecture 01 covering Time Series Foundations, components, and decomposition.">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>01</text></svg>">
-    <link rel="stylesheet" href="../css/style.css">
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Advanced Machine Learning - Lecture 01</title>
+    <meta content="Study notes for Advanced Machine Learning (CSA333), Lecture 01 covering traditional programming vs. machine learning, data types, supervised/unsupervised/reinforcement paradigms, and core engineering tasks." name="description"/>
+    <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>01</text></svg>" rel="icon"/>
+    <link href="../css/style.css" rel="stylesheet"/>
 </head>
 <body>
-
     <header>
         <div class="header-titles">
             <h1>Advanced Machine Learning</h1>
-            <p>Lecture 01 - Time Series Foundations & Decomposition</p>
+            <p>Lecture 01 - Setting the Foundation: From Code to Learning</p>
             <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
             <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
-            <a href="../pdfs/1.pdf" target="_blank" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">Open PDF in New Tab ↗</a>
+            <a href="../pdfs/1.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
         </div>
         <div class="search-container">
-            <input type="text" id="searchInput" placeholder="Search notes...">
+            <input id="searchInput" placeholder="Search notes..." type="text"/>
         </div>
     </header>
-
     <div class="container">
         <!-- Sidebar Index -->
         <aside>
             <div class="aside-header">
                 <h3>Table of Contents</h3>
-                <div class="topic-count">Total Topics: 5</div>
+                <div class="topic-count">Total Topics: 6</div>
             </div>
             <ul class="index-list" id="indexList">
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>Short Notes</a></li>
                 <li>
-                    <a href="#topic-1">1. Introduction to Time Series Data<span class="sub-count">2</span></a>
+                    <a href="#topic-1">1. Course Introduction &amp; Syllabus<span class="sub-count">2</span></a>
                     <ul class="sub-index">
-                        <li><a href="#sub-1-1">1.1 The Shuffling Test</a></li>
-                        <li><a href="#sub-1-2">1.2 Real-world Examples</a></li>
+                        <li><a href="#sub-1-1">1.1 Meet the Faculty</a></li>
+                        <li><a href="#sub-1-2">1.2 Logistics and Grading Structure</a></li>
                     </ul>
                 </li>
                 <li>
-                    <a href="#topic-2">2. Case Study: Energy Demand Forecasting<span class="sub-count">2</span></a>
+                    <a href="#topic-2">2. Traditional Code vs. Machine Learning<span class="sub-count">2</span></a>
                     <ul class="sub-index">
-                        <li><a href="#sub-2-1">2.1 Forecasting Horizons</a></li>
-                        <li><a href="#sub-2-2">2.2 Feature Engineering for Time Series</a></li>
+                        <li><a href="#sub-2-1">2.1 The Rigidity of Explicit Rules</a></li>
+                        <li><a href="#sub-2-2">2.2 The Software Paradigm Flip</a></li>
                     </ul>
                 </li>
                 <li>
-                    <a href="#topic-3">3. Time Series Structures: Index & Frequency<span class="sub-count">2</span></a>
+                    <a href="#topic-3">3. The AI, ML, and DL Ecosystem<span class="sub-count">3</span></a>
                     <ul class="sub-index">
-                        <li><a href="#sub-3-1">3.1 The Time Index</a></li>
-                        <li><a href="#sub-3-2">3.2 Observation Frequency & Noise</a></li>
+                        <li><a href="#sub-3-1">3.1 Artificial Intelligence (AI)</a></li>
+                        <li><a href="#sub-3-2">3.2 Machine Learning (ML)</a></li>
+                        <li><a href="#sub-3-3">3.3 Deep Learning (DL)</a></li>
                     </ul>
                 </li>
                 <li>
-                    <a href="#topic-4">4. Core Behavioral Components<span class="sub-count">3</span></a>
+                    <a href="#topic-4">4. Labelled vs. Unlabelled Data<span class="sub-count">2</span></a>
                     <ul class="sub-index">
-                        <li><a href="#sub-4-1">4.1 Linear vs. Non-linear Trends</a></li>
-                        <li><a href="#sub-4-2">4.2 Additive vs. Multiplicative Seasonality</a></li>
-                        <li><a href="#sub-4-3">4.3 White Noise vs. Structured Noise</a></li>
+                        <li><a href="#sub-4-1">4.1 Definition of Data Types</a></li>
+                        <li><a href="#sub-4-2">4.2 Cost of Labeling</a></li>
                     </ul>
                 </li>
                 <li>
-                    <a href="#topic-5">5. Time Series Decomposition<span class="sub-count">2</span></a>
+                    <a href="#topic-5">5. The Four Learning Strategies<span class="sub-count">4</span></a>
                     <ul class="sub-index">
-                        <li><a href="#sub-5-1">5.1 Additive vs. Multiplicative Formulation</a></li>
-                        <li><a href="#sub-5-2">5.2 Visualizing the Decomposition Stack</a></li>
+                        <li><a href="#sub-5-1">5.1 Supervised Learning</a></li>
+                        <li><a href="#sub-5-2">5.2 Unsupervised Learning</a></li>
+                        <li><a href="#sub-5-3">5.3 Semi-Supervised Learning</a></li>
+                        <li><a href="#sub-5-4">5.4 Reinforcement Learning</a></li>
                     </ul>
                 </li>
-                <li><a href="#original-pdf"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+                <li>
+                    <a href="#topic-6">6. Core Machine Learning Tasks<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-6-1">6.1 Regression (Continuous Scalars)</a></li>
+                        <li><a href="#sub-6-2">6.2 Classification (Categories)</a></li>
+                        <li><a href="#sub-6-3">6.3 Clustering (Statistical Grouping)</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
             </ul>
         </aside>
-
         <!-- Main Content -->
         <main id="notesContent">
+            <!-- Short Notes -->
+            <section id="short-notes" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-short-notes')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                    </div>
+                    <h2>Short Notes &amp; Visual Summary</h2>
+                </div>
+                <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
+                    <p style="margin-bottom: 1rem;">Handwritten / quick summary notes for Lecture 01:</p>
+                    <div style="text-align: center; background: var(--bg-secondary, #f8f9fa); padding: 1rem; border-radius: 8px; border: 1px solid var(--gray-border);">
+                        <a href="../images/1.png" target="_blank" title="Click to view full size">
+                            <img src="../images/1.png" alt="Lecture 01 Short Notes" style="max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
+                        </a>
+                        <p style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-muted);">Click image to open high-resolution version in new tab</p>
+                    </div>
+                </div>
+            </section>
 
             <!-- Topic 1 -->
-            <section id="topic-1" class="topic-section">
+            <section class="topic-section" id="topic-1">
                 <div class="topic-header" onclick="toggleSection('content-1')">
                     <div class="topic-number">1</div>
-                    <h2>Introduction to Time Series Data</h2>
+                    <h2>Course Introduction &amp; Syllabus</h2>
                 </div>
-                <div id="content-1" class="collapsible-content">
-                    <h3 id="sub-1-1">1.1 The Shuffling Test</h3>
-                    <p>Time series data is a sequence of data points collected or recorded at specific, sequential time intervals. The primary distinction between standard data and time series is that <strong>temporal ordering is critical</strong>.</p>
+                <div class="collapsible-content" id="content-1">
+                    <h3 id="sub-1-1">1.1 Meet the Faculty</h3>
+                    <p>The Advanced Machine Learning course (CSA 333) is taught by <strong>Shobhit Johri</strong>, AI/ML Faculty at Newton School of Technology - Rishihood University. He holds a B.Tech from IIT Roorkee, worked as a Mathematics Research Analyst @ Turing, and specializes in mathematics and machine learning problem solving.</p>
                     
-                    <div class="box box-blue">
-                        <div class="box-title">The Shuffling Rule</div>
-                        <p><strong>"If you can shuffle the x-axis and nothing breaks, it was never a time series."</strong></p>
-                        <p>In standard datasets, the order of rows does not alter their meaning. In time series, values are indexed by time, and shuffling the sequence destroys the underlying information and relationships.</p>
-                    </div>
-
-                    <h3 id="sub-1-2">1.2 Real-world Examples</h3>
-                    <p>Time series datasets occur across many domains:</p>
+                    <h3 id="sub-1-2">1.2 Logistics and Grading Structure</h3>
+                    <p>The course spans 12 weeks, covering foundational ML lifecycle models up to bagging, boosting, clustering, and neural configurations. Key evaluation criteria include:</p>
                     <ul>
-                        <li><strong>Weather Data:</strong> Daily temperature recordings.</li>
-                        <li><strong>Sales & Revenue:</strong> Monthly performance metrics.</li>
-                        <li><strong>IoT & Wearables:</strong> Daily step counts (e.g., Fitbit data).</li>
-                        <li><strong>Web Analytics:</strong> Website page views per hour or day.</li>
-                        <li><strong>Agriculture:</strong> Crop yield over consecutive years.</li>
-                        <li><strong>Finance:</strong> Minute-by-minute stock, commodity, or cryptocurrency prices.</li>
+                        <li><strong>Contest (Only 1):</strong> 10%</li>
+                        <li><strong>Lecture &amp; Lab Assignments:</strong> 5%</li>
+                        <li><strong>Projects &amp; Viva:</strong> 20%</li>
+                        <li><strong>Mid Semester Exam:</strong> 25%</li>
+                        <li><strong>End Semester Exam:</strong> 40%</li>
                     </ul>
-
-                    <div class="box box-beige">
-                        <div class="box-title">Recitation: Sanskrit Reflection</div>
-                        <p>Our course opening slide references a classic reflection on how knowledge is acquired:</p>
-                        <p><em>"A student acquires knowledge in four equal parts: one-fourth from the teacher, one-fourth through self-reflection, one-fourth through discussions with peers, and the final one-fourth over time through personal experience."</em></p>
+                    <div class="box box-blue">
+                        <div class="box-title">Course Prerequisites</div>
+                        <ul>
+                            <li><strong>Mathematics:</strong> Solid grasp of Probability &amp; Statistics, Linear Algebra, and Calculus.</li>
+                            <li><strong>Python:</strong> Proficiency with programming and libraries (NumPy, Pandas, Matplotlib).</li>
+                            <li><strong>Fundamentals:</strong> General AI and basic ML concepts.</li>
+                        </ul>
                     </div>
-
                     <div class="topic-nav">
-                        <button class="btn" disabled>Previous Topic</button>
+                        <button class="btn" disabled="">Previous Topic</button>
                         <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
                     </div>
                 </div>
             </section>
 
             <!-- Topic 2 -->
-            <section id="topic-2" class="topic-section">
+            <section class="topic-section" id="topic-2">
                 <div class="topic-header" onclick="toggleSection('content-2')">
                     <div class="topic-number">2</div>
-                    <h2>Case Study: Energy Demand Forecasting</h2>
+                    <h2>Traditional Code vs. Machine Learning</h2>
                 </div>
-                <div id="content-2" class="collapsible-content">
-                    <h3 id="sub-2-1">2.1 Forecasting Horizons</h3>
-                    <p>A power distribution utility must forecast electricity demand (load) at multiple temporal scales to operate efficiently and safely. Incorrect forecasting leads to blackouts or wasted generation costs:</p>
-                    <ul>
-                        <li><strong>Real-time load balancing (15-minute ahead):</strong> Ensuring immediate supply matches demand on the grid.</li>
-                        <li><strong>Generation planning (Day-ahead):</strong> Scheduling power plants and purchasing energy resources.</li>
-                        <li><strong>Maintenance scheduling (Week-ahead):</strong> Shutting down transmission components for maintenance without outages.</li>
-                    </ul>
+                <div class="collapsible-content" id="content-2">
+                    <h3 id="sub-2-1">2.1 The Rigidity of Explicit Rules</h3>
+                    <p>Imagine being asked to write a spam filter in Python. You write rules to block words like "FREE" or "WINNER". It works initially, until spammers change their spelling to "FR33" or "W1NNER". Your program breaks, requiring manual rule patches.</p>
+                    <p>Traditional programming is structurally rigid. It depends on human engineers explicitly writing logic rules. The moment the environment shifts, a traditional program fails because it cannot adapt dynamically.</p>
 
-                    <h3 id="sub-2-2">2.2 Feature Engineering for Time Series</h3>
-                    <p>To forecast a target variable like <strong>Load (in MW)</strong>, features are categorized into distinct groups:</p>
-                    <ul>
-                        <li><strong>Time-based Features:</strong> Extracting calendar variables like <code>hour</code> (0-23), <code>day_of_week</code>, <code>is_weekend</code> (boolean), and <code>month</code>.</li>
-                        <li><strong>Historical (Lag) Features:</strong> 
-                            <ul>
-                                <li><code>load_t-1</code>: Value from the last 15 minutes.</li>
-                                <li><code>load_t-4</code>: Value from 1 hour ago.</li>
-                                <li><code>load_t-96</code>: Value from the same time yesterday (96 steps * 15m = 24 hours).</li>
-                            </ul>
-                        </li>
-                        <li><strong>Rolling Statistics:</strong> Smooth values over a window, e.g., <code>rolling_mean_1h</code> and <code>rolling_mean_24h</code>.</li>
-                        <li><strong>External features:</strong> <code>temperature</code>, <code>humidity</code>, and <code>holiday_flag</code>.</li>
-                    </ul>
-
+                    <h3 id="sub-2-2">2.2 The Software Paradigm Flip</h3>
+                    <p>Machine Learning flips this software engineering structure on its head. Instead of writing rules, we feed data and answers to the computer, allowing the algorithm to discover the underlying logic:</p>
+                    <div class="box box-orange">
+                        <div class="box-title">The Paradigm Flip</div>
+                        <ul>
+                            <li><strong>Traditional Programming:</strong> Data + Rules &rArr; Answers</li>
+                            <li><strong>Machine Learning:</strong> Data + Answers &rArr; Rules</li>
+                        </ul>
+                    </div>
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
                         <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
@@ -152,74 +162,24 @@
             </section>
 
             <!-- Topic 3 -->
-            <section id="topic-3" class="topic-section">
+            <section class="topic-section" id="topic-3">
                 <div class="topic-header" onclick="toggleSection('content-3')">
                     <div class="topic-number">3</div>
-                    <h2>Time Series Structures: Index & Frequency</h2>
+                    <h2>The AI, ML, and DL Ecosystem</h2>
                 </div>
-                <div id="content-3" class="collapsible-content">
-                    <h3 id="sub-3-1">3.1 The Time Index</h3>
-                    <p>The time index represents the specific timestamp at which each observation was captured. Without a consistent time index, order becomes unclear, patterns break, and interpretation becomes unreliable.</p>
-                    <p>The Time Index allows algorithms to:</p>
-                    <ul>
-                        <li>Detect gaps or missing values in logging.</li>
-                        <li>Align and compare separate events.</li>
-                        <li>Measure the physical spacing between consecutive observations.</li>
-                    </ul>
+                <div class="collapsible-content" id="content-3">
+                    <h3 id="sub-3-1">3.1 Artificial Intelligence (AI)</h3>
+                    <p>Artificial Intelligence is the broad, overarching field of computer science dedicated to creating hardware and software systems capable of mimicking human-like intelligence. The goal is to design systems that reason, solve problems, perceive environments, and make autonomous decisions without hardcoded logic.</p>
 
-                    <h3 id="sub-3-2">3.2 Observation Frequency & Noise</h3>
-                    <p>Frequency represents the time gap between consecutive observations. Adjusting the frequency trade-offs detail against clarity:</p>
-                    <ul>
-                        <li><strong>Higher Frequency:</strong> Provides rich detail but introduces substantial high-frequency noise (e.g., per-second IoT sensors).</li>
-                        <li><strong>Lower Frequency:</strong> Smooths out local variance and highlights long-term trends, but can hide transient anomalies (e.g., yearly inflation).</li>
-                    </ul>
+                    <h3 id="sub-3-2">3.2 Machine Learning (ML)</h3>
+                    <p>Machine Learning is a specialized subset of AI focused on developing mathematical models and algorithms. It allows computers to autonomously extract patterns and learn insights directly from data, rather than relying on explicit, hardcoded instructions.</p>
 
-                    <div class="box box-orange">
-                        <div class="box-title">Frequency Trade-offs Table</div>
-                        <table style="width:100%; border-collapse: collapse; margin-top: 0.5rem; font-size: 0.9rem;">
-                            <thead>
-                                <tr style="border-bottom: 2px solid var(--blue); text-align: left;">
-                                    <th style="padding: 0.5rem;">Frequency</th>
-                                    <th style="padding: 0.5rem;">Best For</th>
-                                    <th style="padding: 0.5rem;">Shows</th>
-                                    <th style="padding: 0.5rem;">Hides</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr style="border-bottom: 1px solid var(--gray-border);">
-                                    <td style="padding: 0.5rem; font-weight: bold;">Yearly</td>
-                                    <td style="padding: 0.5rem;">Macroeconomics</td>
-                                    <td style="padding: 0.5rem;">Decadal Trends</td>
-                                    <td style="padding: 0.5rem;">Seasonal cycles</td>
-                                </tr>
-                                <tr style="border-bottom: 1px solid var(--gray-border);">
-                                    <td style="padding: 0.5rem; font-weight: bold;">Monthly</td>
-                                    <td style="padding: 0.5rem;">Climate & Business Planning</td>
-                                    <td style="padding: 0.5rem;">Seasonal swings</td>
-                                    <td style="padding: 0.5rem;">Daily spikes</td>
-                                </tr>
-                                <tr style="border-bottom: 1px solid var(--gray-border);">
-                                    <td style="padding: 0.5rem; font-weight: bold;">Daily</td>
-                                    <td style="padding: 0.5rem;">Operations</td>
-                                    <td style="padding: 0.5rem;">Weekly habits</td>
-                                    <td style="padding: 0.5rem;">Hourly peaks</td>
-                                </tr>
-                                <tr style="border-bottom: 1px solid var(--gray-border);">
-                                    <td style="padding: 0.5rem; font-weight: bold;">Hourly</td>
-                                    <td style="padding: 0.5rem;">Logistics & Web Traffic</td>
-                                    <td style="padding: 0.5rem;">Intraday peaks</td>
-                                    <td style="padding: 0.5rem;">Sensor glitches</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 0.5rem; font-weight: bold;">Per-Second</td>
-                                    <td style="padding: 0.5rem;">High-frequency IoT</td>
-                                    <td style="padding: 0.5rem;">Immediate failures</td>
-                                    <td style="padding: 0.5rem;">Long-term drift</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <h3 id="sub-3-3">3.3 Deep Learning (DL)</h3>
+                    <p>Deep Learning is a highly specialized subfield of ML that utilizes multi-layered Artificial Neural Networks to automatically discover, extract, and optimize representations directly from raw, unstructured data (like images or raw audio waveforms). It solves the feature-engineering bottleneck of standard ML, where humans had to manually highlight edges or shapes before feeding data to the algorithm.</p>
+                    <div class="box box-beige">
+                        <div class="box-title">Visualizing the Ecosystem</div>
+                        <p style="text-align: center; font-weight: bold; font-family: monospace;">Deep Learning &sub; Machine Learning &sub; Artificial Intelligence</p>
                     </div>
-
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
                         <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
@@ -228,45 +188,24 @@
             </section>
 
             <!-- Topic 4 -->
-            <section id="topic-4" class="topic-section">
+            <section class="topic-section" id="topic-4">
                 <div class="topic-header" onclick="toggleSection('content-4')">
                     <div class="topic-number">4</div>
-                    <h2>Core Behavioral Components</h2>
+                    <h2>Labelled vs. Unlabelled Data</h2>
                 </div>
-                <div id="content-4" class="collapsible-content">
-                    <h3 id="sub-4-1">4.1 Linear vs. Non-linear Trends</h3>
-                    <p>A trend represents the long-term movement in the data, ignoring local wiggles. It is the underlying direction of the series:</p>
+                <div class="collapsible-content" id="content-4">
+                    <h3 id="sub-4-1">4.1 Definition of Data Types</h3>
+                    <p>Before training a model, we must recognize the format of the data we feed it, as it dictates the entire learning strategy:</p>
                     <ul>
-                        <li><strong>Linear Trend:</strong> The value increases or decreases by a fixed, constant amount at each time step (represented as a straight line). Easy to forecast by extending the line.</li>
-                        <li><strong>Non-Linear Trend:</strong> The rate of change varies over time, resulting in a curved path (e.g., exponential growth, quadratic curves, or plateaus). Highly complex to forecast.</li>
+                        <li><strong>Labelled Data:</strong> Consists of a set of input features coupled directly with the explicit target outcome or correct answer (the ground truth). Example: 50,000 emails explicitly marked as "spam" or "not spam".</li>
+                        <li><strong>Unlabelled Data:</strong> Raw data that contains only the input features, with absolutely no accompanying target tags, categories, or outcomes. Example: 200,000 chest X-rays with no annotations.</li>
                     </ul>
 
-                    <h3 id="sub-4-2">4.2 Additive vs. Multiplicative Seasonality</h3>
-                    <p>Seasonality represents patterns that repeat at fixed, regular intervals (daily, weekly, monthly, or yearly):</p>
-                    <div class="box box-green">
-                        <div class="box-title">Additive Seasonality</div>
-                        <p>The amplitude of seasonal swings stays constant over time, regardless of the overall trend level. The seasonal component acts as a fixed value added to the base.</p>
-                        <p><strong>Example:</strong> Daily outdoor temperature. Summer is always warmer than winter by a relatively stable difference in degrees, even if the multi-year average temperature shifts slightly.</p>
+                    <h3 id="sub-4-2">4.2 Cost of Labeling</h3>
+                    <div class="box box-red">
+                        <div class="box-title">The Bottleneck of Labelled Data</div>
+                        <p>Labelled data is highly expensive and slow to produce because it requires human domain experts (e.g. radiologists to annotate X-rays, lawyers to tag contracts, or linguists to transcribe audio). This bottleneck drives many organizations to seek unsupervised or semi-supervised methods.</p>
                     </div>
-
-                    <div class="box box-orange">
-                        <div class="box-title">Multiplicative Seasonality</div>
-                        <p>The amplitude of seasonal swings grows or shrinks in proportion to the trend level. The seasonal component represents a percentage scaling factor of the base.</p>
-                        <p><strong>Example:</strong> Retail sales of a growing business. Holiday sales spikes become larger in total volume every year because they scale proportionally with the overall growth of the business.</p>
-                    </div>
-
-                    <div style="text-align: center; margin: 1.5rem 0;">
-                        <img src="../images/seasonality_comparison.png" alt="Additive vs Multiplicative Seasonality" style="max-width: 100%; border-radius: 8px; border: 1px solid var(--gray-border); box-shadow: var(--shadow);">
-                        <p style="font-size: 0.85rem; color: #666; margin-top: 0.5rem; font-style: italic;">Comparison of Additive Seasonality (constant fluctuations) and Multiplicative Seasonality (fluctuations scale with trend level)</p>
-                    </div>
-
-                    <h3 id="sub-4-3">4.3 White Noise vs. Structured Noise</h3>
-                    <p>Noise (Residuals) is the random variation that cannot be explained by trends or seasonality:</p>
-                    <ul>
-                        <li><strong>White Noise:</strong> The variables are independent and identically distributed (i.i.d.) with a constant mean and variance. Knowing the past values provides zero predictive value for future points.</li>
-                        <li><strong>Structured Noise:</strong> Appears random but contains underlying correlation or dependencies over time (e.g., autoregressive processes where values are correlated with their immediate history). Mean and variance may fluctuate.</li>
-                    </ul>
-
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
                         <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
@@ -275,78 +214,89 @@
             </section>
 
             <!-- Topic 5 -->
-            <section id="topic-5" class="topic-section">
+            <section class="topic-section" id="topic-5">
                 <div class="topic-header" onclick="toggleSection('content-5')">
                     <div class="topic-number">5</div>
-                    <h2>Time Series Decomposition</h2>
+                    <h2>The Four Learning Strategies</h2>
                 </div>
-                <div id="content-5" class="collapsible-content">
-                    <h3 id="sub-5-1">5.1 Additive vs. Multiplicative Formulation</h3>
-                    <p>Time series decomposition isolates the underlying components of a complex signal into three independent series: Trend (T<sub>t</sub>), Seasonality (S<sub>t</sub>), and Residuals/Noise (I<sub>t</sub>).</p>
-                    
-                    <div class="box box-blue">
-                        <div class="box-title">Mathematical Formulations</div>
-                        <ul>
-                            <li><strong>Additive Model:</strong> Used when seasonal variations do not scale with the level of the trend.
-                                <div class="formula-box">x(t) = T(t) + S(t) + I(t)</div>
-                            </li>
-                            <li><strong>Multiplicative Model:</strong> Used when seasonal variations increase or decrease in proportion to the trend.
-                                <div class="formula-box">x(t) = T(t) &times; S(t) &times; I(t)</div>
-                            </li>
-                        </ul>
+                <div class="collapsible-content" id="content-5">
+                    <h3 id="sub-5-1">5.1 Supervised Learning</h3>
+                    <p>The model learns using **labelled data**. The system is provided with both the questions (inputs) and the explicit correct answers (labels). The objective is to learn a mapping function that can accurately predict the label for new, unseen inputs (e.g., predicting housing market prices based on square footage and location).</p>
+
+                    <h3 id="sub-5-2">5.2 Unsupervised Learning</h3>
+                    <p>The model is fed completely **unlabelled data**. With no teacher or scoring key, the algorithm acts as a detector, uncovering hidden structures, natural groupings, and statistical similarities in the data (e.g., market segmentation discovering consumer archetypes from purchase histories).</p>
+
+                    <h3 id="sub-5-3">5.3 Semi-Supervised Learning</h3>
+                    <p>A practical hybrid designed to bypass high labeling costs. It combines a small pool of labelled data with a massive pool of unlabelled data. The model uses the small labelled dataset to anchor its understanding, then propagates that knowledge across the vast unlabelled dataset.</p>
+                    <div class="box box-green">
+                        <div class="box-title">Case Study: Google Photos</div>
+                        <p>When you open your photos app, it groups similar faces together automatically (unsupervised clustering). Once you supply a single label (e.g., "This is Alex"), it propagates that label to thousands of other photos containing the same face (supervised labeling).</p>
                     </div>
 
-                    <h3 id="sub-5-2">5.2 Visualizing the Decomposition Stack</h3>
-                    <p>A classical decomposition plot is visualized as a vertical stack of four synchronized graphs sharing the same horizontal time axis:</p>
-                    <ol>
-                        <li><strong>Observed (Original):</strong> The raw, noisy time series data.</li>
-                        <li><strong>Trend (T<sub>t</sub>):</strong> The extracted long-term directional movement.</li>
-                        <li><strong>Seasonality (S<sub>t</sub>):</strong> The extracted repeating cyclical patterns.</li>
-                        <li><strong>Residuals (I<sub>t</sub>):</strong> The remaining random noise or error terms.</li>
-                    </ol>
-
-                    <div style="text-align: center; margin: 1.5rem 0;">
-                        <img src="../images/decomposition_plot.png" alt="Time Series Decomposition Stack" style="max-width: 100%; border-radius: 8px; border: 1px solid var(--gray-border); box-shadow: var(--shadow);">
-                        <p style="font-size: 0.85rem; color: #666; margin-top: 0.5rem; font-style: italic;">Classical decomposition stack showing the Observed Data, Trend Component, Seasonal Component, and Noise/Residual Component</p>
-                    </div>
-
-                    <div style="text-align: center; margin: 1.5rem 0;">
-                        <img src="../images/decomposition_comparison.png" alt="Additive vs Multiplicative Decomposition" style="max-width: 100%; border-radius: 8px; border: 1px solid var(--gray-border); box-shadow: var(--shadow);">
-                        <p style="font-size: 0.85rem; color: #666; margin-top: 0.5rem; font-style: italic;">Visual comparison of Additive Decomposition versus Multiplicative Decomposition</p>
-                    </div>
-
+                    <h3 id="sub-5-4">5.4 Reinforcement Learning</h3>
+                    <p>Unlike the other strategies, Reinforcement Learning does not rely on static datasets. An autonomous agent interacts dynamically with an unknown environment. The agent takes actions, experiences consequences, and receives feedback via **rewards** (positive outcomes) or **penalties** (mistakes) to optimize its policy (e.g., training a drone to fly through windy warehouses by penalizing crashes and rewarding stable flights).</p>
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
-                        <button class="btn" disabled>Next Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 6 -->
+            <section class="topic-section" id="topic-6">
+                <div class="topic-header" onclick="toggleSection('content-6')">
+                    <div class="topic-number">6</div>
+                    <h2>Core Machine Learning Tasks</h2>
+                </div>
+                <div class="collapsible-content" id="content-6">
+                    <h3 id="sub-6-1">6.1 Regression (Continuous Scalars)</h3>
+                    <p>Regression is a supervised learning task where the target output variable is completely continuous and numerical. It answers questions like: <em>"How much?"</em>, <em>"How many?"</em>, or <em>"What value?"</em>.</p>
+                    <ul>
+                        <li><strong>Real-world Example:</strong> Uber Surge Pricing. Uber analyzes demand metrics, driver distributions, and weather constraints to dynamically output a continuous fare multiplier (e.g., 1.4x, 2.1x).</li>
+                        <li><strong>Common Algorithms:</strong> Linear Regression, Support Vector Regression (SVR), Decision Tree Regression.</li>
+                    </ul>
+
+                    <h3 id="sub-6-2">6.2 Classification (Categories)</h3>
+                    <p>Classification is a supervised task where the target output is a discrete, predefined category or class label. The goal is to draw clear decision boundaries in the data space to separate classes.</p>
+                    <ul>
+                        <li><strong>Real-world Example:</strong> Medical Risk Screening. Emergency departments use classification models to evaluate symptoms and vitals, categorizing patients into low-risk or high-risk brackets.</li>
+                        <li><strong>Common Algorithms:</strong> Logistic Regression, K-Nearest Neighbors (KNN), Support Vector Machines (SVM), Naive Bayes.</li>
+                    </ul>
+
+                    <h3 id="sub-6-3">6.3 Clustering (Statistical Grouping)</h3>
+                    <p>Clustering is an unsupervised task where the algorithm groups data points based on natural statistical distributions, dense regions, and geometric proximity. Points inside a cluster are highly similar, while highly distinct from points in other clusters.</p>
+                    <ul>
+                        <li><strong>Real-world Example:</strong> Netflix Taste-Clusters. Netflix clusters users based watching histories to uncover highly specific taste groups, driving personalized homepage recommendations.</li>
+                        <li><strong>Common Algorithms:</strong> K-Means Clustering, DBSCAN, Gaussian Mixture Models (GMM).</li>
+                    </ul>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
                     </div>
                 </div>
             </section>
 
             <!-- Original PDF -->
-            <section id="original-pdf" class="topic-section">
+            <section class="topic-section" id="original-pdf">
                 <div class="topic-header" onclick="toggleSection('content-pdf')">
                     <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                     </div>
                     <h2>Original PDF Notes</h2>
                 </div>
-                <div id="content-pdf" class="collapsible-content">
+                <div class="collapsible-content" id="content-pdf">
                     <p>Below is the original PDF document for your reference:</p>
                     <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
                     <div id="pdfContainer" style="margin-top: 1rem;"></div>
-                    
                     <div class="topic-nav">
-                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
-                        <button class="btn" disabled>Next Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
                     </div>
                 </div>
             </section>
-
         </main>
     </div>
-
     <button id="backToTop" onclick="scrollToTop()">↑</button>
-
     <script>
         function loadPDF() {
             const container = document.getElementById('pdfContainer');

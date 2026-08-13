@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Deep Learning (Sem 5) - Lecture 02</title>
+    <meta content="Study notes for Deep Learning (Sem 5), Lecture 02 covering activation functions, the gradient descent update rule, chain rule derivations, step function limitations, Sigmoid derivation and updates, and Tanh updates." name="description"/>
+    <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>02</text></svg>" rel="icon"/>
+    <link href="../css/style.css" rel="stylesheet"/>
+</head>
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Deep Learning Foundations</h1>
+            <p>Lecture 02 - The Activation Function and the Update Rule</p>
+            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/2.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text"/>
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 7</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>Short Notes</a></li>
+                <li>
+                    <a href="#topic-1">1. What an Activation Function Does<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 Arithmetic vs. Activation</a></li>
+                        <li><a href="#sub-1-2">1.2 Intuitive Example: Student Pass/Fail</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. The Gradient Descent Update Rule<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 Mathematical Update Formulation</a></li>
+                        <li><a href="#sub-2-2">2.2 Chain Rule Derivation</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Why the Step Function Cannot Learn<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 Step Function Derivative</a></li>
+                        <li><a href="#sub-3-2">3.2 Numerical Simulation</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. The Sigmoid Function<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 Definition and Geometry</a></li>
+                        <li><a href="#sub-4-2">4.2 Derivative Derivation</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Worked Example: Weight Update with Sigmoid<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 Sigmoid Numerical Example</a></li>
+                        <li><a href="#sub-5-2">5.2 Direction and Sign Validation</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-6">6. The Tanh Function<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-6-1">6.1 Definition and Output Range</a></li>
+                        <li><a href="#sub-6-2">6.2 Derivative Derivation</a></li>
+                        <li><a href="#sub-6-3">6.3 Numerical Example with Tanh</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-7">7. Comparison and Summary<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-7-1">7.1 Sigmoid vs. Tanh Peak Heights</a></li>
+                        <li><a href="#sub-7-2">7.2 Summary Table of Activation Functions</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Short Notes -->
+            <section id="short-notes" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-short-notes')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                    </div>
+                    <h2>Short Notes &amp; Visual Summary</h2>
+                </div>
+                <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
+                    <p style="margin-bottom: 1rem;">Handwritten / quick summary notes for Lecture 02:</p>
+                    <div style="text-align: center; background: var(--bg-secondary, #f8f9fa); padding: 1rem; border-radius: 8px; border: 1px solid var(--gray-border);">
+                        <a href="../images/2.png" target="_blank" title="Click to view full size">
+                            <img src="../images/2.png" alt="Lecture 02 Short Notes" style="max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
+                        </a>
+                        <p style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-muted);">Click image to open high-resolution version in new tab</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 1 -->
+            <section class="topic-section" id="topic-1">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>What an Activation Function Does</h2>
+                </div>
+                <div class="collapsible-content" id="content-1">
+                    <h3 id="sub-1-1">1.1 Arithmetic vs. Activation</h3>
+                    <p>A single perceptron operates by carrying out two operations in sequence:</p>
+                    <ol>
+                        <li><strong>Arithmetic:</strong> Computes the linear combination of inputs, weights, and bias to yield a raw value <em>z = wx + b</em>.</li>
+                        <li><strong>Activation Function:</strong> Evaluates the raw score <em>z</em> through an activation function <em>f</em> to produce the final prediction <em>ŷ = f(z)</em>.</li>
+                    </ol>
+                    <p>Without the activation function, the output remains a simple measurement rather than a classified answer.</p>
+
+                    <h3 id="sub-1-2">1.2 Intuitive Example: Student Pass/Fail</h3>
+                    <p>Suppose a perceptron determines whether a student passes a course based on marks obtained <em>x</em>. Let weight <em>w = 1</em> and bias <em>b = -40</em>:</p>
+                    <ul>
+                        <li><strong>Student A (x = 65):</strong> raw score <em>z = (1)(65) - 40 = 25</em></li>
+                        <li><strong>Student B (x = 32):</strong> raw score <em>z = (1)(32) - 40 = -8</em></li>
+                    </ul>
+                    <p>Since the question is binary (pass or fail), we require an answer of 1 or 0. The raw scores 25 and -8 do not directly represent this. The activation function converts these scores into the final binary classification:</p>
+                    <div class="box box-blue">
+                        <div class="box-title">Threshold (Step) Decision</div>
+                        <p style="text-align: center; font-style: italic;">f(z) = 1 &nbsp; if &nbsp; z &ge; 0 &nbsp; else &nbsp; 0</p>
+                        <p>Applying this threshold function:</p>
+                        <ul>
+                            <li><strong>Student A:</strong> f(25) = 1 &rArr; Pass</li>
+                            <li><strong>Student B:</strong> f(-8) = 0 &rArr; Fail</li>
+                        </ul>
+                    </div>
+                    <div class="topic-nav">
+                        <button class="btn" disabled="">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section class="topic-section" id="topic-2">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>The Gradient Descent Update Rule</h2>
+                </div>
+                <div class="collapsible-content" id="content-2">
+                    <h3 id="sub-2-1">2.1 Mathematical Update Formulation</h3>
+                    <p>A bad prediction is represented by a large loss value. We define the squared error loss function as:</p>
+                    <p style="text-align: center; font-size: 1.1rem; font-weight: bold; margin: 1rem 0;">L = &frac12; (ŷ - y)<sup>2</sup></p>
+                    <p>Where <em>y</em> is the target and <em>&alpha;</em> is the learning rate. To reduce loss, we must change weights in the direction opposite to the gradient &part;L/&part;w, leading to the **gradient descent update rule**:</p>
+                    <p style="text-align: center; font-size: 1.1rem; font-weight: bold; margin: 1rem 0;">w<sub>new</sub> = w<sub>old</sub> - &alpha; &part;L/&part;w</p>
+
+                    <h3 id="sub-2-2">2.2 Chain Rule Derivation</h3>
+                    <p>Since the weight <em>w</em> affects <em>z</em>, <em>z</em> affects <em>ŷ</em>, and <em>ŷ</em> affects <em>L</em>, we apply the chain rule to expand the gradient:</p>
+                    <p style="text-align: center; font-style: italic; margin: 1rem 0;">&part;L/&part;w = (&part;L/&part;ŷ) &middot; (&part;ŷ/&part;z) &middot; (&part;z/&part;w)</p>
+                    <p>Deriving each term individually:</p>
+                    <ul>
+                        <li><strong>&part;L/&part;ŷ:</strong> Derivative of &frac12;(ŷ - y)<sup>2</sup> with respect to ŷ &rArr; <strong>(ŷ - y)</strong></li>
+                        <li><strong>&part;ŷ/&part;z:</strong> Derivative of f(z) &rArr; <strong>f'(z)</strong></li>
+                        <li><strong>&part;z/&part;w:</strong> Derivative of wx + b with respect to w &rArr; <strong>x</strong></li>
+                    </ul>
+                    <p>Multiplying these factors yields the expanded gradient:</p>
+                    <div class="box box-green">
+                        <div class="box-title">Complete Update Equation</div>
+                        <p style="text-align: center; font-size: 1.2rem; font-weight: bold; margin: 0.5rem 0;">w<sub>new</sub> = w<sub>old</sub> - &alpha; (ŷ - y) f'(z) x</p>
+                        <p>Three distinct factors control the size of the step: the error (ŷ - y), the input (x), and the derivative of the activation function (f'(z)).</p>
+                    </div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section class="topic-section" id="topic-3">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>Why the Step Function Cannot Learn</h2>
+                </div>
+                <div class="collapsible-content" id="content-3">
+                    <h3 id="sub-3-1">3.1 Step Function Derivative</h3>
+                    <p>For the step (threshold) function, the outputs are constant values (0 or 1) except at the boundary point:</p>
+                    <ul>
+                        <li>For z &gt; 0, f(z) = 1 &rArr; f'(z) = 0</li>
+                        <li>For z &lt; 0, f(z) = 0 &rArr; f'(z) = 0</li>
+                        <li>At z = 0, the function jumps, making the derivative f'(0) undefined.</li>
+                    </ul>
+                    <p>Thus, <strong>f'(z) = 0</strong> for all defined inputs (z &ne; 0).</p>
+
+                    <h3 id="sub-3-2">3.2 Numerical Simulation</h3>
+                    <p>Let's run a test with parameters: x = 2, w = 1, b = 0, target y = 0, and learning rate &alpha; = 0.5.</p>
+                    <div class="box box-red">
+                        <div class="box-title">Step Function Failure Calculation</div>
+                        <ol>
+                            <li>Weighted sum: z = (1)(2) + 0 = 2</li>
+                            <li>Prediction: ŷ = f(2) = 1 (since 2 &ge; 0)</li>
+                            <li>Error: ŷ - y = 1 - 0 = 1 (maximum possible error)</li>
+                            <li>Derivative: f'(2) = 0</li>
+                            <li>Gradient: &part;L/&part;w = (1)(0)(2) = 0</li>
+                            <li>Update: w<sub>new</sub> = 1 - (0.5)(0) = 1 (no change)</li>
+                        </ol>
+                        <p>Even though the error was at its maximum value of 1, the weight did not change. The derivative being 0 multiplies the error away, preventing it from updating the weight. Increasing the learning rate &alpha; changes nothing since &alpha; &middot; 0 remains 0.</p>
+                    </div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section class="topic-section" id="topic-4">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>The Sigmoid Function</h2>
+                </div>
+                <div class="collapsible-content" id="content-4">
+                    <h3 id="sub-4-1">4.1 Definition and Geometry</h3>
+                    <p>To enable learning, we need a smooth activation function that has a non-zero derivative everywhere. The **Sigmoid function** is defined as:</p>
+                    <p style="text-align: center; font-size: 1.2rem; font-weight: bold; margin: 1rem 0;">&sigma;(z) = 1 / (1 + e<sup>-z</sup>)</p>
+                    <p>It generates a smooth S-curve passing through (0, 0.5), bounding output values strictly between 0 and 1.</p>
+
+                    <h3 id="sub-4-2">4.2 Derivative Derivation</h3>
+                    <p>Let's derive &sigma;'(z) step-by-step using the chain and quotient rules:</p>
+                    <ol>
+                        <li>Write &sigma;(z) as (1 + e<sup>-z</sup>)<sup>-1</sup>.</li>
+                        <li>By the chain rule: &sigma;'(z) = -(1 + e<sup>-z</sup>)<sup>-2</sup> &middot; d/dz(1 + e<sup>-z</sup>)</li>
+                        <li>Evaluate the inner derivative: d/dz(1 + e<sup>-z</sup>) = -e<sup>-z</sup></li>
+                        <li>Substitute and simplify: &sigma;'(z) = e<sup>-z</sup> / (1 + e<sup>-z</sup>)<sup>2</sup></li>
+                        <li>Rewrite the numerator using e<sup>-z</sup> = (1 + e<sup>-z</sup>) - 1:
+                            <p style="margin: 0.5rem 0; font-family: monospace;">&sigma;'(z) = [(1 + e<sup>-z</sup>) - 1] / (1 + e<sup>-z</sup>)<sup>2</sup></p>
+                        </li>
+                        <li>Split into two fractions: &sigma;'(z) = [1 / (1 + e<sup>-z</sup>)] - [1 / (1 + e<sup>-z</sup>)<sup>2</sup>]</li>
+                        <li>Rewrite terms using powers of &sigma;(z): &sigma;'(z) = &sigma;(z) - &sigma;<sup>2</sup>(z)</li>
+                    </ol>
+                    <div class="box box-blue">
+                        <div class="box-title">Sigmoid Derivative Formula</div>
+                        <p style="text-align: center; font-size: 1.2rem; font-weight: bold; margin: 0.5rem 0;">&sigma;'(z) = &sigma;(z) (1 - &sigma;(z))</p>
+                    </div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 5 -->
+            <section class="topic-section" id="topic-5">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>Worked Example: Weight Update with Sigmoid</h2>
+                </div>
+                <div class="collapsible-content" id="content-5">
+                    <h3 id="sub-5-1">5.1 Sigmoid Numerical Example</h3>
+                    <p>Let's run the same parameters as Part 3 (x = 2, w = 1, b = 0, target y = 0, &alpha; = 0.5), changing only the activation function to Sigmoid:</p>
+                    <div class="box box-orange">
+                        <div class="box-title">Step-by-Step Update Calculation</div>
+                        <ol>
+                            <li><strong>Weighted sum:</strong> z = wx + b = (1)(2) + 0 = 2</li>
+                            <li><strong>Activation:</strong> ŷ = &sigma;(2) = 1 / (1 + e<sup>-2</sup>) &approx; 0.880797</li>
+                            <li><strong>Error:</strong> ŷ - y = 0.880797 - 0 = 0.880797</li>
+                            <li><strong>Derivative:</strong> &sigma;'(2) = &sigma;(2)(1 - &sigma;(2)) = (0.880797)(0.119203) &approx; 0.104994</li>
+                            <li><strong>Gradient:</strong> &part;L/&part;w = (ŷ - y) &sigma;'(z) x = (0.880797)(0.104994)(2) &approx; 0.184956</li>
+                            <li><strong>Update:</strong> w<sub>new</sub> = w<sub>old</sub> - &alpha; &part;L/&part;w = 1 - (0.5)(0.184956) = 0.907522</li>
+                        </ol>
+                    </div>
+
+                    <h3 id="sub-5-2">5.2 Direction and Sign Validation</h3>
+                    <p>Let's perform a sanity check on the update direction:</p>
+                    <ul>
+                        <li>The target is <strong>y = 0</strong>, and our prediction is <strong>ŷ = 0.88</strong> (too high).</li>
+                        <li>To lower ŷ, we must lower the raw score <em>z</em> (since sigmoid increases monotonically with <em>z</em>).</li>
+                        <li>Since <em>z = wx + b</em> and input <strong>x = 2</strong> (positive), we must lower <em>w</em> to lower <em>z</em>.</li>
+                        <li>The weight decreased from 1 to 0.907522, confirming the mathematical update moves the correct way.</li>
+                    </ul>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 6 -->
+            <section class="topic-section" id="topic-6">
+                <div class="topic-header" onclick="toggleSection('content-6')">
+                    <div class="topic-number">6</div>
+                    <h2>The Tanh Function</h2>
+                </div>
+                <div class="collapsible-content" id="content-6">
+                    <h3 id="sub-6-1">6.1 Definition and Output Range</h3>
+                    <p>The **Hyperbolic Tangent (Tanh)** function is another S-shaped curve, but it maps values to a symmetric range between -1 and 1, passing through the origin:</p>
+                    <p style="text-align: center; font-size: 1.2rem; font-weight: bold; margin: 1rem 0;">tanh(z) = (e<sup>z</sup> - e<sup>-z</sup>) / (e<sup>z</sup> + e<sup>-z</sup>)</p>
+
+                    <h3 id="sub-6-2">6.2 Derivative Derivation</h3>
+                    <p>Let u = e<sup>z</sup> - e<sup>-z</sup> and v = e<sup>z</sup> + e<sup>-z</sup>, so tanh(z) = u / v:</p>
+                    <ol>
+                        <li>Differentiate numerator and denominator: u' = e<sup>z</sup> + e<sup>-z</sup> = v, and v' = e<sup>z</sup> - e<sup>-z</sup> = u.</li>
+                        <li>Apply the quotient rule: d/dz(u/v) = (u'v - uv') / v<sup>2</sup>.</li>
+                        <li>Substitute variables: tanh'(z) = (v<sup>2</sup> - u<sup>2</sup>) / v<sup>2</sup>.</li>
+                        <li>Split the fraction: tanh'(z) = 1 - (u<sup>2</sup> / v<sup>2</sup>).</li>
+                    </ol>
+                    <div class="box box-blue">
+                        <div class="box-title">Tanh Derivative Formula</div>
+                        <p style="text-align: center; font-size: 1.2rem; font-weight: bold; margin: 0.5rem 0;">tanh'(z) = 1 - tanh<sup>2</sup>(z)</p>
+                        <p>At z = 0, tanh(0) = 0, yielding a peak derivative height of 1.00.</p>
+                    </div>
+
+                    <h3 id="sub-6-3">6.3 Numerical Example with Tanh</h3>
+                    <p>Let's run a comparative numerical test: x = 1, w = 0, b = 0, target y = 1, and &alpha; = 1.</p>
+                    <div class="box box-orange">
+                        <div class="box-title">Tanh Update Calculation</div>
+                        <ul>
+                            <li>Weighted sum: z = (0)(1) + 0 = 0</li>
+                            <li>Activation: ŷ = tanh(0) = 0</li>
+                            <li>Error: ŷ - y = 0 - 1 = -1</li>
+                            <li>Derivative: tanh'(0) = 1 - 0<sup>2</sup> = 1</li>
+                            <li>Gradient: &part;L/&part;w = (-1)(1)(1) = -1</li>
+                            <li>Update: w<sub>new</sub> = 0 - (1)(-1) = 1</li>
+                        </ul>
+                    </div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-7').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 7 -->
+            <section class="topic-section" id="topic-7">
+                <div class="topic-header" onclick="toggleSection('content-7')">
+                    <div class="topic-number">7</div>
+                    <h2>Comparison and Summary</h2>
+                </div>
+                <div class="collapsible-content" id="content-7">
+                    <h3 id="sub-7-1">7.1 Sigmoid vs. Tanh Peak Heights</h3>
+                    <p>Let's compare the performance of Sigmoid vs. Tanh under identical parameters (x = 1, w = 0, b = 0, y = 1, &alpha; = 1):</p>
+                    <ul>
+                        <li><strong>Sigmoid step size:</strong> 0.125</li>
+                        <li><strong>Tanh step size:</strong> 1.000</li>
+                    </ul>
+                    <p>The Tanh step is exactly <strong>8 times larger</strong> than the Sigmoid step. This is driven by two factors:</p>
+                    <ol>
+                        <li><strong>Error ratio:</strong> Tanh outputs -1 to 1, doubling the error magnitude (ratio of 2).</li>
+                        <li><strong>Derivative ratio:</strong> Tanh's peak derivative is 1.00 compared to Sigmoid's 0.25 (ratio of 4).</li>
+                        <li>Product of ratios: 2 &times; 4 = 8.</li>
+                    </ol>
+
+                    <h3 id="sub-7-2">7.2 Summary Table of Activation Functions</h3>
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--gray-border);">
+                                <th style="text-align: left; padding: 8px;">Activation</th>
+                                <th style="text-align: left; padding: 8px;">Formula f(z)</th>
+                                <th style="text-align: left; padding: 8px;">Derivative f'(z)</th>
+                                <th style="text-align: left; padding: 8px;">Max f'</th>
+                                <th style="text-align: left; padding: 8px;">Learns?</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid var(--gray-border);">
+                                <td style="padding: 8px;"><strong>Threshold</strong></td>
+                                <td style="padding: 8px;">1 if z &ge; 0 else 0</td>
+                                <td style="padding: 8px;">0 (z &ne; 0)</td>
+                                <td style="padding: 8px;">0.00</td>
+                                <td style="padding: 8px;">No</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--gray-border);">
+                                <td style="padding: 8px;"><strong>Sigmoid</strong></td>
+                                <td style="padding: 8px;">1 / (1 + e<sup>-z</sup>)</td>
+                                <td style="padding: 8px;">&sigma;(z)(1 - &sigma;(z))</td>
+                                <td style="padding: 8px;">0.25</td>
+                                <td style="padding: 8px;">Yes (slowly)</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--gray-border);">
+                                <td style="padding: 8px;"><strong>Tanh</strong></td>
+                                <td style="padding: 8px;">(e<sup>z</sup> - e<sup>-z</sup>) / (e<sup>z</sup> + e<sup>-z</sup>)</td>
+                                <td style="padding: 8px;">1 - tanh<sup>2</sup>(z)</td>
+                                <td style="padding: 8px;">1.00</td>
+                                <td style="padding: 8px;">Yes (faster)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="box box-beige" style="margin-top: 1.5rem;">
+                        <div class="box-title">Key takeaway</div>
+                        <p>The derivative term f'(z) acts as a gatekeeper in neural updates. If f'(z) is flat at 0, learning cannot take place. Tanh enables faster learning than Sigmoid by maintaining larger derivatives and errors around the origin.</p>
+                    </div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for your reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-7').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/2.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>
