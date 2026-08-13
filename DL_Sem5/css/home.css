@@ -415,3 +415,48 @@ footer {
         height: 12vw;
     }
 }
+
+/* Lecture Completion Tracker styles */
+.lecture-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    width: 100%;
+}
+.lecture-checkbox {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid var(--text-muted);
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s ease;
+    background: transparent;
+}
+.lecture-checkbox:hover {
+    border-color: var(--accent-purple, #7c3aed);
+    transform: scale(1.1);
+}
+.lecture-card.completed .lecture-checkbox {
+    background: var(--accent-purple, #7c3aed);
+    border-color: var(--accent-purple, #7c3aed);
+}
+.lecture-card.completed .lecture-checkbox::after {
+    content: '✓';
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.lecture-card.completed {
+    opacity: 0.75;
+}
+.lecture-card.completed h2 {
+    text-decoration: line-through;
+    opacity: 0.8;
+}
+

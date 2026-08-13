@@ -24,7 +24,7 @@
             <span class="logo-text">NST Notes</span>
         </a>
         <ul class="nav-menu">
-            <li><a href="DL_Sem5/index.html">Deep Learning (Sem 5)</a></li>
+            <li><a href="DL_Sem5/index.html">Deep Learning</a></li>
             <li><a href="AML/index.html">Advanced Machine Learning</a></li>
             <li><a href="CN/index.html">Computer Networks</a></li>
             <li><a href="MCA/index.html">Modern Computer Architecture</a></li>
@@ -47,8 +47,8 @@
                     <h2 class="subject-title">Deep Learning</h2>
                     <p class="subject-desc">Master neural networks from first principles: biological neurons, McCulloch-Pitts logic gates, forward/backward propagation, linear separation limits, and the XOR problem.</p>
                     <div class="subject-meta">
-                        <span class="subject-tag">DL Foundations (Sem 5)</span>
-                        <span class="subject-stats">2 Lectures</span>
+                        <span class="subject-tag">DL Foundations</span>
+                        <span class="subject-stats" data-subject="dl">2 Lectures &bull; 0/2 Done</span>
                     </div>
                 </a>
 
@@ -59,7 +59,7 @@
                     <p class="subject-desc">Build strong ML fundamentals conceptually, mathematically, and practically: explore structured vs unstructured data, learning paradigms, and core engineering tasks.</p>
                     <div class="subject-meta">
                         <span class="subject-tag">Advanced ML (CSA333)</span>
-                        <span class="subject-stats">1 Lecture</span>
+                        <span class="subject-stats" data-subject="aml">1 Lecture &bull; 0/1 Done</span>
                     </div>
                 </a>
 
@@ -70,7 +70,7 @@
                     <p class="subject-desc">Deconstruct the physical and logical architectures of the Internet: global routing, subsea physical fiber cables, network classifications (PAN/LAN/MAN/WAN), and top-down layers.</p>
                     <div class="subject-meta">
                         <span class="subject-tag">CN Foundations (CSAI321)</span>
-                        <span class="subject-stats">1 Lecture</span>
+                        <span class="subject-stats" data-subject="cn">1 Lecture &bull; 0/1 Done</span>
                     </div>
                 </a>
 
@@ -81,7 +81,7 @@
                     <p class="subject-desc">Master CPU design and digital logic: trace execution down the abstraction stack, implement logical gates, and apply Boolean simplification laws.</p>
                     <div class="subject-meta">
                         <span class="subject-tag">Modern Computer Architecture</span>
-                        <span class="subject-stats">1 Lecture</span>
+                        <span class="subject-stats" data-subject="mca">1 Lecture &bull; 0/1 Done</span>
                     </div>
                 </a>
 
@@ -106,7 +106,7 @@
                 <div class="stat-label">Subjects Managed</div>
             </div>
             <div class="stat-item">
-                <div class="stat-val">100%</div>
+                <div class="stat-val">0%</div>
                 <div class="stat-label">Completion Rate</div>
             </div>
         </div>
@@ -124,5 +124,83 @@
         </div>
     </footer>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const subjectLectures = {
+                dl: ['dl-l1', 'dl-l2'],
+                aml: ['aml-l1'],
+                cn: ['cn-l1'],
+                mca: ['mca-l1']
+            };
+
+            function renderUI() {
+                let totalLectures = 0;
+                let totalCompleted = 0;
+
+                for (const [subj, ids] of Object.entries(subjectLectures)) {
+                    let completed = 0;
+                    ids.forEach(id => {
+                        if (localStorage.getItem('nst-completed-' + id) === 'true') {
+                            completed++;
+                        }
+                    });
+
+                    totalLectures += ids.length;
+                    totalCompleted += completed;
+
+                    // Update subject stats UI
+                    const span = document.querySelector(`.subject-stats[data-subject="${subj}"]`);
+                    if (span) {
+                        const label = ids.length === 1 ? '1 Lecture' : ids.length + ' Lectures';
+                        span.innerHTML = `${label} &bull; ${completed}/${ids.length} Done`;
+                    }
+                }
+
+                // Update overall Completion Rate
+                const rate = totalLectures ? Math.round((totalCompleted / totalLectures) * 100) : 0;
+                const progressVal = document.querySelector('.stats-grid .stat-item:last-child .stat-val');
+                if (progressVal) {
+                    progressVal.innerText = rate + '%';
+                }
+            }
+
+            async function syncWithCloud() {
+                try {
+                    const res = await fetch('https://keyvalue.immanuel.co/api/KeyVal/GetValue/tjjy72bz/progress');
+                    if (res.ok) {
+                        const cloudDataStr = await res.json();
+                        if (cloudDataStr && cloudDataStr !== '""' && cloudDataStr !== 'null') {
+                            const cleanStr = cloudDataStr.replace(/"/g, '');
+                            const items = cleanStr.split(',');
+                            let changed = false;
+                            items.forEach(item => {
+                                const [shortKey, val] = item.split('_');
+                                if (shortKey && val) {
+                                    const currentLocal = localStorage.getItem('nst-completed-' + shortKey);
+                                    const newLocal = val === '1' ? 'true' : 'false';
+                                    if (currentLocal !== newLocal) {
+                                        localStorage.setItem('nst-completed-' + shortKey, newLocal);
+                                        changed = true;
+                                    }
+                                }
+                            });
+                            if (changed) {
+                                renderUI();
+                            }
+                        }
+                    }
+                } catch (err) {
+                    console.warn('Failed to sync progress with cloud.', err);
+                }
+            }
+
+            // Initial load
+            await syncWithCloud();
+            renderUI();
+
+            // Poll for updates in background every 3 seconds
+            setInterval(syncWithCloud, 3000);
+        });
+    </script>
 </body>
 </html>

@@ -40,8 +40,11 @@
             <div class="lectures-grid">
                 
                 <!-- Lecture 01 -->
-                <a href="lectures/lecture-01.html" class="lecture-card">
-                    <div class="lecture-number">01</div>
+                <a href="lectures/lecture-01.html" class="lecture-card" data-lecture-id="cn-l1">
+                    <div class="lecture-card-top">
+                        <div class="lecture-number">01</div>
+                        <div class="lecture-checkbox" onclick="toggleComplete(event, 'cn-l1')" title="Toggle completion status"></div>
+                    </div>
                     <h2>Introduction: The Cloud, Infrastructure & Top-Down Layers</h2>
                     <p>Understanding data center connectivity, network classifications (PAN, LAN, MAN, WAN), subsea cable physical geography, top-down layers, and grading parameters.</p>
                     <div class="lecture-card-header">
@@ -71,7 +74,7 @@
                 <div class="stat-label">Diagrams Embedded</div>
             </div>
             <div class="stat-item">
-                <div class="stat-val">100%</div>
+                <div class="stat-val">0%</div>
                 <div class="stat-label">Completed</div>
             </div>
         </div>
@@ -89,5 +92,103 @@
         </div>
     </footer>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Initial load
+            await syncWithCloud();
+            renderUI();
+
+            // Poll for updates in background every 3 seconds
+            setInterval(async () => {
+                const changed = await syncWithCloud();
+                if (changed) {
+                    renderUI();
+                }
+            }, 3000);
+        });
+
+        function renderUI() {
+            document.querySelectorAll('.lecture-card').forEach(card => {
+                const id = card.getAttribute('data-lecture-id');
+                if (localStorage.getItem('nst-completed-' + id) === 'true') {
+                    card.classList.add('completed');
+                } else {
+                    card.classList.remove('completed');
+                }
+            });
+            updateProgress();
+        }
+
+        async function syncWithCloud() {
+            try {
+                const res = await fetch('https://keyvalue.immanuel.co/api/KeyVal/GetValue/tjjy72bz/progress');
+                if (res.ok) {
+                    const cloudDataStr = await res.json();
+                    if (cloudDataStr && cloudDataStr !== '""' && cloudDataStr !== 'null') {
+                        const cleanStr = cloudDataStr.replace(/"/g, '');
+                        const items = cleanStr.split(',');
+                        let changed = false;
+                        items.forEach(item => {
+                            const [shortKey, val] = item.split('_');
+                            if (shortKey && val) {
+                                const currentLocal = localStorage.getItem('nst-completed-' + shortKey);
+                                const newLocal = val === '1' ? 'true' : 'false';
+                                if (currentLocal !== newLocal) {
+                                    localStorage.setItem('nst-completed-' + shortKey, newLocal);
+                                    changed = true;
+                                }
+                            }
+                        });
+                        return changed;
+                    }
+                }
+            } catch (err) {
+                console.warn('Failed to sync progress with cloud.', err);
+            }
+            return false;
+        }
+
+        async function toggleComplete(event, id) {
+            event.preventDefault();
+            event.stopPropagation();
+            const card = document.querySelector(`.lecture-card[data-lecture-id="${id}"]`);
+            const isCompleted = card.classList.toggle('completed');
+            localStorage.setItem('nst-completed-' + id, isCompleted);
+            updateProgress();
+            
+            // Push updated progress to cloud
+            await pushProgress();
+        }
+
+        async function pushProgress() {
+            const progressList = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith('nst-completed-')) {
+                    const val = localStorage.getItem(key) === 'true' ? '1' : '0';
+                    const shortKey = key.replace('nst-completed-', '');
+                    progressList.push(`${shortKey}_${val}`);
+                }
+            }
+            const progressStr = progressList.join(',');
+            try {
+                await fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/tjjy72bz/progress/${progressStr}`, {
+                    method: 'POST'
+                });
+            } catch (err) {
+                console.warn('Failed to upload progress to cloud.', err);
+            }
+        }
+
+        function updateProgress() {
+            const cards = document.querySelectorAll('.lecture-card');
+            const completed = document.querySelectorAll('.lecture-card.completed').length;
+            const rate = cards.length ? Math.round((completed / cards.length) * 100) : 0;
+            const progressVal = document.querySelector('.stats-grid .stat-item:last-child .stat-val');
+            if (progressVal) {
+                progressVal.innerText = rate + '%';
+            }
+        }
+    </script>
 </body>
 </html>
