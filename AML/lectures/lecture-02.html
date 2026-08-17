@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Advanced Machine Learning - Lecture 02</title>
+    <meta content="Study notes for Advanced Machine Learning (CSA333), Lecture 02 covering the ML Project Lifecycle: Problem Definition, Data Collection, Exploratory Data Analysis (EDA), and Data Preprocessing (Scaling & Encoding)." name="description"/>
+    <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>02</text></svg>" rel="icon"/>
+    <link href="../css/style.css" rel="stylesheet"/>
+</head>
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Advanced Machine Learning</h1>
+            <p>Lecture 02 - The ML Project Lifecycle (Part 1)</p>
+            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/2.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text"/>
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 5</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>Short Notes</a></li>
+                <li>
+                    <a href="#topic-1">1. Defining the Problem: The ML Blueprint<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 Translating Vague Human Problems</a></li>
+                        <li><a href="#sub-1-2">1.2 Constraints & Alignment</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Data Collection: Sourcing & Structures<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 Sourcing production data</a></li>
+                        <li><a href="#sub-2-2">2.2 Data structures (Structured vs. Unstructured)</a></li>
+                        <li><a href="#sub-2-3">2.3 Categorical vs. Numerical Feature classification</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Exploratory Data Analysis (EDA)<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 Diagnostic Checklist & Analysis levels</a></li>
+                        <li><a href="#sub-3-2">3.2 Outliers, Distributions & Correlations</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Data Preprocessing: Cleaning & Scaling<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 Handling Missing & Inconsistent Values</a></li>
+                        <li><a href="#sub-4-2">4.2 Hand-worked scaling (Min-Max, Z-score, Robust)</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Categorical Encoding Strategies<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 Label, Ordinal, One-Hot & Binary mappings</a></li>
+                        <li><a href="#sub-5-2">5.2 Curse of Dimensionality & Space comparisons</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Short Notes -->
+            <section id="short-notes" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-short-notes')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                    </div>
+                    <h2>Short Notes &amp; Visual Summary</h2>
+                </div>
+                <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
+                    <p style="margin-bottom: 1rem;">Handwritten / quick summary notes for Lecture 02:</p>
+                    <div style="text-align: center; background: var(--bg-secondary, #f8f9fa); padding: 1rem; border-radius: 8px; border: 1px solid var(--gray-border);">
+                        <a href="../images/2.png" target="_blank" title="Click to view full size">
+                            <img src="../images/2.png" alt="Lecture 02 Short Notes (Pending Upload)" style="max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); filter: grayscale(20%);" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22800%22 height=%22400%22 viewBox=%220 0 800 400%22><rect width=%22100%%22 height=%22100%%22 fill=%22%231a221e%22/><text x=%2250%%22 y=%2250%%22 font-family=%22Inter, sans-serif%22 font-size=%2224%22 fill=%22%23a0aec0%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>Short Notes Visual (images/2.png) Pending Upload</text><text x=%2250%%22 y=%2260%%22 font-family=%22Inter, sans-serif%22 font-size=%2214%22 fill=%22%23718096%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>HTML notes are fully functional. PDF is linked below.</text></svg>'" />
+                        </a>
+                        <p style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-muted);">Click image to open high-resolution version in new tab</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 1 -->
+            <section class="topic-section" id="topic-1">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>Defining the Problem: The ML Blueprint</h2>
+                </div>
+                <div class="collapsible-content" id="content-1">
+                    <h3 id="sub-1-1">1.1 Translating Vague Human Problems</h3>
+                    <p>An algorithm cannot guess what a business needs. A poorly defined problem wastes more time than a bad algorithm. To solve this, Phase 1 of the ML project lifecycle translates a messy human problem into an explicit mathematical framework using a five-step blueprint:</p>
+                    <table class="grid-table" style="width: 100%; border-collapse: collapse; margin-bottom: 1rem;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--gray-border);">
+                                <th style="text-align: left; padding: 0.5rem;">Step</th>
+                                <th style="text-align: left; padding: 0.5rem;">What You Do</th>
+                                <th style="text-align: left; padding: 0.5rem;">Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>1. Understand the Problem</strong></td>
+                                <td>Isolate the exact friction point.</td>
+                                <td>Users canceling premium subscriptions (Churn).</td>
+                            </tr>
+                            <tr>
+                                <td><strong>2. Set Quantifiable Goals</strong></td>
+                                <td>Define a measurable target.</td>
+                                <td>Reduce churn by 10% over two quarters.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>3. Assess ML Feasibility</strong></td>
+                                <td>Ask: do we need ML? Do we have data? Can SQL solve it?</td>
+                                <td>If a simple SQL query can solve the logic, skip ML.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>4. Identify Constraints</strong></td>
+                                <td>Evaluate budget, latency limits, and privacy laws.</td>
+                                <td>In-app predictions must run in &lt; 10ms on a mobile chip.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>5. Stakeholder Alignment</strong></td>
+                                <td>Bring PMs, devs, and executives to a agreement.</td>
+                                <td>Share a common definition of "success".</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="box box-green">
+                        <div class="box-title">Blueprint in Action</div>
+                        <ul>
+                            <li><strong>Vague:</strong> "We want to improve our online retail store."</li>
+                            <li><strong>Rigorous:</strong> "Using historical clickstreams and purchase data, predict which users will stop shopping within 3 months."</li>
+                        </ul>
+                    </div>
+
+                    <h3 id="sub-1-2">1.2 Constraints & Alignment</h3>
+                    <p>Operational constraints can break an ML project before coding starts. For example, GDPR rules or data collection limitations might make it illegal to use personal data for training models, rendering the project infeasible from the start.</p>
+                    <div class="box box-red">
+                        <div class="box-title">Critical Takeaway</div>
+                        <p>Never write a line of ML code until you have a quantified target, confirmed data access, and stakeholder agreement on metrics.</p>
+                    </div>
+                    <div class="topic-nav">
+                        <a href="lecture-01.html" class="btn" style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;">Previous Lecture</a>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section class="topic-section" id="topic-2">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>Data Collection: Sourcing & Structures</h2>
+                </div>
+                <div class="collapsible-content" id="content-2">
+                    <h3 id="sub-2-1">2.1 Sourcing production data</h3>
+                    <p>An algorithm has no concept of reality; it only knows the world you present via training data. Flawed data collection leads to a broken model. There are five main production data sources:</p>
+                    <ul>
+                        <li><strong>Internal Warehouses (SQL databases):</strong> Customer transactions, purchase history, system logs.</li>
+                        <li><strong>Public Repositories:</strong> Open data repositories like Kaggle and the UCI Machine Learning Repository.</li>
+                        <li><strong>APIs:</strong> Real-time streaming data (e.g., weather feeds, live stock prices).</li>
+                        <li><strong>Web Scraping:</strong> Automated web data extraction (e.g., competitor retail pricing).</li>
+                        <li><strong>Manual Labeling:</strong> Human annotators labeling raw data (e.g., radiologists labeling tumors on X-rays).</li>
+                    </ul>
+
+                    <h3 id="sub-2-2">2.2 Data structures (Structured vs. Unstructured)</h3>
+                    <p>Data exists in diverse formats, defining how it must be ingested:</p>
+                    <ul>
+                        <li><strong>Structured:</strong> Rigid table formats with rows and columns (e.g., SQL databases).</li>
+                        <li><strong>Unstructured:</strong> Free-form files with no strict tabular layout (e.g., images, video, audio, text reviews).</li>
+                        <li><strong>Semi-structured:</strong> Relies on tags, markers, or key-value structures without a rigid schema (e.g., JSON, XML, sensor logs).</li>
+                        <li><strong>Time-series:</strong> Data points recorded at successive, uniform time intervals (e.g., daily stock prices, hourly weather metrics).</li>
+                    </ul>
+
+                    <h3 id="sub-2-3">2.3 Categorical vs. Numerical Feature classification</h3>
+                    <p>Features must be classified precisely to determine appropriate encoding and scaling:</p>
+                    <ul>
+                        <li><strong>Categorical Nominal:</strong> Labels without any mathematical rank or order (e.g., Blood Type: A, B, AB, O; Eye Color; City).</li>
+                        <li><strong>Categorical Ordinal:</strong> Category labels with a distinct rank or order (e.g., Education: HS &lt; Bachelor &lt; Master &lt; PhD).</li>
+                        <li><strong>Numerical Discrete:</strong> Countable integer values (e.g., number of rooms, items in a cart).</li>
+                        <li><strong>Numerical Continuous:</strong> Infinitely divisible values representing measurements (e.g., income, temperature, weight).</li>
+                    </ul>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section class="topic-section" id="topic-3">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>Exploratory Data Analysis (EDA)</h2>
+                </div>
+                <div class="collapsible-content" id="content-3">
+                    <h3 id="sub-3-1">3.1 Diagnostic Checklist & Analysis levels</h3>
+                    <p>Like a medical examiner, you must diagnose your data before treating it. EDA identifies critical anomalies before preprocessing occurs. The EDA checklist includes:</p>
+                    <ol>
+                        <li><strong>Dataset Structure:</strong> Examining columns, types, and counts.</li>
+                        <li><strong>Missing Values:</strong> Finding empty values and checking if they are missing at random.</li>
+                        <li><strong>Outliers:</strong> Detecting extreme anomalies (errors vs. rare events).</li>
+                        <li><strong>Duplicates:</strong> Removing identical records from collection bugs.</li>
+                        <li><strong>Distributions:</strong> Checking skewness (bell curves vs. left/right skews).</li>
+                        <li><strong>Relationships:</strong> Finding correlations and redundant features.</li>
+                        <li><strong>Class Imbalance:</strong> Identifying heavily skewed target labels (e.g., 99% non-fraud vs 1% fraud).</li>
+                    </ol>
+
+                    <h4 style="margin-top:1rem;">Levels of Analysis:</h4>
+                    <ul>
+                        <li><strong>Univariate:</strong> Analyzing one feature alone (distributions, skew, outliers) using Histograms and Box Plots.</li>
+                        <li><strong>Bivariate:</strong> Checking relationships between two features using Scatter Plots and Heatmaps.</li>
+                        <li><strong>Multivariate:</strong> Investigating interactions across multiple features using Pair Plots.</li>
+                    </ul>
+
+                    <h3 id="sub-3-2">3.2 Outliers, Distributions & Correlations</h3>
+                    <p>Visualizing data reveals hidden patterns:</p>
+                    <ul>
+                        <li><strong>Histogram:</strong> Best for observing distributions and skewness.</li>
+                        <li><strong>Box Plot:</strong> Best for outliers and visualizing the Interquartile Range (IQR).</li>
+                        <li><strong>Correlation Heatmap:</strong> Displays coefficients from +1 (perfect positive correlation) to -1 (perfect negative correlation).</li>
+                    </ul>
+                    <div class="box box-orange">
+                        <div class="box-title">Why Class Imbalance Matters</div>
+                        <p>If a fraud detection dataset is 99% non-fraud, a dummy model that predicts "non-fraud" every single time will score 99% accuracy. This is useless because the recall for the fraud class is 0%.</p>
+                    </div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section class="topic-section" id="topic-4">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>Data Preprocessing: Cleaning & Scaling</h2>
+                </div>
+                <div class="collapsible-content" id="content-4">
+                    <h3 id="sub-4-1">4.1 Handling Missing & Inconsistent Values</h3>
+                    <p>Real-world data is messy. Algorithms require clean numerical inputs:</p>
+                    <ul>
+                        <li><strong>Missing Data Strategies:</strong>
+                            <ul>
+                                <li><em>Deletion:</em> Dropping rows/columns. Best only if &lt;1–2% data is missing or a column is &gt;80% empty. Otherwise introduces bias.</li>
+                                <li><em>Imputation:</em> Filling missing cells with statistical values (mean/median for numerical, mode for categorical).</li>
+                            </ul>
+                        </li>
+                        <li><strong>Inconsistent Data:</strong>
+                            <ul>
+                                <li><em>Mixed Units:</em> Weight in both kg and lbs &rarr; Standardize to a single unit.</li>
+                                <li><em>Typos:</em> e.g., 'Californa' vs. 'California' &rarr; Clean using Regex or Levenshtein distance matching.</li>
+                                <li><em>Duplicates:</em> Same record logged twice &rarr; Remove duplicate records.</li>
+                                <li><em>Inconsistent Labels:</em> Yes, Y, True, 1 &rarr; Map all to a single label format (e.g., boolean representation).</li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <h3 id="sub-4-2">4.2 Hand-worked scaling (Min-Max, Z-score, Robust)</h3>
+                    <p>When features have highly different ranges, distance-based models (KNN, SVM) and gradient descent will be dominated by the larger range. Scaling resolves this.</p>
+                    <table class="grid-table" style="width: 100%; border-collapse: collapse; margin-bottom: 1.5rem;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--gray-border);">
+                                <th style="text-align: left; padding: 0.5rem;">Scaler</th>
+                                <th style="text-align: left; padding: 0.5rem;">Formula</th>
+                                <th style="text-align: left; padding: 0.5rem;">Best Used When</th>
+                                <th style="text-align: left; padding: 0.5rem;">Drawback/Risk</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Min-Max (Normalization)</strong></td>
+                                <td>X<sub>scaled</sub> = (X - X<sub>min</sub>) / (X<sub>max</sub> - X<sub>min</sub>)</td>
+                                <td>Neural networks; bounded range [0, 1]; non-Gaussian.</td>
+                                <td>One major outlier squashes all typical values close to 0.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Z-Score (Standardization)</strong></td>
+                                <td>Z = (X - &mu;) / &sigma;</td>
+                                <td>Normal distribution; mean &rarr; 0, standard deviation &rarr; 1.</td>
+                                <td>Assumes an approximately Gaussian distribution.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Max Absolute</strong></td>
+                                <td>X<sub>scaled</sub> = X / max(|X|)</td>
+                                <td>Sparse data; preserves zeros ([-1, 1] output).</td>
+                                <td>Sensitive to extreme outliers.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Robust Scaler</strong></td>
+                                <td>X<sub>scaled</sub> = (X - Median) / IQR</td>
+                                <td>Heavy outliers present; ignores mean/std. Uses Median and IQR.</td>
+                                <td>Ignores outer distribution data.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4 style="margin-top: 1rem;">Hand Computation Walkthrough: Robust Scaling</h4>
+                    <p>Given dataset X = [100, 150, 200, 250, 50000]:</p>
+                    <ol>
+                        <li>Sorted list: [100, 150, 200, 250, 50000].</li>
+                        <li><strong>Median (Q2)</strong> = 200.</li>
+                        <li><strong>Q1</strong> (median of lower half [100, 150]) = 125.</li>
+                        <li><strong>Q3</strong> (median of upper half [250, 50000]) = 25125.</li>
+                        <li><strong>IQR</strong> = Q3 - Q1 = 25125 - 125 = 25000.</li>
+                        <li>Scale X = 100: (100 - 200) / 25000 = -0.004.</li>
+                        <li>Scale X = 50000: (50000 - 200) / 25000 = 1.992.</li>
+                    </ol>
+                    <p><strong>Note:</strong> The massive outlier (50,000) did not break the scaling limits because the IQR bounds typical data values securely.</p>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 5 -->
+            <section class="topic-section" id="topic-5">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>Categorical Encoding Strategies</h2>
+                </div>
+                <div class="collapsible-content" id="content-5">
+                    <h3 id="sub-5-1">5.1 Label, Ordinal, One-Hot & Binary mappings</h3>
+                    <p>Mapping strings to raw integers (e.g. Red=0, Green=1, Blue=2) forces models to assume Blue &gt; Green &gt; Red, introducing a mathematical bias. We must encode categories correctly:</p>
+                    <ul>
+                        <li><strong>Label Encoding:</strong> Map unique categories to unique integers (e.g., target labels like Spam=1, Ham=0). Best for binary target variables.</li>
+                        <li><strong>Ordinal Encoding:</strong> Explicitly preserve rank order (e.g., Low=0, Med=1, High=2).</li>
+                        <li><strong>One-Hot Encoding:</strong> Create N binary columns where a single high bit indicates the category. Best for unordered nominal data with low cardinality.</li>
+                        <li><strong>Binary Encoding:</strong> Categories are mapped to integers, which are then converted to binary digits. The binary digits are split into separate columns. Best for high-cardinality nominal data.</li>
+                    </ul>
+
+                    <h3 id="sub-5-2">5.2 Curse of Dimensionality & Space comparisons</h3>
+                    <p>One-hot encoding high-cardinality features (e.g., 1000 cities) creates 1000 sparse columns, causing the <strong>Curse of Dimensionality</strong>. Binary encoding resolves this space issue:</p>
+                    <div class="box box-orange">
+                        <div class="box-title">Space Complexity: One-Hot vs. Binary</div>
+                        <p>For 1,000 categories:</p>
+                        <ul>
+                            <li><strong>One-Hot Encoding:</strong> Creates 1,000 columns.</li>
+                            <li><strong>Binary Encoding:</strong> Creates only &lceil;log<sub>2</sub>(1000)&rceil; &approx; 10 columns.</li>
+                        </ul>
+                    </div>
+
+                    <h4 style="margin-top: 1rem;">Example: Binary Encoding for [Red, Green, Blue]</h4>
+                    <p>Map integers: Red = 1 (binary 01), Green = 2 (binary 10), Blue = 3 (binary 11):</p>
+                    <table class="grid-table" style="width: 50%; border-collapse: collapse; margin-top: 0.5rem;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--gray-border);">
+                                <th style="padding: 0.25rem;">Input</th>
+                                <th style="padding: 0.25rem;">Bit 1</th>
+                                <th style="padding: 0.25rem;">Bit 0</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Red</td>
+                                <td>0</td>
+                                <td>1</td>
+                            </tr>
+                            <tr>
+                                <td>Green</td>
+                                <td>1</td>
+                                <td>0</td>
+                            </tr>
+                            <tr>
+                                <td>Blue</td>
+                                <td>1</td>
+                                <td>1</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <a href="#original-pdf" class="btn" style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;" onclick="document.getElementById('original-pdf').scrollIntoView()">Next Section</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for your reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/2.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>

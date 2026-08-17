@@ -30,7 +30,7 @@
             <li><a href="MCA/index.html">Modern Computer Architecture</a></li>
             <li><a href="archive.html">Archive</a></li>
         </ul>
-        <div class="nav-stats">5 Lectures &bull; 28 Topics</div>
+        <div class="nav-stats">8 Lectures &bull; 43 Topics</div>
     </nav>
 
 
@@ -59,7 +59,7 @@
                     <p class="subject-desc">Build strong ML fundamentals conceptually, mathematically, and practically: explore structured vs unstructured data, learning paradigms, and core engineering tasks.</p>
                     <div class="subject-meta">
                         <span class="subject-tag">Advanced ML (CSA333)</span>
-                        <span class="subject-stats" data-subject="aml">1 Lecture &bull; 0/1 Done</span>
+                        <span class="subject-stats" data-subject="aml">2 Lectures &bull; 0/2 Done</span>
                     </div>
                 </a>
 
@@ -70,7 +70,7 @@
                     <p class="subject-desc">Deconstruct the physical and logical architectures of the Internet: global routing, subsea physical fiber cables, network classifications (PAN/LAN/MAN/WAN), and top-down layers.</p>
                     <div class="subject-meta">
                         <span class="subject-tag">CN Foundations (CSAI321)</span>
-                        <span class="subject-stats" data-subject="cn">1 Lecture &bull; 0/1 Done</span>
+                        <span class="subject-stats" data-subject="cn">2 Lectures &bull; 0/2 Done</span>
                     </div>
                 </a>
 
@@ -81,7 +81,7 @@
                     <p class="subject-desc">Master CPU design and digital logic: trace execution down the abstraction stack, implement logical gates, and apply Boolean simplification laws.</p>
                     <div class="subject-meta">
                         <span class="subject-tag">Modern Computer Architecture</span>
-                        <span class="subject-stats" data-subject="mca">1 Lecture &bull; 0/1 Done</span>
+                        <span class="subject-stats" data-subject="mca">2 Lectures &bull; 0/2 Done</span>
                     </div>
                 </a>
 
@@ -94,11 +94,11 @@
         <h3 class="stats-title">Browse compile metrics</h3>
         <div class="stats-grid">
             <div class="stat-item">
-                <div class="stat-val">5</div>
+                <div class="stat-val">8</div>
                 <div class="stat-label">Total Lectures</div>
             </div>
             <div class="stat-item">
-                <div class="stat-val">28</div>
+                <div class="stat-val">43</div>
                 <div class="stat-label">Topics Compiled</div>
             </div>
             <div class="stat-item">
@@ -128,9 +128,9 @@
         document.addEventListener('DOMContentLoaded', async () => {
             const subjectLectures = {
                 dl: ['dl-l1', 'dl-l2'],
-                aml: ['aml-l1'],
-                cn: ['cn-l1'],
-                mca: ['mca-l1']
+                aml: ['aml-l1', 'aml-l2'],
+                cn: ['cn-l1', 'cn-l2'],
+                mca: ['mca-l1', 'mca-l2']
             };
 
             function renderUI() {

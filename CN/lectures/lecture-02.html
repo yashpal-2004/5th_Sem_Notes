@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Computer Networks - Lecture 02</title>
+    <meta content="Study notes for Computer Networks (CSAI321), Lecture 02 covering Circuit vs Packet Switching, Store-and-Forward transmission, the 4 sources of network delay (Processing, Queuing, Transmission, Propagation), and Bottleneck throughput." name="description"/>
+    <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>02</text></svg>" rel="icon"/>
+    <link href="../css/style.css" rel="stylesheet"/>
+</head>
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Computer Networks Foundations</h1>
+            <p>Lecture 02 - Moving Data Through the Core: Switching, Delays & Bottlenecks</p>
+            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/2.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text"/>
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 5</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>Short Notes</a></li>
+                <li>
+                    <a href="#topic-1">1. Global Infrastructure Recap & The AI Network Era<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 Core Components & Scale</a></li>
+                        <li><a href="#sub-1-2">1.2 AI Network Requirements</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Circuit Switching vs. Packet Switching<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 Circuit Switching: Dedicated Paths</a></li>
+                        <li><a href="#sub-2-2">2.2 Packet Switching: Sharing on Demand</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Packets, Store-and-Forward & Best-Effort Core<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 What is a Packet? & Store-and-Forward</a></li>
+                        <li><a href="#sub-3-2">3.2 Statistical Multiplexing & Best-Effort Delivery</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. The Four Sources of Network Delay<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 Processing & Queuing Delay</a></li>
+                        <li><a href="#sub-4-2">4.2 Transmission vs. Propagation Delay</a></li>
+                        <li><a href="#sub-4-3">4.3 Caravan Analogy & Numerical Examples</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Throughput & Bottleneck Links<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 Understanding Throughput</a></li>
+                        <li><a href="#sub-5-2">5.2 Finding the Bottleneck Hop</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Short Notes -->
+            <section id="short-notes" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-short-notes')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                    </div>
+                    <h2>Short Notes &amp; Visual Summary</h2>
+                </div>
+                <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
+                    <p style="margin-bottom: 1rem;">Handwritten / quick summary notes for Lecture 02:</p>
+                    <div style="text-align: center; background: var(--bg-secondary, #f8f9fa); padding: 1rem; border-radius: 8px; border: 1px solid var(--gray-border);">
+                        <a href="../images/2.png" target="_blank" title="Click to view full size">
+                            <img src="../images/2.png" alt="Lecture 02 Short Notes (Pending Upload)" style="max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); filter: grayscale(20%);" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22800%22 height=%22400%22 viewBox=%220 0 800 400%22><rect width=%22100%%22 height=%22100%%22 fill=%22%231a221e%22/><text x=%2250%%22 y=%2250%%22 font-family=%22Inter, sans-serif%22 font-size=%2224%22 fill=%22%23a0aec0%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>Short Notes Visual (images/2.png) Pending Upload</text><text x=%2250%%22 y=%2260%%22 font-family=%22Inter, sans-serif%22 font-size=%2214%22 fill=%22%23718096%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>HTML notes are fully functional. PDF is linked below.</text></svg>'" />
+                        </a>
+                        <p style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-muted);">Click image to open high-resolution version in new tab</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 1 -->
+            <section class="topic-section" id="topic-1">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>Global Infrastructure Recap & The AI Network Era</h2>
+                </div>
+                <div class="collapsible-content" id="content-1">
+                    <h3 id="sub-1-1">1.1 Core Components & Scale</h3>
+                    <p>The global infrastructure is massive and complex. To recap the physical scale of the "Cloud":</p>
+                    <ul>
+                        <li><strong>Physical Servers:</strong> Millions of servers are housed inside data centers worldwide, powering applications.</li>
+                        <li><strong>Subsea Cabling:</strong> Over <strong>597 submarine cables</strong> route data globally across oceans, connecting continents dynamically.</li>
+                    </ul>
+                    
+                    <h3 id="sub-1-2">1.2 AI Network Requirements</h3>
+                    <p>Modern Artificial Intelligence (AI) workloads demand a massive shift in how networks are structured:</p>
+                    <ul>
+                        <li><strong>Immense Compute Needs:</strong> Training large language models (LLMs) requires clustering <strong>10,000+ GPUs</strong>.</li>
+                        <li><strong>Ultra-low Latency:</strong> Standard networks are too slow for fast GPU-to-GPU communications. AI requires specialized, high-bandwidth interconnects to avoid networking bottlenecks during parallelized matrix calculations.</li>
+                    </ul>
+                    <div class="box box-blue">
+                        <div class="box-title">Key Insight</div>
+                        <p>The network is just as critical as the compute hardware in the modern AI training stack. A slow connection will leave expensive GPUs sitting idle, waiting for parameter weights to sync.</p>
+                    </div>
+                    <div class="topic-nav">
+                        <a href="lecture-01.html" class="btn" style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;">Previous Lecture</a>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section class="topic-section" id="topic-2">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>Circuit Switching vs. Packet Switching</h2>
+                </div>
+                <div class="collapsible-content" id="content-2">
+                    <h3 id="sub-2-1">2.1 Circuit Switching: Dedicated Paths</h3>
+                    <p>This is the classic landline telephone network model. Before any communication begins, the source and destination must establish a dedicated end-to-end path (circuit) through the network core.</p>
+                    <ul>
+                        <li><strong>Guaranteed Capacity:</strong> Once the circuit is set up, the allocated capacity is reserved exclusively. This ensures a predictable, stable transmission rate with zero performance surprises.</li>
+                        <li><strong>Inefficient for Bursty Data:</strong> If the users go silent (e.g., pausing for 10 seconds to think), the reserved circuit capacity sits idle. It cannot be utilized by any other user on the network, leading to wasted bandwidth.</li>
+                    </ul>
+
+                    <h3 id="sub-2-2">2.2 Packet Switching: Sharing on Demand</h3>
+                    <p>This is the model used by WhatsApp calls and the modern internet. No reservations are made. Instead, resources are allocated on demand.</p>
+                    <ul>
+                        <li><strong>Idle Efficiency:</strong> If you stop talking or pause data transmission, zero packets are pushed onto the wire. That capacity is instantly available for other users to send their packets.</li>
+                        <li><strong>Resource Sharing:</strong> Many users share the same physical links dynamically.</li>
+                    </ul>
+
+                    <div class="box box-beige">
+                        <div class="box-title">Analogy: The Landline vs. WhatsApp Call</div>
+                        <ul>
+                            <li><strong>Landline (Circuit Switching):</strong> When Grandma pauses for 10 seconds, that line's resource sits idle, reserved, but wasted.</li>
+                            <li><strong>WhatsApp (Packet Switching):</strong> When you pause for 10 seconds, no packets are sent. Other users' packets fill the space, maximizing the utility of the link.</li>
+                        </ul>
+                    </div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section class="topic-section" id="topic-3">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>Packets, Store-and-Forward & Best-Effort Core</h2>
+                </div>
+                <div class="collapsible-content" id="content-3">
+                    <h3 id="sub-3-1">3.1 What is a Packet? & Store-and-Forward</h3>
+                    <p>In packet-switched networks, applications slice data (web pages, photos, audio clips) into small, manageable chunks called <strong>packets</strong>.</p>
+                    <ul>
+                        <li><strong>Packet Structure:</strong> A packet contains a <strong>Header</strong> (addressing & routing metadata) and a <strong>Payload</strong> (the actual application content).</li>
+                        <li><strong>Store-and-Forward Rule:</strong> Most packet routers operate on a store-and-forward policy. A router must receive and store the <em>entire</em> packet before it starts transmitting the first bit of that packet onto the next hop. This allows the router to check the header and verify there are no transmission errors before forwarding.</li>
+                    </ul>
+
+                    <h3 id="sub-3-2">3.2 Statistical Multiplexing & Best-Effort Delivery</h3>
+                    <p>Rather than partitioning link capacity statically (like circuit switching), packet switching aggregates bursty traffic dynamically. This is known as <strong>Statistical Multiplexing</strong>.</p>
+                    <ul>
+                        <li><strong>Superpower 1: Efficiency:</strong> Networks leverage the statistical reality that not all users transmit at maximum rates simultaneously, allowing more active users to share a single link.</li>
+                        <li><strong>Superpower 2: Resilience:</strong> Packets do not rely on pre-reserved static paths. If a router or intermediate link fails, packets can simply route dynamically around the failure spot.</li>
+                        <li><strong>The Trade-off (Best-Effort Core):</strong> Packet switching offers no built-in performance guarantees. Packets can wait in buffer queues, experience delay variance (jitter), or be dropped entirely if a router's buffer overflows.</li>
+                    </ul>
+
+                    <div class="box box-orange">
+                        <div class="box-title">Why TCP Exists</div>
+                        <p>Because the network core is a "best-effort", unreliable packet-switching environment, protocols like <strong>TCP (Transmission Control Protocol)</strong> are needed at the edges. TCP handles error recovery, retransmits lost packets, and manages flow control to present a reliable interface to applications.</p>
+                    </div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section class="topic-section" id="topic-4">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>The Four Sources of Network Delay</h2>
+                </div>
+                <div class="collapsible-content" id="content-4">
+                    <h3 id="sub-4-1">4.1 Processing & Queuing Delay</h3>
+                    <p>Every packet traversing a network router experiences four distinct delay components:</p>
+                    <ol>
+                        <li><strong>Nodal Processing Delay (d<sub>proc</sub>):</strong> The time a router takes to evaluate the packet header, verify the checksum for bit errors, and determine the appropriate outgoing interface. (Typically microseconds, tiny).</li>
+                        <li><strong>Queuing Delay (d<sub>queue</sub>):</strong> The time a packet spends waiting in a router's buffer queue before being pushed onto the link. This delay is highly variable and depends on the amount of traffic already waiting.</li>
+                    </ol>
+
+                    <h3 id="sub-4-2">4.2 Transmission vs. Propagation Delay</h3>
+                    <p>These two delays are often confused but are physically distinct:</p>
+                    <ol start="3">
+                        <li><strong>Transmission Delay (d<sub>trans</sub>):</strong> The time required to push all the packet's bits onto the physical transmission link. It depends on packet length (L bits) and transmission rate (R bits/sec).
+                            <div class="formula">d<sub>trans</sub> = L / R</div>
+                        </li>
+                        <li><strong>Propagation Delay (d<sub>prop</sub>):</strong> The time required for a single bit to physically travel from one end of the physical link to the other. It depends on the link distance (d) and the wave propagation speed (s) of the physical medium (typically ~ 2 &times; 10<sup>8</sup> m/s in optical fiber).
+                            <div class="formula">d<sub>prop</sub> = d / s</div>
+                        </li>
+                    </ol>
+
+                    <h3 id="sub-4-3">4.3 Caravan Analogy & Numerical Examples</h3>
+                    <div class="box box-green">
+                        <div class="box-title">The Toll-Booth Caravan Analogy</div>
+                        <ul>
+                            <li><strong>Caravan of Cars:</strong> Analogous to a packet (each car represents a single bit).</li>
+                            <li><strong>Toll Booth:</strong> The transmission link. The booth must process each car one by one and push them onto the highway. This is <strong>Transmission Delay</strong>. Doubling the booths (increasing the link rate) processes cars faster.</li>
+                            <li><strong>Highway Drive:</strong> The physical link. The time a car spends driving down the road at the speed limit to the next toll booth is <strong>Propagation Delay</strong>. Adding lanes does not make a single car drive faster; only the speed limit or a shorter distance can reduce this time.</li>
+                        </ul>
+                    </div>
+
+                    <h4 style="margin-top: 1.5rem;">Worked Numerical Example: Transmission Delay</h4>
+                    <p>Compute the transmission delay (d<sub>trans</sub>) for a packet size L = 8,000 bits on a link with bandwidth R = 2 Mbps:</p>
+                    <div class="formula">
+                        d<sub>trans</sub> = 8,000 bits / 2,000,000 bits/sec = 0.004 seconds = 4 ms
+                    </div>
+                    <p>If we scale the link rate (R):</p>
+                    <ul>
+                        <li>At <strong>2 Mbps</strong>: 4 ms</li>
+                        <li>At <strong>4 Mbps</strong>: 2 ms</li>
+                        <li>At <strong>8 Mbps</strong>: 1 ms</li>
+                    </ul>
+
+                    <h4 style="margin-top: 1.5rem;">Physical Propagation Delay: Geostationary Satellite Link</h4>
+                    <div class="box box-beige">
+                        <p>Consider a geostationary satellite link operating at a fast <strong>500 Mbps</strong>. Even though the link rate is high, live voice calls experience a noticeable delay (~half a second lag).</p>
+                        <p><strong>The Physics:</strong> A geostationary satellite orbits roughly <strong>35,786 km</strong> above the Earth. A signal must travel up to the satellite and back down, totaling:
+                            Distance d &approx; 2 &times; 35,786 km = 71,572 km
+                        </p>
+                        <p>Traveling at the speed of light (3 &times; 10<sup>8</sup> m/s in vacuum):</p>
+                        <div class="formula">
+                            d<sub>prop</sub> &approx; 71,572,000 m / 300,000,000 m/s &approx; 238.5 ms (one-way)
+                        </div>
+                        <p>This results in an unavoidable ~<strong>477 ms round-trip propagation delay</strong>, purely constrained by the laws of physics, regardless of the bandwidth (e.g., 500 Mbps vs 1 Gbps).</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 5 -->
+            <section class="topic-section" id="topic-5">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>Throughput & Bottleneck Links</h2>
+                </div>
+                <div class="collapsible-content" id="content-5">
+                    <h3 id="sub-5-1">5.1 Understanding Throughput</h3>
+                    <p><strong>Throughput</strong> is the actual rate (in bits/sec) at which data is successfully transferred from the source to the destination over the network. This is the real-world performance value rather than the theoretical maximum limit.</p>
+
+                    <h3 id="sub-5-2">5.2 Finding the Bottleneck Hop</h3>
+                    <p>For an end-to-end network path, the total throughput is constrained by the slowest link on that path. This is referred to as the <strong>Bottleneck Link</strong>.</p>
+                    
+                    <div class="box box-orange">
+                        <div class="box-title">Throughput Capacity Example</div>
+                        <p>Consider a path consisting of three consecutive links:</p>
+                        <div style="text-align: center; margin: 1rem 0; font-family: monospace; font-size: 1.1rem; color: var(--blue);">
+                            Source &mdash;[10 Mbps]&rarr; Router &mdash;[2 Mbps]&rarr; Router &mdash;[5 Mbps]&rarr; Destination
+                        </div>
+                        <p>The middle link acts as the bottleneck. The end-to-end throughput is capped at <strong>2 Mbps</strong>, regardless of the faster speeds available on the other hops.</p>
+                    </div>
+
+                    <h4 style="margin-top: 1.5rem;">Case Study: "I pay for 300 Mbps. Why is my video buffering?"</h4>
+                    <p>When your ISP plan advertises 300 Mbps but a streaming video is stuttering, the bottleneck could be hiding anywhere along the path:</p>
+                    <ol>
+                        <li>An overloaded video server (e.g., Netflix server capacity exhausted).</li>
+                        <li>Congestion on a transit link between your ISP and the content provider.</li>
+                        <li>Local interference on your home Wi-Fi network (walls, distance, other devices).</li>
+                    </ol>
+                    <p>Your 300 Mbps subscription only represents the maximum capacity of your access link, which is just a single hop in a long end-to-end path.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <a href="#original-pdf" class="btn" style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;" onclick="document.getElementById('original-pdf').scrollIntoView()">Next Section</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for your reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/2.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>
