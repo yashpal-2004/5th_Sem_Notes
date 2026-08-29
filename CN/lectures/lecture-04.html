@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Computer Networks - Lecture 04</title>
+    <meta content="Study notes for Computer Networks (CSAI321), Lecture 04 covering hubs, switches, routers, firewalls, load balancers, topologies, and cloud networking foundations (regions, AZs, VPCs)." name="description"/>
+    <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>04</text></svg>" rel="icon"/>
+    <link href="../css/style.css" rel="stylesheet"/>
+</head>
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Computer Networks Foundations</h1>
+            <p>Lecture 04 - Networking Devices, Topologies and the Cloud Network</p>
+            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/4.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text"/>
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 5</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li>
+                    <a href="#topic-1">1. The Why of Network Devices<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 Why Direct Cables Do Not Scale</a></li>
+                        <li><a href="#sub-1-2">1.2 The Centralised Pivot Idea</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Core Networking Devices<span class="sub-count">7</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 The Hub (L1 Layer)</a></li>
+                        <li><a href="#sub-2-2">2.2 The Switch (L2 Layer)</a></li>
+                        <li><a href="#sub-2-3">2.3 Hub versus Switch Comparison</a></li>
+                        <li><a href="#sub-2-4">2.4 The Router (L3 Layer)</a></li>
+                        <li><a href="#sub-2-5">2.5 The Firewall (L3/L4 Filtering)</a></li>
+                        <li><a href="#sub-2-6">2.6 Load Balancers (L4/L7 Distribution)</a></li>
+                        <li><a href="#sub-2-7">2.7 Core Devices Summary Table</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Network Topologies<span class="sub-count">4</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 Star Topology</a></li>
+                        <li><a href="#sub-3-2">3.2 Mesh Topology</a></li>
+                        <li><a href="#sub-3-3">3.3 Hybrid Topology</a></li>
+                        <li><a href="#sub-3-4">3.4 Environment Selection & Trade-offs</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Software-Defined Cloud Networks<span class="sub-count">4</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 The Evolutionary Shift</a></li>
+                        <li><a href="#sub-4-2">4.2 AWS Regions & Edge Caching</a></li>
+                        <li><a href="#sub-4-3">4.3 Redundancy: Availability Zones</a></li>
+                        <li><a href="#sub-4-4">4.4 Virtual Private Cloud (VPC) & Subnets</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+        <!-- Main Content -->
+        <main id="notesContent">
+            
+            <!-- Topic 1 -->
+            <section class="topic-section" id="topic-1">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>The Why of Network Devices</h2>
+                </div>
+                <div class="collapsible-content" id="content-1">
+                    <h3 id="sub-1-1">1.1 Why Direct Cables Do Not Scale</h3>
+                    <p>Suppose you want every computer in a network to be able to talk directly to every other computer, and you connect each pair with its own dedicated cable. The number of cables needed for $n$ devices grows quadratically as:</p>
+                    <div class="formula-box">
+                        Cables = n * (n - 1) / 2
+                    </div>
+                    <ul>
+                        <li><strong>3 Devices:</strong> 3 cables</li>
+                        <li><strong>10 Devices:</strong> 45 cables</li>
+                        <li><strong>100 Devices:</strong> 4,950 cables</li>
+                        <li><strong>1,000 Devices:</strong> 499,500 cables</li>
+                    </ul>
+                    <p>As the network grows, the number of cables scales with the square of devices. This makes direct cabling impossible to manage in office configurations, let alone datacenter environments.</p>
+                    
+                    <h3 id="sub-1-2">1.2 The Centralised Pivot Idea</h3>
+                    <p>Instead of connecting everyone to everyone, we connect every device to exactly <strong>one central device</strong> in the middle. With this topology shift, $n$ devices require only $n$ cables. This centralized pivot is the reason networking hardware exists, and the differences between devices depend on how deep they look into packets to make decisions.</p>
+                    <div class="topic-nav">
+                        <button class="btn" disabled="">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section class="topic-section" id="topic-2">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>Core Networking Devices</h2>
+                </div>
+                <div class="collapsible-content" id="content-2">
+                    <h3 id="sub-2-1">2.1 The Hub (L1 Layer)</h3>
+                    <p>A hub is a Layer 1 (Physical) device. It represents the most literal interpretation of connecting everyone to one device. When a signal arrives on one port, the hub replicates it electrically and broadcasts it out of every other port. It does not understand MAC addresses or IP addresses. The main weakness of a hub is <strong>unnecessary traffic</strong>—every device must inspect and discard traffic meant for other machines, causing massive congestion as the network grows.</p>
+                    
+                    <h3 id="sub-2-2">2.2 The Switch (L2 Layer)</h3>
+                    <p>A switch operates at Layer 2 (Data Link) and acts like a "hub with a memory." It learns which MAC address resides on which physical port by inspecting incoming traffic. When a frame arrives, it unicasts it directly to the destination port instead of broadcasting it. The switch eliminates unnecessary local congestion but cannot read IP addresses, meaning it cannot forward traffic to other networks.</p>
+                    
+                    <h3 id="sub-2-3">2.3 Hub versus Switch Comparison</h3>
+                    <table style="width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.95rem;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--border-light); text-align: left;">
+                                <th style="padding: 0.75rem 0.5rem;">Feature</th>
+                                <th style="padding: 0.75rem 0.5rem;">Hub</th>
+                                <th style="padding: 0.75rem 0.5rem;">Switch</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid rgba(19, 34, 25, 0.05);">
+                                <td style="padding: 0.75rem 0.5rem; font-weight: 600;">Era</td>
+                                <td style="padding: 0.75rem 0.5rem;">1980s</td>
+                                <td style="padding: 0.75rem 0.5rem;">1990s onward</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(19, 34, 25, 0.05);">
+                                <td style="padding: 0.75rem 0.5rem; font-weight: 600;">OSI Layer</td>
+                                <td style="padding: 0.75rem 0.5rem;">Layer 1 - Physical</td>
+                                <td style="padding: 0.75rem 0.5rem;">Layer 2 - Data Link</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(19, 34, 25, 0.05);">
+                                <td style="padding: 0.75rem 0.5rem; font-weight: 600;">Addressing Type</td>
+                                <td style="padding: 0.75rem 0.5rem;">None</td>
+                                <td style="padding: 0.75rem 0.5rem;">MAC addresses</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(19, 34, 25, 0.05);">
+                                <td style="padding: 0.75rem 0.5rem; font-weight: 600;">Forwarding Logic</td>
+                                <td style="padding: 0.75rem 0.5rem;">Broadcast (Replicates to all ports)</td>
+                                <td style="padding: 0.75rem 0.5rem;">Unicast (Sends to destination port only)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3 id="sub-2-4">2.5 The Router (L3 Layer)</h3>
+                    <p>A router operates at Layer 3 (Network). It connects different local networks and forwards packets using logical IP addressing. The router makes path-finding decisions (routing) much like a GPS maps routes across different states and roads.</p>
+
+                    <h3 id="sub-2-5">2.5 The Firewall (L3/L4 Filtering)</h3>
+                    <p>A firewall is a network security device that monitors and filters incoming and outgoing traffic based on security rules. A basic packet-filtering firewall inspects Layer 3 IP headers (Source/Destination IP) and Layer 4 TCP/UDP headers (Source/Destination Port). It decides whether to allow or block packets, reading exactly two layers deep.</p>
+
+                    <h3 id="sub-2-6">2.6 Load Balancers (L4/L7 Distribution)</h3>
+                    <p>A load balancer distributes incoming network traffic across multiple back-end servers to prevent any single server from becoming a performance bottleneck. Operating at Layer 4 (Transport) or Layer 7 (Application), it ensures high availability and smooth service scaling for major web platforms like Netflix and Google.</p>
+
+                    <h3 id="sub-2-7">2.7 Core Devices Summary Table</h3>
+                    <table style="width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.95rem;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--border-light); text-align: left;">
+                                <th style="padding: 0.75rem 0.5rem;">Device</th>
+                                <th style="padding: 0.75rem 0.5rem;">Layer</th>
+                                <th style="padding: 0.75rem 0.5rem;">Decision Parameter</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid rgba(19, 34, 25, 0.05);">
+                                <td style="padding: 0.75rem 0.5rem; font-weight: 600;">Hub</td>
+                                <td style="padding: 0.75rem 0.5rem;">L1 - Physical</td>
+                                <td style="padding: 0.75rem 0.5rem;">Nothing (Repeats electrical signals)</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(19, 34, 25, 0.05);">
+                                <td style="padding: 0.75rem 0.5rem; font-weight: 600;">Switch</td>
+                                <td style="padding: 0.75rem 0.5rem;">L2 - Data Link</td>
+                                <td style="padding: 0.75rem 0.5rem;">MAC addresses (local networks)</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(19, 34, 25, 0.05);">
+                                <td style="padding: 0.75rem 0.5rem; font-weight: 600;">Router</td>
+                                <td style="padding: 0.75rem 0.5rem;">L3 - Network</td>
+                                <td style="padding: 0.75rem 0.5rem;">IP addresses (routing between networks)</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(19, 34, 25, 0.05);">
+                                <td style="padding: 0.75rem 0.5rem; font-weight: 600;">Firewall</td>
+                                <td style="padding: 0.75rem 0.5rem;">L3 / L4 (and above)</td>
+                                <td style="padding: 0.75rem 0.5rem;">IP addresses & Port numbers</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(19, 34, 25, 0.05);">
+                                <td style="padding: 0.75rem 0.5rem; font-weight: 600;">Load Balancer</td>
+                                <td style="padding: 0.75rem 0.5rem;">L4 / L7</td>
+                                <td style="padding: 0.75rem 0.5rem;">Distribution logic across target server pools</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section class="topic-section" id="topic-3">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>Network Topologies</h2>
+                </div>
+                <div class="collapsible-content" id="content-3">
+                    <h3 id="sub-3-1">3.1 Star Topology</h3>
+                    <p>In a star topology, all network devices connect to a central hub or switch. Data flows from the source device to the switch, which forwards it. The design is easy to set up and maintain, but the central switch forms a single point of failure.</p>
+                    
+                    <h3 id="sub-3-2">3.2 Mesh Topology</h3>
+                    <p>In a mesh topology, every device connects directly to every other device. It offers high fault tolerance because data has many paths. However, physical cabling cost scales as $n(n-1)/2$, making it complex. Mesh structures are very useful in wireless networks (e.g. Wi-Fi mesh extensions) where there are no cables.</p>
+                    
+                    <h3 id="sub-3-3">3.3 Hybrid Topology</h3>
+                    <p>A hybrid topology combines multiple topologies (such as joining star, ring, or bus segments). Real-world networks of any scale are almost always hybrids because different segments of an organization have different requirements.</p>
+
+                    <h3 id="sub-3-4">3.4 Environment Selection & Trade-offs</h3>
+                    <table style="width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.95rem;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--border-light); text-align: left;">
+                                <th style="padding: 0.75rem 0.5rem;">Environment</th>
+                                <th style="padding: 0.75rem 0.5rem;">Suitable Topology</th>
+                                <th style="padding: 0.75rem 0.5rem;">Primary Reason</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid rgba(19, 34, 25, 0.05);">
+                                <td style="padding: 0.75rem 0.5rem;">Small Office / LAN</td>
+                                <td style="padding: 0.75rem 0.5rem;">Star</td>
+                                <td style="padding: 0.75rem 0.5rem;">Easy installation and centralized maintenance.</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(19, 34, 25, 0.05);">
+                                <td style="padding: 0.75rem 0.5rem;">Smart Home</td>
+                                <td style="padding: 0.75rem 0.5rem;">Mesh</td>
+                                <td style="padding: 0.75rem 0.5rem;">Direct wireless device-to-device paths (high fault tolerance).</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(19, 34, 25, 0.05);">
+                                <td style="padding: 0.75rem 0.5rem;">Enterprise Datacenter</td>
+                                <td style="padding: 0.75rem 0.5rem;">Hybrid</td>
+                                <td style="padding: 0.75rem 0.5rem;">Combines scaling flexibility with high reliability structures.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section class="topic-section" id="topic-4">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>Software-Defined Cloud Networks</h2>
+                </div>
+                <div class="collapsible-content" id="content-4">
+                    <h3 id="sub-4-1">4.1 The Evolutionary Shift</h3>
+                    <p>While traditional networking relies on physical boxes, copper cables, and manual configurations, the cloud era implements the exact same concepts via software-defined networking. None of the concepts change: a load balancer or a subnet in AWS operates identical to its physical counterpart.</p>
+                    <ul>
+                        <li><strong>Physical Boxes</strong> become <strong>Virtual Instances</strong>.</li>
+                        <li><strong>Copper Cables</strong> become <strong>Virtual Overlays</strong>.</li>
+                        <li><strong>Manual Wiring</strong> becomes <strong>API calls & Console clicks</strong>.</li>
+                    </ul>
+                    
+                    <h3 id="sub-4-2">4.2 AWS Regions & Edge Caching</h3>
+                    <p>AWS isolates workloads across geographic clusters called <strong>Regions</strong> (e.g. Mumbai), connected by high-speed fiber backbones. <strong>Edge Locations</strong> serve as Content Delivery Network (CDN) caching endpoints physically located close to users, reducing propagation latency ($d$ in $d/s$ delay formula).</p>
+                    
+                    <h3 id="sub-4-3">4.3 Redundancy: Availability Zones</h3>
+                    <p>An Availability Zone (AZ) consists of one or more isolated datacenters with redundant power, cooling, and network links. Designing applications to deploy across multiple AZs ensures they survive physical facility disasters (fire, flood, local power failure).</p>
+
+                    <h3 id="sub-4-4">4.4 Virtual Private Cloud (VPC) & Subnets</h3>
+                    <p>A VPC is a private, logically isolated software-defined network inside the cloud. Engineers control routing, security gates, and partition IP addresses into <strong>subnets</strong> mapped to specific AZs. VPC IP addressing spaces are allocated using CIDR block notations.</p>
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('original-pdf').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/4.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>

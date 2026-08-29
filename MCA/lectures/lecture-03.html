@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>MCA - Lecture 03</title>
+    <meta content="CPU logic building blocks, instruction sets philosophies, decoders, multiplexers, and logic gates execution models." name="description"/>
+    <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>03</text></svg>" rel="icon"/>
+    <link href="../css/style.css" rel="stylesheet"/>
+</head>
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>MCA Coursework</h1>
+            <p>Lecture 03 - Combinational Building Blocks: CISC vs RISC ISA</p>
+            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/3.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text"/>
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 30</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li>
+                    <a href="#topic-1">1. Overview<span class="sub-count">1</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 General info</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. L03 · MODERN COMPUTER ARCHITECTURE 02 / 34<span class="sub-count">1</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 General info</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Σ<span class="sub-count">1</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 General info</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. (L2).<span class="sub-count">1</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 General info</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. L03 · MODERN COMPUTER ARCHITECTURE 03 / 34<span class="sub-count">1</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 General info</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-6">6. L03 · MODERN COMPUTER ARCHITECTURE 04 / 34<span class="sub-count">1</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-6-1">6.1 General info</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-7">7. ▣ ABSTRACTION<span class="sub-count">1</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-7-1">7.1 General info</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-8">8. ⟳ REUSE<span class="sub-count">1</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-8-1">8.1 General info</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-9">9. ✓ VERIFICATION<span class="sub-count">1</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-9-1">9.1 General info</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-10">10. ⇗ SCALE<span class="sub-count">1</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-10-1">10.1 General info</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-11">11. CORE DEFINITION<span class="sub-count">1</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-11-1">11.1 General info</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-12">12. IN<span class="sub-count">1</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-12-1">12.1 General info</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-13">13. SEL<span class="sub-count">1</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-13-1">13.1 General info</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-14">14. OUT<span class="sub-count">1</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-14-1">14.1 General info</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-15">15. L03 · MODERN COMPUTER ARCHITECTURE 06 / 34<span class="sub-count">1</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-15-1">15.1 General info</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-16">16. THINK: RAILWAY SWITCH<span class="sub-count">1</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-16-1">16.1 General info</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-17">17. L03 · MODERN COMPUTER ARCHITECTURE 07 / 34<span class="sub-count">1</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-17-1">17.1 General info</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-18">18. READING IT<span class="sub-count">1</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-18-1">18.1 General info</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-19">19. S=1.<span class="sub-count">1</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-19-1">19.1 General info</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-20">20. L03 · MODERN COMPUTER ARCHITECTURE 08 / 34<span class="sub-count">1</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-20-1">20.1 General info</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-21">21. Y = S1'S0'·I0 + S1'S0·I1 + S1S0'·I2 + S1S0·I3<span class="sub-count">1</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-21-1">21.1 General info</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-22">22. L03 · MODERN COMPUTER ARCHITECTURE 09 / 34<span class="sub-count">1</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-22-1">22.1 General info</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-23">23. WHY IT MATTERS<span class="sub-count">1</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-23-1">23.1 General info</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-24">24. L03 · MODERN COMPUTER ARCHITECTURE 10 / 34<span class="sub-count">1</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-24-1">24.1 General info</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-25">25. THE TRICK<span class="sub-count">1</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-25-1">25.1 General info</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-26">26. WHY THIS IS A BIG DEAL<span class="sub-count">1</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-26-1">26.1 General info</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-27">27. L03 · MODERN COMPUTER ARCHITECTURE 12 / 34<span class="sub-count">1</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-27-1">27.1 General info</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-28">28. MUX RUN BACKWARDS<span class="sub-count">1</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-28-1">28.1 General info</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-29">29. REAL USE<span class="sub-count">1</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-29-1">29.1 General info</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-30">30. L03 · MODERN COMPUTER ARCHITECTURE 12 / 34<span class="sub-count">1</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-30-1">30.1 General info</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Topic 1 -->
+            <section class="topic-section" id="topic-1">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>Overview</h2>
+                </div>
+                <div class="collapsible-content" id="content-1">
+                    <h3 id="sub-1-1">1.1 General info</h3>
+                    <p>Lecture: 0011 Combinational Building Blocks CSA222: Modern Computer Architecture Two Philosophies for a CPU's Language The instruction set is the contract between hardware and software — and there are two great ways to write it.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" disabled="">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 2 -->
+            <section class="topic-section" id="topic-2">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>L03 · MODERN COMPUTER ARCHITECTURE 02 / 34</h2>
+                </div>
+                <div class="collapsible-content" id="content-2">
+                    <h3 id="sub-2-1">2.1 General info</h3>
+                    <p>Where We Left Off From single gates to reusable blocks — L1 & L2 gave us the raw materials. & Gates & truth tables AND, OR, NOT, XOR — and how any behaviour becomes a truth table</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 3 -->
+            <section class="topic-section" id="topic-3">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>Σ</h2>
+                </div>
+                <div class="collapsible-content" id="content-3">
+                    <h3 id="sub-3-1">3.1 General info</h3>
+                    <p>SOP / POS forms Any truth table → a Boolean expression we can build in hardware</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 4 -->
+            <section class="topic-section" id="topic-4">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>(L2).</h2>
+                </div>
+                <div class="collapsible-content" id="content-4">
+                    <h3 id="sub-4-1">4.1 General info</h3>
+                    <p>▦ K-map minimisation Fewest gates for a given function — area, power, delay all matter (L2). ⊼ NAND is universal One gate builds everything. Today we build USEFUL things from gates. Today: stop thinking in individual gates. Start thinking in blocks you reuse everywhere.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 5 -->
+            <section class="topic-section" id="topic-5">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>L03 · MODERN COMPUTER ARCHITECTURE 03 / 34</h2>
+                </div>
+                <div class="collapsible-content" id="content-5">
+                    <h3 id="sub-5-1">5.1 General info</h3>
+                    <p>Today's Roadmap Four building blocks — then we snap them together into a CPU's core. 1 Multiplexer/Selectors Multiplexers pick one of many inputs; demultiplexers route one input to many outputs. → 2 Decoders Turn an n-bit code into one active line out of 2ⁿ — the heart of addressing. → 3 Adders Half and full adders — the arithmetic every ALU is built on. Then — the payoﬀ:  we show exactly where MUXes, decoders, and adders live inside an ALU and a register ﬁle.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 6 -->
+            <section class="topic-section" id="topic-6">
+                <div class="topic-header" onclick="toggleSection('content-6')">
+                    <div class="topic-number">6</div>
+                    <h2>L03 · MODERN COMPUTER ARCHITECTURE 04 / 34</h2>
+                </div>
+                <div class="collapsible-content" id="content-6">
+                    <h3 id="sub-6-1">6.1 General info</h3>
+                    <p>Why Reusable Blocks? Nobody designs a CPU one gate at a time — they use a parts catalogue. ~5 core block types MUX, decoder, adder, register, and a few more — repeated millions of times — build an entire processor.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-7').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 7 -->
+            <section class="topic-section" id="topic-7">
+                <div class="topic-header" onclick="toggleSection('content-7')">
+                    <div class="topic-number">7</div>
+                    <h2>▣ ABSTRACTION</h2>
+                </div>
+                <div class="collapsible-content" id="content-7">
+                    <h3 id="sub-7-1">7.1 General info</h3>
+                    <p>Think 'select this input', not '17 gates wired thus'.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-8').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 8 -->
+            <section class="topic-section" id="topic-8">
+                <div class="topic-header" onclick="toggleSection('content-8')">
+                    <div class="topic-number">8</div>
+                    <h2>⟳ REUSE</h2>
+                </div>
+                <div class="collapsible-content" id="content-8">
+                    <h3 id="sub-8-1">8.1 General info</h3>
+                    <p>One veriﬁed MUX design, dropped in everywhere it's needed.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-7').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-9').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 9 -->
+            <section class="topic-section" id="topic-9">
+                <div class="topic-header" onclick="toggleSection('content-9')">
+                    <div class="topic-number">9</div>
+                    <h2>✓ VERIFICATION</h2>
+                </div>
+                <div class="collapsible-content" id="content-9">
+                    <h3 id="sub-9-1">9.1 General info</h3>
+                    <p>Test the block once; trust every copy of it.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-8').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-10').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 10 -->
+            <section class="topic-section" id="topic-10">
+                <div class="topic-header" onclick="toggleSection('content-10')">
+                    <div class="topic-number">10</div>
+                    <h2>⇗ SCALE</h2>
+                </div>
+                <div class="collapsible-content" id="content-10">
+                    <h3 id="sub-10-1">10.1 General info</h3>
+                    <p>Small blocks cascade into big ones — 2:1 MUX → 4:1 → 8:1.</p>
+                    <p>05 / 34 1. Multiplexers A data selector: many inputs go in, a select code picks exactly one to come out.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-9').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-11').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 11 -->
+            <section class="topic-section" id="topic-11">
+                <div class="topic-header" onclick="toggleSection('content-11')">
+                    <div class="topic-number">11</div>
+                    <h2>CORE DEFINITION</h2>
+                </div>
+                <div class="collapsible-content" id="content-11">
+                    <h3 id="sub-11-1">11.1 General info</h3>
+                    <p>A Data Selector A multiplexer acts as a digital traﬃc controller for processing signals. Many inputs go in, but a dynamic select code picks exactly one to come out.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-10').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-12').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 12 -->
+            <section class="topic-section" id="topic-12">
+                <div class="topic-header" onclick="toggleSection('content-12')">
+                    <div class="topic-number">12</div>
+                    <h2>IN</h2>
+                </div>
+                <div class="collapsible-content" id="content-12">
+                    <h3 id="sub-12-1">12.1 General info</h3>
+                    <p>Many Inputs Multiple source channels arrive carrying unique parallel data streams.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-11').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-13').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 13 -->
+            <section class="topic-section" id="topic-13">
+                <div class="topic-header" onclick="toggleSection('content-13')">
+                    <div class="topic-number">13</div>
+                    <h2>SEL</h2>
+                </div>
+                <div class="collapsible-content" id="content-13">
+                    <h3 id="sub-13-1">13.1 General info</h3>
+                    <p>The Select Code Control signals act as the selector, dynamically determining the routing path.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-12').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-14').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 14 -->
+            <section class="topic-section" id="topic-14">
+                <div class="topic-header" onclick="toggleSection('content-14')">
+                    <div class="topic-number">14</div>
+                    <h2>OUT</h2>
+                </div>
+                <div class="collapsible-content" id="content-14">
+                    <h3 id="sub-14-1">14.1 General info</h3>
+                    <p>Exactly One Output Only the chosen input line is connected and successfully passes outward.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-13').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-15').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 15 -->
+            <section class="topic-section" id="topic-15">
+                <div class="topic-header" onclick="toggleSection('content-15')">
+                    <div class="topic-number">15</div>
+                    <h2>L03 · MODERN COMPUTER ARCHITECTURE 06 / 34</h2>
+                </div>
+                <div class="collapsible-content" id="content-15">
+                    <h3 id="sub-15-1">15.1 General info</h3>
+                    <p>The 2:1 Multiplexer One select line chooses between two inputs — the simplest selector. 2:1</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-14').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-16').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 16 -->
+            <section class="topic-section" id="topic-16">
+                <div class="topic-header" onclick="toggleSection('content-16')">
+                    <div class="topic-number">16</div>
+                    <h2>THINK: RAILWAY SWITCH</h2>
+                </div>
+                <div class="collapsible-content" id="content-16">
+                    <h3 id="sub-16-1">16.1 General info</h3>
+                    <p>Two tracks (A, B) converge to one line (Y). The select signal S is the switch lever deciding which train passes through. Change S, and a completely diﬀerent input ﬂows out — instantly, no data is stored.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-15').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-17').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 17 -->
+            <section class="topic-section" id="topic-17">
+                <div class="topic-header" onclick="toggleSection('content-17')">
+                    <div class="topic-number">17</div>
+                    <h2>L03 · MODERN COMPUTER ARCHITECTURE 07 / 34</h2>
+                </div>
+                <div class="collapsible-content" id="content-17">
+                    <h3 id="sub-17-1">17.1 General info</h3>
+                    <p>Building a 2:1 MUX from Gates Y = S'·A + S·B — two ANDs, one NOT, one OR.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-16').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-18').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 18 -->
+            <section class="topic-section" id="topic-18">
+                <div class="topic-header" onclick="toggleSection('content-18')">
+                    <div class="topic-number">18</div>
+                    <h2>READING IT</h2>
+                </div>
+                <div class="collapsible-content" id="content-18">
+                    <h3 id="sub-18-1">18.1 General info</h3>
+                    <p style="margin-left:1.5rem; margin-bottom:0.5rem;">• The top AND passes A only when</p>
+                    <p>S'=1 (i.e. S=0).</p>
+                    <p style="margin-left:1.5rem; margin-bottom:0.5rem;">• The bottom AND passes B only when</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-17').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-19').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 19 -->
+            <section class="topic-section" id="topic-19">
+                <div class="topic-header" onclick="toggleSection('content-19')">
+                    <div class="topic-number">19</div>
+                    <h2>S=1.</h2>
+                </div>
+                <div class="collapsible-content" id="content-19">
+                    <h3 id="sub-19-1">19.1 General info</h3>
+                    <p style="margin-left:1.5rem; margin-bottom:0.5rem;">• At any moment exactly one AND is</p>
+                    <p>'open'; the OR merges them into Y.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-18').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-20').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 20 -->
+            <section class="topic-section" id="topic-20">
+                <div class="topic-header" onclick="toggleSection('content-20')">
+                    <div class="topic-number">20</div>
+                    <h2>L03 · MODERN COMPUTER ARCHITECTURE 08 / 34</h2>
+                </div>
+                <div class="collapsible-content" id="content-20">
+                    <h3 id="sub-20-1">20.1 General info</h3>
+                    <p>The 4:1 Multiplexer Two select lines address four inputs — 2 select bits choose 1 of 2² = 4. 4:1</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-19').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-21').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 21 -->
+            <section class="topic-section" id="topic-21">
+                <div class="topic-header" onclick="toggleSection('content-21')">
+                    <div class="topic-number">21</div>
+                    <h2>Y = S1'S0'·I0 + S1'S0·I1 + S1S0'·I2 + S1S0·I3</h2>
+                </div>
+                <div class="collapsible-content" id="content-21">
+                    <h3 id="sub-21-1">21.1 General info</h3>
+                    <p>Each select combination = one minterm that gates exactly one input through.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-20').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-22').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 22 -->
+            <section class="topic-section" id="topic-22">
+                <div class="topic-header" onclick="toggleSection('content-22')">
+                    <div class="topic-number">22</div>
+                    <h2>L03 · MODERN COMPUTER ARCHITECTURE 09 / 34</h2>
+                </div>
+                <div class="collapsible-content" id="content-22">
+                    <h3 id="sub-22-1">22.1 General info</h3>
+                    <p>Cascading: Build Big MUXes from Small Ones A 4:1 MUX is just three 2:1 MUXes in a tree.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-21').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-23').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 23 -->
+            <section class="topic-section" id="topic-23">
+                <div class="topic-header" onclick="toggleSection('content-23')">
+                    <div class="topic-number">23</div>
+                    <h2>WHY IT MATTERS</h2>
+                </div>
+                <div class="collapsible-content" id="content-23">
+                    <h3 id="sub-23-1">23.1 General info</h3>
+                    <p>One small, veriﬁed block scales to any size. Need an 8:1? Two 4:1s feeding a 2:1. Need 16:1? Keep tree-ing. This 'compose small proven parts into big ones' is exactly how real chips — and good software — are built.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-22').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-24').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 24 -->
+            <section class="topic-section" id="topic-24">
+                <div class="topic-header" onclick="toggleSection('content-24')">
+                    <div class="topic-number">24</div>
+                    <h2>L03 · MODERN COMPUTER ARCHITECTURE 10 / 34</h2>
+                </div>
+                <div class="collapsible-content" id="content-24">
+                    <h3 id="sub-24-1">24.1 General info</h3>
+                    <p>A MUX Can Be Any Logic Function Wire the inputs to constants, and a 4:1 MUX implements ANY 2-variable function.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-23').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-25').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 25 -->
+            <section class="topic-section" id="topic-25">
+                <div class="topic-header" onclick="toggleSection('content-25')">
+                    <div class="topic-number">25</div>
+                    <h2>THE TRICK</h2>
+                </div>
+                <div class="collapsible-content" id="content-25">
+                    <h3 id="sub-25-1">25.1 General info</h3>
+                    <p>Feed the input variables into the SELECT lines. Then wire each data input Iₖ to the 0 or 1 that the truth table demands for that row. Example — implement XOR(A,B): S1=A, S0=B   (selects)</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-24').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-26').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 26 -->
+            <section class="topic-section" id="topic-26">
+                <div class="topic-header" onclick="toggleSection('content-26')">
+                    <div class="topic-number">26</div>
+                    <h2>WHY THIS IS A BIG DEAL</h2>
+                </div>
+                <div class="collapsible-content" id="content-26">
+                    <h3 id="sub-26-1">26.1 General info</h3>
+                    <p>A 2ⁿ:1 MUX implements ANY n-variable function — no minimisation needed. This is the principle behind the Lookup Tables (LUTs) inside every FPGA. An FPGA is, at its core, a sea of tiny MUX-based LUTs you reprogram by changing what the data inputs are wired to — which is why an FPGA can 'become' any circuit.</p>
+                    <p>11 / 34 2. Demultiplexers & Decoders The reverse of a MUX — route one input to many outputs, or light up one line from a code.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-25').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-27').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 27 -->
+            <section class="topic-section" id="topic-27">
+                <div class="topic-header" onclick="toggleSection('content-27')">
+                    <div class="topic-number">27</div>
+                    <h2>L03 · MODERN COMPUTER ARCHITECTURE 12 / 34</h2>
+                </div>
+                <div class="collapsible-content" id="content-27">
+                    <h3 id="sub-27-1">27.1 General info</h3>
+                    <p>The Demultiplexer (DEMUX) One input, many outputs — the select code decides which output it reaches. 1:4</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-26').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-28').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 28 -->
+            <section class="topic-section" id="topic-28">
+                <div class="topic-header" onclick="toggleSection('content-28')">
+                    <div class="topic-number">28</div>
+                    <h2>MUX RUN BACKWARDS</h2>
+                </div>
+                <div class="collapsible-content" id="content-28">
+                    <h3 id="sub-28-1">28.1 General info</h3>
+                    <p>A MUX has many inputs → one output. A DEMUX ﬂips it: one input → many outputs. The select bits choose the single destination; all other outputs stay at 0.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-27').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-29').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 29 -->
+            <section class="topic-section" id="topic-29">
+                <div class="topic-header" onclick="toggleSection('content-29')">
+                    <div class="topic-number">29</div>
+                    <h2>REAL USE</h2>
+                </div>
+                <div class="collapsible-content" id="content-29">
+                    <h3 id="sub-29-1">29.1 General info</h3>
+                    <p>A single data line fanned out to one of many destinations — e.g. a CPU writing a result to one chosen register, or a network switch routing a packet to one output port.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-28').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-30').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 30 -->
+            <section class="topic-section" id="topic-30">
+                <div class="topic-header" onclick="toggleSection('content-30')">
+                    <div class="topic-number">30</div>
+                    <h2>L03 · MODERN COMPUTER ARCHITECTURE 12 / 34</h2>
+                </div>
+                <div class="collapsible-content" id="content-30">
+                    <h3 id="sub-30-1">30.1 General info</h3>
+                    <p>The Demultiplexer (DEMUX) One input, many outputs — the select code decides which output it reaches.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-29').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for your reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/3.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Computer Networks - Lecture 05</title>
+    <meta content="Study notes for Computer Networks (CSAI321), Lecture 05 covering client-server vs P2P architectures, HTTP statelessness, HTTP request/response headers, status codes, HTTP/1.0, HTTP/1.1, HTTP/2, HTTP/3 with QUIC, and REST APIs." name="description"/>
+    <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>05</text></svg>" rel="icon"/>
+    <link href="../css/style.css" rel="stylesheet"/>
+</head>
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Computer Networks Foundations</h1>
+            <p>Lecture 05 - Application Layer: Architecture, Protocols and APIs</p>
+            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/5.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text"/>
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 5</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li>
+                    <a href="#topic-1">1. Network Architectures<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 Client/Server Model</a></li>
+                        <li><a href="#sub-1-2">1.2 Peer-to-Peer (P2P) Model</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. The Application Layer & HTTP Basics<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 Layer 7 Role & Protocols</a></li>
+                        <li><a href="#sub-2-2">2.2 HTTP: Stateless Web Protocol</a></li>
+                        <li><a href="#sub-2-3">2.3 Handling State: Cookies & Sessions</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. HTTP Messages Breakdown<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 Request Breakdown (Line, Headers, Body)</a></li>
+                        <li><a href="#sub-3-2">3.2 Response Breakdown (Status, Headers, Body)</a></li>
+                        <li><a href="#sub-3-3">3.3 Standard HTTP Status Codes</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. HTTP Generations (1.0 to 3.0)<span class="sub-count">4</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 HTTP/1.0 (Single TCP Connection)</a></li>
+                        <li><a href="#sub-4-2">4.2 HTTP/1.1 (Keep-Alive & FIFO blocking)</a></li>
+                        <li><a href="#sub-4-3">4.3 HTTP/2 (Binary, Multiplexing & Server Push)</a></li>
+                        <li><a href="#sub-4-4">4.4 HTTP/3 (QUIC over UDP & Stream Isolation)</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. REST APIs & Inter-App Communication<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 REST Architectural Principles</a></li>
+                        <li><a href="#sub-5-2">5.2 API Standardization via OpenAPI</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+        <!-- Main Content -->
+        <main id="notesContent">
+            
+            <!-- Topic 1 -->
+            <section class="topic-section" id="topic-1">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>Network Architectures</h2>
+                </div>
+                <div class="collapsible-content" id="content-1">
+                    <h3 id="sub-1-1">1.1 Client/Server Model</h3>
+                    <p>The client/server architecture is a centralized model where powerful, dedicated servers store data and process incoming requests for multiple dependent clients (such as web browsers or mobile applications).</p>
+                    <ul>
+                        <li>Centralized control and data storage.</li>
+                        <li>Server resources scale to handle multiple clients.</li>
+                        <li>Clients do not communicate with each other directly; all traffic passes through the server.</li>
+                    </ul>
+                    
+                    <h3 id="sub-1-2">1.2 Peer-to-Peer (P2P) Model</h3>
+                    <p>The peer-to-peer (P2P) architecture is a decentralized model where all connected devices ("peers") act as both clients and servers with equal privileges and capabilities. P2P architectures do not rely on central servers, making them highly resilient to single-point-of-failure issues.</p>
+                    <div class="topic-nav">
+                        <button class="btn" disabled="">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section class="topic-section" id="topic-2">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>The Application Layer & HTTP Basics</h2>
+                </div>
+                <div class="collapsible-content" id="content-2">
+                    <h3 id="sub-2-1">2.1 Layer 7 Role & Protocols</h3>
+                    <p>The Application Layer (Layer 7) is the direct interface between software programs (such as browsers, email clients, games) and the underlying network. It interprets user commands and manages data exchanges across systems using high-level protocols (HTTP, SMTP, FTP, DNS).</p>
+                    
+                    <h3 id="sub-2-2">2.2 HTTP: Stateless Web Protocol</h3>
+                    <p>HTTP is a stateless request-response protocol. The client (browser) sends a request to the server, and the server processes it and sends back a response. Because HTTP is <strong>stateless</strong>, the server remembers nothing between requests, treating each message exchange completely independently.</p>
+                    
+                    <h3 id="sub-2-3">2.3 Handling State: Cookies & Sessions</h3>
+                    <p>If HTTP is stateless, how do shopping carts stay full or logins stay active? Developers use **Cookies** and **Session Tokens**. The server sends a unique session key inside a response header, which the client browser stores and automatically appends to every subsequent request, identifying the user state.</p>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section class="topic-section" id="topic-3">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>HTTP Messages Breakdown</h2>
+                </div>
+                <div class="collapsible-content" id="content-3">
+                    <h3 id="sub-3-1">3.1 Request Breakdown (Line, Headers, Body)</h3>
+                    <p>HTTP requests consist of a **Request Line**, **Headers**, and an optional **Body**:</p>
+                    <ul>
+                        <li><strong>Request Line:</strong> Contains the HTTP Method (e.g. GET, POST, PUT, DELETE), URL Resource path, and HTTP Version.
+                            <div class="formula-box">GET /index.html HTTP/1.1</div>
+                        </li>
+                        <li><strong>Headers:</strong> Metadata providing details about client capabilities (e.g., <code>Host</code>, <code>User-Agent</code>, <code>Content-Type</code>, <code>Accept</code>).</li>
+                        <li><strong>Body:</strong> Contains actual form data or JSON payloads (mostly for POST, PUT, and PATCH operations).</li>
+                    </ul>
+                    
+                    <h3 id="sub-3-2">3.2 Response Breakdown (Status, Headers, Body)</h3>
+                    <p>HTTP responses mirror the request structure: **Status Line**, **Headers**, and a **Body**:</p>
+                    <ul>
+                        <li><strong>Status Line:</strong> Contains HTTP Version, numeric Status Code, and Status Message.
+                            <div class="formula-box">HTTP/1.1 200 OK</div>
+                        </li>
+                        <li><strong>Headers:</strong> Response metadata (e.g., <code>Content-Type</code>, <code>Content-Length</code>, <code>Server</code>, <code>Date</code>).</li>
+                        <li><strong>Body:</strong> The actual resource content (HTML structure, image binary data, or API JSON response).</li>
+                    </ul>
+
+                    <h3 id="sub-3-3">3.3 Standard HTTP Status Codes</h3>
+                    <ul>
+                        <li><strong>200 OK:</strong> Request succeeded; resource returned.</li>
+                        <li><strong>301 Moved Permanently:</strong> Resource moved to a new URL.</li>
+                        <li><strong>302 Found:</strong> Temporary URL redirection.</li>
+                        <li><strong>403 Forbidden:</strong> Access refused by server credentials.</li>
+                        <li><strong>404 Not Found:</strong> Resource cannot be located.</li>
+                        <li><strong>500 Internal Server Error:</strong> Server crash/error.</li>
+                    </ul>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section class="topic-section" id="topic-4">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>HTTP Generations (1.0 to 3.0)</h2>
+                </div>
+                <div class="collapsible-content" id="content-4">
+                    <h3 id="sub-4-1">4.1 HTTP/1.0 (Single TCP Connection)</h3>
+                    <p>Introduced in 1996, HTTP/1.0 establishes a new TCP connection for every single file request (HTML, CSS, image), terminating it immediately after transfer. This creates massive overhead and slows rendering of complex multi-asset web pages.</p>
+                    
+                    <h3 id="sub-4-2">4.2 HTTP/1.1 (Keep-Alive & FIFO blocking)</h3>
+                    <p>Released in 1997, HTTP/1.1 introduced persistent TCP connections (<code>Keep-Alive</code>) allowing multiple resource transfers on a single socket. However, resources must be sent sequentially in First-In-First-Out (FIFO) order. If a slow resource (like a large image) stalls, it blocks all subsequent elements—a problem known as <strong>Head-of-Line (HoL) Blocking</strong> at the application level.</p>
+                    
+                    <h3 id="sub-4-3">4.3 HTTP/2 (Binary, Multiplexing & Server Push)</h3>
+                    <p>Launched in 2015, HTTP/2 replaced text-based messages with a **Binary Framing Layer** and introduced **Multiplexing**—transmitting multiple requests and responses concurrently over a single TCP connection. It also added **Server Push**, letting servers preemptively push assets (like CSS files) to clients. However, because it runs on TCP, a single lost packet stalls the entire connection (TCP-level Head-of-Line blocking).</p>
+                    
+                    <h3 id="sub-4-4">4.4 HTTP/3 (QUIC over UDP & Stream Isolation)</h3>
+                    <p>Standardized in 2022, HTTP/3 replaces TCP with **QUIC** (a UDP-based transport protocol developed by Google). It handles multiplexed streams independently. If a packet is lost, only that specific stream is stalled while other streams continue unimpeded, fully solving both application-level and transport-level Head-of-Line blocking.</p>
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 5 -->
+            <section class="topic-section" id="topic-5">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>REST APIs & Inter-App Communication</h2>
+                </div>
+                <div class="collapsible-content" id="content-5">
+                    <h3 id="sub-5-1">5.1 REST Architectural Principles</h3>
+                    <p>API stands for Application Programming Interface. When applications need to talk to other applications, they use API rules. The most popular architecture on the public web is **REST** (Representational State Transfer), which is used by roughly 83% of public web services to transmit JSON data over standard HTTP methods (GET, POST, PUT, DELETE).</p>
+                    
+                    <h3 id="sub-5-2">5.2 API Standardization via OpenAPI</h3>
+                    <p>OpenAPI (popularized by Swagger) is an open specification schema used to describe, design, document, and test RESTful APIs in a human-readable and machine-readable JSON/YAML format.</p>
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('original-pdf').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/5.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>

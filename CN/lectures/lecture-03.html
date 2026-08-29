@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Computer Networks - Lecture 03</title>
+    <meta content="Study notes for Computer Networks (CSAI321), Lecture 03 covering the OSI 7-layer Reference Model, TCP/IP Model, encapsulation, layering, addressing scopes, and protocols." name="description"/>
+    <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>03</text></svg>" rel="icon"/>
+    <link href="../css/style.css" rel="stylesheet"/>
+</head>
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Computer Networks Foundations</h1>
+            <p>Lecture 03 - OSI and TCP/IP Reference Models</p>
+            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/3.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text"/>
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 5</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li>
+                    <a href="#topic-1">1. The Idea Behind Layering<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 Sending a Letter Analogy</a></li>
+                        <li><a href="#sub-1-2">1.2 What Layering Buys Us</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Encapsulation & Decapsulation<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 The Nesting Doll Analogy</a></li>
+                        <li><a href="#sub-2-2">2.2 Gift-Wrapping & Peeling Headers</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. The 7-Layer OSI Model<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 Open Systems Interconnection Standard</a></li>
+                        <li><a href="#sub-3-2">3.2 Importance & Memory Aids</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Seven Layers, One at a Time<span class="sub-count">7</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 Layer 7: Application Layer</a></li>
+                        <li><a href="#sub-4-2">4.2 Layer 6: Presentation Layer</a></li>
+                        <li><a href="#sub-4-3">4.3 Layer 5: Session Layer</a></li>
+                        <li><a href="#sub-4-4">4.4 Layer 4: Transport Layer</a></li>
+                        <li><a href="#sub-4-5">4.5 Layer 3: Network Layer</a></li>
+                        <li><a href="#sub-4-6">4.6 Layer 2: Data Link Layer</a></li>
+                        <li><a href="#sub-4-7">4.7 Layer 1: Physical Layer</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. The TCP/IP Model & Comparison<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 TCP/IP Protocol Stack Overview</a></li>
+                        <li><a href="#sub-5-2">5.2 Comparison: OSI vs TCP/IP</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+        <!-- Main Content -->
+        <main id="notesContent">
+            
+            <!-- Topic 1 -->
+            <section class="topic-section" id="topic-1">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>The Idea Behind Layering</h2>
+                </div>
+                <div class="collapsible-content" id="content-1">
+                    <h3 id="sub-1-1">1.1 Sending a Letter Analogy</h3>
+                    <p>A network is far too complicated to design, build, or debug as a single monolith. Layering is the trick that makes it manageable: each layer does one specific job, speaks only to the layers directly above and below it, and deliberately knows nothing about the rest.</p>
+                    <p>Consider sending a letter: you write it, place it in an envelope, and hand it to the postal service. The mail carrier only cares about the address written on the outside of the envelope—they do not care about the contents. You only need to know how to write a letter, not how sorting offices, mail delivery vehicles, or flight routes coordinate to deliver it. If the carrier read the letter, this clean separation would break: privacy is lost, and the carrier would have to understand every language or message type. A layer looking inside the layer above it breaks the layering model.</p>
+                    
+                    <h3 id="sub-1-2">1.2 What Layering Buys Us</h3>
+                    <ul>
+                        <li><strong>Isolation of Problems:</strong> Each layer solves exactly one problem and can be understood on its own.</li>
+                        <li><strong>Modularity & Upgradability:</strong> A layer can be replaced without disturbing the others (e.g., swapping Wi-Fi for Ethernet does not require rewriting applications).</li>
+                        <li><strong>Interoperability:</strong> Vendors can build different components separately as long as boundaries and interfaces are agreed upon in advance.</li>
+                        <li><strong>Localising Faults:</strong> When something breaks, engineers can isolate the issue to a specific layer instead of searching the entire system.</li>
+                    </ul>
+                    <div class="topic-nav">
+                        <button class="btn" disabled="">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section class="topic-section" id="topic-2">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>Encapsulation & Decapsulation</h2>
+                </div>
+                <div class="collapsible-content" id="content-2">
+                    <h3 id="sub-2-1">2.1 The Nesting Doll Analogy</h3>
+                    <p>Encapsulation works like a set of nesting dolls. Going down the sender's stack, each layer wraps the payload handed to it from above with its own header. Coming up the receiver's stack, decapsulation reverses the process: each layer strips off its specific header and hands the remaining payload upwards.</p>
+                    <p>The core property is <strong>symmetry</strong>. Layer 3 on the receiving machine reads exactly the header that Layer 3 on the sending machine wrote. Neither touches anything belonging to other layers, allowing each layer to have an independent virtual conversation with its counterpart at the other end.</p>
+                    
+                    <h3 id="sub-2-2">2.2 Gift-Wrapping & Peeling Headers</h3>
+                    <p>You can also think of this as gift wrapping: you wrap a gift in layers (paper, then a box, then ribbon) going out, and you unwrap them in the exact reverse order on receipt. You cannot untie the ribbon last. In a real network capture, you will see a nested structure of headers (Ethernet, then IP, then TCP, then Application data) which you peel back layer by layer.</p>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section class="topic-section" id="topic-3">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>The 7-Layer OSI Model</h2>
+                </div>
+                <div class="collapsible-content" id="content-3">
+                    <h3 id="sub-3-1">3.1 Open Systems Interconnection Standard</h3>
+                    <p>OSI stands for Open Systems Interconnection. It divides network communication into seven layers to simplify the process of designing and reasoning about it. It was developed by the International Organization for Standardization (ISO) to ensure interoperation between different vendors' products.</p>
+                    
+                    <h3 id="sub-3-2">3.2 Importance & Memory Aids</h3>
+                    <p>Understanding the OSI model is essential because it is the industry's shared language for localizing faults and explaining behaviors (e.g., "a Layer 4 issue"). Memorize the layers in order using these mnemonics:</p>
+                    <ul>
+                        <li><strong>Bottom-up (L1 to L7):</strong> <em>Please Do Not Throw Sausage Pizza Away</em></li>
+                        <li><strong>Top-down (L7 to L1):</strong> <em>All People Seem To Need Data Processing</em></li>
+                    </ul>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section class="topic-section" id="topic-4">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>Seven Layers, One at a Time</h2>
+                </div>
+                <div class="collapsible-content" id="content-4">
+                    <h3 id="sub-4-1">4.1 Layer 7: Application Layer</h3>
+                    <p><strong>What it does:</strong> Delivers network services directly to users and applications (web browsers, email, file transfers). Its unit of concern is simply <strong>data</strong>.</p>
+                    <p><strong>Analogy:</strong> A waiter in a restaurant. It takes your order (user request), relays it to the kitchen (network), and comes back with your food (data). The customer never enters the kitchen, and the chef never speaks to the customer.</p>
+                    
+                    <h3 id="sub-4-2">4.2 Layer 6: Presentation Layer</h3>
+                    <p><strong>What it does:</strong> Formats, encrypts, and compresses data so that it is readable and secure for the receiving application. It translates data representation between the application format and network-friendly format.</p>
+                    <p><strong>Analogy:</strong> A translator who converts, formats, and secures messages so that sender and receiver understand each other even if they speak different languages.</p>
+                    
+                    <h3 id="sub-4-3">4.3 Layer 5: Session Layer</h3>
+                    <p><strong>What it does:</strong> Establishes, manages, and terminates communication sessions between two devices. It controls dialogue flow and handles session synchronization.</p>
+                    <p><strong>Analogy:</strong> A moderator on a panel or a courtroom judge who calls "Order! Order!", starts the discussion, keeps connections running smoothly, and ends the session when finished.</p>
+                    
+                    <h3 id="sub-4-4">4.4 Layer 4: Transport Layer</h3>
+                    <p><strong>What it does:</strong> Ensures reliable and efficient delivery of data segments between two devices across a network. It segments large messages, reassembles them, handles multiplexing, and controls flow/errors (where TCP lives).</p>
+                    <p><strong>Analogy:</strong> Sharing a phone line: multiplexing ensures different concurrent conversations reach the correct recipient instead of overlapping.</p>
+                    
+                    <h3 id="sub-4-5">4.5 Layer 3: Network Layer</h3>
+                    <p><strong>What it does:</strong> Responsible for logical IP addressing and routing packets across different networks from Point A to Point B. It does not care about the underlying physical link types.</p>
+                    <p><strong>Analogy:</strong> A GPS system that chooses the best route for delivery trucks (packets) to reach their destination safely and fast.</p>
+                    
+                    <h3 id="sub-4-6">4.6 Layer 2: Data Link Layer</h3>
+                    <p><strong>What it does:</strong> Ensures reliable data transfer between two <em>directly connected</em> nodes. It handles physical (MAC) addressing, media access control ("one at a time!"), and error checking of frames.</p>
+                    <p><strong>Analogy:</strong> A traffic controller. While Layer 3 worries about the whole journey, Layer 2 only worries about getting safely to the other end of a single link.</p>
+                    
+                    <h3 id="sub-4-7">4.7 Layer 1: Physical Layer</h3>
+                    <p><strong>What it does:</strong> Transmits raw bits (0s and 1s) over physical media such as copper coaxial cables, fiber optics, or radio waves. This is where physical propagation delay limits exist.</p>
+                    <p><strong>Analogy:</strong> The physical roads, wires, and signals that a vehicle uses to move. It has no concept of addresses, routing, or data meaning—just raw bit movement.</p>
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 5 -->
+            <section class="topic-section" id="topic-5">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>The TCP/IP Model & Comparison</h2>
+                </div>
+                <div class="collapsible-content" id="content-5">
+                    <h3 id="sub-5-1">5.1 TCP/IP Protocol Stack Overview</h3>
+                    <p>The TCP/IP model is a layered framework that defines how data is transmitted over the actual internet. While the OSI model is a clean conceptual scheme used for reasoning and teaching, the TCP/IP model is the working system that the internet actually runs on. It was developed by DARPA and contains 4 layers instead of 7.</p>
+                    
+                    <h3 id="sub-5-2">5.2 Comparison: OSI vs TCP/IP</h3>
+                    <table style="width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.95rem;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--border-light); text-align: left;">
+                                <th style="padding: 0.75rem 0.5rem;">Feature</th>
+                                <th style="padding: 0.75rem 0.5rem;">OSI Reference Model</th>
+                                <th style="padding: 0.75rem 0.5rem;">TCP/IP Protocol Stack</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid rgba(19, 34, 25, 0.05);">
+                                <td style="padding: 0.75rem 0.5rem; font-weight: 600;">Full Name</td>
+                                <td style="padding: 0.75rem 0.5rem;">Open Systems Interconnection</td>
+                                <td style="padding: 0.75rem 0.5rem;">Transmission Control Protocol / Internet Protocol</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(19, 34, 25, 0.05);">
+                                <td style="padding: 0.75rem 0.5rem; font-weight: 600;">Number of Layers</td>
+                                <td style="padding: 0.75rem 0.5rem; color: var(--accent-purple); font-weight: bold;">7 Layers</td>
+                                <td style="padding: 0.75rem 0.5rem; color: var(--accent-purple); font-weight: bold;">4 Layers</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(19, 34, 25, 0.05);">
+                                <td style="padding: 0.75rem 0.5rem; font-weight: 600;">Developed By</td>
+                                <td style="padding: 0.75rem 0.5rem;">ISO (International Organization for Standardization)</td>
+                                <td style="padding: 0.75rem 0.5rem;">DARPA (Defense Advanced Research Projects Agency)</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(19, 34, 25, 0.05);">
+                                <td style="padding: 0.75rem 0.5rem; font-weight: 600;">Nature</td>
+                                <td style="padding: 0.75rem 0.5rem;">Conceptual & theoretical mapping scheme</td>
+                                <td style="padding: 0.75rem 0.5rem;">Working protocol stack implemented in hardware & software</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('original-pdf').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/3.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>

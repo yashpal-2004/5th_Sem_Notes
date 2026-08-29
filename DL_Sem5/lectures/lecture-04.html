@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Deep Learning - Lecture 04</title>
+    <meta content="Study notes for Deep Learning Foundations, Lecture 04 — Activation Functions in Practice: comparing all 6 activations live, gradient bar, loss bowl, decision boundary, and the 2-3-1 network simulator with dead neuron detection." name="description"/>
+    <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>04</text></svg>" rel="icon"/>
+    <link href="../css/style.css" rel="stylesheet"/>
+</head>
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Deep Learning Foundations</h1>
+            <p>Lecture 04 — Activation Functions in Practice (Interactive Simulation)</p>
+            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="https://d3dyfaf3iutrxo.cloudfront.net/file/course/video_session/whiteboard/83c2f75113fa45d9a1afee7e963b864d.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open Interactive Whiteboard ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text"/>
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 6</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li>
+                    <a href="#topic-1">1. The Lecture Format: Simulation Over Formulas<span class="sub-count">1</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 What the Whiteboard Does</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Page 1: Six Perceptrons Training Side-by-Side<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 The Setup</a></li>
+                        <li><a href="#sub-2-2">2.2 Two Training Scenarios</a></li>
+                        <li><a href="#sub-2-3">2.3 The Four Views</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. What to Observe: Activation-by-Activation<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 Scenario A (b=+12): Large Positive Bias</a></li>
+                        <li><a href="#sub-3-2">3.2 Scenario B (b=−3): Negative Bias (Dead ReLU)</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Reading the Gradient Bar<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 What the Bar Measures</a></li>
+                        <li><a href="#sub-4-2">4.2 Key Gradient Patterns to Spot</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Page 2: The 2-3-1 Network Simulator<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 Network Architecture</a></li>
+                        <li><a href="#sub-5-2">5.2 Presets and What They Demonstrate</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-6">6. Loss Functions in the Simulator<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-6-1">6.1 MSE, MAE, and BCE Compared</a></li>
+                        <li><a href="#sub-6-2">6.2 Key Takeaways from This Lecture</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#whiteboard">
+                        <svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align:text-bottom;margin-right:4px;" viewbox="0 0 24 24" width="16"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 12h8M12 8v8"/></svg>
+                        Embedded Whiteboard
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="notesContent">
+
+            <!-- Topic 1 -->
+            <section class="topic-section" id="topic-1">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>The Lecture Format: Simulation Over Formulas</h2>
+                </div>
+                <div class="collapsible-content" id="content-1">
+                    <h3 id="sub-1-1">1.1 What the Whiteboard Does</h3>
+                    <p>Lecture 4 is delivered as an <strong>interactive simulation</strong> instead of a written worksheet. The whiteboard at the link above contains two live experiments:</p>
+                    <ul>
+                        <li><strong>Page 1 — "Perceptron":</strong> All 6 activation functions train simultaneously on the same 2D dataset. You watch the decision boundary, loss, and gradient evolve in real-time for Threshold, Sigmoid, Tanh, ReLU, Leaky ReLU, and ELU side-by-side.</li>
+                        <li><strong>Page 2 — "Network":</strong> A 2-input → 3-hidden → 1-output network where you can choose the activation function for each hidden unit, switch loss functions (MSE, MAE, BCE), and watch training on XOR or concentric circles data.</li>
+                    </ul>
+                    <p>The purpose: <strong>see the theory from Lecture 3 play out quantitatively</strong> — vanishing gradient, dead neurons, and loss convergence are not just described, they are measured and animated.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" disabled="">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section class="topic-section" id="topic-2">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>Page 1: Six Perceptrons Training Side-by-Side</h2>
+                </div>
+                <div class="collapsible-content" id="content-2">
+                    <h3 id="sub-2-1">2.1 The Setup</h3>
+                    <p>The dataset has <strong>120 points</strong> in 2D: 60 labelled class 0 (red, centered at (−2, −2)) and 60 labelled class 1 (blue, centered at (+2, +2)). The perceptron has weights w₁, w₂ and a bias b, trained with:</p>
+                    <div class="formula-box">w<sub>new</sub> = w<sub>old</sub> − α · (1/n) · Σ [(ŷᵢ − yᵢ) · f′(zᵢ) · xᵢ]</div>
+                    <p>All 6 perceptrons are initialised identically from the same scenario, then updated independently using their own activation function.</p>
+
+                    <h3 id="sub-2-2">2.2 Two Training Scenarios</h3>
+                    <table style="width:100%;border-collapse:collapse;margin:1rem 0;font-size:0.9rem;">
+                        <thead>
+                            <tr style="border-bottom:2px solid var(--border-light);">
+                                <th style="padding:0.6rem 0.5rem;text-align:left;">Scenario</th>
+                                <th style="padding:0.6rem 0.5rem;">Initial w₁</th>
+                                <th style="padding:0.6rem 0.5rem;">Initial w₂</th>
+                                <th style="padding:0.6rem 0.5rem;">Initial b</th>
+                                <th style="padding:0.6rem 0.5rem;">α</th>
+                                <th style="padding:0.6rem 0.5rem;text-align:left;">What it tests</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom:1px solid rgba(0,0,0,0.06);">
+                                <td style="padding:0.6rem 0.5rem;font-weight:600;">A</td>
+                                <td style="padding:0.6rem 0.5rem;text-align:center;">1</td>
+                                <td style="padding:0.6rem 0.5rem;text-align:center;">1</td>
+                                <td style="padding:0.6rem 0.5rem;text-align:center;font-weight:600;">+12</td>
+                                <td style="padding:0.6rem 0.5rem;text-align:center;">0.05</td>
+                                <td style="padding:0.6rem 0.5rem;">Large positive bias → sigmoid/tanh saturated; ReLU active on positive side</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0.6rem 0.5rem;font-weight:600;">B</td>
+                                <td style="padding:0.6rem 0.5rem;text-align:center;">0.5</td>
+                                <td style="padding:0.6rem 0.5rem;text-align:center;">0.5</td>
+                                <td style="padding:0.6rem 0.5rem;text-align:center;font-weight:600;">−3</td>
+                                <td style="padding:0.6rem 0.5rem;text-align:center;">0.05</td>
+                                <td style="padding:0.6rem 0.5rem;">Negative bias → all z values are negative → ReLU is <span style="color:var(--red);font-weight:600;">permanently dead</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3 id="sub-2-3">2.3 The Four Views</h3>
+                    <p>Each of the six panels can switch between four visualizations using the View selector:</p>
+                    <ul>
+                        <li><strong>Boundary:</strong> The 2D scatter plot with the current decision boundary (black line) and its trail of previous positions (fading grey). Shows whether the line is converging correctly.</li>
+                        <li><strong>Loss vs Epoch:</strong> A log-scale plot of loss over training time. A steeply falling curve = fast convergence; a flat curve = vanishing gradient or dead neuron.</li>
+                        <li><strong>Loss Bowl:</strong> A schematic parabola with a dot showing how far down the bowl the current weight is. Starts at the rim, ideally slides to the bottom.</li>
+                        <li><strong>Loss Slice:</strong> A cross-section of the loss landscape as a function of the bias b alone (holding w₁, w₂ fixed). The current b value is marked — shows whether the optimiser is sliding toward the minimum.</li>
+                    </ul>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section class="topic-section" id="topic-3">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>What to Observe: Activation-by-Activation</h2>
+                </div>
+                <div class="collapsible-content" id="content-3">
+                    <h3 id="sub-3-1">3.1 Scenario A (b = +12): Large Positive Bias</h3>
+                    <ul>
+                        <li><strong>Threshold:</strong> Gradient is always exactly 0 — weights never move at all. Decision boundary is frozen. The gradient bar stays empty forever.</li>
+                        <li><strong>Sigmoid:</strong> All z values are large and positive (z ≈ 12 + w·x ≫ 0) → σ(z) ≈ 1 for every point → σ′(z) ≈ 0 → gradient ≈ 0. Boundary moves only very slowly — vanishing gradient confirmed live.</li>
+                        <li><strong>Tanh:</strong> Similar saturation. Starts slightly faster than sigmoid (taller derivative peak), but also saturates and effectively stalls.</li>
+                        <li><strong>ReLU:</strong> z &gt; 0 for all data points → f′(z) = 1 for all → gradient is full strength → boundary converges rapidly. ReLU and Leaky ReLU are <em>bit-identical</em> in Scenario A until the first z value goes negative.</li>
+                        <li><strong>Leaky ReLU:</strong> Same rapid convergence as ReLU (since all z &gt; 0 at first). They diverge only after the boundary crosses a point where z &lt; 0.</li>
+                        <li><strong>ELU:</strong> Same as ReLU and Leaky ReLU for z &gt; 0. The curve in the network diagram shows the smooth exponential on the left half of the neuron icon.</li>
+                    </ul>
+
+                    <h3 id="sub-3-2">3.2 Scenario B (b = −3): Negative Bias (Dead ReLU)</h3>
+                    <ul>
+                        <li><strong>Threshold:</strong> Still frozen — gradient = 0 always regardless of scenario.</li>
+                        <li><strong>Sigmoid &amp; Tanh:</strong> z ≈ −3 + w·x. Gradient is non-zero (S-curve isn't flat at z = −3) → boundary moves slowly but continuously.</li>
+                        <li><strong>ReLU:</strong> z ≤ 0 for every single data point → f′(z) = 0 for all → <strong>gradient = 0 exactly</strong>. The boundary doesn't move by even one floating-point step across 5,000,000 epochs. This is the <em>dead neuron confirmed live</em>. The gradient bar is completely empty and stays empty even with α = 1,000,000.</li>
+                        <li><strong>Leaky ReLU:</strong> f′(z) = 0.01 for z &lt; 0 → tiny but non-zero gradient → boundary crawls (very slow progress visible in the loss vs epoch plot).</li>
+                        <li><strong>ELU:</strong> f′(z) = eᶻ = e⁻³ ≈ 0.05 for z ≈ −3 → noticeably faster gradient than Leaky ReLU → boundary moves more visibly.</li>
+                    </ul>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section class="topic-section" id="topic-4">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>Reading the Gradient Bar</h2>
+                </div>
+                <div class="collapsible-content" id="content-4">
+                    <h3 id="sub-4-1">4.1 What the Bar Measures</h3>
+                    <p>Below each panel there is a readout row: <strong>epoch</strong>, <strong>accuracy</strong>, <strong>loss</strong>, and a <strong>gradient bar</strong>. The bar shows the magnitude of the current gradient on a <em>log scale</em>:</p>
+                    <div class="formula-box">Bar fraction = (log₁₀(|grad|) + 16) / 17 &nbsp;&nbsp; clamped to [0, 1]</div>
+                    <p>This maps the range 10⁻¹⁶ → 10¹ onto a bar from empty to full. Why log scale? Because gradient magnitudes span many orders of magnitude — from effectively zero (sigmoid saturated ≈ 10⁻¹⁰) to full strength (ReLU ≈ 10⁰).</p>
+
+                    <h3 id="sub-4-2">4.2 Key Gradient Patterns to Spot</h3>
+                    <table style="width:100%;border-collapse:collapse;margin:1rem 0;font-size:0.9rem;">
+                        <thead>
+                            <tr style="border-bottom:2px solid var(--border-light);">
+                                <th style="padding:0.6rem 0.5rem;text-align:left;">Activation</th>
+                                <th style="padding:0.6rem 0.5rem;">Gradient bar (Sc. A)</th>
+                                <th style="padding:0.6rem 0.5rem;">Gradient bar (Sc. B)</th>
+                                <th style="padding:0.6rem 0.5rem;text-align:left;">Interpretation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom:1px solid rgba(0,0,0,0.06);">
+                                <td style="padding:0.6rem 0.5rem;">Threshold</td>
+                                <td style="padding:0.6rem 0.5rem;text-align:center;color:var(--red);">Empty (always)</td>
+                                <td style="padding:0.6rem 0.5rem;text-align:center;color:var(--red);">Empty (always)</td>
+                                <td style="padding:0.6rem 0.5rem;">Cannot train — derivative is 0 everywhere</td>
+                            </tr>
+                            <tr style="border-bottom:1px solid rgba(0,0,0,0.06);">
+                                <td style="padding:0.6rem 0.5rem;">Sigmoid</td>
+                                <td style="padding:0.6rem 0.5rem;text-align:center;color:var(--red);">Nearly empty</td>
+                                <td style="padding:0.6rem 0.5rem;text-align:center;">Partial</td>
+                                <td style="padding:0.6rem 0.5rem;">Vanishing gradient when |z| is large (Sc. A)</td>
+                            </tr>
+                            <tr style="border-bottom:1px solid rgba(0,0,0,0.06);">
+                                <td style="padding:0.6rem 0.5rem;">Tanh</td>
+                                <td style="padding:0.6rem 0.5rem;text-align:center;color:var(--red);">Nearly empty</td>
+                                <td style="padding:0.6rem 0.5rem;text-align:center;">Partial</td>
+                                <td style="padding:0.6rem 0.5rem;">Also vanishes, somewhat faster than sigmoid</td>
+                            </tr>
+                            <tr style="border-bottom:1px solid rgba(0,0,0,0.06);">
+                                <td style="padding:0.6rem 0.5rem;font-weight:600;">ReLU</td>
+                                <td style="padding:0.6rem 0.5rem;text-align:center;font-weight:600;color:var(--accent);">Full</td>
+                                <td style="padding:0.6rem 0.5rem;text-align:center;color:var(--red);">Empty (dead)</td>
+                                <td style="padding:0.6rem 0.5rem;">Fast for z&gt;0, completely dead for z&lt;0</td>
+                            </tr>
+                            <tr style="border-bottom:1px solid rgba(0,0,0,0.06);">
+                                <td style="padding:0.6rem 0.5rem;">Leaky ReLU</td>
+                                <td style="padding:0.6rem 0.5rem;text-align:center;color:var(--accent);">Full (= ReLU early)</td>
+                                <td style="padding:0.6rem 0.5rem;text-align:center;">Very small</td>
+                                <td style="padding:0.6rem 0.5rem;">Alive but crawling when z&lt;0 (0.01 slope)</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0.6rem 0.5rem;font-weight:600;">ELU</td>
+                                <td style="padding:0.6rem 0.5rem;text-align:center;color:var(--accent);">Full (= ReLU early)</td>
+                                <td style="padding:0.6rem 0.5rem;text-align:center;font-weight:600;color:var(--accent);">Small but bigger</td>
+                                <td style="padding:0.6rem 0.5rem;">Alive and moving properly — eᶻ &gt; 0.01 for z ≈ −3</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 5 -->
+            <section class="topic-section" id="topic-5">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>Page 2: The 2-3-1 Network Simulator</h2>
+                </div>
+                <div class="collapsible-content" id="content-5">
+                    <h3 id="sub-5-1">5.1 Network Architecture</h3>
+                    <p>The network on Page 2 has a fixed structure:</p>
+                    <ul>
+                        <li><strong>Input layer:</strong> 2 units — x₁ and x₂ (the 2D features)</li>
+                        <li><strong>Hidden layer:</strong> 3 units (U1, U2, U3) — each can independently use any of the 6 activation functions. Click any hidden neuron to switch its activation via a popup menu.</li>
+                        <li><strong>Output layer:</strong> 1 unit — always uses <strong>sigmoid</strong> (to output a probability between 0 and 1)</li>
+                    </ul>
+                    <p>Each neuron is drawn split in two: the left half shows the Σ (weighted sum) and the right half shows a miniature curve of its activation function. Edge thickness shows weight magnitude.</p>
+                    <p>Live readouts: <strong>epoch</strong>, <strong>accuracy</strong>, <strong>loss</strong>, and a <strong>dead</strong> counter (number of hidden units where every input produces z ≤ 0 → f′ = 0).</p>
+
+                    <h3 id="sub-5-2">5.2 Presets and What They Demonstrate</h3>
+                    <table style="width:100%;border-collapse:collapse;margin:1rem 0;font-size:0.9rem;">
+                        <thead>
+                            <tr style="border-bottom:2px solid var(--border-light);">
+                                <th style="padding:0.6rem 0.5rem;text-align:left;">Preset</th>
+                                <th style="padding:0.6rem 0.5rem;text-align:left;">Hidden units</th>
+                                <th style="padding:0.6rem 0.5rem;text-align:left;">What to observe</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom:1px solid rgba(0,0,0,0.06);">
+                                <td style="padding:0.6rem 0.5rem;font-weight:600;">All Sigmoid</td>
+                                <td style="padding:0.6rem 0.5rem;">σ, σ, σ</td>
+                                <td style="padding:0.6rem 0.5rem;">Slow convergence or stalling if weights initialise into the saturated zone. Gradient bars may be very thin.</td>
+                            </tr>
+                            <tr style="border-bottom:1px solid rgba(0,0,0,0.06);">
+                                <td style="padding:0.6rem 0.5rem;font-weight:600;">All ReLU</td>
+                                <td style="padding:0.6rem 0.5rem;">ReLU, ReLU, ReLU</td>
+                                <td style="padding:0.6rem 0.5rem;">Usually fast convergence. But some random seeds may lead to dead=1 or dead=2 — some units whose z goes negative and stays there.</td>
+                            </tr>
+                            <tr style="border-bottom:1px solid rgba(0,0,0,0.06);">
+                                <td style="padding:0.6rem 0.5rem;font-weight:600;">One Dead ReLU</td>
+                                <td style="padding:0.6rem 0.5rem;">ReLU (b=−8), ReLU, ReLU</td>
+                                <td style="padding:0.6rem 0.5rem;">U1's bias is forced to −8 so it is permanently dead from epoch 0. Dead counter reads at least 1. Network must solve XOR with only 2 effective units.</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0.6rem 0.5rem;font-weight:600;">Mixed (default)</td>
+                                <td style="padding:0.6rem 0.5rem;">ReLU, Sigmoid, ELU</td>
+                                <td style="padding:0.6rem 0.5rem;">Shows how different activations behave simultaneously in one network. Typically converges robustly.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p><strong>Run 10 seeds</strong> button: trains 10 different random initialisations for up to 5,000 epochs each and reports how many solved the task (accuracy = 100%) and the median solving epoch. This shows that activation choice affects <em>reliability</em>, not just speed.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 6 -->
+            <section class="topic-section" id="topic-6">
+                <div class="topic-header" onclick="toggleSection('content-6')">
+                    <div class="topic-number">6</div>
+                    <h2>Loss Functions in the Simulator</h2>
+                </div>
+                <div class="collapsible-content" id="content-6">
+                    <h3 id="sub-6-1">6.1 MSE, MAE, and BCE Compared</h3>
+                    <p>Page 2 lets you switch between three loss functions and observe how they change training dynamics:</p>
+                    <table style="width:100%;border-collapse:collapse;margin:1rem 0;font-size:0.9rem;">
+                        <thead>
+                            <tr style="border-bottom:2px solid var(--border-light);">
+                                <th style="padding:0.6rem 0.5rem;text-align:left;">Loss Function</th>
+                                <th style="padding:0.6rem 0.5rem;text-align:left;">Formula</th>
+                                <th style="padding:0.6rem 0.5rem;text-align:left;">Gradient of output unit</th>
+                                <th style="padding:0.6rem 0.5rem;text-align:left;">Effect</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom:1px solid rgba(0,0,0,0.06);">
+                                <td style="padding:0.6rem 0.5rem;font-weight:600;">MSE</td>
+                                <td style="padding:0.6rem 0.5rem;">0.5·(ŷ − y)²</td>
+                                <td style="padding:0.6rem 0.5rem;">(ŷ − y) · ŷ·(1−ŷ)</td>
+                                <td style="padding:0.6rem 0.5rem;">Gradient shrinks as ŷ approaches 0 or 1 (sigmoid saturates the output too). Can be slow near convergence.</td>
+                            </tr>
+                            <tr style="border-bottom:1px solid rgba(0,0,0,0.06);">
+                                <td style="padding:0.6rem 0.5rem;font-weight:600;">MAE</td>
+                                <td style="padding:0.6rem 0.5rem;">|ŷ − y|</td>
+                                <td style="padding:0.6rem 0.5rem;">sign(ŷ − y) · ŷ·(1−ŷ)</td>
+                                <td style="padding:0.6rem 0.5rem;">Constant gradient magnitude (±1 before the sigmoid factor). Less sensitive to large errors but not smooth.</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0.6rem 0.5rem;font-weight:600;">BCE</td>
+                                <td style="padding:0.6rem 0.5rem;">−[y·log(ŷ) + (1−y)·log(1−ŷ)]</td>
+                                <td style="padding:0.6rem 0.5rem;font-weight:600;color:var(--accent);">(ŷ − y) directly</td>
+                                <td style="padding:0.6rem 0.5rem;font-weight:600;">The sigmoid's ŷ·(1−ŷ) factor cancels out — gradient is simply (ŷ − y). No output-layer saturation. <strong>BCE + sigmoid is the standard pairing for binary classification.</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="formula-box">BCE + Sigmoid: ∂L/∂z₂ = ŷ − y &nbsp;&nbsp; (no sigmoid derivative in the way)</div>
+
+                    <h3 id="sub-6-2">6.2 Key Takeaways from This Lecture</h3>
+                    <ul>
+                        <li><strong>Vanishing gradient is visible:</strong> In Scenario A, the sigmoid gradient bar barely fills. In Scenario B, the ReLU bar is empty. This confirms the Lecture 3 derivations numerically.</li>
+                        <li><strong>Dead neurons are permanent:</strong> Once ReLU lands in the dead zone, no amount of training (or higher α) rescues it — gradient is zero exactly, not approximately.</li>
+                        <li><strong>ELU &gt; Leaky ReLU on the negative side:</strong> Both are alive, but ELU's gradient (eᶻ ≈ 0.05 at z=−3) is about 5× larger than Leaky ReLU's fixed 0.01 — confirmed by the loss curve slopes.</li>
+                        <li><strong>BCE + Sigmoid is the natural pairing:</strong> The gradient simplification ∂L/∂z = ŷ − y removes output saturation and makes training more stable.</li>
+                        <li><strong>Activation choice affects reliability, not just speed:</strong> The "Run 10 seeds" button shows some activation configurations solve the task every time; others fail on some seeds due to dead neurons.</li>
+                    </ul>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('whiteboard').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Embedded Whiteboard -->
+            <section class="topic-section" id="whiteboard">
+                <div class="topic-header" onclick="toggleSection('content-wb')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 12h8M12 8v8"/></svg>
+                    </div>
+                    <h2>Interactive Whiteboard (Embedded)</h2>
+                </div>
+                <div class="collapsible-content" id="content-wb">
+                    <p>The interactive simulation is embedded below. Use the <strong>Perceptron</strong> and <strong>Network</strong> tabs inside it to explore both experiments. Click <strong>Play</strong> to start training.</p>
+                    <button class="btn" id="loadWbBtn" onclick="loadWhiteboard()" style="margin-bottom: 1rem; display: inline-block;">Load Interactive Whiteboard</button>
+                    <div id="wbContainer"></div>
+                    <div class="topic-nav" style="margin-top: 1.5rem;">
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadWhiteboard() {
+            const container = document.getElementById('wbContainer');
+            const btn = document.getElementById('loadWbBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<iframe src="https://d3dyfaf3iutrxo.cloudfront.net/file/course/video_session/whiteboard/83c2f75113fa45d9a1afee7e963b864d.html" width="100%" height="700px" style="border: 1px solid var(--gray-border); border-radius: 12px; display: block;" allowfullscreen></iframe>';
+                btn.innerText = "Hide Whiteboard";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Interactive Whiteboard";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>

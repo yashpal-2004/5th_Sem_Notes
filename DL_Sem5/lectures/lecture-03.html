@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Deep Learning - Lecture 03</title>
+    <meta content="Study notes for Deep Learning Foundations, Lecture 03 covering ReLU, Leaky ReLU, ELU, and Softmax activation functions: vanishing gradient problem, dead neuron problem, ELU smooth derivative, and multi-class classification." name="description"/>
+    <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>03</text></svg>" rel="icon"/>
+    <link href="../css/style.css" rel="stylesheet"/>
+</head>
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Deep Learning Foundations</h1>
+            <p>Lecture 03 - ReLU, Leaky ReLU, ELU and Softmax</p>
+            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/3.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text"/>
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 7</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li>
+                    <a href="#topic-1">1. Vanishing Gradient: Sigmoid's Real Failure<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 Sigmoid at Saturation</a></li>
+                        <li><a href="#sub-1-2">1.2 Tanh Doesn't Fix It</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. ReLU — Rectified Linear Unit<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 Definition & Positive Side</a></li>
+                        <li><a href="#sub-2-2">2.2 Where ReLU Lives in a Network</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Dead Neuron: ReLU's Negative Side<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 Dead Neuron Numerically</a></li>
+                        <li><a href="#sub-3-2">3.2 Why Identity Function Fails</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Leaky ReLU<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 Definition & The Fix</a></li>
+                        <li><a href="#sub-4-2">4.2 Weaknesses of Leaky ReLU</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. ELU — Exponential Linear Unit<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 Definition & Smooth Derivative</a></li>
+                        <li><a href="#sub-5-2">5.2 ELU vs Leaky ReLU Comparison</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-6">6. Full Activation Function Comparison<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-6-1">6.1 Mathematical Summary</a></li>
+                        <li><a href="#sub-6-2">6.2 Practical Use Cases</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-7">7. Softmax — Multi-class Classification<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-7-1">7.1 Definition & Worked Numerical</a></li>
+                        <li><a href="#sub-7-2">7.2 Softmax as Generalized Sigmoid</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="notesContent">
+
+            <!-- Topic 1 -->
+            <section class="topic-section" id="topic-1">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>Vanishing Gradient: Sigmoid's Real Failure</h2>
+                </div>
+                <div class="collapsible-content" id="content-1">
+                    <h3 id="sub-1-1">1.1 Sigmoid at Saturation</h3>
+                    <p>From Lecture 02, the perceptron update rule is:</p>
+                    <div class="formula-box">w<sub>new</sub> = w<sub>old</sub> − α &middot; (ŷ − y) &middot; f′(z) &middot; x &nbsp;&nbsp; where z = wx + b</div>
+                    <p>Last lecture tested sigmoid at its best point (z = 0, σ′ = 0.25). Now consider a perceptron that is almost as wrong as possible — with a large weight w = 6:</p>
+                    <ul>
+                        <li>z = 6 → ŷ = σ(6) = <strong>0.99752738</strong> — error is 99.75% of maximum</li>
+                        <li>σ′(6) = σ(6)·(1−σ(6)) = <strong>0.00246651</strong> — derivative is nearly zero</li>
+                        <li>∂L/∂w = 0.00246041 → step = 0.0025 (despite a massive error!)</li>
+                        <li>w<sub>new</sub> = 5.99753959 — barely moved</li>
+                    </ul>
+                    <p>⚠️ <strong>The Contradiction:</strong> Error was 99.75% of maximum, yet the step was only 0.0025. The culprit:</p>
+                    <div class="formula-box">Vanishing Gradient: When |z| is large, sigmoid is flat → σ′(z) ≈ 0 → gradient ≈ 0 → no learning</div>
+
+                    <h3 id="sub-1-2">1.2 Tanh Doesn't Fix It</h3>
+                    <p>Tanh has a taller peak (max f′ = 1.0 vs 0.25) — looks like the cure. But:</p>
+                    <ul>
+                        <li>Near z = 0: tanh′ is steeper than σ′ ✓</li>
+                        <li>The two derivative curves cross at z = <strong>1.663</strong></li>
+                        <li>Beyond the crossing, tanh′ falls below σ′ and drops faster</li>
+                        <li>At z = 6: both derivatives ≈ <strong>0</strong></li>
+                    </ul>
+                    <p>Tanh wins near the origin and loses badly once |z| grows. Both are S-shaped, both saturate, both vanish. <strong>The S-shape itself is the problem — no rescaling of an S-curve fixes this.</strong></p>
+
+                    <div class="topic-nav">
+                        <button class="btn" disabled="">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section class="topic-section" id="topic-2">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>ReLU — Rectified Linear Unit</h2>
+                </div>
+                <div class="collapsible-content" id="content-2">
+                    <h3 id="sub-2-1">2.1 Definition & Positive Side</h3>
+                    <p>Instead of bending an S, use a function that <strong>never flattens on the positive side</strong>:</p>
+                    <div class="formula-box">f(z) = max(0, z) = z if z &gt; 0, else 0</div>
+                    <div class="formula-box">f′(z) = 1 if z &gt; 0, else 0 &nbsp;&nbsp; (f′(0) undefined; libraries use 0)</div>
+                    <p>Critical property: <strong>f′(z) = 1 for all z &gt; 0</strong>. There is no z in it, so the derivative cannot shrink — f′(6) = 1, f′(600) = 1.</p>
+                    <p><strong>Worked example</strong> (same setup as Part 2): x=1, w=6, b=0, y=0, α=1</p>
+                    <ul>
+                        <li>z = 6 → ŷ = max(0, 6) = <strong>6</strong></li>
+                        <li>ŷ − y = 6 &nbsp;|&nbsp; f′(6) = <strong>1</strong> &nbsp;|&nbsp; ∂L/∂w = 6</li>
+                        <li>w<sub>new</sub> = 6 − 1·6·1·1 = <strong>0</strong> → verify: z=0, ŷ=0, error=0 ✓</li>
+                    </ul>
+                    <p><strong>Solved in one step</strong> — on the same problem where sigmoid moved by only 0.0025.</p>
+                    <table style="width:100%;border-collapse:collapse;margin:1rem 0;font-size:0.9rem;">
+                        <thead>
+                            <tr style="border-bottom:2px solid var(--border-light);">
+                                <th style="padding:0.6rem 0.5rem;">Activation</th>
+                                <th style="padding:0.6rem 0.5rem;">f′(6)</th>
+                                <th style="padding:0.6rem 0.5rem;">Step taken</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom:1px solid rgba(0,0,0,0.06);">
+                                <td style="padding:0.6rem 0.5rem;">Sigmoid</td>
+                                <td style="padding:0.6rem 0.5rem;text-align:center;">0.00246651</td>
+                                <td style="padding:0.6rem 0.5rem;text-align:center;">0.00246041</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0.6rem 0.5rem;font-weight:600;">ReLU</td>
+                                <td style="padding:0.6rem 0.5rem;text-align:center;font-weight:600;color:var(--accent);">1</td>
+                                <td style="padding:0.6rem 0.5rem;text-align:center;font-weight:600;color:var(--accent);">6 &nbsp;(≈ 2439× bigger)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3 id="sub-2-2">2.2 Where ReLU Lives in a Network</h3>
+                    <p>ReLU's output is <strong>unbounded</strong> (ReLU(6) = 6 — not a probability). So it <em>cannot</em> be the final-layer activation:</p>
+                    <ul>
+                        <li><strong>Hidden layers:</strong> ReLU is the standard default — cheap and no vanishing gradient for z &gt; 0</li>
+                        <li><strong>Output layer (binary):</strong> Sigmoid squashes output to [0, 1]</li>
+                        <li><strong>Output layer (multi-class):</strong> Softmax (introduced in Topic 7)</li>
+                    </ul>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section class="topic-section" id="topic-3">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>Dead Neuron: ReLU's Negative Side</h2>
+                </div>
+                <div class="collapsible-content" id="content-3">
+                    <h3 id="sub-3-1">3.1 Dead Neuron Numerically</h3>
+                    <p>Test ReLU when z &lt; 0: x=1, w=−3, b=0, y=1, α=1</p>
+                    <ul>
+                        <li>z = −3 → ŷ = max(0, −3) = <strong>0</strong></li>
+                        <li>ŷ − y = −1 &nbsp;|&nbsp; f′(−3) = <strong>0</strong> (z is negative → derivative is exactly 0)</li>
+                        <li>∂L/∂w = (−1)·0·1 = <strong>0</strong> → w<sub>new</sub> = −3 (no change)</li>
+                    </ul>
+                    <div class="formula-box">Dead Neuron: When z &lt; 0, f′(z) = 0 → gradient = 0 → permanently stuck (α = 1,000,000 still gives zero step)</div>
+                    <p>Unlike sigmoid's vanishing gradient (gradient is merely <em>small</em>), ReLU's dead neuron problem is absolute — the gradient is <em>exactly</em> zero. No learning rate can rescue a product containing zero.</p>
+
+                    <h3 id="sub-3-2">3.2 Why Identity Function Fails</h3>
+                    <p>Tempting fix: "Use f(z) = z everywhere — slope 1, derivative never zero."</p>
+                    <p>But substituting f(z) = z: ŷ = f(wx + b) = wx + b. The activation function does nothing. A straight line fed into a straight line is still a straight line. However many layers are stacked, the whole network is still one linear function and <strong>can never learn a non-linear decision boundary</strong>.</p>
+                    <p>What we need: a non-zero derivative on the negative side <em>and</em> a shape that is not one straight line (so the network can still bend).</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section class="topic-section" id="topic-4">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>Leaky ReLU</h2>
+                </div>
+                <div class="collapsible-content" id="content-4">
+                    <h3 id="sub-4-1">4.1 Definition & The Fix</h3>
+                    <p>Keep the negative side as a straight line, but give it a <em>different</em> slope (0.01) from the positive side (1). That single difference creates a bend at z = 0 — it is no longer one straight line:</p>
+                    <div class="formula-box">f(z) = z if z &gt; 0, else 0.01·z</div>
+                    <div class="formula-box">f′(z) = 1 if z &gt; 0, else 0.01</div>
+                    <p><strong>Worked example</strong> (same negative problem): x=1, w=−3, b=0, y=1, α=1</p>
+                    <ul>
+                        <li>z = −3 → ŷ = 0.01·(−3) = <strong>−0.03</strong></li>
+                        <li>f′(−3) = <strong>0.01</strong> &nbsp;|&nbsp; ∂L/∂w = (−1.03)·(0.01)·1 = −0.0103</li>
+                        <li>w<sub>new</sub> = −3 − (−0.0103) = <strong>−2.9897</strong> ✅ Alive!</li>
+                    </ul>
+
+                    <h3 id="sub-4-2">4.2 Weaknesses of Leaky ReLU</h3>
+                    <ul>
+                        <li><strong>Tiny negative output:</strong> ŷ = −0.03 (barely different from zero — crawling, not running)</li>
+                        <li><strong>Derivative discontinuity at z = 0:</strong> f′ jumps from 0.01 to 1 — not a smooth derivative</li>
+                        <li><strong>Arbitrary hand-chosen constant:</strong> Why 0.01? Not 0.001 or 0.1? This is a hyperparameter requiring tuning</li>
+                    </ul>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 5 -->
+            <section class="topic-section" id="topic-5">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>ELU — Exponential Linear Unit</h2>
+                </div>
+                <div class="collapsible-content" id="content-5">
+                    <h3 id="sub-5-1">5.1 Definition & Smooth Derivative</h3>
+                    <p>Keep f(z) = z for z &gt; 0 (same as ReLU). Replace the flat/straight negative part with a smooth exponential curve that floors at −1:</p>
+                    <div class="formula-box">f(z) = z if z &gt; 0, else eᶻ − 1</div>
+                    <div class="formula-box">f′(z) = 1 if z &gt; 0, else eᶻ</div>
+                    <p>Two key checks:</p>
+                    <ul>
+                        <li>As z → −∞: eᶻ → 0, so f(z) → <strong>−1</strong>. The negative side is <em>bounded</em> — not a straight line running to −∞</li>
+                        <li>At z = 0: f′(0⁺) = 1, f′(0⁻) = e⁰ = 1. They agree → <strong>no jump → continuous derivative</strong> (unlike Leaky ReLU)</li>
+                    </ul>
+                    <p><strong>Worked example</strong> (same problem, e⁻³ = 0.049787): x=1, w=−3, b=0, y=1, α=1</p>
+                    <ul>
+                        <li>z = −3 → ŷ = e⁻³ − 1 = <strong>−0.950213</strong></li>
+                        <li>f′(−3) = e⁻³ = <strong>0.049787</strong> &nbsp;|&nbsp; ∂L/∂w = −1.950213 × 0.049787 = −0.097095</li>
+                        <li>w<sub>new</sub> = −3 + 0.097095 = <strong>−2.902905</strong></li>
+                    </ul>
+
+                    <h3 id="sub-5-2">5.2 ELU vs Leaky ReLU Comparison</h3>
+                    <table style="width:100%;border-collapse:collapse;margin:1rem 0;font-size:0.88rem;">
+                        <thead>
+                            <tr style="border-bottom:2px solid var(--border-light);">
+                                <th style="padding:0.6rem 0.4rem;text-align:left;">Activation</th>
+                                <th style="padding:0.6rem 0.4rem;text-align:center;">ŷ at z=−3</th>
+                                <th style="padding:0.6rem 0.4rem;text-align:center;">f′(−3)</th>
+                                <th style="padding:0.6rem 0.4rem;text-align:center;">∂L/∂w</th>
+                                <th style="padding:0.6rem 0.4rem;text-align:center;">w: −3 →</th>
+                                <th style="padding:0.6rem 0.4rem;text-align:left;">Verdict</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom:1px solid rgba(0,0,0,0.06);">
+                                <td style="padding:0.6rem 0.4rem;">ReLU</td>
+                                <td style="padding:0.6rem 0.4rem;text-align:center;">0</td>
+                                <td style="padding:0.6rem 0.4rem;text-align:center;color:var(--red);font-weight:600;">0</td>
+                                <td style="padding:0.6rem 0.4rem;text-align:center;">0</td>
+                                <td style="padding:0.6rem 0.4rem;text-align:center;">−3</td>
+                                <td style="padding:0.6rem 0.4rem;color:var(--red);">💀 Dead</td>
+                            </tr>
+                            <tr style="border-bottom:1px solid rgba(0,0,0,0.06);">
+                                <td style="padding:0.6rem 0.4rem;">Identity</td>
+                                <td style="padding:0.6rem 0.4rem;text-align:center;">−3</td>
+                                <td style="padding:0.6rem 0.4rem;text-align:center;">1</td>
+                                <td style="padding:0.6rem 0.4rem;text-align:center;">−4</td>
+                                <td style="padding:0.6rem 0.4rem;text-align:center;">1</td>
+                                <td style="padding:0.6rem 0.4rem;">⚠️ Network = 1 straight line</td>
+                            </tr>
+                            <tr style="border-bottom:1px solid rgba(0,0,0,0.06);">
+                                <td style="padding:0.6rem 0.4rem;">Leaky ReLU</td>
+                                <td style="padding:0.6rem 0.4rem;text-align:center;">−0.03</td>
+                                <td style="padding:0.6rem 0.4rem;text-align:center;">0.01</td>
+                                <td style="padding:0.6rem 0.4rem;text-align:center;">−0.0103</td>
+                                <td style="padding:0.6rem 0.4rem;text-align:center;">−2.9897</td>
+                                <td style="padding:0.6rem 0.4rem;">🐢 Alive, crawling</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0.6rem 0.4rem;font-weight:600;">ELU</td>
+                                <td style="padding:0.6rem 0.4rem;text-align:center;font-weight:600;">−0.9502</td>
+                                <td style="padding:0.6rem 0.4rem;text-align:center;font-weight:600;color:var(--accent);">0.0498</td>
+                                <td style="padding:0.6rem 0.4rem;text-align:center;font-weight:600;color:var(--accent);">−0.0971</td>
+                                <td style="padding:0.6rem 0.4rem;text-align:center;font-weight:600;">−2.9029</td>
+                                <td style="padding:0.6rem 0.4rem;color:var(--accent);">✅ Alive, properly moving (~9.4× faster)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 6 -->
+            <section class="topic-section" id="topic-6">
+                <div class="topic-header" onclick="toggleSection('content-6')">
+                    <div class="topic-number">6</div>
+                    <h2>Full Activation Function Comparison</h2>
+                </div>
+                <div class="collapsible-content" id="content-6">
+                    <h3 id="sub-6-1">6.1 Mathematical Summary</h3>
+                    <table style="width:100%;border-collapse:collapse;margin:1rem 0;font-size:0.88rem;">
+                        <thead>
+                            <tr style="border-bottom:2px solid var(--border-light);">
+                                <th style="padding:0.6rem 0.5rem;text-align:left;">Function</th>
+                                <th style="padding:0.6rem 0.5rem;text-align:left;">f(z)</th>
+                                <th style="padding:0.6rem 0.5rem;text-align:left;">f′(z)</th>
+                                <th style="padding:0.6rem 0.5rem;text-align:center;">Range</th>
+                                <th style="padding:0.6rem 0.5rem;text-align:center;">Max f′</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom:1px solid rgba(0,0,0,0.06);">
+                                <td style="padding:0.6rem 0.5rem;">Threshold</td>
+                                <td style="padding:0.6rem 0.5rem;">1 if z≥0, else 0</td>
+                                <td style="padding:0.6rem 0.5rem;color:var(--red);">0</td>
+                                <td style="padding:0.6rem 0.5rem;text-align:center;">{0,1}</td>
+                                <td style="padding:0.6rem 0.5rem;text-align:center;">0</td>
+                            </tr>
+                            <tr style="border-bottom:1px solid rgba(0,0,0,0.06);">
+                                <td style="padding:0.6rem 0.5rem;">Sigmoid</td>
+                                <td style="padding:0.6rem 0.5rem;">1/(1+e⁻ᶻ)</td>
+                                <td style="padding:0.6rem 0.5rem;">σ(1−σ)</td>
+                                <td style="padding:0.6rem 0.5rem;text-align:center;">(0,1)</td>
+                                <td style="padding:0.6rem 0.5rem;text-align:center;">0.25</td>
+                            </tr>
+                            <tr style="border-bottom:1px solid rgba(0,0,0,0.06);">
+                                <td style="padding:0.6rem 0.5rem;">Tanh</td>
+                                <td style="padding:0.6rem 0.5rem;">(eᶻ−e⁻ᶻ)/(eᶻ+e⁻ᶻ)</td>
+                                <td style="padding:0.6rem 0.5rem;">1−tanh²z</td>
+                                <td style="padding:0.6rem 0.5rem;text-align:center;">(−1,1)</td>
+                                <td style="padding:0.6rem 0.5rem;text-align:center;">1</td>
+                            </tr>
+                            <tr style="border-bottom:1px solid rgba(0,0,0,0.06);">
+                                <td style="padding:0.6rem 0.5rem;font-weight:600;">ReLU</td>
+                                <td style="padding:0.6rem 0.5rem;">max(0,z)</td>
+                                <td style="padding:0.6rem 0.5rem;">1 or 0</td>
+                                <td style="padding:0.6rem 0.5rem;text-align:center;">[0,∞)</td>
+                                <td style="padding:0.6rem 0.5rem;text-align:center;">1</td>
+                            </tr>
+                            <tr style="border-bottom:1px solid rgba(0,0,0,0.06);">
+                                <td style="padding:0.6rem 0.5rem;font-weight:600;">Leaky ReLU</td>
+                                <td style="padding:0.6rem 0.5rem;">z or 0.01z</td>
+                                <td style="padding:0.6rem 0.5rem;">1 or 0.01</td>
+                                <td style="padding:0.6rem 0.5rem;text-align:center;">(−∞,∞)</td>
+                                <td style="padding:0.6rem 0.5rem;text-align:center;">1</td>
+                            </tr>
+                            <tr style="border-bottom:1px solid rgba(0,0,0,0.06);">
+                                <td style="padding:0.6rem 0.5rem;font-weight:600;">ELU</td>
+                                <td style="padding:0.6rem 0.5rem;">z or eᶻ−1</td>
+                                <td style="padding:0.6rem 0.5rem;">1 or eᶻ</td>
+                                <td style="padding:0.6rem 0.5rem;text-align:center;">(−1,∞)</td>
+                                <td style="padding:0.6rem 0.5rem;text-align:center;">1</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0.6rem 0.5rem;font-weight:600;">Softmax</td>
+                                <td style="padding:0.6rem 0.5rem;">eᶻⁱ/Σeᶻʲ</td>
+                                <td style="padding:0.6rem 0.5rem;">(cross-layer)</td>
+                                <td style="padding:0.6rem 0.5rem;text-align:center;">(0,1), sums to 1</td>
+                                <td style="padding:0.6rem 0.5rem;text-align:center;">—</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3 id="sub-6-2">6.2 Practical Use Cases</h3>
+                    <table style="width:100%;border-collapse:collapse;margin:1rem 0;font-size:0.85rem;">
+                        <thead>
+                            <tr style="border-bottom:2px solid var(--border-light);">
+                                <th style="padding:0.6rem 0.5rem;text-align:left;">Function</th>
+                                <th style="padding:0.6rem 0.5rem;text-align:left;">Advantage</th>
+                                <th style="padding:0.6rem 0.5rem;text-align:left;">Disadvantage</th>
+                                <th style="padding:0.6rem 0.5rem;text-align:left;">Typical Use</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom:1px solid rgba(0,0,0,0.06);">
+                                <td style="padding:0.6rem 0.5rem;">Sigmoid</td>
+                                <td style="padding:0.6rem 0.5rem;">Output = probability</td>
+                                <td style="padding:0.6rem 0.5rem;">Vanishing gradient; max f′=0.25</td>
+                                <td style="padding:0.6rem 0.5rem;">Final layer (binary), LSTM gates</td>
+                            </tr>
+                            <tr style="border-bottom:1px solid rgba(0,0,0,0.06);">
+                                <td style="padding:0.6rem 0.5rem;">Tanh</td>
+                                <td style="padding:0.6rem 0.5rem;">Zero-centred, steeper near origin</td>
+                                <td style="padding:0.6rem 0.5rem;">Saturates faster than sigmoid</td>
+                                <td style="padding:0.6rem 0.5rem;">RNN/LSTM hidden states</td>
+                            </tr>
+                            <tr style="border-bottom:1px solid rgba(0,0,0,0.06);">
+                                <td style="padding:0.6rem 0.5rem;">ReLU</td>
+                                <td style="padding:0.6rem 0.5rem;">No vanishing gradient (z&gt;0); cheap</td>
+                                <td style="padding:0.6rem 0.5rem;">Dead neuron (z&lt;0); unbounded output</td>
+                                <td style="padding:0.6rem 0.5rem;">Default hidden layers (CNNs)</td>
+                            </tr>
+                            <tr style="border-bottom:1px solid rgba(0,0,0,0.06);">
+                                <td style="padding:0.6rem 0.5rem;">Leaky ReLU</td>
+                                <td style="padding:0.6rem 0.5rem;">Never dies; cheap as ReLU</td>
+                                <td style="padding:0.6rem 0.5rem;">Tiny negative output; jump at z=0; hand-picked slope</td>
+                                <td style="padding:0.6rem 0.5rem;">GANs (dead units destabilise)</td>
+                            </tr>
+                            <tr style="border-bottom:1px solid rgba(0,0,0,0.06);">
+                                <td style="padding:0.6rem 0.5rem;">ELU</td>
+                                <td style="padding:0.6rem 0.5rem;">Never dies; smooth at z=0; bounded below</td>
+                                <td style="padding:0.6rem 0.5rem;">Exponential is slower than ReLU</td>
+                                <td style="padding:0.6rem 0.5rem;">When too many ReLU units are dying</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0.6rem 0.5rem;">Softmax</td>
+                                <td style="padding:0.6rem 0.5rem;">Probabilities that sum to 1</td>
+                                <td style="padding:0.6rem 0.5rem;">Meaningful only across entire layer</td>
+                                <td style="padding:0.6rem 0.5rem;">Final layer (multi-class)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-7').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 7 -->
+            <section class="topic-section" id="topic-7">
+                <div class="topic-header" onclick="toggleSection('content-7')">
+                    <div class="topic-number">7</div>
+                    <h2>Softmax — Multi-class Classification</h2>
+                </div>
+                <div class="collapsible-content" id="content-7">
+                    <h3 id="sub-7-1">7.1 Definition & Worked Numerical</h3>
+                    <p>Sigmoid outputs one probability between 0 and 1 — it answers yes/no. For three classes (cat, dog, bird), three separate sigmoids don't work: they answer independently and don't sum to 1. Softmax takes all n raw scores together:</p>
+                    <div class="formula-box">softmax(zᵢ) = eᶻⁱ / Σⱼ eᶻʲ</div>
+                    <p>The exponential makes every value positive. Dividing by the total forces them to sum to 1.</p>
+                    <p><strong>Worked numerical:</strong> z₁ = 2.0 (cat), z₂ = 1.0 (dog), z₃ = 0.1 (bird)</p>
+                    <ol>
+                        <li>Exponentiate: e²·⁰ = 7.389056, e¹·⁰ = 2.718282, e⁰·¹ = 1.105171</li>
+                        <li>Sum: Σeᶻ = <strong>11.212509</strong></li>
+                        <li>Divide: p₁ = <strong>0.659</strong>, p₂ = <strong>0.242</strong>, p₃ = <strong>0.099</strong></li>
+                        <li>Check: 0.659 + 0.242 + 0.099 = 1.000 ✓</li>
+                        <li>Decision: <strong>cat</strong> at 65.9% confidence</li>
+                    </ol>
+                    <p>✨ <strong>Order preserved:</strong> The largest raw score still gives the largest probability. Softmax doesn't change which class wins — only converts scores to interpretable probabilities.</p>
+
+                    <h3 id="sub-7-2">7.2 Softmax as Generalized Sigmoid</h3>
+                    <p>Sigmoid is softmax for two classes. With n=2, scores z and 0:</p>
+                    <div class="formula-box">softmax(z) = eᶻ / (eᶻ + e⁰) = eᶻ / (eᶻ + 1) = 1 / (1 + e⁻ᶻ) = σ(z)</div>
+                    <p>Binary classification is a special case of multi-class, not a separate idea.</p>
+
+                    <p><strong>Quick reference:</strong></p>
+                    <table style="width:100%;border-collapse:collapse;margin:1rem 0;font-size:0.9rem;">
+                        <thead>
+                            <tr style="border-bottom:2px solid var(--border-light);">
+                                <th style="padding:0.6rem 0.5rem;text-align:left;">Task</th>
+                                <th style="padding:0.6rem 0.5rem;text-align:left;">Final-layer Activation</th>
+                                <th style="padding:0.6rem 0.5rem;text-align:center;">Output Units</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom:1px solid rgba(0,0,0,0.06);">
+                                <td style="padding:0.6rem 0.5rem;">Binary classification</td>
+                                <td style="padding:0.6rem 0.5rem;">Sigmoid</td>
+                                <td style="padding:0.6rem 0.5rem;text-align:center;">1</td>
+                            </tr>
+                            <tr style="border-bottom:1px solid rgba(0,0,0,0.06);">
+                                <td style="padding:0.6rem 0.5rem;">Multi-class classification</td>
+                                <td style="padding:0.6rem 0.5rem;">Softmax</td>
+                                <td style="padding:0.6rem 0.5rem;text-align:center;">One per class</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0.6rem 0.5rem;">Hidden layers</td>
+                                <td style="padding:0.6rem 0.5rem;">ReLU (Leaky ReLU / ELU if dying)</td>
+                                <td style="padding:0.6rem 0.5rem;text-align:center;">Any</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('original-pdf').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original worksheet PDF for reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-7').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/3.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>

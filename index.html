@@ -15,7 +15,124 @@
     <link rel="stylesheet" href="css/home.css?v=1.1">
     <link rel="icon"
         href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23000000%22/><circle cx=%2250%22 cy=%2228%22 r=%2214%22 fill=%22white%22/><circle cx=%2226%22 cy=%2270%22 r=%2214%22 fill=%22white%22/><circle cx=%2274%22 cy=%2270%22 r=%2214%22 fill=%22white%22/></svg>">
+<style>
+.subject-updated {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--text-muted, #8a9099);
+    margin-top: 6px;
+    letter-spacing: 0.01em;
+}
+.subject-updated svg { opacity: 0.6; flex-shrink: 0; }
+.hero-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 4rem;
+}
+.hero-left {
+    flex: 1;
+    max-width: 650px;
+}
+.hero-right {
+    width: 420px;
+    background-color: white;
+    border-radius: 16px;
+    border: 1px solid var(--border-light);
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    flex-shrink: 0;
+}
+.hero-timeline-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--border-light);
+    padding-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.hero-timeline-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+.hero-timeline-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+}
+.hero-timeline-date {
+    font-family: monospace;
+    font-weight: 600;
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+}
+.hero-timeline-date.cn {
+    color: #0284c7;
+    background-color: rgba(2, 132, 199, 0.08);
+}
+.hero-timeline-date.dl {
+    color: #059669;
+    background-color: rgba(5, 150, 105, 0.08);
+}
+.hero-timeline-date.mca {
+    color: #d97706;
+    background-color: rgba(217, 119, 6, 0.08);
+}
+.hero-timeline-date.aml {
+    color: #7c3aed;
+    background-color: rgba(124, 58, 237, 0.08);
+}
+.hero-timeline-name {
+    font-weight: 500;
+}
+.hero-timeline-name.cn {
+    color: #0284c7;
+}
+.hero-timeline-name.dl {
+    color: #059669;
+}
+.hero-timeline-name.mca {
+    color: #d97706;
+}
+.hero-timeline-name.aml {
+    color: #7c3aed;
+}
+.subject-card.dl {
+    border-top: 3px solid #059669 !important;
+}
+.subject-card.aml {
+    border-top: 3px solid #7c3aed !important;
+}
+.subject-card.cn {
+    border-top: 3px solid #0284c7 !important;
+}
+.subject-card.mca {
+    border-top: 3px solid #d97706 !important;
+}
+@media (max-width: 900px) {
+    .hero-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2rem;
+    }
+    .hero-right {
+        width: 100%;
+        max-width: 100%;
+    }
+}
+</style>
 </head>
+
 
 <body>
 
@@ -34,20 +151,64 @@
             <li><a href="AML/index.html">Advanced Machine Learning</a></li>
             <li><a href="CN/index.html">Computer Networks</a></li>
             <li><a href="MCA/index.html">Modern Computer Architecture</a></li>
-            <li><a href="evaluation-criteria.html">Evaluation Criteria</a></li>
             <li><a href="archive.html">Archive</a></li>
         </ul>
-        <div class="nav-stats">8 Lectures &bull; 43 Topics</div>
+        <div style="display:flex;align-items:center;gap:12px;">
+            <div class="nav-stats">17 Lectures &bull; 93 Topics</div>
+            <a href="evaluation-criteria.html" title="Course Handbook &amp; Evaluation Criteria" style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;background:rgba(0,0,0,0.05);color:inherit;text-decoration:none;transition:background 0.2s;flex-shrink:0;" onmouseover="this.style.background='rgba(0,0,0,0.12)'" onmouseout="this.style.background='rgba(0,0,0,0.05)'">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+            </a>
+        </div>
     </nav>
 
     <!-- Hero Section -->
     <header class="hero-section">
-        <h4 class="hero-subtitle">Newton School of Technology</h4>
-        <h1 class="hero-title">5th Semester Course Hub</h1>
-        <p class="hero-description">Access comprehensive notes, lecture materials, and check your grading expectations
-            with our official <a href="evaluation-criteria.html"
-                style="color: var(--accent-purple); font-weight: 600; text-decoration: none; border-bottom: 2px solid var(--accent-purple);">2024
-                Course Handbook & Evaluation Criteria</a>.</p>
+        <div class="hero-left">
+            <h4 class="hero-subtitle">Newton School of Technology</h4>
+            <h1 class="hero-title">5th Semester Course Hub</h1>
+            <p class="hero-description">Access comprehensive notes and lecture materials for every subject, all in one place.</p>
+        </div>
+        <div class="hero-right">
+            <h3 class="hero-timeline-title">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                Upcoming Contests
+            </h3>
+            <div class="hero-timeline-list">
+                <div class="hero-timeline-item">
+                    <span class="hero-timeline-name cn">CN (C1) <small style="font-weight: normal; opacity: 0.75;">(10%)</small></span>
+                    <span class="hero-timeline-date cn">04 Sep</span>
+                </div>
+                <div class="hero-timeline-item">
+                    <span class="hero-timeline-name dl">DL (C1) <small style="font-weight: normal; opacity: 0.75;">(5%)</small></span>
+                    <span class="hero-timeline-date dl">11 Sep</span>
+                </div>
+                <div class="hero-timeline-item">
+                    <span class="hero-timeline-name mca">MCA (C1) <small style="font-weight: normal; opacity: 0.75;">(10%)</small></span>
+                    <span class="hero-timeline-date mca">18 Sep</span>
+                </div>
+                <div class="hero-timeline-item">
+                    <span class="hero-timeline-name aml">AML (C1) <small style="font-weight: normal; opacity: 0.75;">(10%)</small></span>
+                    <span class="hero-timeline-date aml">25 Sep</span>
+                </div>
+                <div class="hero-timeline-item">
+                    <span class="hero-timeline-name cn">CN (C2) <small style="font-weight: normal; opacity: 0.75;">(10%)</small></span>
+                    <span class="hero-timeline-date cn">30 Oct</span>
+                </div>
+                <div class="hero-timeline-item">
+                    <span class="hero-timeline-name dl">DL (C2) <small style="font-weight: normal; opacity: 0.75;">(5%)</small></span>
+                    <span class="hero-timeline-date dl">20 Nov</span>
+                </div>
+                <div class="hero-timeline-item">
+                    <span class="hero-timeline-name mca">MCA (C2) <small style="font-weight: normal; opacity: 0.75;">(10%)</small></span>
+                    <span class="hero-timeline-date mca">27 Nov</span>
+                </div>
+            </div>
+        </div>
     </header>
 
     <!-- Coursework / Solutions Section -->
@@ -57,7 +218,7 @@
             <div class="subject-grid">
 
                 <!-- Deep Learning Sem 5 -->
-                <a href="DL_Sem5/index.html" class="subject-card">
+                <a href="DL_Sem5/index.html" class="subject-card dl">
                     <div class="subject-number">01</div>
                     <h2 class="subject-title">Deep Learning</h2>
                     <p class="subject-desc">Master neural networks from first principles: biological neurons,
@@ -65,24 +226,32 @@
                         problem.</p>
                     <div class="subject-meta">
                         <span class="subject-tag">DL Foundations</span>
-                        <span class="subject-stats" data-subject="dl">2 Lectures &bull; 0/2 Done</span>
+                        <span class="subject-stats" data-subject="dl">4 Lectures &bull; 0/4 Done</span>
+                    </div>
+                    <div class="subject-updated">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                        Last updated: Aug 29, 2026
                     </div>
                 </a>
 
                 <!-- Advanced Machine Learning -->
-                <a href="AML/index.html" class="subject-card">
+                <a href="AML/index.html" class="subject-card aml">
                     <div class="subject-number">02</div>
                     <h2 class="subject-title">Advanced Machine Learning</h2>
                     <p class="subject-desc">Build strong ML fundamentals conceptually, mathematically, and practically:
                         explore structured vs unstructured data, learning paradigms, and core engineering tasks.</p>
                     <div class="subject-meta">
                         <span class="subject-tag">Advanced ML (CSA333)</span>
-                        <span class="subject-stats" data-subject="aml">2 Lectures &bull; 0/2 Done</span>
+                        <span class="subject-stats" data-subject="aml">4 Lectures &bull; 0/4 Done</span>
+                    </div>
+                    <div class="subject-updated">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                        Last updated: Aug 29, 2026
                     </div>
                 </a>
 
                 <!-- Computer Networks -->
-                <a href="CN/index.html" class="subject-card">
+                <a href="CN/index.html" class="subject-card cn">
                     <div class="subject-number">03</div>
                     <h2 class="subject-title">Computer Networks</h2>
                     <p class="subject-desc">Deconstruct the physical and logical architectures of the Internet: global
@@ -90,19 +259,27 @@
                         layers.</p>
                     <div class="subject-meta">
                         <span class="subject-tag">CN Foundations (CSAI321)</span>
-                        <span class="subject-stats" data-subject="cn">2 Lectures &bull; 0/2 Done</span>
+                        <span class="subject-stats" data-subject="cn">6 Lectures &bull; 0/6 Done</span>
+                    </div>
+                    <div class="subject-updated">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                        Last updated: Aug 29, 2026
                     </div>
                 </a>
 
                 <!-- Modern Computer Architecture -->
-                <a href="MCA/index.html" class="subject-card">
+                <a href="MCA/index.html" class="subject-card mca">
                     <div class="subject-number">04</div>
                     <h2 class="subject-title">Modern Computer Architecture</h2>
                     <p class="subject-desc">Master CPU design and digital logic: trace execution down the abstraction
                         stack, implement logical gates, and apply Boolean simplification laws.</p>
                     <div class="subject-meta">
                         <span class="subject-tag">Modern Computer Architecture</span>
-                        <span class="subject-stats" data-subject="mca">2 Lectures &bull; 0/2 Done</span>
+                        <span class="subject-stats" data-subject="mca">3 Lectures &bull; 0/3 Done</span>
+                    </div>
+                    <div class="subject-updated">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                        Last updated: Aug 29, 2026
                     </div>
                 </a>
 
@@ -115,11 +292,11 @@
         <h3 class="stats-title">Browse compile metrics</h3>
         <div class="stats-grid">
             <div class="stat-item">
-                <div class="stat-val">8</div>
+                <div class="stat-val">17</div>
                 <div class="stat-label">Total Lectures</div>
             </div>
             <div class="stat-item">
-                <div class="stat-val">43</div>
+                <div class="stat-val">93</div>
                 <div class="stat-label">Topics Compiled</div>
             </div>
             <div class="stat-item">
@@ -148,10 +325,10 @@
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             const subjectLectures = {
-                dl: ['dl-l1', 'dl-l2'],
-                aml: ['aml-l1', 'aml-l2'],
-                cn: ['cn-l1', 'cn-l2'],
-                mca: ['mca-l1', 'mca-l2']
+                dl: ['dl-l1', 'dl-l2', 'dl-l3', 'dl-l4'],
+                aml: ['aml-l1', 'aml-l2', 'aml-l3', 'aml-l4'],
+                cn: ['cn-l1', 'cn-l2', 'cn-l3', 'cn-l4', 'cn-l5', 'cn-l6'],
+                mca: ['mca-l1', 'mca-l2', 'mca-l3']
             };
 
             function renderUI() {
