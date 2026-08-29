@@ -1,24 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Deep Learning - Lecture 01</title>
-    <meta content="Study notes for Deep Learning, Lecture 01 covering the biological neuron, McCulloch & Pitts mathematical model, logic gates, forward/backward propagation, linear decision boundaries, and the XOR limitation." name="description"/>
-    <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>01</text></svg>" rel="icon"/>
-    <link href="../css/style.css" rel="stylesheet"/>
+    <meta
+        content="Study notes for Deep Learning, Lecture 01 covering the biological neuron, McCulloch & Pitts mathematical model, logic gates, forward/backward propagation, linear decision boundaries, and the XOR limitation."
+        name="description" />
+    <link
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>01</text></svg>"
+        rel="icon" />
+    <link href="../css/style.css" rel="stylesheet" />
 </head>
+
 <body>
     <header>
         <div class="header-titles">
             <h1>Deep Learning Foundations</h1>
             <p>Lecture 01 - Where it Begins: The Neuron & Decision Boundaries</p>
-            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <a href="../index.html"
+                style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">←
+                Back to Dashboard</a>
             <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
-            <a href="../pdfs/1.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+            <a href="../pdfs/1.pdf"
+                style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;"
+                target="_blank">Open PDF in New Tab ↗</a>
         </div>
         <div class="search-container">
-            <input id="searchInput" placeholder="Search notes..." type="text"/>
+            <input id="searchInput" placeholder="Search notes..." type="text" />
         </div>
     </header>
     <div class="container">
@@ -29,7 +39,15 @@
                 <div class="topic-count">Total Topics: 5</div>
             </div>
             <ul class="index-list" id="indexList">
-                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>Short Notes</a></li>
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            style="vertical-align: text-bottom; margin-right: 4px;">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>Short Notes</a></li>
                 <li>
                     <a href="#topic-1">1. The Biological & Mathematical Neuron<span class="sub-count">2</span></a>
                     <ul class="sub-index">
@@ -67,7 +85,15 @@
                         <li><a href="#sub-5-2">5.2 Minsky & Papert Proof (1969)</a></li>
                     </ul>
                 </li>
-                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round"
+                            stroke-linejoin="round" stroke-width="2"
+                            style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" x2="8" y1="13" y2="13"></line>
+                            <line x1="16" x2="8" y1="17" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>Original PDF</a></li>
             </ul>
         </aside>
         <!-- Main Content -->
@@ -75,18 +101,28 @@
             <!-- Short Notes -->
             <section id="short-notes" class="topic-section">
                 <div class="topic-header" onclick="toggleSection('content-short-notes')">
-                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                    <div class="topic-number"
+                        style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
                     </div>
                     <h2>Short Notes &amp; Visual Summary</h2>
                 </div>
                 <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
                     <p style="margin-bottom: 1rem;">Handwritten / quick summary notes for Lecture 01:</p>
-                    <div style="text-align: center; background: var(--bg-secondary, #f8f9fa); padding: 1rem; border-radius: 8px; border: 1px solid var(--gray-border);">
+                    <div
+                        style="text-align: center; background: var(--bg-secondary, #f8f9fa); padding: 1rem; border-radius: 8px; border: 1px solid var(--gray-border);">
                         <a href="../images/1.png" target="_blank" title="Click to view full size">
-                            <img src="../images/1.png" alt="Lecture 01 Short Notes" style="max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
+                            <img src="../images/1.png" alt="Lecture 01 Short Notes"
+                                style="max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
                         </a>
-                        <p style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-muted);">Click image to open high-resolution version in new tab</p>
+                        <p style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-muted);">Click image to
+                            open high-resolution version in new tab</p>
                     </div>
                 </div>
             </section>
@@ -99,32 +135,41 @@
                 </div>
                 <div class="collapsible-content" id="content-1">
                     <h3 id="sub-1-1">1.1 Biology of the Neuron</h3>
-                    <p>In 1888, the father of modern neuroscience, <strong>Santiago Ramón y Cajal</strong>, showed that the brain is constructed from individual, separate cells called neurons. These biological units process information in a unidirectional manner.</p>
+                    <p>In 1888, the father of modern neuroscience, <strong>Santiago Ramón y Cajal</strong>, showed that
+                        the brain is constructed from individual, separate cells called neurons. These biological units
+                        process information in a unidirectional manner.</p>
                     <p>A biological neuron operates on a simple principle:</p>
                     <ul>
-                        <li><strong>Receive:</strong> It collects chemical and electrical signals from neighboring cells through its dendrites.</li>
+                        <li><strong>Receive:</strong> It collects chemical and electrical signals from neighboring cells
+                            through its dendrites.</li>
                         <li><strong>Sum:</strong> It aggregates these incoming potentials at the cell body (soma).</li>
-                        <li><strong>Fire:</strong> If the cumulative potential surpasses a specific threshold, it generates an action potential that travels down the axon to signal other neurons.</li>
+                        <li><strong>Fire:</strong> If the cumulative potential surpasses a specific threshold, it
+                            generates an action potential that travels down the axon to signal other neurons.</li>
                     </ul>
 
                     <h3 id="sub-1-2">1.2 Mathematical Formulation</h3>
-                    <p>To implement reasoning in machinery, we must convert this biological mechanism into mathematical equations. We model the incoming signals as a weighted sum, where each input has an associated weight representing its connection strength.</p>
+                    <p>To implement reasoning in machinery, we must convert this biological mechanism into mathematical
+                        equations. We model the incoming signals as a weighted sum, where each input has an associated
+                        weight representing its connection strength.</p>
                     <div class="box box-blue">
                         <div class="box-title">Mathematical Neuron Model</div>
-                        <p>A neuron will fire (output 1) if the weighted sum of inputs meets or exceeds a threshold value:</p>
+                        <p>A neuron will fire (output 1) if the weighted sum of inputs meets or exceeds a threshold
+                            value:</p>
                         <p style="text-align: center; font-size: 1.2rem; font-weight: bold; margin: 1rem 0;">
                             Output = 1 &nbsp; if &nbsp; &sum; w<sub>i</sub>x<sub>i</sub> &ge; &theta;
                         </p>
                         <p>Where:</p>
                         <ul>
                             <li><strong>x<sub>i</sub>:</strong> Input signals.</li>
-                            <li><strong>w<sub>i</sub>:</strong> Weights that scale the relative importance of each input.</li>
+                            <li><strong>w<sub>i</sub>:</strong> Weights that scale the relative importance of each
+                                input.</li>
                             <li><strong>&theta; (Theta):</strong> The activation threshold.</li>
                         </ul>
                     </div>
                     <div class="topic-nav">
                         <button class="btn" disabled="">Previous Topic</button>
-                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next
+                            Topic</button>
                     </div>
                 </div>
             </section>
@@ -137,11 +182,15 @@
                 </div>
                 <div class="collapsible-content" id="content-2">
                     <h3 id="sub-2-1">2.1 Logic Gates as Building Blocks</h3>
-                    <p>In 1943, Warren McCulloch and Walter Pitts formulated the sum-and-threshold model into exact mathematics. They realized that by stacking these simple mathematical nodes, they could build logic gates—the essential components of any computer architecture capable of arithmetic, memory, and general computation.</p>
+                    <p>In 1943, Warren McCulloch and Walter Pitts formulated the sum-and-threshold model into exact
+                        mathematics. They realized that by stacking these simple mathematical nodes, they could build
+                        logic gates—the essential components of any Modern Computer Architecture capable of arithmetic,
+                        memory, and general computation.</p>
 
                     <h3 id="sub-2-2">2.2 Gate Implementations (AND, OR, NOT)</h3>
-                    <p>By manually tuning weights and thresholds, a single mathematical neuron can act as standard logical operators:</p>
-                    
+                    <p>By manually tuning weights and thresholds, a single mathematical neuron can act as standard
+                        logical operators:</p>
+
                     <div class="box box-orange">
                         <div class="box-title">Logical Gate Exercises</div>
                         <ul>
@@ -167,14 +216,20 @@
                     </div>
 
                     <h3 id="sub-2-3">2.3 Implications of the 1943 Result</h3>
-                    <p>Since one cell can be configured to act as an AND, OR, or NOT gate, a network of these basic units can theoretically construct any logical circuit whatsoever. This was a critical step in establishing the mathematical foundation of neural computation.</p>
+                    <p>Since one cell can be configured to act as an AND, OR, or NOT gate, a network of these basic
+                        units can theoretically construct any logical circuit whatsoever. This was a critical step in
+                        establishing the mathematical foundation of neural computation.</p>
                     <div class="box box-beige">
                         <div class="box-title">Real Talk: The Missing Element</div>
-                        <p>In the McCulloch-Pitts model, the weights had to be set manually by human engineering. The model could compute, but it did not learn from experience. True learning requires the weights to adapt dynamically from training data without human intervention.</p>
+                        <p>In the McCulloch-Pitts model, the weights had to be set manually by human engineering. The
+                            model could compute, but it did not learn from experience. True learning requires the
+                            weights to adapt dynamically from training data without human intervention.</p>
                     </div>
                     <div class="topic-nav">
-                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
-                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous
+                            Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next
+                            Topic</button>
                     </div>
                 </div>
             </section>
@@ -189,14 +244,18 @@
                     <h3 id="sub-3-1">3.1 Forward Propagation</h3>
                     <p>The operational flow of a perceptron is divided into two phases:</p>
                     <ol>
-                        <li><strong>Linear Combination:</strong> Mixes inputs using weights to calculate a total score.</li>
-                        <li><strong>Activation Function:</strong> Evaluates the sum against a threshold to output a final category (0 or 1).</li>
+                        <li><strong>Linear Combination:</strong> Mixes inputs using weights to calculate a total score.
+                        </li>
+                        <li><strong>Activation Function:</strong> Evaluates the sum against a threshold to output a
+                            final category (0 or 1).</li>
                     </ol>
 
                     <h3 id="sub-3-2">3.2 The Concept of Bias</h3>
-                    <p>To simplify operations, we can rewrite the threshold condition by moving the parameter to the other side of the inequality:</p>
+                    <p>To simplify operations, we can rewrite the threshold condition by moving the parameter to the
+                        other side of the inequality:</p>
                     <p style="text-align: center; font-style: italic; margin: 1rem 0;">
-                        w<sub>1</sub>x<sub>1</sub> + w<sub>2</sub>x<sub>2</sub> &ge; &theta; &nbsp;&rArr;&nbsp; w<sub>1</sub>x<sub>1</sub> + w<sub>2</sub>x<sub>2</sub> - &theta; &ge; 0
+                        w<sub>1</sub>x<sub>1</sub> + w<sub>2</sub>x<sub>2</sub> &ge; &theta; &nbsp;&rArr;&nbsp;
+                        w<sub>1</sub>x<sub>1</sub> + w<sub>2</sub>x<sub>2</sub> - &theta; &ge; 0
                     </p>
                     <p>We define the <strong>Bias (b)</strong> as negative &theta;:</p>
                     <div class="box box-blue">
@@ -204,14 +263,19 @@
                         <p style="text-align: center; font-size: 1.2rem; font-weight: bold; margin: 0.5rem 0;">
                             w<sub>1</sub>x<sub>1</sub> + w<sub>2</sub>x<sub>2</sub> + b &ge; 0
                         </p>
-                        <p>This formulation makes calculation much cleaner, representing bias as an offset rather than a varying inequality target.</p>
+                        <p>This formulation makes calculation much cleaner, representing bias as an offset rather than a
+                            varying inequality target.</p>
                     </div>
 
                     <h3 id="sub-3-3">3.3 Backward Propagation & Learning</h3>
-                    <p>If the model makes a classification error during forward propagation, it performs **backward propagation** to adjust its weights. It computes the mismatch between prediction and reality, then modifies the parameters in the direction that decreases the error.</p>
+                    <p>If the model makes a classification error during forward propagation, it performs **backward
+                        propagation** to adjust its weights. It computes the mismatch between prediction and reality,
+                        then modifies the parameters in the direction that decreases the error.</p>
                     <div class="topic-nav">
-                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
-                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous
+                            Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next
+                            Topic</button>
                     </div>
                 </div>
             </section>
@@ -224,13 +288,19 @@
                 </div>
                 <div class="collapsible-content" id="content-4">
                     <h3 id="sub-4-1">4.1 Geometry of the Boundary</h3>
-                    <p>A perceptron acts as a classifier, taking two input features (x<sub>1</sub>, x<sub>2</sub>) and drawing a boundary that splits points into distinct categories based on sign:</p>
+                    <p>A perceptron acts as a classifier, taking two input features (x<sub>1</sub>, x<sub>2</sub>) and
+                        drawing a boundary that splits points into distinct categories based on sign:</p>
                     <ul>
-                        <li><strong>Above the line:</strong> w<sub>1</sub>x<sub>1</sub> + w<sub>2</sub>x<sub>2</sub> + b &gt; 0 &rArr; Class 1</li>
-                        <li><strong>Below the line:</strong> w<sub>1</sub>x<sub>1</sub> + w<sub>2</sub>x<sub>2</sub> + b &lt; 0 &rArr; Class 0</li>
-                        <li><strong>On the line:</strong> w<sub>1</sub>x<sub>1</sub> + w<sub>2</sub>x<sub>2</sub> + b = 0 &rArr; The Decision Boundary</li>
+                        <li><strong>Above the line:</strong> w<sub>1</sub>x<sub>1</sub> + w<sub>2</sub>x<sub>2</sub> + b
+                            &gt; 0 &rArr; Class 1</li>
+                        <li><strong>Below the line:</strong> w<sub>1</sub>x<sub>1</sub> + w<sub>2</sub>x<sub>2</sub> + b
+                            &lt; 0 &rArr; Class 0</li>
+                        <li><strong>On the line:</strong> w<sub>1</sub>x<sub>1</sub> + w<sub>2</sub>x<sub>2</sub> + b =
+                            0 &rArr; The Decision Boundary</li>
                     </ul>
-                    <p>Because the feature inputs are only to the first power (linear scaling), the boundary equation represents a straight line. This boundary divides the feature space cleanly into two halves, a process known as **linear separation**.</p>
+                    <p>Because the feature inputs are only to the first power (linear scaling), the boundary equation
+                        represents a straight line. This boundary divides the feature space cleanly into two halves, a
+                        process known as **linear separation**.</p>
 
                     <h3 id="sub-4-2">4.2 A Concrete Mathematical Example</h3>
                     <p>Let's choose specific numbers to see how the line separates the plane:</p>
@@ -238,12 +308,17 @@
                         <div class="box-title">Example parameters</div>
                         <p>Weights w<sub>1</sub> = 2, w<sub>2</sub> = 3, and Bias b = -12.</p>
                         <p>The decision rule becomes:</p>
-                        <p style="text-align: center; font-weight: bold;">2x<sub>1</sub> + 3x<sub>2</sub> - 12 &ge; 0</p>
-                        <p>Setting this to zero gives the boundary line equation: <strong>2x<sub>1</sub> + 3x<sub>2</sub> - 12 = 0</strong>. Points above this line yield a positive sum (Class 1), while points below yield a negative sum (Class 0).</p>
+                        <p style="text-align: center; font-weight: bold;">2x<sub>1</sub> + 3x<sub>2</sub> - 12 &ge; 0
+                        </p>
+                        <p>Setting this to zero gives the boundary line equation: <strong>2x<sub>1</sub> +
+                                3x<sub>2</sub> - 12 = 0</strong>. Points above this line yield a positive sum (Class 1),
+                            while points below yield a negative sum (Class 0).</p>
                     </div>
                     <div class="topic-nav">
-                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
-                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous
+                            Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next
+                            Topic</button>
                     </div>
                 </div>
             </section>
@@ -256,16 +331,24 @@
                 </div>
                 <div class="collapsible-content" id="content-5">
                     <h3 id="sub-5-1">5.1 The Non-Linear Separation Problem</h3>
-                    <p>Because a single perceptron uses a linear combination, it is mathematically constrained to draw only a straight boundary. If the classes are distributed such that they cannot be separated by a single straight cut, a single perceptron cannot resolve them.</p>
-                    
+                    <p>Because a single perceptron uses a linear combination, it is mathematically constrained to draw
+                        only a straight boundary. If the classes are distributed such that they cannot be separated by a
+                        single straight cut, a single perceptron cannot resolve them.</p>
+
                     <h3 id="sub-5-2">5.2 Minsky & Papert Proof (1969)</h3>
-                    <p>In 1969, Marvin Minsky and Seymour Papert published a mathematical proof showing that a single perceptron cannot learn the XOR (Exclusive OR) function. XOR requires diagonal grouping, which cannot be separated by any single straight line. This publication caused AI research funding to dry up for over a decade, ending the first wave of neural network enthusiasm.</p>
+                    <p>In 1969, Marvin Minsky and Seymour Papert published a mathematical proof showing that a single
+                        perceptron cannot learn the XOR (Exclusive OR) function. XOR requires diagonal grouping, which
+                        cannot be separated by any single straight line. This publication caused AI research funding to
+                        dry up for over a decade, ending the first wave of neural network enthusiasm.</p>
                     <div class="box box-red">
                         <div class="box-title">Critical Bottleneck</div>
-                        <p>The straight-line boundary is baked into the linear combination formula (w &middot; x + b). Changing activation functions (like switching from step to sigmoid) does not change this limitation. A single neuron can never separate non-linear data distributions like XOR.</p>
+                        <p>The straight-line boundary is baked into the linear combination formula (w &middot; x + b).
+                            Changing activation functions (like switching from step to sigmoid) does not change this
+                            limitation. A single neuron can never separate non-linear data distributions like XOR.</p>
                     </div>
                     <div class="topic-nav">
-                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous
+                            Topic</button>
                         <button class="btn" disabled="">Next Topic</button>
                     </div>
                 </div>
@@ -274,17 +357,27 @@
             <!-- Original PDF -->
             <section class="topic-section" id="original-pdf">
                 <div class="topic-header" onclick="toggleSection('content-pdf')">
-                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
-                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    <div class="topic-number"
+                        style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round"
+                            stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" x2="8" y1="13" y2="13"></line>
+                            <line x1="16" x2="8" y1="17" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
                     </div>
                     <h2>Original PDF Notes</h2>
                 </div>
                 <div class="collapsible-content" id="content-pdf">
                     <p>Below is the original PDF document for your reference:</p>
-                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()"
+                        style="margin-top: 1rem; display: block;">Load Original PDF</button>
                     <div id="pdfContainer" style="margin-top: 1rem;"></div>
                     <div class="topic-nav">
-                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous
+                            Topic</button>
                         <button class="btn" disabled="">Next Topic</button>
                     </div>
                 </div>
@@ -307,4 +400,5 @@
     </script>
     <script src="../js/script.js"></script>
 </body>
+
 </html>

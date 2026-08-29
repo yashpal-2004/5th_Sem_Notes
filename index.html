@@ -1,25 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>5th Sem Notes Dashboard</title>
-    <meta name="description" content="Central Hub for Newton School of Technology 5th Semester Course Notes (OS, Advanced Machine Learning, Deep Learning).">
+    <meta name="description"
+        content="Central Hub for Newton School of Technology 5th Semester Course Notes (OS, Advanced Machine Learning, Deep Learning).">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="css/home.css?v=1.1">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23000000%22/><circle cx=%2250%22 cy=%2228%22 r=%2214%22 fill=%22white%22/><circle cx=%2226%22 cy=%2270%22 r=%2214%22 fill=%22white%22/><circle cx=%2274%22 cy=%2270%22 r=%2214%22 fill=%22white%22/></svg>">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23000000%22/><circle cx=%2250%22 cy=%2228%22 r=%2214%22 fill=%22white%22/><circle cx=%2226%22 cy=%2270%22 r=%2214%22 fill=%22white%22/><circle cx=%2274%22 cy=%2270%22 r=%2214%22 fill=%22white%22/></svg>">
 </head>
+
 <body>
 
     <!-- Navigation Bar -->
     <nav>
         <a href="index.html" class="logo-container">
             <svg class="logo-symbol" viewBox="0 0 24 24">
-                <circle cx="12" cy="6" r="3"/>
-                <circle cx="6" cy="16" r="3"/>
-                <circle cx="18" cy="16" r="3"/>
+                <circle cx="12" cy="6" r="3" />
+                <circle cx="6" cy="16" r="3" />
+                <circle cx="18" cy="16" r="3" />
             </svg>
             <span class="logo-text">NST Notes</span>
         </a>
@@ -28,24 +34,35 @@
             <li><a href="AML/index.html">Advanced Machine Learning</a></li>
             <li><a href="CN/index.html">Computer Networks</a></li>
             <li><a href="MCA/index.html">Modern Computer Architecture</a></li>
+            <li><a href="evaluation-criteria.html">Evaluation Criteria</a></li>
             <li><a href="archive.html">Archive</a></li>
         </ul>
         <div class="nav-stats">8 Lectures &bull; 43 Topics</div>
     </nav>
 
-
+    <!-- Hero Section -->
+    <header class="hero-section">
+        <h4 class="hero-subtitle">Newton School of Technology</h4>
+        <h1 class="hero-title">5th Semester Course Hub</h1>
+        <p class="hero-description">Access comprehensive notes, lecture materials, and check your grading expectations
+            with our official <a href="evaluation-criteria.html"
+                style="color: var(--accent-purple); font-weight: 600; text-decoration: none; border-bottom: 2px solid var(--accent-purple);">2024
+                Course Handbook & Evaluation Criteria</a>.</p>
+    </header>
 
     <!-- Coursework / Solutions Section -->
     <section class="coursework-section">
         <div class="coursework-container">
             <h3 class="section-label">Our Coursework</h3>
             <div class="subject-grid">
-                
+
                 <!-- Deep Learning Sem 5 -->
                 <a href="DL_Sem5/index.html" class="subject-card">
                     <div class="subject-number">01</div>
                     <h2 class="subject-title">Deep Learning</h2>
-                    <p class="subject-desc">Master neural networks from first principles: biological neurons, McCulloch-Pitts logic gates, forward/backward propagation, linear separation limits, and the XOR problem.</p>
+                    <p class="subject-desc">Master neural networks from first principles: biological neurons,
+                        McCulloch-Pitts logic gates, forward/backward propagation, linear separation limits, and the XOR
+                        problem.</p>
                     <div class="subject-meta">
                         <span class="subject-tag">DL Foundations</span>
                         <span class="subject-stats" data-subject="dl">2 Lectures &bull; 0/2 Done</span>
@@ -56,7 +73,8 @@
                 <a href="AML/index.html" class="subject-card">
                     <div class="subject-number">02</div>
                     <h2 class="subject-title">Advanced Machine Learning</h2>
-                    <p class="subject-desc">Build strong ML fundamentals conceptually, mathematically, and practically: explore structured vs unstructured data, learning paradigms, and core engineering tasks.</p>
+                    <p class="subject-desc">Build strong ML fundamentals conceptually, mathematically, and practically:
+                        explore structured vs unstructured data, learning paradigms, and core engineering tasks.</p>
                     <div class="subject-meta">
                         <span class="subject-tag">Advanced ML (CSA333)</span>
                         <span class="subject-stats" data-subject="aml">2 Lectures &bull; 0/2 Done</span>
@@ -67,7 +85,9 @@
                 <a href="CN/index.html" class="subject-card">
                     <div class="subject-number">03</div>
                     <h2 class="subject-title">Computer Networks</h2>
-                    <p class="subject-desc">Deconstruct the physical and logical architectures of the Internet: global routing, subsea physical fiber cables, network classifications (PAN/LAN/MAN/WAN), and top-down layers.</p>
+                    <p class="subject-desc">Deconstruct the physical and logical architectures of the Internet: global
+                        routing, subsea physical fiber cables, network classifications (PAN/LAN/MAN/WAN), and top-down
+                        layers.</p>
                     <div class="subject-meta">
                         <span class="subject-tag">CN Foundations (CSAI321)</span>
                         <span class="subject-stats" data-subject="cn">2 Lectures &bull; 0/2 Done</span>
@@ -77,8 +97,9 @@
                 <!-- Modern Computer Architecture -->
                 <a href="MCA/index.html" class="subject-card">
                     <div class="subject-number">04</div>
-                    <h2 class="subject-title">Computer Architecture</h2>
-                    <p class="subject-desc">Master CPU design and digital logic: trace execution down the abstraction stack, implement logical gates, and apply Boolean simplification laws.</p>
+                    <h2 class="subject-title">Modern Computer Architecture</h2>
+                    <p class="subject-desc">Master CPU design and digital logic: trace execution down the abstraction
+                        stack, implement logical gates, and apply Boolean simplification laws.</p>
                     <div class="subject-meta">
                         <span class="subject-tag">Modern Computer Architecture</span>
                         <span class="subject-stats" data-subject="mca">2 Lectures &bull; 0/2 Done</span>
@@ -117,9 +138,9 @@
         <div class="footer-logo-row">
             <div class="footer-brand-logo">nstnotes</div>
             <svg class="footer-symbol" viewBox="0 0 24 24">
-                <circle cx="12" cy="6" r="3"/>
-                <circle cx="6" cy="16" r="3"/>
-                <circle cx="18" cy="16" r="3"/>
+                <circle cx="12" cy="6" r="3" />
+                <circle cx="6" cy="16" r="3" />
+                <circle cx="18" cy="16" r="3" />
             </svg>
         </div>
     </footer>
@@ -203,4 +224,5 @@
         });
     </script>
 </body>
+
 </html>

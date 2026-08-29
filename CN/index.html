@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,19 +8,23 @@
     <meta name="description" content="Dashboard for Computer Networks (CSAI321) lecture notes.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="css/home.css?v=1.1">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2240%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>CN</text></svg>">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2240%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>CN</text></svg>">
 </head>
+
 <body>
 
     <!-- Navigation Bar -->
     <nav>
         <a href="../index.html" class="logo-container">
             <svg class="logo-symbol" viewBox="0 0 24 24">
-                <circle cx="12" cy="6" r="3"/>
-                <circle cx="6" cy="16" r="3"/>
-                <circle cx="18" cy="16" r="3"/>
+                <circle cx="12" cy="6" r="3" />
+                <circle cx="6" cy="16" r="3" />
+                <circle cx="18" cy="16" r="3" />
             </svg>
             <span class="logo-text">CN Notes</span>
         </a>
@@ -38,15 +43,17 @@
         <div class="coursework-container">
             <h3 class="section-label">Compiled Lectures</h3>
             <div class="lectures-grid">
-                
+
                 <!-- Lecture 01 -->
                 <a href="lectures/lecture-01.html" class="lecture-card" data-lecture-id="cn-l1">
                     <div class="lecture-card-top">
                         <div class="lecture-number">01</div>
-                        <div class="lecture-checkbox" onclick="toggleComplete(event, 'cn-l1')" title="Toggle completion status"></div>
+                        <div class="lecture-checkbox" onclick="toggleComplete(event, 'cn-l1')"
+                            title="Toggle completion status"></div>
                     </div>
                     <h2>Introduction: The Cloud, Infrastructure & Top-Down Layers</h2>
-                    <p>Understanding data center connectivity, network classifications (PAN, LAN, MAN, WAN), subsea cable physical geography, top-down layers, and grading parameters.</p>
+                    <p>Understanding data center connectivity, network classifications (PAN, LAN, MAN, WAN), subsea
+                        cable physical geography, top-down layers, and grading parameters.</p>
                     <div class="lecture-card-header">
                         <span class="lecture-tag">Introduction</span>
                         <span class="lecture-stats">5 Topics</span>
@@ -57,10 +64,12 @@
                 <a href="lectures/lecture-02.html" class="lecture-card" data-lecture-id="cn-l2">
                     <div class="lecture-card-top">
                         <div class="lecture-number">02</div>
-                        <div class="lecture-checkbox" onclick="toggleComplete(event, 'cn-l2')" title="Toggle completion status"></div>
+                        <div class="lecture-checkbox" onclick="toggleComplete(event, 'cn-l2')"
+                            title="Toggle completion status"></div>
                     </div>
                     <h2>Moving Data Through the Core: Switching, Delays & Bottlenecks</h2>
-                    <p>Comparing circuit switching vs packet switching, store-and-forward rule, calculating transmission and propagation delays, caravan analogy, and throughput bottlenecks.</p>
+                    <p>Comparing circuit switching vs packet switching, store-and-forward rule, calculating transmission
+                        and propagation delays, caravan analogy, and throughput bottlenecks.</p>
                     <div class="lecture-card-header">
                         <span class="lecture-tag">Network Core</span>
                         <span class="lecture-stats">5 Topics</span>
@@ -99,9 +108,9 @@
         <div class="footer-logo-row">
             <div class="footer-brand-logo">nstnotes</div>
             <svg class="footer-symbol" viewBox="0 0 24 24">
-                <circle cx="12" cy="6" r="3"/>
-                <circle cx="6" cy="16" r="3"/>
-                <circle cx="18" cy="16" r="3"/>
+                <circle cx="12" cy="6" r="3" />
+                <circle cx="6" cy="16" r="3" />
+                <circle cx="18" cy="16" r="3" />
             </svg>
         </div>
     </footer>
@@ -169,7 +178,7 @@
             const isCompleted = card.classList.toggle('completed');
             localStorage.setItem('nst-completed-' + id, isCompleted);
             updateProgress();
-            
+
             // Push updated progress to cloud
             await pushProgress();
         }
@@ -205,4 +214,5 @@
         }
     </script>
 </body>
+
 </html>

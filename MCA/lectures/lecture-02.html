@@ -1,24 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Computer Architecture - Lecture 02</title>
-    <meta content="Study notes for Modern Computer Architecture (CSA222), Lecture 02 covering Logic Minimisation, SOP/POS canonical expressions, Karnaugh Maps (K-maps) with Gray-code, DeMorgan's Theorems, and Universal Gates (NAND/NOR)." name="description"/>
-    <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>02</text></svg>" rel="icon"/>
-    <link href="../css/style.css" rel="stylesheet"/>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Modern Computer Architecture - Lecture 02</title>
+    <meta
+        content="Study notes for Modern Computer Architecture (CSA222), Lecture 02 covering Logic Minimisation, SOP/POS canonical expressions, Karnaugh Maps (K-maps) with Gray-code, DeMorgan's Theorems, and Universal Gates (NAND/NOR)."
+        name="description" />
+    <link
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>02</text></svg>"
+        rel="icon" />
+    <link href="../css/style.css" rel="stylesheet" />
 </head>
+
 <body>
     <header>
         <div class="header-titles">
             <h1>Modern Computer Architecture</h1>
             <p>Lecture 02 - Logic Minimisation & Universal Gates</p>
-            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <a href="../index.html"
+                style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">←
+                Back to Dashboard</a>
             <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
-            <a href="../pdfs/2.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+            <a href="../pdfs/2.pdf"
+                style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;"
+                target="_blank">Open PDF in New Tab ↗</a>
         </div>
         <div class="search-container">
-            <input id="searchInput" placeholder="Search notes..." type="text"/>
+            <input id="searchInput" placeholder="Search notes..." type="text" />
         </div>
     </header>
     <div class="container">
@@ -29,7 +39,15 @@
                 <div class="topic-count">Total Topics: 5</div>
             </div>
             <ul class="index-list" id="indexList">
-                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>Short Notes</a></li>
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            style="vertical-align: text-bottom; margin-right: 4px;">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>Short Notes</a></li>
                 <li>
                     <a href="#topic-1">1. Why Shrink a Circuit? (Silicon Efficiency)<span class="sub-count">2</span></a>
                     <ul class="sub-index">
@@ -38,7 +56,8 @@
                     </ul>
                 </li>
                 <li>
-                    <a href="#topic-2">2. Truth Table to Canonical Expression (SOP & POS)<span class="sub-count">2</span></a>
+                    <a href="#topic-2">2. Truth Table to Canonical Expression (SOP & POS)<span
+                            class="sub-count">2</span></a>
                     <ul class="sub-index">
                         <li><a href="#sub-2-1">2.1 Sum of Products (SOP) & Minterms</a></li>
                         <li><a href="#sub-2-2">2.2 Product of Sums (POS) & Maxterms</a></li>
@@ -66,7 +85,15 @@
                         <li><a href="#sub-5-2">5.2 CMOS Transistor Budget (NAND vs. AND)</a></li>
                     </ul>
                 </li>
-                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round"
+                            stroke-linejoin="round" stroke-width="2"
+                            style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" x2="8" y1="13" y2="13"></line>
+                            <line x1="16" x2="8" y1="17" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>Original PDF</a></li>
             </ul>
         </aside>
         <!-- Main Content -->
@@ -74,18 +101,29 @@
             <!-- Short Notes -->
             <section id="short-notes" class="topic-section">
                 <div class="topic-header" onclick="toggleSection('content-short-notes')">
-                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                    <div class="topic-number"
+                        style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
                     </div>
                     <h2>Short Notes &amp; Visual Summary</h2>
                 </div>
                 <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
                     <p style="margin-bottom: 1rem;">Handwritten / quick summary notes for Lecture 02:</p>
-                    <div style="text-align: center; background: var(--bg-secondary, #f8f9fa); padding: 1rem; border-radius: 8px; border: 1px solid var(--gray-border);">
+                    <div
+                        style="text-align: center; background: var(--bg-secondary, #f8f9fa); padding: 1rem; border-radius: 8px; border: 1px solid var(--gray-border);">
                         <a href="../images/2.png" target="_blank" title="Click to view full size">
-                            <img src="../images/2.png" alt="Lecture 02 Short Notes (Pending Upload)" style="max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); filter: grayscale(20%);" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22800%22 height=%22400%22 viewBox=%220 0 800 400%22><rect width=%22100%%22 height=%22100%%22 fill=%22%231a221e%22/><text x=%2250%%22 y=%2250%%22 font-family=%22Inter, sans-serif%22 font-size=%2224%22 fill=%22%23a0aec0%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>Short Notes Visual (images/2.png) Pending Upload</text><text x=%2250%%22 y=%2260%%22 font-family=%22Inter, sans-serif%22 font-size=%2214%22 fill=%22%23718096%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>HTML notes are fully functional. PDF is linked below.</text></svg>'" />
+                            <img src="../images/2.png" alt="Lecture 02 Short Notes (Pending Upload)"
+                                style="max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); filter: grayscale(20%);"
+                                onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22800%22 height=%22400%22 viewBox=%220 0 800 400%22><rect width=%22100%%22 height=%22100%%22 fill=%22%231a221e%22/><text x=%2250%%22 y=%2250%%22 font-family=%22Inter, sans-serif%22 font-size=%2224%22 fill=%22%23a0aec0%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>Short Notes Visual (images/2.png) Pending Upload</text><text x=%2250%%22 y=%2260%%22 font-family=%22Inter, sans-serif%22 font-size=%2214%22 fill=%22%23718096%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>HTML notes are fully functional. PDF is linked below.</text></svg>'" />
                         </a>
-                        <p style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-muted);">Click image to open high-resolution version in new tab</p>
+                        <p style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-muted);">Click image to
+                            open high-resolution version in new tab</p>
                     </div>
                 </div>
             </section>
@@ -98,23 +136,34 @@
                 </div>
                 <div class="collapsible-content" id="content-1">
                     <h3 id="sub-1-1">1.1 Area, Power, Speed, and Cost</h3>
-                    <p>Every extra gate in a digital circuit represents silicon area, power burned, and picoseconds lost. Shrinking a circuit brings four immediate advantages:</p>
+                    <p>Every extra gate in a digital circuit represents silicon area, power burned, and picoseconds
+                        lost. Shrinking a circuit brings four immediate advantages:</p>
                     <ul>
-                        <li><strong>Area:</strong> Fewer gates mean smaller die size, allowing fabs to fit more chips per wafer, lowering fabrication costs.</li>
-                        <li><strong>Power:</strong> Fewer switching events mean less dynamic power dissipation, extending battery life.</li>
-                        <li><strong>Speed:</strong> Shorter gate chains reduce signal propagation paths, enabling higher clock frequencies.</li>
+                        <li><strong>Area:</strong> Fewer gates mean smaller die size, allowing fabs to fit more chips
+                            per wafer, lowering fabrication costs.</li>
+                        <li><strong>Power:</strong> Fewer switching events mean less dynamic power dissipation,
+                            extending battery life.</li>
+                        <li><strong>Speed:</strong> Shorter gate chains reduce signal propagation paths, enabling higher
+                            clock frequencies.</li>
                         <li><strong>Cost:</strong> Smaller silicon area + higher yield = increased profits.</li>
                     </ul>
 
                     <h3 id="sub-1-2">1.2 Industry Scale & Logic Synthesis</h3>
-                    <p>Apple's M3 chip packs <strong>98 billion transistors</strong> on TSMC's 3nm process. At that scale, even a 1% gate reduction saves massive die space and millions of dollars. This is why semiconductor companies run automated logic synthesis tools (e.g., Synopsys Design Compiler, Cadence Genus) to minimize logic gates automatically before silicon fabrication.</p>
+                    <p>Apple's M3 chip packs <strong>98 billion transistors</strong> on TSMC's 3nm process. At that
+                        scale, even a 1% gate reduction saves massive die space and millions of dollars. This is why
+                        semiconductor companies run automated logic synthesis tools (e.g., Synopsys Design Compiler,
+                        Cadence Genus) to minimize logic gates automatically before silicon fabrication.</p>
                     <div class="box box-blue">
                         <div class="box-title">Synthesis Power</div>
-                        <p>A typical 4-variable boolean function can easily shrink from 16 gates to as few as 2 gates, keeping the exact same truth table while saving 8x silicon space.</p>
+                        <p>A typical 4-variable boolean function can easily shrink from 16 gates to as few as 2 gates,
+                            keeping the exact same truth table while saving 8x silicon space.</p>
                     </div>
                     <div class="topic-nav">
-                        <a href="lecture-01.html" class="btn" style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;">Previous Lecture</a>
-                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                        <a href="lecture-01.html" class="btn"
+                            style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;">Previous
+                            Lecture</a>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next
+                            Topic</button>
                     </div>
                 </div>
             </section>
@@ -127,11 +176,15 @@
                 </div>
                 <div class="collapsible-content" id="content-2">
                     <h3 id="sub-2-1">2.1 Sum of Products (SOP) & Minterms</h3>
-                    <p>A truth table cannot be directly minimized; it must first be translated into boolean algebra. Sum of Products (SOP) ORs together terms representing inputs where output F = 1.</p>
+                    <p>A truth table cannot be directly minimized; it must first be translated into boolean algebra. Sum
+                        of Products (SOP) ORs together terms representing inputs where output F = 1.</p>
                     <ul>
-                        <li>Each term in SOP is called a <strong>minterm</strong> (representing a single row's AND configuration).</li>
-                        <li><strong>Rule:</strong> Variable = 1 &rarr; X; Variable = 0 &rarr; X'. Keep it if it is 1; invert if 0.</li>
-                        <li><strong>Shorthand:</strong> Written using Sigma (&Sigma;m) notation. For example, F = &Sigma;m(1, 3, 5, 7).</li>
+                        <li>Each term in SOP is called a <strong>minterm</strong> (representing a single row's AND
+                            configuration).</li>
+                        <li><strong>Rule:</strong> Variable = 1 &rarr; X; Variable = 0 &rarr; X'. Keep it if it is 1;
+                            invert if 0.</li>
+                        <li><strong>Shorthand:</strong> Written using Sigma (&Sigma;m) notation. For example, F =
+                            &Sigma;m(1, 3, 5, 7).</li>
                     </ul>
                     <div class="box box-green">
                         <div class="box-title">Worked SOP Example</div>
@@ -148,8 +201,10 @@
                     <p>Product of Sums (POS) ANDs together terms representing inputs where output F = 0.</p>
                     <ul>
                         <li>Each term is a <strong>maxterm</strong> (representing a single row's OR configuration).</li>
-                        <li><strong>Rule:</strong> Variable = 1 &rarr; X'; Variable = 0 &rarr; X. (Inverted relative to SOP).</li>
-                        <li><strong>Shorthand:</strong> Written using Pi (&Pi;M) notation. For example, F = &Pi;M(0, 2, 4, 6).</li>
+                        <li><strong>Rule:</strong> Variable = 1 &rarr; X'; Variable = 0 &rarr; X. (Inverted relative to
+                            SOP).</li>
+                        <li><strong>Shorthand:</strong> Written using Pi (&Pi;M) notation. For example, F = &Pi;M(0, 2,
+                            4, 6).</li>
                     </ul>
                     <div class="box box-orange">
                         <div class="box-title">Worked POS Example</div>
@@ -162,8 +217,10 @@
                         </ul>
                     </div>
                     <div class="topic-nav">
-                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
-                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous
+                            Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next
+                            Topic</button>
                     </div>
                 </div>
             </section>
@@ -176,10 +233,15 @@
                 </div>
                 <div class="collapsible-content" id="content-3">
                     <h3 id="sub-3-1">3.1 Gray-Code Adjacency & Legal Group Sizes</h3>
-                    <p>Karnaugh Maps (K-maps) re-organise truth tables visually so adjacent cells differ by exactly <strong>one bit</strong>. This allows the algebraic complement law (X + X' = 1) to occur automatically through grouping.</p>
+                    <p>Karnaugh Maps (K-maps) re-organise truth tables visually so adjacent cells differ by exactly
+                        <strong>one bit</strong>. This allows the algebraic complement law (X + X' = 1) to occur
+                        automatically through grouping.
+                    </p>
                     <ul>
-                        <li><strong>Gray-Code Ordering:</strong> Columns are ordered 00 &rarr; 01 &rarr; 11 &rarr; 10 (not binary count). This guarantees that every step flips just one variable.</li>
-                        <li><strong>Legal Group Sizes:</strong> Must be powers of 2 (2<sup>n</sup>). Grouping larger blocks cancels more variables:
+                        <li><strong>Gray-Code Ordering:</strong> Columns are ordered 00 &rarr; 01 &rarr; 11 &rarr; 10
+                            (not binary count). This guarantees that every step flips just one variable.</li>
+                        <li><strong>Legal Group Sizes:</strong> Must be powers of 2 (2<sup>n</sup>). Grouping larger
+                            blocks cancels more variables:
                             <ul>
                                 <li><strong>Single (1 cell):</strong> 0 variables cancel.</li>
                                 <li><strong>Pair (2 cells):</strong> 1 variable cancels.</li>
@@ -190,10 +252,14 @@
                     </ul>
 
                     <h3 id="sub-3-2">3.2 The Torus Wrap-Around Trick & Don't-Cares</h3>
-                    <p>K-maps are logically represented on a <strong>torus (donut)</strong>. Opposite edges and all four corners wrap around and are adjacent.</p>
+                    <p>K-maps are logically represented on a <strong>torus (donut)</strong>. Opposite edges and all four
+                        corners wrap around and are adjacent.</p>
                     <ul>
-                        <li><strong>Wrap-Around:</strong> Left column matches right column; top row matches bottom row. The 4 corners can form a single Quad, simplifying to F = B'D' in a 4-variable map.</li>
-                        <li><strong>Don't-Care (X):</strong> Outputs for inputs that physically cannot happen (e.g. invalid BCD codes 10-15). You can treat X as 1 or 0, depending on which assignment yields larger groups.</li>
+                        <li><strong>Wrap-Around:</strong> Left column matches right column; top row matches bottom row.
+                            The 4 corners can form a single Quad, simplifying to F = B'D' in a 4-variable map.</li>
+                        <li><strong>Don't-Care (X):</strong> Outputs for inputs that physically cannot happen (e.g.
+                            invalid BCD codes 10-15). You can treat X as 1 or 0, depending on which assignment yields
+                            larger groups.</li>
                     </ul>
 
                     <h3 id="sub-3-3">3.3 Algebra Laws mapped to K-Maps</h3>
@@ -205,8 +271,10 @@
                         <li><strong>Distributive:</strong> A(B + C) = AB + AC; A + BC = (A + B)(A + C)</li>
                     </ul>
                     <div class="topic-nav">
-                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
-                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous
+                            Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next
+                            Topic</button>
                     </div>
                 </div>
             </section>
@@ -221,8 +289,12 @@
                     <h3 id="sub-4-1">4.1 Formal Theorems & Algebraic Simplification</h3>
                     <p>DeMorgan's theorems allow you to convert expressions between AND and OR worlds:</p>
                     <ul>
-                        <li><strong>Theorem 1:</strong> <div class="formula">(A &middot; B)' = A' + B'</div> (NOT of an AND is the OR of NOTs).</li>
-                        <li><strong>Theorem 2:</strong> <div class="formula">(A + B)' = A' &middot; B'</div> (NOT of an OR is the AND of NOTs).</li>
+                        <li><strong>Theorem 1:</strong>
+                            <div class="formula">(A &middot; B)' = A' + B'</div> (NOT of an AND is the OR of NOTs).
+                        </li>
+                        <li><strong>Theorem 2:</strong>
+                            <div class="formula">(A + B)' = A' &middot; B'</div> (NOT of an OR is the AND of NOTs).
+                        </li>
                         <li><strong>Memory Hook:</strong> <em>"Break the bar, flip the sign."</em></li>
                     </ul>
 
@@ -236,12 +308,15 @@
                     <h3 id="sub-4-2">4.2 Bubble Pushing Visual Motion</h3>
                     <p>DeMorgan's theorem can be applied graphically through <strong>bubble pushing</strong>:</p>
                     <ul>
-                        <li>Pushing an output bubble backward through an AND gate transforms it into an OR gate with bubbles on its inputs.</li>
+                        <li>Pushing an output bubble backward through an AND gate transforms it into an OR gate with
+                            bubbles on its inputs.</li>
                         <li>This makes DeMorgan's rules intuitive to apply visually during schematic reviews.</li>
                     </ul>
                     <div class="topic-nav">
-                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
-                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous
+                            Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next
+                            Topic</button>
                     </div>
                 </div>
             </section>
@@ -254,28 +329,36 @@
                 </div>
                 <div class="collapsible-content" id="content-5">
                     <h3 id="sub-5-1">5.1 Implementing NOT, AND, OR using NAND/NOR</h3>
-                    <p>A gate type is <strong>universal</strong> if it can implement all possible boolean functions on its own. Both NAND and NOR gates are universal.</p>
-                    
+                    <p>A gate type is <strong>universal</strong> if it can implement all possible boolean functions on
+                        its own. Both NAND and NOR gates are universal.</p>
+
                     <h4 style="margin-top:1rem;">Building Gates with NAND:</h4>
                     <ul>
                         <li><strong>NOT(A):</strong> Tie inputs together &rarr; NAND(A, A) = A'.</li>
                         <li><strong>AND(A, B):</strong> Invert a NAND's output &rarr; NOT(NAND(A, B)).</li>
-                        <li><strong>OR(A, B):</strong> NAND the inverted inputs &rarr; NAND(A', B') = (A' &middot; B')' = A + B.</li>
+                        <li><strong>OR(A, B):</strong> NAND the inverted inputs &rarr; NAND(A', B') = (A' &middot; B')'
+                            = A + B.</li>
                     </ul>
 
                     <h3 id="sub-5-2">5.2 CMOS Transistor Budget (NAND vs. AND)</h3>
                     <p>At the physical transistor level, semiconductor fabs prefer NAND over AND gates:</p>
                     <ul>
-                        <li><strong>CMOS NAND:</strong> Needs only <strong>4 transistors</strong> (2 NMOS + 2 PMOS in series/parallel). This is a natural physical mapping.</li>
-                        <li><strong>CMOS AND:</strong> Needs <strong>6 transistors</strong> (a 4-transistor NAND followed by a 2-transistor NOT inverter).</li>
+                        <li><strong>CMOS NAND:</strong> Needs only <strong>4 transistors</strong> (2 NMOS + 2 PMOS in
+                            series/parallel). This is a natural physical mapping.</li>
+                        <li><strong>CMOS AND:</strong> Needs <strong>6 transistors</strong> (a 4-transistor NAND
+                            followed by a 2-transistor NOT inverter).</li>
                     </ul>
                     <div class="box box-orange">
                         <div class="box-title">Scaling Transistors</div>
-                        <p>With 28 billion transistors on Apple's M4 chip, saving 2 transistors per AND gate adds up to massive savings in silicon space and thermal dissipation across the chip.</p>
+                        <p>With 28 billion transistors on Apple's M4 chip, saving 2 transistors per AND gate adds up to
+                            massive savings in silicon space and thermal dissipation across the chip.</p>
                     </div>
                     <div class="topic-nav">
-                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
-                        <a href="#original-pdf" class="btn" style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;" onclick="document.getElementById('original-pdf').scrollIntoView()">Next Section</a>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous
+                            Topic</button>
+                        <a href="#original-pdf" class="btn"
+                            style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;"
+                            onclick="document.getElementById('original-pdf').scrollIntoView()">Next Section</a>
                     </div>
                 </div>
             </section>
@@ -283,17 +366,27 @@
             <!-- Original PDF -->
             <section class="topic-section" id="original-pdf">
                 <div class="topic-header" onclick="toggleSection('content-pdf')">
-                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
-                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    <div class="topic-number"
+                        style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round"
+                            stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" x2="8" y1="13" y2="13"></line>
+                            <line x1="16" x2="8" y1="17" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
                     </div>
                     <h2>Original PDF Notes</h2>
                 </div>
                 <div class="collapsible-content" id="content-pdf">
                     <p>Below is the original PDF document for your reference:</p>
-                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()"
+                        style="margin-top: 1rem; display: block;">Load Original PDF</button>
                     <div id="pdfContainer" style="margin-top: 1rem;"></div>
                     <div class="topic-nav">
-                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous
+                            Topic</button>
                         <button class="btn" disabled="">Next Topic</button>
                     </div>
                 </div>
@@ -316,4 +409,5 @@
     </script>
     <script src="../js/script.js"></script>
 </body>
+
 </html>

@@ -48,7 +48,8 @@
                 <a href="lectures/lecture-01.html" class="lecture-card" data-lecture-id="dl-l1">
                     <div class="lecture-card-top">
                         <div class="lecture-number">01</div>
-                        <div class="lecture-checkbox" onclick="toggleComplete(event, 'dl-l1')" title="Toggle completion status"></div>
+                        <div class="lecture-checkbox" onclick="toggleComplete(event, 'dl-l1')"
+                            title="Toggle completion status"></div>
                     </div>
                     <h2>Where it Begins: The Neuron & Decision Boundaries</h2>
                     <p>Biological neurons, McCulloch & Pitts threshold logic gates (AND, OR, NOT), perceptron
@@ -63,7 +64,8 @@
                 <a href="lectures/lecture-02.html" class="lecture-card" data-lecture-id="dl-l2">
                     <div class="lecture-card-top">
                         <div class="lecture-number">02</div>
-                        <div class="lecture-checkbox" onclick="toggleComplete(event, 'dl-l2')" title="Toggle completion status"></div>
+                        <div class="lecture-checkbox" onclick="toggleComplete(event, 'dl-l2')"
+                            title="Toggle completion status"></div>
                     </div>
                     <h2>The Activation Function and the Update Rule</h2>
                     <p>Understanding linear combination vs activation functions, chain rule derivations for weight
@@ -176,7 +178,7 @@
             const isCompleted = card.classList.toggle('completed');
             localStorage.setItem('nst-completed-' + id, isCompleted);
             updateProgress();
-            
+
             // Push updated progress to cloud
             await pushProgress();
         }

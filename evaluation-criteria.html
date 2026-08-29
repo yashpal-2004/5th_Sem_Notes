@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subject-Wise Evaluation Criteria</title>
+    <meta name="description"
+        content="Official evaluation schemas, weightage distribution, and interactive internal marks calculator for NST 5th Semester.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/home.css?v=1.1">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23000000%22/><circle cx=%2250%22 cy=%2228%22 r=%2214%22 fill=%22white%22/><circle cx=%2226%22 cy=%2270%22 r=%2214%22 fill=%22white%22/><circle cx=%2274%22 cy=%2270%22 r=%2214%22 fill=%22white%22/></svg>">
+</head>
+
+<body>
+
+    <!-- Navigation Bar -->
+    <nav>
+        <a href="index.html" class="logo-container" id="nav-logo">
+            <svg class="logo-symbol" viewBox="0 0 24 24">
+                <circle cx="12" cy="6" r="3" />
+                <circle cx="6" cy="16" r="3" />
+                <circle cx="18" cy="16" r="3" />
+            </svg>
+            <span class="logo-text">NST Notes</span>
+        </a>
+        <ul class="nav-menu">
+            <li><a href="DL_Sem5/index.html">Deep Learning</a></li>
+            <li><a href="AML/index.html">Advanced Machine Learning</a></li>
+            <li><a href="CN/index.html">Computer Networks</a></li>
+            <li><a href="MCA/index.html">Modern Computer Architecture</a></li>
+            <li><a href="evaluation-criteria.html" style="color: var(--accent-purple); font-weight: 700;">Evaluation
+                    Criteria</a></li>
+            <li><a href="archive.html">Archive</a></li>
+        </ul>
+        <div class="nav-stats">8 Subjects Covered</div>
+    </nav>
+
+    <!-- Header Section -->
+    <header class="hero-section" style="padding-bottom: 2rem;">
+        <h4 class="hero-subtitle">Academic Guidelines 2026</h4>
+        <h1 class="hero-title">Evaluation Criteria</h1>
+        <p class="hero-description">Detailed marks weightage distribution for Core subjects extracted from the official
+            handbook.</p>
+    </header>
+
+    <!-- Evaluation Cards Section -->
+    <section class="eval-section">
+
+        <!-- Core Subjects Grid -->
+        <div class="eval-grid" id="grid-core">
+
+            <!-- Advanced Machine Learning -->
+            <div class="eval-card">
+                <div class="eval-card-header">
+                    <h2 class="eval-card-title">Advanced Machine Learning</h2>
+                    <div class="eval-card-subtitle">Course Code: CSA333 &bull; 4 Credits</div>
+                </div>
+                <table class="eval-table">
+                    <thead>
+                        <tr>
+                            <th>Component</th>
+                            <th style="text-align: right;">Weightage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>In-class & Post-class Assignments</td>
+                            <td class="weight">5%</td>
+                        </tr>
+                        <tr>
+                            <td>Weekly Contests</td>
+                            <td class="weight">10%</td>
+                        </tr>
+                        <tr>
+                            <td>Projects & Viva</td>
+                            <td class="weight">20%</td>
+                        </tr>
+                        <tr>
+                            <td>Mid Semester Exam</td>
+                            <td class="weight">25%</td>
+                        </tr>
+                        <tr>
+                            <td>End Semester Exam</td>
+                            <td class="weight">40%</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="eval-card-notes">
+                    Builds conceptual and mathematical foundations from scratch. Continuous assessments and coding labs
+                    form the bulk of the internal weightage.
+                </div>
+            </div>
+
+            <!-- Computer Networks -->
+            <div class="eval-card">
+                <div class="eval-card-header">
+                    <h2 class="eval-card-title">Computer Networks</h2>
+                    <div class="eval-card-subtitle">Course Code: CSA223 &bull; 4 Credits</div>
+                </div>
+                <table class="eval-table">
+                    <thead>
+                        <tr>
+                            <th>Component</th>
+                            <th style="text-align: right;">Weightage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Contests</td>
+                            <td class="weight">20%</td>
+                        </tr>
+                        <tr>
+                            <td>Projects</td>
+                            <td class="weight">20%</td>
+                        </tr>
+                        <tr>
+                            <td>Mid Semester Exam</td>
+                            <td class="weight">20%</td>
+                        </tr>
+                        <tr>
+                            <td>End Semester Exam</td>
+                            <td class="weight">40%</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="eval-card-notes">
+                    Heavily project and contest driven. Emphasizes protocol execution structures and routing
+                    simulations.
+                </div>
+            </div>
+
+            <!-- Deep Learning -->
+            <div class="eval-card">
+                <div class="eval-card-header">
+                    <h2 class="eval-card-title">Deep Learning</h2>
+                    <div class="eval-card-subtitle">Course Code: CSA343 &bull; 4 Credits</div>
+                </div>
+                <table class="eval-table">
+                    <thead>
+                        <tr>
+                            <th>Component</th>
+                            <th style="text-align: right;">Weightage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>In Class & Post Class Assignments</td>
+                            <td class="weight">5%</td>
+                        </tr>
+                        <tr>
+                            <td>Weekly Contests</td>
+                            <td class="weight">10%</td>
+                        </tr>
+                        <tr>
+                            <td>Projects & Practical Labs</td>
+                            <td class="weight">25%</td>
+                        </tr>
+                        <tr>
+                            <td>Mid Semester Exam</td>
+                            <td class="weight">20%</td>
+                        </tr>
+                        <tr>
+                            <td>End Semester Exam</td>
+                            <td class="weight">40%</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="eval-card-notes">
+                    Strong focus on implementation: biological model logic, feedforward neural nets, backpropagation,
+                    and CNNs.
+                </div>
+            </div>
+
+            <!-- Modern Computer Architecture -->
+            <div class="eval-card">
+                <div class="eval-card-header">
+                    <h2 class="eval-card-title">Modern Computer Architecture</h2>
+                    <div class="eval-card-subtitle">Course Code: CSA213 &bull; 4 Credits</div>
+                </div>
+                <table class="eval-table">
+                    <thead>
+                        <tr>
+                            <th>Component</th>
+                            <th style="text-align: right;">Weightage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Assignments & Class Participation</td>
+                            <td class="weight">10%</td>
+                        </tr>
+                        <tr>
+                            <td>Mini Projects</td>
+                            <td class="weight">10%</td>
+                        </tr>
+                        <tr>
+                            <td>Weekly Contests</td>
+                            <td class="weight">20%</td>
+                        </tr>
+                        <tr>
+                            <td>Mid Semester Exam</td>
+                            <td class="weight">20%</td>
+                        </tr>
+                        <tr>
+                            <td>End Semester Exam</td>
+                            <td class="weight">40%</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="eval-card-notes">
+                    Covers assembly programming, digital logic networks, logic gate simplification, and memory hierarchy
+                    concepts.
+                </div>
+            </div>
+
+        </div>
+
+
+
+    </section>
+
+    <!-- Calendar Schedule and Holidays Grid -->
+    <section class="schedule-grid" id="academic-calendar-section">
+
+        <!-- Column 1: Contest & Mid-Term Schedule -->
+        <div>
+            <h3 class="section-label"
+                style="font-size: 2rem; margin-bottom: 1rem; border-bottom: 2px solid var(--border-light); padding-bottom: 1rem;">
+                Assessment Roadmap</h3>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2rem; line-height: 1.5;">Week-wise
+                schedule of internal contests and mid-term examinations for the Odd Semester 2026.</p>
+
+            <div class="timeline-container" style="margin-top: 0;">
+                <!-- CN Contest 1 -->
+                <div class="timeline-item">
+                    <div class="timeline-badge"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-info">
+                            <h4 class="timeline-title">Computer Networks (Contest 1)</h4>
+                            <p class="timeline-desc">Assessment on basic protocols, topologies, and layering.</p>
+                        </div>
+                        <div class="timeline-date">04 Sep 2026</div>
+                    </div>
+                </div>
+
+                <!-- DL Contest 1 -->
+                <div class="timeline-item">
+                    <div class="timeline-badge"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-info">
+                            <h4 class="timeline-title">Deep Learning (Contest 1)</h4>
+                            <p class="timeline-desc">Biological models, perceptrons, and linear separability.</p>
+                        </div>
+                        <div class="timeline-date">11 Sep 2026</div>
+                    </div>
+                </div>
+
+                <!-- MCA Contest 1 -->
+                <div class="timeline-item">
+                    <div class="timeline-badge"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-info">
+                            <h4 class="timeline-title">Modern Computer Architecture (Contest 1)</h4>
+                            <p class="timeline-desc">Logic gates simplification and assembly instructions.</p>
+                        </div>
+                        <div class="timeline-date">18 Sep 2026</div>
+                    </div>
+                </div>
+
+                <!-- AML Contest 1 -->
+                <div class="timeline-item">
+                    <div class="timeline-badge"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-info">
+                            <h4 class="timeline-title">Advanced ML (Contest 1)</h4>
+                            <p class="timeline-desc">Linear models, residual analysis, homoscedasticity, and MLE.</p>
+                        </div>
+                        <div class="timeline-date">25 Sep 2026</div>
+                    </div>
+                </div>
+
+                <!-- Mid Term -->
+                <div class="timeline-item">
+                    <div class="timeline-badge"
+                        style="background-color: #ef4444; border-color: var(--bg-beige); box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);">
+                    </div>
+                    <div class="timeline-content" style="border-left: 4px solid #ef4444;">
+                        <div class="timeline-info">
+                            <h4 class="timeline-title" style="color: #b91c1c;">Mid-Term Examination</h4>
+                            <p class="timeline-desc">Mid-semester comprehensive evaluation for all courses.</p>
+                        </div>
+                        <div class="timeline-date" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.15);">16 Oct
+                            2026</div>
+                    </div>
+                </div>
+
+                <!-- CN Contest 2 -->
+                <div class="timeline-item">
+                    <div class="timeline-badge"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-info">
+                            <h4 class="timeline-title">Computer Networks (Contest 2)</h4>
+                            <p class="timeline-desc">Routing algorithms, transport protocols, and simulations.</p>
+                        </div>
+                        <div class="timeline-date">30 Oct 2026</div>
+                    </div>
+                </div>
+
+                <!-- DL Contest 2 -->
+                <div class="timeline-item">
+                    <div class="timeline-badge"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-info">
+                            <h4 class="timeline-title">Deep Learning (Contest 2)</h4>
+                            <p class="timeline-desc">Multi-layer perceptrons, backpropagation, and CNNs.</p>
+                        </div>
+                        <div class="timeline-date">20 Nov 2026</div>
+                    </div>
+                </div>
+
+                <!-- MCA Contest 2 -->
+                <div class="timeline-item">
+                    <div class="timeline-badge"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-info">
+                            <h4 class="timeline-title">Modern Computer Architecture (Contest 2)</h4>
+                            <p class="timeline-desc">Memory hierarchies, CPU execution pipelines, and logic design.</p>
+                        </div>
+                        <div class="timeline-date">27 Nov 2026</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Column 2: Holidays & Academic Breaks -->
+        <div class="holiday-container">
+            <h3 class="section-label"
+                style="font-size: 2rem; margin-bottom: 1rem; border-bottom: 2px solid var(--border-light); padding-bottom: 1rem;">
+                Holidays & Breaks</h3>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2rem; line-height: 1.5;">Official
+                list of national holidays and semester breaks scheduled for 2026-27.</p>
+
+            <ul class="holiday-list">
+                <li class="holiday-item">
+                    <div class="holiday-info">
+                        <div class="holiday-name">Independence Day</div>
+                        <div class="holiday-desc">National Holiday</div>
+                    </div>
+                    <div class="holiday-date">15 Aug 2026</div>
+                </li>
+                <li class="holiday-item">
+                    <div class="holiday-info">
+                        <div class="holiday-name">Rakshabandhan</div>
+                        <div class="holiday-desc">Regional Holiday</div>
+                    </div>
+                    <div class="holiday-date">28 Aug 2026</div>
+                </li>
+                <li class="holiday-item">
+                    <div class="holiday-info">
+                        <div class="holiday-name">Gandhi Jayanti</div>
+                        <div class="holiday-desc">National Holiday</div>
+                    </div>
+                    <div class="holiday-date">02 Oct 2026</div>
+                </li>
+                <li class="holiday-item">
+                    <div class="holiday-info">
+                        <div class="holiday-name">Navaratari Celebration</div>
+                        <div class="holiday-desc">Cultural celebration day</div>
+                    </div>
+                    <div class="holiday-date">16 Oct 2026</div>
+                </li>
+                <li class="holiday-item">
+                    <div class="holiday-info">
+                        <div class="holiday-name">Dussehra</div>
+                        <div class="holiday-desc">Gazetted Holiday</div>
+                    </div>
+                    <div class="holiday-date">20 Oct 2026</div>
+                </li>
+                <li class="holiday-item">
+                    <div class="holiday-info">
+                        <div class="holiday-name">Diwali Semester Break</div>
+                        <div class="holiday-desc">One-week academic recess</div>
+                    </div>
+                    <div class="holiday-date">06 - 13 Nov 2026</div>
+                </li>
+                <li class="holiday-item">
+                    <div class="holiday-info">
+                        <div class="holiday-name">Winter Break</div>
+                        <div class="holiday-desc">End-of-semester winter break</div>
+                    </div>
+                    <div class="holiday-date">25 - 31 Dec 2026</div>
+                </li>
+                <li class="holiday-item">
+                    <div class="holiday-info">
+                        <div class="holiday-name">New Year's Day</div>
+                        <div class="holiday-desc">National holiday (Even Sem)</div>
+                    </div>
+                    <div class="holiday-date">01 Jan 2027</div>
+                </li>
+                <li class="holiday-item">
+                    <div class="holiday-info">
+                        <div class="holiday-name">Makar Sankranti</div>
+                        <div class="holiday-desc">Harvest festival celebration</div>
+                    </div>
+                    <div class="holiday-date">14 Jan 2027</div>
+                </li>
+                <li class="holiday-item">
+                    <div class="holiday-info">
+                        <div class="holiday-name">Republic Day</div>
+                        <div class="holiday-desc">National Holiday</div>
+                    </div>
+                    <div class="holiday-date">26 Jan 2027</div>
+                </li>
+                <li class="holiday-item">
+                    <div class="holiday-info">
+                        <div class="holiday-name">Basant Panchami</div>
+                        <div class="holiday-desc">Saraswati Puja / Cultural celebration</div>
+                    </div>
+                    <div class="holiday-date">11 Feb 2027</div>
+                </li>
+                <li class="holiday-item">
+                    <div class="holiday-info">
+                        <div class="holiday-name">Mahashivratri</div>
+                        <div class="holiday-desc">Cultural Holiday</div>
+                    </div>
+                    <div class="holiday-date">06 Mar 2027</div>
+                </li>
+                <li class="holiday-item">
+                    <div class="holiday-info">
+                        <div class="holiday-name">Holi Break</div>
+                        <div class="holiday-desc">Spring break and festival break</div>
+                    </div>
+                    <div class="holiday-date">22 - 26 Mar 2027</div>
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Marks Calculator Section -->
+    <section class="calc-container" id="calculator-section">
+        <h2 class="calc-title">Interactive Marks Estimator</h2>
+        <p class="calc-desc">Select a subject, input your expected marks (out of 100) for each evaluation component, and
+            preview your projected score.</p>
+
+        <div class="calc-form-group">
+            <label class="calc-label" for="subject-select">Select Subject</label>
+            <select class="calc-select" id="subject-select" onchange="updateCalcFields()">
+                <option value="aml">Advanced Machine Learning</option>
+                <option value="cn">Computer Networks</option>
+                <option value="dl">Deep Learning</option>
+                <option value="mca">Modern Computer Architecture</option>
+            </select>
+        </div>
+
+        <div class="calc-grid" id="calc-inputs">
+            <!-- Dynamic Inputs will be loaded here -->
+        </div>
+
+        <div style="text-align: center; margin-top: 2rem;">
+            <button class="btn-primary" id="btn-calculate" onclick="calculateScore()">Estimate Total Score</button>
+        </div>
+
+        <div class="calc-result-box" id="calc-result">
+            <h3 style="font-family: 'Playfair Display', serif; font-size: 1.5rem;">Projected Cumulative Score</h3>
+            <div class="calc-result-score" id="result-score">0.0 / 100</div>
+            <p id="result-breakdown" style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.5;"></p>
+        </div>
+    </section>
+
+    <!-- PDF Viewer Section -->
+    <section class="pdf-section" id="handbook-pdf-section">
+        <h3 class="section-label" style="font-size: 2.2rem; margin-bottom: 1.5rem;">Official Academic Documents</h3>
+        <p style="color: var(--text-muted); max-width: 600px; margin: 0 auto 2.5rem auto; line-height: 1.6;">Access the
+            original official syllabus handbook and academic calendar details below.</p>
+
+        <div style="display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap; margin-bottom: 2rem;">
+            <div
+                style="background-color: white; padding: 2rem; border-radius: 12px; border: 1px solid var(--border-light); width: 280px; box-shadow: var(--shadow);">
+                <h4 style="margin-bottom: 1rem; font-family: 'Playfair Display', serif; font-size: 1.25rem;">Course
+                    Handbook</h4>
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <button class="btn-primary" id="btn-load-pdf"
+                        onclick="togglePdfViewer('5th Sem_2024 Handbook.pdf', 'btn-load-pdf')">View Inline</button>
+                    <a href="5th Sem_2024 Handbook.pdf" class="btn-secondary" target="_blank">Download ↗</a>
+                </div>
+            </div>
+            <div
+                style="background-color: white; padding: 2rem; border-radius: 12px; border: 1px solid var(--border-light); width: 280px; box-shadow: var(--shadow);">
+                <h4 style="margin-bottom: 1rem; font-family: 'Playfair Display', serif; font-size: 1.25rem;">Academic
+                    Calendar</h4>
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <button class="btn-primary" id="btn-load-cal"
+                        onclick="togglePdfViewer('Academic Calander.pdf', 'btn-load-cal')">View Inline</button>
+                    <a href="Academic Calander.pdf" class="btn-secondary" target="_blank">Download ↗</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="pdf-container-box" id="pdf-viewer-container" style="display: none;">
+            <!-- Embedding will happen on-demand to optimize performance -->
+        </div>
+    </section>
+
+    <!-- Footer Section -->
+    <footer>
+        <div class="footer-logo-row">
+            <div class="footer-brand-logo">nstnotes</div>
+            <svg class="footer-symbol" viewBox="0 0 24 24">
+                <circle cx="12" cy="6" r="3" />
+                <circle cx="6" cy="16" r="3" />
+                <circle cx="18" cy="16" r="3" />
+            </svg>
+        </div>
+    </footer>
+
+    <script>
+        // Subjects component mapping structure
+        const schemas = {
+            aml: {
+                name: "Advanced Machine Learning",
+                components: [
+                    { key: "assign", label: "Assignments (In/Post Class)", weight: 0.05 },
+                    { key: "contest", label: "Weekly Contests", weight: 0.10 },
+                    { key: "proj", label: "Projects & Viva", weight: 0.20 },
+                    { key: "mid", label: "Mid Semester Exam", weight: 0.25 },
+                    { key: "end", label: "End Semester Exam", weight: 0.40 }
+                ]
+            },
+            cn: {
+                name: "Computer Networks",
+                components: [
+                    { key: "contest", label: "Weekly Contests", weight: 0.20 },
+                    { key: "proj", label: "Projects & Labs", weight: 0.20 },
+                    { key: "mid", label: "Mid Semester Exam", weight: 0.20 },
+                    { key: "end", label: "End Semester Exam", weight: 0.40 }
+                ]
+            },
+            dl: {
+                name: "Deep Learning",
+                components: [
+                    { key: "assign", label: "Assignments (In/Post Class)", weight: 0.05 },
+                    { key: "contest", label: "Weekly Contests", weight: 0.10 },
+                    { key: "proj", label: "Projects & Labs", weight: 0.25 },
+                    { key: "mid", label: "Mid Semester Exam", weight: 0.20 },
+                    { key: "end", label: "End Semester Exam", weight: 0.40 }
+                ]
+            },
+            mca: {
+                name: "Modern Computer Architecture",
+                components: [
+                    { key: "assign", label: "Assignments & Participation", weight: 0.10 },
+                    { key: "proj", label: "Mini Projects", weight: 0.10 },
+                    { key: "contest", label: "Weekly Contests", weight: 0.20 },
+                    { key: "mid", label: "Mid Semester Exam", weight: 0.20 },
+                    { key: "end", label: "End Semester Exam", weight: 0.40 }
+                ]
+            }
+        };
+
+        // Dynamically update fields for selected subject in calculator
+        function updateCalcFields() {
+            const select = document.getElementById('subject-select');
+            const selectedSubj = select.value;
+            const container = document.getElementById('calc-inputs');
+
+            container.innerHTML = '';
+
+            if (schemas[selectedSubj]) {
+                schemas[selectedSubj].components.forEach(comp => {
+                    const group = document.createElement('div');
+                    group.className = 'calc-form-group';
+                    group.innerHTML = `
+                        <label class="calc-label" for="input-${comp.key}">${comp.label} (Score out of 100)</label>
+                        <input class="calc-input" type="number" id="input-${comp.key}" min="0" max="100" placeholder="e.g. 85">
+                    `;
+                    container.appendChild(group);
+                });
+            }
+            // Hide result when switching subjects
+            document.getElementById('calc-result').style.display = 'none';
+        }
+
+        // Calculate final marks estimation
+        function calculateScore() {
+            const select = document.getElementById('subject-select');
+            const selectedSubj = select.value;
+            const schema = schemas[selectedSubj];
+
+            if (!schema) return;
+
+            let totalWeightedScore = 0;
+            let breakdownHtml = '<strong>Breakdown:</strong><br>';
+
+            for (const comp of schema.components) {
+                const input = document.getElementById(`input-${comp.key}`);
+                const val = parseFloat(input.value);
+
+                if (!isNaN(val)) {
+                    const weighted = val * comp.weight;
+                    totalWeightedScore += weighted;
+                    breakdownHtml += `&bull; ${comp.label}: ${val}/100 &times; ${Math.round(comp.weight * 100)}% = ${weighted.toFixed(2)} marks<br>`;
+                } else {
+                    breakdownHtml += `&bull; ${comp.label}: (Not entered - calculated as 0)<br>`;
+                }
+            }
+
+            const projectedPercentage = totalWeightedScore;
+
+            // Basic Grade Prediction
+            let grade = 'F';
+            if (projectedPercentage >= 90) grade = 'O (Outstanding)';
+            else if (projectedPercentage >= 80) grade = 'A+ (Excellent)';
+            else if (projectedPercentage >= 70) grade = 'A (Very Good)';
+            else if (projectedPercentage >= 60) grade = 'B+ (Good)';
+            else if (projectedPercentage >= 50) grade = 'B (Above Average)';
+            else if (projectedPercentage >= 40) grade = 'C (Pass)';
+
+            document.getElementById('result-score').innerText = `${projectedPercentage.toFixed(1)} / 100`;
+
+            breakdownHtml += `<br><strong>Projected Grade:</strong> ${grade}`;
+            document.getElementById('result-breakdown').innerHTML = breakdownHtml;
+            document.getElementById('calc-result').style.display = 'block';
+            document.getElementById('calc-result').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // PDF View Toggle
+        let currentLoadedPdf = '';
+        function togglePdfViewer(file, btnId) {
+            const container = document.getElementById('pdf-viewer-container');
+            const btn = document.getElementById(btnId);
+
+            if (container.style.display === 'block' && currentLoadedPdf === file) {
+                container.innerHTML = '';
+                container.style.display = 'none';
+                btn.innerText = "View Inline";
+            } else {
+                // Reset all buttons
+                const pdfBtn = document.getElementById('btn-load-pdf');
+                const calBtn = document.getElementById('btn-load-cal');
+                if (pdfBtn) pdfBtn.innerText = "View Inline";
+                if (calBtn) calBtn.innerText = "View Inline";
+
+                container.innerHTML = `<embed src="${file}" type="application/pdf" width="100%" height="800px" style="border: none;" />`;
+                container.style.display = 'block';
+                btn.innerText = "Hide Viewer";
+                currentLoadedPdf = file;
+                container.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // Initial setup for the calculator
+        document.addEventListener('DOMContentLoaded', () => {
+            updateCalcFields();
+        });
+    </script>
+</body>
+
+</html>
