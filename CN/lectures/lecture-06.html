@@ -29,6 +29,7 @@
                 <div class="topic-count">Total Topics: 5</div>
             </div>
             <ul class="index-list" id="indexList">
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>Short Notes</a></li>
                 <li>
                     <a href="#topic-1">1. The Padlock & Plaintext Vulnerabilities<span class="sub-count">2</span></a>
                     <ul class="sub-index">
@@ -74,6 +75,25 @@
         <!-- Main Content -->
         <main id="notesContent">
             
+            <!-- Short Notes Image -->
+            <section class="topic-section" id="short-notes">
+                <div class="topic-header" onclick="toggleSection('content-short-notes')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                    </div>
+                    <h2>Short Notes &amp; Visual Summary</h2>
+                </div>
+                <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
+                    <p style="margin-bottom: 1rem;">Handwritten / quick summary notes for Lecture 06:</p>
+                    <div style="text-align: center; background: var(--bg-secondary, #f8f9fa); padding: 1rem; border-radius: 8px; border: 1px solid var(--gray-border);">
+                        <a href="../images/6.png" target="_blank" title="Click to view full size">
+                            <img src="../images/6.png" alt="Lecture 06 Short Notes" style="max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22800%22 height=%22400%22 viewBox=%220 0 800 400%22><rect width=%22100%%22 height=%22100%%22 fill=%22%231a221e%22/><text x=%2250%%22 y=%2250%%22 font-family=%22Inter, sans-serif%22 font-size=%2224%22 fill=%22%23a0aec0%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>Short Notes Visual (images/6.png) Pending Upload</text><text x=%2250%%22 y=%2260%%22 font-family=%22Inter, sans-serif%22 font-size=%2214%22 fill=%22%23718096%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>HTML notes are fully functional. PDF is linked below.</text></svg>'" />
+                        </a>
+                        <p style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-muted);">Click image to open high-resolution version in new tab</p>
+                    </div>
+                </div>
+            </section>
+            
             <!-- Topic 1 -->
             <section class="topic-section" id="topic-1">
                 <div class="topic-header" onclick="toggleSection('content-1')">
@@ -112,7 +132,7 @@
                     </div>
                     
                     <h3 id="sub-2-2">2.2 Transition: SSL to TLS</h3>
-                    <p>Historically, HTTPS utilized <strong>SSL</strong> (Secure Sockets Layer). Because of security flaws discovered in SSL over time, modern web systems use **TLS** (Transport Layer Security) to encrypt client-server communication channels.</p>
+                    <p>Historically, HTTPS utilized <strong>SSL</strong> (Secure Sockets Layer). Because of security flaws discovered in SSL over time, modern web systems use <strong>TLS</strong> (Transport Layer Security) to encrypt client-server communication channels.</p>
                     
                     <h3 id="sub-2-3">2.3 Core Goals: Confidentiality, Integrity, Authentication</h3>
                     <p>Secure communications rely on three major pillars:</p>
@@ -136,16 +156,16 @@
                 </div>
                 <div class="collapsible-content" id="content-3">
                     <h3 id="sub-3-1">3.1 Symmetric Key Exchange Issue</h3>
-                    <p>Symmetric encryption uses a single shared secret key for both encryption and decryption. It is fast and efficient, but presents a massive logistical issue: **how do strangers securely share the symmetric key** on an insecure open internet without someone eavesdropping on it during exchange?</p>
+                    <p>Symmetric encryption uses a single shared secret key for both encryption and decryption. It is fast and efficient, but presents a massive logistical issue: <strong>how do strangers securely share the symmetric key</strong> on an insecure open internet without someone eavesdropping on it during exchange?</p>
                     
                     <h3 id="sub-3-2">3.2 Asymmetric Public/Private Keys</h3>
-                    <p>Asymmetric encryption uses a mathematically linked pair: a **Public Key** (can be shared with anyone to encrypt data) and a **Private Key** (kept secure by the owner to decrypt). Anyone can encrypt a message for the server, but only the server can decrypt it.</p>
+                    <p>Asymmetric encryption uses a mathematically linked pair: a <strong>Public Key</strong> (can be shared with anyone to encrypt data) and a <strong>Private Key</strong> (kept secure by the owner to decrypt). Anyone can encrypt a message for the server, but only the server can decrypt it.</p>
                     
                     <h3 id="sub-3-3">3.3 The TLS Hybrid Key Insight</h3>
                     <p>Why not use only asymmetric encryption? It is mathematically heavy and slow. TLS solves this by combining both methods:</p>
                     <ol>
-                        <li>Uses **Asymmetric Encryption** initially to share a symmetric key securely.</li>
-                        <li>Switches immediately to **Symmetric Encryption** using that shared key for fast session communications.</li>
+                        <li>Uses <strong>Asymmetric Encryption</strong> initially to share a symmetric key securely.</li>
+                        <li>Switches immediately to <strong>Symmetric Encryption</strong> using that shared key for fast session communications.</li>
                     </ol>
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
@@ -165,13 +185,13 @@
                     <p>The client initiates the handshake by offering supported TLS versions, cipher suites (algorithm preferences), and a random nonce string used for session calculations.</p>
                     
                     <h3 id="sub-4-2">4.2 Step 2: ServerHello + Certificate</h3>
-                    <p>The server responds by choosing the preferred cipher suite, sending its own random nonce, and sharing its **Digital Certificate** containing the server's public key and authority signatures.</p>
+                    <p>The server responds by choosing the preferred cipher suite, sending its own random nonce, and sharing its <strong>Digital Certificate</strong> containing the server's public key and authority signatures.</p>
                     
                     <h3 id="sub-4-3">4.3 Step 3: Certificate Authentication</h3>
                     <p>The client validates the server's certificate chain through Certificate Authorities (CAs). If the signature checks pass, the client trusts the server's identity, preventing Man-in-the-Middle (MitM) attacks.</p>
                     
                     <h3 id="sub-4-4">4.4 Step 4: Key Exchange & Encryption Start</h3>
-                    <p>Client and server compute a shared **session key** using the exchanged nonces. Once calculated, they signal the switch, and all subsequent application traffic is encrypted symmetrically.</p>
+                    <p>Client and server compute a shared <strong>session key</strong> using the exchanged nonces. Once calculated, they signal the switch, and all subsequent application traffic is encrypted symmetrically.</p>
                     
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
@@ -191,7 +211,7 @@
                     <p>Browsers trust digital certificates because they are signed by trusted <strong>Certificate Authorities (CAs)</strong>. Browsers ship pre-loaded with root certificates, validating the signature chain of intermediate CAs down to individual web endpoints.</p>
                     
                     <h3 id="sub-5-2">5.2 AWS Certificate Manager (ACM) Deployment</h3>
-                    <p>In cloud deployments, provisioning SSL/TLS certificates manually is tedious. Services like **AWS Certificate Manager (ACM)** automate certificate issuance, validation, and renewal, attaching them directly to CloudFront CDNs or Application Load Balancers (ALBs).</p>
+                    <p>In cloud deployments, provisioning SSL/TLS certificates manually is tedious. Services like <strong>AWS Certificate Manager (ACM)</strong> automate certificate issuance, validation, and renewal, attaching them directly to CloudFront CDNs or Application Load Balancers (ALBs).</p>
                     
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>

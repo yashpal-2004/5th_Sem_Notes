@@ -29,6 +29,7 @@
                 <div class="topic-count">Total Topics: 5</div>
             </div>
             <ul class="index-list" id="indexList">
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>Short Notes</a></li>
                 <li>
                     <a href="#topic-1">1. Network Architectures<span class="sub-count">2</span></a>
                     <ul class="sub-index">
@@ -74,6 +75,25 @@
         <!-- Main Content -->
         <main id="notesContent">
             
+            <!-- Short Notes Image -->
+            <section class="topic-section" id="short-notes">
+                <div class="topic-header" onclick="toggleSection('content-short-notes')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                    </div>
+                    <h2>Short Notes &amp; Visual Summary</h2>
+                </div>
+                <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
+                    <p style="margin-bottom: 1rem;">Handwritten / quick summary notes for Lecture 05:</p>
+                    <div style="text-align: center; background: var(--bg-secondary, #f8f9fa); padding: 1rem; border-radius: 8px; border: 1px solid var(--gray-border);">
+                        <a href="../images/5.png" target="_blank" title="Click to view full size">
+                            <img src="../images/5.png" alt="Lecture 05 Short Notes" style="max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22800%22 height=%22400%22 viewBox=%220 0 800 400%22><rect width=%22100%%22 height=%22100%%22 fill=%22%231a221e%22/><text x=%2250%%22 y=%2250%%22 font-family=%22Inter, sans-serif%22 font-size=%2224%22 fill=%22%23a0aec0%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>Short Notes Visual (images/5.png) Pending Upload</text><text x=%2250%%22 y=%2260%%22 font-family=%22Inter, sans-serif%22 font-size=%2214%22 fill=%22%23718096%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>HTML notes are fully functional. PDF is linked below.</text></svg>'" />
+                        </a>
+                        <p style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-muted);">Click image to open high-resolution version in new tab</p>
+                    </div>
+                </div>
+            </section>
+            
             <!-- Topic 1 -->
             <section class="topic-section" id="topic-1">
                 <div class="topic-header" onclick="toggleSection('content-1')">
@@ -112,7 +132,7 @@
                     <p>HTTP is a stateless request-response protocol. The client (browser) sends a request to the server, and the server processes it and sends back a response. Because HTTP is <strong>stateless</strong>, the server remembers nothing between requests, treating each message exchange completely independently.</p>
                     
                     <h3 id="sub-2-3">2.3 Handling State: Cookies & Sessions</h3>
-                    <p>If HTTP is stateless, how do shopping carts stay full or logins stay active? Developers use **Cookies** and **Session Tokens**. The server sends a unique session key inside a response header, which the client browser stores and automatically appends to every subsequent request, identifying the user state.</p>
+                    <p>If HTTP is stateless, how do shopping carts stay full or logins stay active? Developers use <strong>Cookies</strong> and <strong>Session Tokens</strong>. The server sends a unique session key inside a response header, which the client browser stores and automatically appends to every subsequent request, identifying the user state.</p>
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
                         <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
@@ -128,7 +148,7 @@
                 </div>
                 <div class="collapsible-content" id="content-3">
                     <h3 id="sub-3-1">3.1 Request Breakdown (Line, Headers, Body)</h3>
-                    <p>HTTP requests consist of a **Request Line**, **Headers**, and an optional **Body**:</p>
+                    <p>HTTP requests consist of a <strong>Request Line</strong>, <strong>Headers</strong>, and an optional <strong>Body</strong>:</p>
                     <ul>
                         <li><strong>Request Line:</strong> Contains the HTTP Method (e.g. GET, POST, PUT, DELETE), URL Resource path, and HTTP Version.
                             <div class="formula-box">GET /index.html HTTP/1.1</div>
@@ -138,7 +158,7 @@
                     </ul>
                     
                     <h3 id="sub-3-2">3.2 Response Breakdown (Status, Headers, Body)</h3>
-                    <p>HTTP responses mirror the request structure: **Status Line**, **Headers**, and a **Body**:</p>
+                    <p>HTTP responses mirror the request structure: <strong>Status Line</strong>, <strong>Headers</strong>, and a <strong>Body</strong>:</p>
                     <ul>
                         <li><strong>Status Line:</strong> Contains HTTP Version, numeric Status Code, and Status Message.
                             <div class="formula-box">HTTP/1.1 200 OK</div>
@@ -177,10 +197,10 @@
                     <p>Released in 1997, HTTP/1.1 introduced persistent TCP connections (<code>Keep-Alive</code>) allowing multiple resource transfers on a single socket. However, resources must be sent sequentially in First-In-First-Out (FIFO) order. If a slow resource (like a large image) stalls, it blocks all subsequent elements—a problem known as <strong>Head-of-Line (HoL) Blocking</strong> at the application level.</p>
                     
                     <h3 id="sub-4-3">4.3 HTTP/2 (Binary, Multiplexing & Server Push)</h3>
-                    <p>Launched in 2015, HTTP/2 replaced text-based messages with a **Binary Framing Layer** and introduced **Multiplexing**—transmitting multiple requests and responses concurrently over a single TCP connection. It also added **Server Push**, letting servers preemptively push assets (like CSS files) to clients. However, because it runs on TCP, a single lost packet stalls the entire connection (TCP-level Head-of-Line blocking).</p>
+                    <p>Launched in 2015, HTTP/2 replaced text-based messages with a <strong>Binary Framing Layer</strong> and introduced <strong>Multiplexing</strong>—transmitting multiple requests and responses concurrently over a single TCP connection. It also added <strong>Server Push</strong>, letting servers preemptively push assets (like CSS files) to clients. However, because it runs on TCP, a single lost packet stalls the entire connection (TCP-level Head-of-Line blocking).</p>
                     
                     <h3 id="sub-4-4">4.4 HTTP/3 (QUIC over UDP & Stream Isolation)</h3>
-                    <p>Standardized in 2022, HTTP/3 replaces TCP with **QUIC** (a UDP-based transport protocol developed by Google). It handles multiplexed streams independently. If a packet is lost, only that specific stream is stalled while other streams continue unimpeded, fully solving both application-level and transport-level Head-of-Line blocking.</p>
+                    <p>Standardized in 2022, HTTP/3 replaces TCP with <strong>QUIC</strong> (a UDP-based transport protocol developed by Google). It handles multiplexed streams independently. If a packet is lost, only that specific stream is stalled while other streams continue unimpeded, fully solving both application-level and transport-level Head-of-Line blocking.</p>
                     
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
@@ -197,7 +217,7 @@
                 </div>
                 <div class="collapsible-content" id="content-5">
                     <h3 id="sub-5-1">5.1 REST Architectural Principles</h3>
-                    <p>API stands for Application Programming Interface. When applications need to talk to other applications, they use API rules. The most popular architecture on the public web is **REST** (Representational State Transfer), which is used by roughly 83% of public web services to transmit JSON data over standard HTTP methods (GET, POST, PUT, DELETE).</p>
+                    <p>API stands for Application Programming Interface. When applications need to talk to other applications, they use API rules. The most popular architecture on the public web is <strong>REST</strong> (Representational State Transfer), which is used by roughly 83% of public web services to transmit JSON data over standard HTTP methods (GET, POST, PUT, DELETE).</p>
                     
                     <h3 id="sub-5-2">5.2 API Standardization via OpenAPI</h3>
                     <p>OpenAPI (popularized by Swagger) is an open specification schema used to describe, design, document, and test RESTful APIs in a human-readable and machine-readable JSON/YAML format.</p>
