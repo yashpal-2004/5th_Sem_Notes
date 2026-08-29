@@ -200,31 +200,31 @@
                 Upcoming Contests
             </h3>
             <div class="hero-timeline-list">
-                <div class="hero-timeline-item upcoming-contest">
-                    <span class="hero-timeline-name cn">CN (C1) <small style="font-weight: normal; opacity: 0.75;">(10%)</small> <span class="days-left-badge">6 days left</span></span>
+                <div class="hero-timeline-item" data-date="2026-09-04">
+                    <span class="hero-timeline-name cn">CN (C1) <small style="font-weight: normal; opacity: 0.75;">(10%)</small></span>
                     <span class="hero-timeline-date cn">04 Sep</span>
                 </div>
-                <div class="hero-timeline-item">
+                <div class="hero-timeline-item" data-date="2026-09-11">
                     <span class="hero-timeline-name dl">DL (C1) <small style="font-weight: normal; opacity: 0.75;">(5%)</small></span>
                     <span class="hero-timeline-date dl">11 Sep</span>
                 </div>
-                <div class="hero-timeline-item">
+                <div class="hero-timeline-item" data-date="2026-09-18">
                     <span class="hero-timeline-name mca">MCA (C1) <small style="font-weight: normal; opacity: 0.75;">(10%)</small></span>
                     <span class="hero-timeline-date mca">18 Sep</span>
                 </div>
-                <div class="hero-timeline-item">
+                <div class="hero-timeline-item" data-date="2026-09-25">
                     <span class="hero-timeline-name aml">AML (C1) <small style="font-weight: normal; opacity: 0.75;">(10%)</small></span>
                     <span class="hero-timeline-date aml">25 Sep</span>
                 </div>
-                <div class="hero-timeline-item">
+                <div class="hero-timeline-item" data-date="2026-10-30">
                     <span class="hero-timeline-name cn">CN (C2) <small style="font-weight: normal; opacity: 0.75;">(10%)</small></span>
                     <span class="hero-timeline-date cn">30 Oct</span>
                 </div>
-                <div class="hero-timeline-item">
+                <div class="hero-timeline-item" data-date="2026-11-20">
                     <span class="hero-timeline-name dl">DL (C2) <small style="font-weight: normal; opacity: 0.75;">(5%)</small></span>
                     <span class="hero-timeline-date dl">20 Nov</span>
                 </div>
-                <div class="hero-timeline-item">
+                <div class="hero-timeline-item" data-date="2026-11-27">
                     <span class="hero-timeline-name mca">MCA (C2) <small style="font-weight: normal; opacity: 0.75;">(10%)</small></span>
                     <span class="hero-timeline-date mca">27 Nov</span>
                 </div>
@@ -413,9 +413,53 @@
                 }
             }
 
+            // Update dynamic countdown and active highlighting for upcoming contests
+            function updateTimeline() {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                const items = document.querySelectorAll('.hero-timeline-item');
+                let nextUpcoming = null;
+                let minDaysLeft = Infinity;
+
+                items.forEach(item => {
+                    item.classList.remove('upcoming-contest');
+                    const badge = item.querySelector('.days-left-badge');
+                    if (badge) badge.remove();
+                });
+
+                items.forEach(item => {
+                    const dateStr = item.getAttribute('data-date');
+                    if (!dateStr) return;
+
+                    const contestDate = new Date(dateStr);
+                    contestDate.setHours(0, 0, 0, 0);
+
+                    const diffTime = contestDate - today;
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                    if (diffDays >= 0) {
+                        if (diffDays < minDaysLeft) {
+                            minDaysLeft = diffDays;
+                            nextUpcoming = { item, days: diffDays };
+                        }
+                    }
+                });
+
+                if (nextUpcoming) {
+                    nextUpcoming.item.classList.add('upcoming-contest');
+                    const nameSpan = nextUpcoming.item.querySelector('.hero-timeline-name');
+                    const badge = document.createElement('span');
+                    badge.className = 'days-left-badge';
+                    badge.textContent = nextUpcoming.days === 0 ? 'Today' : (nextUpcoming.days === 1 ? '1 day left' : `${nextUpcoming.days} days left`);
+                    nameSpan.appendChild(badge);
+                }
+            }
+
             // Initial load
             await syncWithCloud();
             renderUI();
+            updateTimeline();
 
             // Poll for updates in background every 3 seconds
             setInterval(syncWithCloud, 3000);
