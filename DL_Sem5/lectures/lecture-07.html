@@ -95,7 +95,8 @@
                 <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
 
                     <p><strong>Core Concept:</strong> Standard SGD sees only the current mini-batch gradient and forgets prior history. Advanced optimizers maintain exponential moving averages of gradients (1st moment, for direction/velocity) and squared gradients (2nd moment, for adaptive coordinate scaling). AdamW decouples L2 weight decay from adaptive gradients for superior generalization.</p>
-                    <div class="box box-blue"><div class="box-title">Formula Sheet & Key Rules</div>
+                    <div class="box box-blue">
+                        <div class="box-title">Formula Sheet & Key Rules</div>
                         <ul style="list-style:none; padding-left:0;">
                             <li><strong>EWMA Formula:</strong> <div class="formula-box">v<sub>t</sub> = &beta; v<sub>t-1</sub> + (1 - &beta;) g<sub>t</sub></div></li>
                             <li><strong>SGD + Momentum:</strong> \(v_t = \beta v_{t-1} + g_t\); \(w_{t+1} = w_t - \alpha v_t\)</li>
@@ -104,9 +105,16 @@
                             <li><strong>Adam (Bias Corrected):</strong> \(\hat{m}_t = \frac{m_t}{1 - \beta_1^t}\), \(\hat{v}_t = \frac{v_t}{1 - \beta_2^t}\); \(w_{t+1} = w_t - \frac{\alpha}{\sqrt{\hat{v}_t} + \epsilon} \hat{m}_t\)</li>
                             <li><strong>AdamW:</strong> \(w_{t+1} = w_t (1 - \alpha \lambda) - \frac{\alpha}{\sqrt{\hat{v}_t} + \epsilon} \hat{m}_t\)</li>
                         </ul>
-                    
-                </div>
-                                    <div class="topic-nav">
+                    </div>
+
+                    <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Handwritten Short Notes</h3>
+                    <div style="text-align: center; background: var(--bg-secondary, #f8f9fa); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-light); margin-bottom: 1.5rem;">
+                        <a href="../images/7.png" target="_blank" title="Click to view full size">
+                            <img src="../images/7.png" alt="Lecture 07 Short Notes" style="max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
+                        </a>
+                        <p style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-muted);">Click image to open high-resolution version in new tab</p>
+                    </div>
+                    <div class="topic-nav">
                         <button class="btn" disabled="">Previous Topic</button>
                         <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Next Topic</button>
                     </div>

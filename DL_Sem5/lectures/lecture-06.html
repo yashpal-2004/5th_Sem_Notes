@@ -93,16 +93,24 @@
                 <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
 
                     <p><strong>Core Concept:</strong> Gradient descent navigates complex high-dimensional loss landscapes using only local slope information. The gradient vector \(\nabla f(\mathbf{x})\) always points perpendicular (orthogonal) to level contour curves in the direction of steepest ascent. Ravines with ill-conditioned curvature cause plain GD to oscillate wildly across steep walls rather than moving along the shallow valley floor.</p>
-                    <div class="box box-blue"><div class="box-title">Formula Sheet & Key Rules</div>
+                    <div class="box box-blue">
+                        <div class="box-title">Formula Sheet & Key Rules</div>
                         <ul style="list-style:none; padding-left:0;">
                             <li><strong>Gradient Vector:</strong> \(\nabla f(x, y) = \left[ \frac{\partial f}{\partial x}, \frac{\partial f}{\partial y} \right]^T\)</li>
                             <li><strong>Steepest Descent Rule:</strong> <div class="formula-box">x<sub>k+1</sub> = x<sub>k</sub> - &alpha; &nabla;f(x<sub>k</sub>)</div></li>
                             <li><strong>Contour Orthogonality:</strong> \(\nabla f(\mathbf{x})\) is perpendicular to the tangent of \(f(\mathbf{x}) = c\)</li>
                             <li><strong>Condition Number:</strong> Ratio of max to min curvature \(\kappa = \frac{\lambda_{\max}}{\lambda_{\min}}\); high \(\kappa\) causes severe zig-zagging.</li>
                         </ul>
-                    
-                </div>
-                                    <div class="topic-nav">
+                    </div>
+
+                    <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Handwritten Short Notes</h3>
+                    <div style="text-align: center; background: var(--bg-secondary, #f8f9fa); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-light); margin-bottom: 1.5rem;">
+                        <a href="../images/6.png" target="_blank" title="Click to view full size">
+                            <img src="../images/6.png" alt="Lecture 06 Short Notes" style="max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
+                        </a>
+                        <p style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-muted);">Click image to open high-resolution version in new tab</p>
+                    </div>
+                    <div class="topic-nav">
                         <button class="btn" disabled="">Previous Topic</button>
                         <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Next Topic</button>
                     </div>
