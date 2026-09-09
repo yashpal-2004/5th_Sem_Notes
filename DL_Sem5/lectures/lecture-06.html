@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Deep Learning - Lecture 06</title>
+    <meta content="Study notes for Deep Learning, Lecture 06 covering Gradient Descent mechanics, loss surface geometry, contour slopes, step sizing, and directional derivatives." name="description"/>
+    <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>06</text></svg>" rel="icon"/>
+    <link href="../css/style.css" rel="stylesheet"/>
+</head>
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Deep Learning Foundations</h1>
+            <p>Lecture 06 - Gradient Descent Mechanics & Loss Landscapes</p>
+            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/lecture06_gradient_descent.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open Full Visual Lecture ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text"/>
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 6</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Short Notes</a></li>
+                <li>
+                    <a href="#topic-1">1. Starting Point & Local Exploration<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 Why Local Information Guides Search</a></li>
+                        <li><a href="#sub-1-2">1.2 Sampling Multiple Neighborhood Points</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Direction vs. Magnitude of Slope<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 Is Direction Alone Sufficient?</a></li>
+                        <li><a href="#sub-2-2">2.2 Slope Magnitude as a Velocity Factor</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. The Gradient Vector Field<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 Partial Derivatives as Component Slopes</a></li>
+                        <li><a href="#sub-3-2">3.2 Orthogonality to Level Contours</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Step Multipliers & Learning Rates<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 Tuning the Step Size Multiplier</a></li>
+                        <li><a href="#sub-4-2">4.2 Overshooting Ravines and Anisotropic Valleys</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Loss Surface Trajectories<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 Isisotropic Bowl vs Ill-conditioned Surfaces</a></li>
+                        <li><a href="#sub-5-2">5.2 Pathological Zig-zagging Behavior</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-6">6. Numerical Contour Trajectory Example<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-6-1">6.1 Quadratic Bowl \(f(x,y) = x^2 + 10y^2\)</a></li>
+                        <li><a href="#sub-6-2">6.2 Step-by-step Descent Vector Calculation</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="mainContent">
+            <!-- Short Notes Summary Section -->
+            <section class="short-notes-section" id="short-notes">
+                <div class="short-notes-header">
+                    <div class="short-notes-title-group">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="short-notes-icon"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                        <h2>Executive Summary & Formula Sheet</h2>
+                    </div>
+                    <span class="badge">Lecture 06 Quick Ref</span>
+                </div>
+                <div class="short-notes-content">
+                    <p><strong>Core Concept:</strong> Gradient descent navigates complex high-dimensional loss landscapes using only local slope information. The gradient vector \(\nabla f(\mathbf{x})\) always points perpendicular (orthogonal) to level contour curves in the direction of steepest ascent. Ravines with ill-conditioned curvature cause plain GD to oscillate wildly across steep walls rather than moving along the shallow valley floor.</p>
+                    <div class="formula-block">
+                        <ul>
+                            <li><strong>Gradient Vector:</strong> \(\nabla f(x, y) = \left[ \frac{\partial f}{\partial x}, \frac{\partial f}{\partial y} \right]^T\)</li>
+                            <li><strong>Steepest Descent Rule:</strong> \(\mathbf{x}_{k+1} = \mathbf{x}_k - \alpha \nabla f(\mathbf{x}_k)\)</li>
+                            <li><strong>Contour Orthogonality:</strong> \(\nabla f(\mathbf{x})\) is perpendicular to the tangent of \(f(\mathbf{x}) = c\)</li>
+                            <li><strong>Condition Number:</strong> Ratio of max to min curvature \(\kappa = \frac{\lambda_{\max}}{\lambda_{\min}}\); high \(\kappa\) causes severe zig-zagging.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 1 -->
+            <article class="topic-card" id="topic-1">
+                <div class="topic-header">
+                    <span class="topic-number">Topic 01</span>
+                    <h2>1. Starting Point & Local Exploration</h2>
+                </div>
+                <div class="topic-body">
+                    <div class="sub-topic" id="sub-1-1">
+                        <h3>1.1 Why Local Information Guides Search</h3>
+                        <p>In high dimensions, evaluating the loss surface globally is computationally impossible. Optimization algorithms must rely entirely on local evaluation—the value and slope at the current parameter position.</p>
+                    </div>
+                    <div class="sub-topic" id="sub-1-2">
+                        <h3>1.2 Sampling Multiple Neighborhood Points</h3>
+                        <p>Sampling adjacent points determines which direction yields the maximum decrease in loss per unit distance, establishing the foundation of directional derivatives.</p>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Topic 2 -->
+            <article class="topic-card" id="topic-2">
+                <div class="topic-header">
+                    <span class="topic-number">Topic 02</span>
+                    <h2>2. Direction vs. Magnitude of Slope</h2>
+                </div>
+                <div class="topic-body">
+                    <div class="sub-topic" id="sub-2-1">
+                        <h3>2.1 Is Direction Alone Sufficient?</h3>
+                        <p>Moving a fixed distance in the steepest direction ignores how steep the hill actually is. On nearly flat plateaus, fixed step sizes move well, but near sharp drops, fixed steps can destabilize training.</p>
+                    </div>
+                    <div class="sub-topic" id="sub-2-2">
+                        <h3>2.2 Slope Magnitude as a Velocity Factor</h3>
+                        <p>Scaling step size proportionally to slope magnitude \(\|\nabla f\|\) naturally takes large steps on steep slopes and automatically slows down near stationary minimum points where slope approaches 0.</p>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Topic 3 -->
+            <article class="topic-card" id="topic-3">
+                <div class="topic-header">
+                    <span class="topic-number">Topic 03</span>
+                    <h2>3. The Gradient Vector Field</h2>
+                </div>
+                <div class="topic-body">
+                    <div class="sub-topic" id="sub-3-1">
+                        <h3>3.1 Partial Derivatives as Component Slopes</h3>
+                        <p>For multivariable loss \(f(w_1, w_2)\), partial derivative \(\frac{\partial f}{\partial w_1}\) measures slope along the \(w_1\) axis, and \(\frac{\partial f}{\partial w_2}\) along \(w_2\). Combined, vector \(\nabla f = [\frac{\partial f}{\partial w_1}, \frac{\partial f}{\partial w_2}]^T\) gives the true 2D slope direction.</p>
+                    </div>
+                    <div class="sub-topic" id="sub-3-2">
+                        <h3>3.2 Orthogonality to Level Contours</h3>
+                        <p>Contour lines connect points of equal loss elevation. Moving along a contour line changes loss by 0. Therefore, the direction of steepest loss change must be exactly perpendicular (orthogonal) to the contour line at every point.</p>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Topic 4 -->
+            <article class="topic-card" id="topic-4">
+                <div class="topic-header">
+                    <span class="topic-number">Topic 04</span>
+                    <h2>4. Step Multipliers & Learning Rates</h2>
+                </div>
+                <div class="topic-body">
+                    <div class="sub-topic" id="sub-4-1">
+                        <h3>4.1 Tuning the Step Size Multiplier</h3>
+                        <p>The learning rate \(\alpha\) acts as a scaling multiplier convert slope vector into spatial step displacement: \(\Delta \mathbf{w} = -\alpha \nabla f\).</p>
+                    </div>
+                    <div class="sub-topic" id="sub-4-2">
+                        <h3>4.2 Overshooting Ravines and Anisotropic Valleys</h3>
+                        <p>In narrow ravines with steep walls and a gentle floor, slope magnitude across the wall dominates the gradient vector. As a result, GD takes large steps back and forth across the walls instead of moving down the floor.</p>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Topic 5 -->
+            <article class="topic-card" id="topic-5">
+                <div class="topic-header">
+                    <span class="topic-number">Topic 05</span>
+                    <h2>5. Loss Surface Trajectories</h2>
+                </div>
+                <div class="topic-body">
+                    <div class="sub-topic" id="sub-5-1">
+                        <h3>5.1 Isotropic Bowl vs Ill-conditioned Surfaces</h3>
+                        <p>On spherical circular contours (\(f(x,y) = x^2 + y^2\)), gradients point directly toward the center minimum. On elliptical contours (\(f(x,y) = x^2 + 10y^2\)), gradients point away from the minimum, producing severe trajectory deflection.</p>
+                    </div>
+                    <div class="sub-topic" id="sub-5-2">
+                        <h3>5.2 Pathological Zig-zagging Behavior</h3>
+                        <p>Because each step in plain gradient descent is orthogonal to the local contour, successive steps on ill-conditioned surfaces form right-angle zig-zag paths, dramatically slowing progress towards the goal.</p>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Topic 6 -->
+            <article class="topic-card" id="topic-6">
+                <div class="topic-header">
+                    <span class="topic-number">Topic 06</span>
+                    <h2>6. Numerical Contour Trajectory Example</h2>
+                </div>
+                <div class="topic-body">
+                    <div class="sub-topic" id="sub-6-1">
+                        <h3>6.1 Quadratic Bowl \(f(x,y) = x^2 + 10y^2\)</h3>
+                        <p>Gradient is \(\nabla f(x,y) = [2x, 20y]^T\). Notice the vertical component slope is 10 times larger than the horizontal component slope for equal displacement.</p>
+                    </div>
+                    <div class="sub-topic" id="sub-6-2">
+                        <h3>6.2 Step-by-step Descent Vector Calculation</h3>
+                        <p>Start at \((x_0, y_0) = (10, 1)\) with \(\alpha = 0.08\):</p>
+                        <ul>
+                            <li>\(\nabla f(10, 1) = [20, 20]^T\)</li>
+                            <li>\(x_1 = 10 - 0.08(20) = 10 - 1.6 = 8.4\)</li>
+                            <li>\(y_1 = 1 - 0.08(20) = 1 - 1.6 = -0.6\) (Notice \(y\) flipped sign from +1 to -0.6!)</li>
+                            <li>\(\nabla f(8.4, -0.6) = [16.8, -12]^T\)</li>
+                            <li>\(x_2 = 8.4 - 0.08(16.8) = 7.056\), \(y_2 = -0.6 - 0.08(-12) = +0.36\) (Flipped sign again!)</li>
+                            <li>The trajectory oscillates violently between positive and negative \(y\) while making slow progress on \(x\).</li>
+                        </ul>
+                    </div>
+                </div>
+            </article>
+
+        </main>
+    </div>
+
+    <script src="../js/main.js"></script>
+</body>
+</html>

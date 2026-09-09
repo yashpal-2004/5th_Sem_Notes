@@ -35,7 +35,7 @@
             <li><a href="../MCA/index.html">Modern Computer Architecture</a></li>
             <li><a href="../archive.html">Archive</a></li>
         </ul>
-        <div class="nav-stats">4 Lectures &bull; 24 Topics</div>
+        <div class="nav-stats">2 Lectures &bull; 12 Topics</div>
     </nav>
 
     <!-- Lectures Section -->
@@ -48,8 +48,7 @@
                 <a href="lectures/lecture-01.html" class="lecture-card" data-lecture-id="dl-l1">
                     <div class="lecture-card-top">
                         <div class="lecture-number">01</div>
-                        <div class="lecture-checkbox" onclick="toggleComplete(event, 'dl-l1')"
-                            title="Toggle completion status"></div>
+                        <div class="lecture-checkbox" onclick="toggleComplete(event, 'dl-l1')" title="Toggle completion status"></div>
                     </div>
                     <h2>Where it Begins: The Neuron & Decision Boundaries</h2>
                     <p>Biological neurons, McCulloch & Pitts threshold logic gates (AND, OR, NOT), perceptron
@@ -64,8 +63,7 @@
                 <a href="lectures/lecture-02.html" class="lecture-card" data-lecture-id="dl-l2">
                     <div class="lecture-card-top">
                         <div class="lecture-number">02</div>
-                        <div class="lecture-checkbox" onclick="toggleComplete(event, 'dl-l2')"
-                            title="Toggle completion status"></div>
+                        <div class="lecture-checkbox" onclick="toggleComplete(event, 'dl-l2')" title="Toggle completion status"></div>
                     </div>
                     <h2>The Activation Function and the Update Rule</h2>
                     <p>Understanding linear combination vs activation functions, chain rule derivations for weight
@@ -73,36 +71,6 @@
                     <div class="lecture-card-header">
                         <span class="lecture-tag">Activation & Update</span>
                         <span class="lecture-stats">7 Topics</span>
-                    </div>
-                </a>
-
-                <!-- Lecture 03 -->
-                <a href="lectures/lecture-03.html" class="lecture-card" data-lecture-id="dl-l3">
-                    <div class="lecture-card-top">
-                        <div class="lecture-number">03</div>
-                        <div class="lecture-checkbox" onclick="toggleComplete(event, 'dl-l3')"
-                            title="Toggle completion status"></div>
-                    </div>
-                    <h2>Activation Functions: ReLU, Leaky ReLU, ELU and Softmax</h2>
-                    <p>Explores formulas, derivatives, shapes, and implementation logic of standard neural network activation functions (ReLU, Leaky ReLU, ELU, Softmax).</p>
-                    <div class="lecture-card-header">
-                        <span class="lecture-tag">DL Activation</span>
-                        <span class="lecture-stats">6 Topics</span>
-                    </div>
-                </a>
-
-                <!-- Lecture 04 -->
-                <a href="lectures/lecture-04.html" class="lecture-card" data-lecture-id="dl-l4">
-                    <div class="lecture-card-top">
-                        <div class="lecture-number">04</div>
-                        <div class="lecture-checkbox" onclick="toggleComplete(event, 'dl-l4')"
-                            title="Toggle completion status"></div>
-                    </div>
-                    <h2>Activation Functions in Practice (Interactive Simulation)</h2>
-                    <p>Live animated comparison of all 6 activations training side-by-side; decision boundary, loss bowl, and gradient bar; 2-3-1 network with dead neuron counter; MSE vs MAE vs BCE loss functions.</p>
-                    <div class="lecture-card-header">
-                        <span class="lecture-tag">Simulation Lab</span>
-                        <span class="lecture-stats">6 Topics</span>
                     </div>
                 </a>
 
@@ -115,11 +83,11 @@
         <h3 class="stats-title">DL Notes Metrics</h3>
         <div class="stats-grid">
             <div class="stat-item">
-                <div class="stat-val">4</div>
+                <div class="stat-val">2</div>
                 <div class="stat-label">Lectures Compiled</div>
             </div>
             <div class="stat-item">
-                <div class="stat-val">24</div>
+                <div class="stat-val">12</div>
                 <div class="stat-label">Topics</div>
             </div>
             <div class="stat-item">
@@ -208,7 +176,7 @@
             const isCompleted = card.classList.toggle('completed');
             localStorage.setItem('nst-completed-' + id, isCompleted);
             updateProgress();
-
+            
             // Push updated progress to cloud
             await pushProgress();
         }

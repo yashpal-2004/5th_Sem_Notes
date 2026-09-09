@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Deep Learning - Lecture 07</title>
+    <meta content="Study notes for Deep Learning, Lecture 07 covering optimizers with memory (EWMA, Momentum, NAG, AdaGrad, RMSProp, Adam, AdamW)." name="description"/>
+    <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>07</text></svg>" rel="icon"/>
+    <link href="../css/style.css" rel="stylesheet"/>
+</head>
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Deep Learning Foundations</h1>
+            <p>Lecture 07 - Optimizers with Memory: Momentum, NAG, AdaGrad & Adam</p>
+            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/Worksheet_6_Optimizers_Solved.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF Worksheet ↗</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/worksheet07_momentum_nag.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open Momentum/NAG Interactive ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text"/>
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 6</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Short Notes</a></li>
+                <li>
+                    <a href="#topic-1">1. Why Memory is Needed (EWMA)<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 Plain SGD Short-sightedness</a></li>
+                        <li><a href="#sub-1-2">1.2 Exponentially Weighted Moving Average Math</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. SGD with Momentum & Nesterov (NAG)<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 Heavy-Ball Momentum Rule</a></li>
+                        <li><a href="#sub-2-2">2.2 Nesterov Accelerated Gradient Lookahead</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Adaptive Per-Coordinate Scaling<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 AdaGrad Accumulation & Stalling</a></li>
+                        <li><a href="#sub-3-2">3.2 RMSProp Fading Memory Scale</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Adam & AdamW Optimizers<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 Dual Memory (1st & 2nd Moments) + Bias Correction</a></li>
+                        <li><a href="#sub-4-2">4.2 Decoupled Weight Decay in AdamW</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Optimizer Selection & Decision Map<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 Comparative Trade-off Matrix</a></li>
+                        <li><a href="#sub-5-2">5.2 Domain-specific Recommendations</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-6">6. Worked Numerical Comparison<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-6-1">6.1 Gradients +4, +4, -1 Simulation</a></li>
+                        <li><a href="#sub-6-2">6.2 SGD vs Momentum Step Trajectory</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="mainContent">
+            <!-- Short Notes Summary Section -->
+            <section class="short-notes-section" id="short-notes">
+                <div class="short-notes-header">
+                    <div class="short-notes-title-group">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="short-notes-icon"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                        <h2>Executive Summary & Formula Sheet</h2>
+                    </div>
+                    <span class="badge">Lecture 07 Quick Ref</span>
+                </div>
+                <div class="short-notes-content">
+                    <p><strong>Core Concept:</strong> Standard SGD sees only the current mini-batch gradient and forgets prior history. Advanced optimizers maintain exponential moving averages of gradients (1st moment, for direction/velocity) and squared gradients (2nd moment, for adaptive coordinate scaling). AdamW decouples L2 weight decay from adaptive gradients for superior generalization.</p>
+                    <div class="formula-block">
+                        <ul>
+                            <li><strong>EWMA Formula:</strong> \(v_t = \beta v_{t-1} + (1-\beta) g_t\)</li>
+                            <li><strong>SGD + Momentum:</strong> \(v_t = \beta v_{t-1} + g_t\); \(w_{t+1} = w_t - \alpha v_t\)</li>
+                            <li><strong>NAG (Lookahead):</strong> Evaluate gradient at predicted position \(g_t = \nabla L(w_t - \alpha \beta v_{t-1})\)</li>
+                            <li><strong>RMSProp Scale:</strong> \(s_t = \beta_2 s_{t-1} + (1-\beta_2) g_t^2\); \(w_{t+1} = w_t - \frac{\alpha}{\sqrt{s_t + \epsilon}} g_t\)</li>
+                            <li><strong>Adam (Bias Corrected):</strong> \(\hat{m}_t = \frac{m_t}{1 - \beta_1^t}\), \(\hat{v}_t = \frac{v_t}{1 - \beta_2^t}\); \(w_{t+1} = w_t - \frac{\alpha}{\sqrt{\hat{v}_t} + \epsilon} \hat{m}_t\)</li>
+                            <li><strong>AdamW:</strong> \(w_{t+1} = w_t (1 - \alpha \lambda) - \frac{\alpha}{\sqrt{\hat{v}_t} + \epsilon} \hat{m}_t\)</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 1 -->
+            <article class="topic-card" id="topic-1">
+                <div class="topic-header">
+                    <span class="topic-number">Topic 01</span>
+                    <h2>1. Why Memory is Needed (EWMA)</h2>
+                </div>
+                <div class="topic-body">
+                    <div class="sub-topic" id="sub-1-1">
+                        <h3>1.1 Plain SGD Short-sightedness</h3>
+                        <p>Plain SGD updates parameters purely based on the instantaneous gradient of the current mini-batch. If a noisy mini-batch yields an outlier gradient, SGD immediately overreacts in that single direction, ignoring consistent trends established over past iterations.</p>
+                    </div>
+                    <div class="sub-topic" id="sub-1-2">
+                        <h3>1.2 Exponentially Weighted Moving Average Math</h3>
+                        <p>EWMA aggregates past values with exponentially decaying weights: \(v_t = \beta v_{t-1} + (1-\beta) g_t\). The parameter \(\beta \in (0,1)\) controls memory length: effective window size is approximately \(\frac{1}{1-\beta}\) steps (e.g., \(\beta = 0.9\) averages over 10 steps).</p>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Topic 2 -->
+            <article class="topic-card" id="topic-2">
+                <div class="topic-header">
+                    <span class="topic-number">Topic 02</span>
+                    <h2>2. SGD with Momentum & Nesterov (NAG)</h2>
+                </div>
+                <div class="topic-body">
+                    <div class="sub-topic" id="sub-2-1">
+                        <h3>2.1 Heavy-Ball Momentum Rule</h3>
+                        <p>Simulates a heavy ball rolling down the loss landscape. Velocity vector \(v_t = \beta v_{t-1} + g_t\) accumulates consistent directional gradients, accelerating progress along flat valleys and dampening oscillations across steep walls.</p>
+                    </div>
+                    <div class="sub-topic" id="sub-2-2">
+                        <h3>2.2 Nesterov Accelerated Gradient Lookahead</h3>
+                        <p>Instead of calculating gradient at current position \(w_t\), NAG computes gradient at the projected future position \(w_t - \alpha \beta v_{t-1}\). This lookahead step allows NAG to detect upcoming slope reversals early and apply braking before overshooting.</p>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Topic 3 -->
+            <article class="topic-card" id="topic-3">
+                <div class="topic-header">
+                    <span class="topic-number">Topic 03</span>
+                    <h2>3. Adaptive Per-Coordinate Scaling</h2>
+                </div>
+                <div class="topic-body">
+                    <div class="sub-topic" id="sub-3-1">
+                        <h3>3.1 AdaGrad Accumulation & Stalling</h3>
+                        <p>AdaGrad divides learning rate by square root of sum of all past squared gradients \(G_t = \sum_{\tau=1}^t g_\tau^2\). Frequently updated parameters get smaller steps; rare parameters get larger steps. However, monotonically increasing \(G_t\) eventually causes learning rate to shrink to zero, stalling learning prematurely.</p>
+                    </div>
+                    <div class="sub-topic" id="sub-3-2">
+                        <h3>3.2 RMSProp Fading Memory Scale</h3>
+                        <p>RMSProp fixes AdaGrad's stalling by replacing raw sum with an exponential moving average of squared gradients: \(s_t = \beta_2 s_{t-1} + (1-\beta_2) g_t^2\). This allows effective learning rates to adjust dynamically up or down over time.</p>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Topic 4 -->
+            <article class="topic-card" id="topic-4">
+                <div class="topic-header">
+                    <span class="topic-number">Topic 04</span>
+                    <h2>4. Adam & AdamW Optimizers</h2>
+                </div>
+                <div class="topic-body">
+                    <div class="sub-topic" id="sub-4-1">
+                        <h3>4.1 Dual Memory (1st & 2nd Moments) + Bias Correction</h3>
+                        <p>Adam combines Momentum (1st moment \(m_t\), \(\beta_1=0.9\)) and RMSProp (2nd moment \(v_t\), \(\beta_2=0.999\)). Because \(m_0=0\) and \(v_0=0\), initial estimates are biased towards zero. Adam applies bias correction: \(\hat{m}_t = \frac{m_t}{1-\beta_1^t}\) and \(\hat{v}_t = \frac{v_t}{1-\beta_2^t}\).</p>
+                    </div>
+                    <div class="sub-topic" id="sub-4-2">
+                        <h3>4.2 Decoupled Weight Decay in AdamW</h3>
+                        <p>In standard Adam, adding L2 regularization to loss conflates weight decay with adaptive gradient scaling, penalizing large parameters incorrectly. AdamW applies weight decay directly to parameters: \(w_{t+1} = w_t(1-\alpha \lambda) - \frac{\alpha}{\sqrt{\hat{v}_t}+\epsilon}\hat{m}_t\), significantly improving generalization in Transformers and deep models.</p>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Topic 5 -->
+            <article class="topic-card" id="topic-5">
+                <div class="topic-header">
+                    <span class="topic-number">Topic 05</span>
+                    <h2>5. Optimizer Selection & Decision Map</h2>
+                </div>
+                <div class="topic-body">
+                    <div class="sub-topic" id="sub-5-1">
+                        <h3>5.1 Comparative Trade-off Matrix</h3>
+                        <p><strong>SGD + Momentum:</strong> Outstanding generalization; requires careful learning rate & momentum tuning. Preferred for Computer Vision (ResNets).</p>
+                        <p><strong>RMSProp:</strong> Great for non-stationary problems, Recurrent Neural Networks (RNNs/LSTMs).</p>
+                        <p><strong>Adam / AdamW:</strong> Robust, fast convergence, low sensitivity to initial learning rate. Standard default for Transformers, LLMs, and complex architectures.</p>
+                    </div>
+                    <div class="sub-topic" id="sub-5-2">
+                        <h3>5.2 Domain-specific Recommendations</h3>
+                        <p>Use <strong>AdamW</strong> (\(\beta_1=0.9, \beta_2=0.999, \epsilon=10^{-8}\), weight decay 0.01) as your initial default optimizer for almost all deep learning architectures today.</p>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Topic 6 -->
+            <article class="topic-card" id="topic-6">
+                <div class="topic-header">
+                    <span class="topic-number">Topic 06</span>
+                    <h2>6. Worked Numerical Comparison</h2>
+                </div>
+                <div class="topic-body">
+                    <div class="sub-topic" id="sub-6-1">
+                        <h3>6.1 Gradients +4, +4, -1 Simulation</h3>
+                        <p>Consider 3 successive mini-batches yielding gradients \(g_1 = +4, g_2 = +4, g_3 = -1\). Should the optimizer reverse direction after the 3rd batch?</p>
+                    </div>
+                    <div class="sub-topic" id="sub-6-2">
+                        <h3>6.2 SGD vs Momentum Step Trajectory</h3>
+                        <ul>
+                            <li><strong>SGD (\(\alpha = 0.1\)):</strong> Step 1: \(\Delta w = -0.4\); Step 2: \(\Delta w = -0.4\); Step 3: \(\Delta w = +0.1\). SGD immediately reverses direction on batch 3!</li>
+                            <li><strong>SGD + Momentum (\(\beta = 0.9, \alpha = 0.1\)):</strong></li>
+                            <li>\(v_1 = 4.0 \implies \Delta w_1 = -0.4\)</li>
+                            <li>\(v_2 = 0.9(4.0) + 4.0 = 7.6 \implies \Delta w_2 = -0.76\)</li>
+                            <li>\(v_3 = 0.9(7.6) + (-1.0) = 6.84 - 1.0 = 5.84 \implies \Delta w_3 = -0.584\)</li>
+                            <li>Notice velocity remains positive (\(+5.84\)), so parameter step \(-0.584\) continues moving in the original direction, smoothing out the transient noise!</li>
+                        </ul>
+                    </div>
+                </div>
+            </article>
+
+        </main>
+    </div>
+
+    <script src="../js/main.js"></script>
+</body>
+</html>

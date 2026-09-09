@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Deep Learning - Lecture 05</title>
+    <meta content="Study notes for Deep Learning, Lecture 05 covering Gradient Descent variants (Batch GD, SGD, Mini-batch GD), learning rate diagnosis, and learning-rate scheduling." name="description"/>
+    <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>05</text></svg>" rel="icon"/>
+    <link href="../css/style.css" rel="stylesheet"/>
+</head>
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Deep Learning Foundations</h1>
+            <p>Lecture 05 - Optimization & Learning-Rate Control</p>
+            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/Worksheet_05_Optimization.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF Worksheet ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text"/>
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 6</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Short Notes</a></li>
+                <li>
+                    <a href="#topic-1">1. Intuition of Downhill Steps<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 Foggy Hill Analogy & Local Slope</a></li>
+                        <li><a href="#sub-1-2">1.2 Mathematical Loss Function Minimization</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Batch GD vs. SGD vs. Mini-batch GD<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 Full-Batch Gradient Descent</a></li>
+                        <li><a href="#sub-2-2">2.2 Stochastic & Mini-Batch Trade-offs</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Learning Rate Pathology & Diagnosis<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 Under-stepping, Oscillation & Divergence</a></li>
+                        <li><a href="#sub-3-2">3.2 Loss Trajectory Visual Signatures</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Learning-Rate Schedules<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 Step Decay & Exponential Decay</a></li>
+                        <li><a href="#sub-4-2">4.2 Cosine Annealing Schedule</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Learning Rate Warm-up<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 Why Early High Rates Destabilize Training</a></li>
+                        <li><a href="#sub-5-2">5.2 Linear Warmup Formulation</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-6">6. Worked Gradient Descent Calculation<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-6-1">6.1 Single Variable Loss \(L(w) = (w-3)^2\)</a></li>
+                        <li><a href="#sub-6-2">6.2 Multi-step Convergence Tracing</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="mainContent">
+            <!-- Short Notes Summary Section -->
+            <section class="short-notes-section" id="short-notes">
+                <div class="short-notes-header">
+                    <div class="short-notes-title-group">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="short-notes-icon"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                        <h2>Executive Summary & Formula Sheet</h2>
+                    </div>
+                    <span class="badge">Lecture 05 Quick Ref</span>
+                </div>
+                <div class="short-notes-content">
+                    <p><strong>Core Concept:</strong> Gradient descent updates parameters by moving opposite to the gradient: \(w_{t+1} = w_t - \alpha \nabla L(w_t)\). The choice of batch size balances gradient precision against computation speed. Selecting and scheduling learning rate \(\alpha\) is critical: rates that are too high cause divergence, while rates that are too low stall convergence.</p>
+                    <div class="formula-block">
+                        <ul>
+                            <li><strong>Gradient Descent Update:</strong> \(w_{t+1} = w_t - \alpha \frac{\partial L}{\partial w_t}\)</li>
+                            <li><strong>Batch GD:</strong> Uses all \(N\) samples per step (exact, slow).</li>
+                            <li><strong>Stochastic GD (SGD):</strong> Uses 1 sample per step (noisy, fast).</li>
+                            <li><strong>Mini-batch GD:</strong> Uses batch size \(B \in [32, 256]\) (balanced GPU parallelization).</li>
+                            <li><strong>Step Decay:</strong> \(\alpha_t = \alpha_0 \cdot \gamma^{\lfloor t / S \rfloor}\)</li>
+                            <li><strong>Cosine Annealing:</strong> \(\alpha_t = \alpha_{\min} + \frac{1}{2}(\alpha_{\max} - \alpha_{\min})\left(1 + \cos\left(\frac{t}{T_{\max}}\pi\right)\right)\)</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 1 -->
+            <article class="topic-card" id="topic-1">
+                <div class="topic-header">
+                    <span class="topic-number">Topic 01</span>
+                    <h2>1. Intuition of Downhill Steps</h2>
+                </div>
+                <div class="topic-body">
+                    <div class="sub-topic" id="sub-1-1">
+                        <h3>1.1 Foggy Hill Analogy & Local Slope</h3>
+                        <p>Imagine walking down a foggy mountain blindfolded. You feel the slope directly under your feet. Taking small steps in the steepest downhill direction eventually leads to the valley floor (loss minimum).</p>
+                    </div>
+                    <div class="sub-topic" id="sub-1-2">
+                        <h3>1.2 Mathematical Loss Function Minimization</h3>
+                        <p>The gradient \(\nabla L(w)\) points in the direction of steepest loss increase. Therefore, subtracting \(\alpha \nabla L(w)\) moves parameter \(w\) towards lower loss.</p>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Topic 2 -->
+            <article class="topic-card" id="topic-2">
+                <div class="topic-header">
+                    <span class="topic-number">Topic 02</span>
+                    <h2>2. Batch GD vs. SGD vs. Mini-batch GD</h2>
+                </div>
+                <div class="topic-body">
+                    <div class="sub-topic" id="sub-2-1">
+                        <h3>2.1 Full-Batch Gradient Descent</h3>
+                        <p>Calculates average gradient across all \(N\) dataset samples. Guaranteed smooth convergence to minimum for convex loss, but requires massive memory and compute per single parameter step.</p>
+                    </div>
+                    <div class="sub-topic" id="sub-2-2">
+                        <h3>2.2 Stochastic & Mini-Batch Trade-offs</h3>
+                        <p><strong>SGD:</strong> Updates weights using 1 random sample. High variance causes noisy trajectories, which helps escape shallow local minima but prevents exact convergence without learning rate decay.</p>
+                        <p><strong>Mini-batch GD:</strong> Uses mini-batches of size \(B\) (e.g., 32 or 64). Combines vectorization efficiency of GPUs with regularizing noise of SGD.</p>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Topic 3 -->
+            <article class="topic-card" id="topic-3">
+                <div class="topic-header">
+                    <span class="topic-number">Topic 03</span>
+                    <h2>3. Learning Rate Pathology & Diagnosis</h2>
+                </div>
+                <div class="topic-body">
+                    <div class="sub-topic" id="sub-3-1">
+                        <h3>3.1 Under-stepping, Oscillation & Divergence</h3>
+                        <p><strong>Too Small (\(\alpha = 0.0001\)):</strong> Loss decreases extremely slowly; model gets stuck in plateaus.</p>
+                        <p><strong>Optimal (\(\alpha = 0.01\)):</strong> Smooth logarithmic decline to minimum.</p>
+                        <p><strong>Too High (\(\alpha = 0.5\)):</strong> Loss oscillates back and forth across valley walls without descending.</p>
+                        <p><strong>Very High (\(\alpha = 2.0\)):</strong> Steps overshoot the opposite slope, loss explodes to \(\infty\) or NaN (divergence).</p>
+                    </div>
+                    <div class="sub-topic" id="sub-3-2">
+                        <h3>3.2 Loss Trajectory Visual Signatures</h3>
+                        <p>Monitoring training loss curves over epochs reveals learning rate health: linear slow drop indicates low \(\alpha\), explosive vertical spikes indicate high \(\alpha\), and steady exponential decay signals well-tuned \(\alpha\).</p>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Topic 4 -->
+            <article class="topic-card" id="topic-4">
+                <div class="topic-header">
+                    <span class="topic-number">Topic 04</span>
+                    <h2>4. Learning-Rate Schedules</h2>
+                </div>
+                <div class="topic-body">
+                    <div class="sub-topic" id="sub-4-1">
+                        <h3>4.1 Step Decay & Exponential Decay</h3>
+                        <p>Starting with a larger \(\alpha\) allows rapid initial progress. Periodically reducing \(\alpha\) (e.g., halving every 10 epochs) lets the model settle into precise minima late in training.</p>
+                    </div>
+                    <div class="sub-topic" id="sub-4-2">
+                        <h3>4.2 Cosine Annealing Schedule</h3>
+                        <p>Smoothly decreases learning rate following a cosine curve from \(\alpha_{\max}\) to \(\alpha_{\min}\) over the course of training, avoiding sudden abrupt drops of step decay.</p>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Topic 5 -->
+            <article class="topic-card" id="topic-5">
+                <div class="topic-header">
+                    <span class="topic-number">Topic 05</span>
+                    <h2>5. Learning Rate Warm-up</h2>
+                </div>
+                <div class="topic-body">
+                    <div class="sub-topic" id="sub-5-1">
+                        <h3>5.1 Why Early High Rates Destabilize Training</h3>
+                        <p>At initialization, randomly set weights produce large unstable gradients. Applying high learning rates immediately can permanently distort early feature representations.</p>
+                    </div>
+                    <div class="sub-topic" id="sub-5-2">
+                        <h3>5.2 Linear Warmup Formulation</h3>
+                        <p>Warm-up linearly ramps \(\alpha\) from 0 to \(\alpha_{\text{base}}\) over the first few epochs (e.g., 5 epochs), giving initial gradients time to stabilize before high-speed optimization begins.</p>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Topic 6 -->
+            <article class="topic-card" id="topic-6">
+                <div class="topic-header">
+                    <span class="topic-number">Topic 06</span>
+                    <h2>6. Worked Gradient Descent Calculation</h2>
+                </div>
+                <div class="topic-body">
+                    <div class="sub-topic" id="sub-6-1">
+                        <h3>6.1 Single Variable Loss \(L(w) = (w-3)^2\)</h3>
+                        <p>Gradient \(\frac{dL}{dw} = 2(w-3)\). Target minimum is at \(w^* = 3\).</p>
+                    </div>
+                    <div class="sub-topic" id="sub-6-2">
+                        <h3>6.2 Multi-step Convergence Tracing</h3>
+                        <p>Starting from \(w_0 = 0\) with learning rate \(\alpha = 0.1\):</p>
+                        <ul>
+                            <li>Step 1: \(\nabla L(0) = 2(0-3) = -6 \implies w_1 = 0 - 0.1(-6) = 0.6\)</li>
+                            <li>Step 2: \(\nabla L(0.6) = 2(0.6-3) = -4.8 \implies w_2 = 0.6 - 0.1(-4.8) = 1.08\)</li>
+                            <li>Step 3: \(\nabla L(1.08) = 2(1.08-3) = -3.84 \implies w_3 = 1.08 - 0.1(-3.84) = 1.464\)</li>
+                            <li>Notice \(w_t\) smoothly approaches 3 at rate \((1 - 2\alpha)^t = 0.8^t\).</li>
+                        </ul>
+                    </div>
+                </div>
+            </article>
+
+        </main>
+    </div>
+
+    <script src="../js/main.js"></script>
+</body>
+</html>
