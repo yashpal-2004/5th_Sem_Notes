@@ -7,6 +7,10 @@
     <meta content="Study notes for Deep Learning, Lecture 03 covering activation functions (ReLU, Leaky ReLU, ELU, Softmax), vanishing gradient problem, mathematical update rules, and output layer calculations." name="description"/>
     <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>03</text></svg>" rel="icon"/>
     <link href="../css/style.css" rel="stylesheet"/>
+    <!-- KaTeX for LaTeX rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}]});"></script>
 </head>
 <body>
     <header>
@@ -42,7 +46,7 @@
                 <li>
                     <a href="#topic-2">2. Rectified Linear Unit (ReLU)<span class="sub-count">2</span></a>
                     <ul class="sub-index">
-                        <li><a href="#sub-2-1">2.2 Definition and Derivative</a></li>
+                        <li><a href="#sub-2-1">2.1 Definition and Derivative</a></li>
                         <li><a href="#sub-2-2">2.2 Dying ReLU Problem</a></li>
                     </ul>
                 </li>
@@ -74,23 +78,24 @@
                         <li><a href="#sub-6-2">6.2 Practical Selection Guidelines</a></li>
                     </ul>
                 </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
             </ul>
         </aside>
 
         <!-- Main Content -->
-        <main id="mainContent">
+        <main id="notesContent">
             <!-- Short Notes Summary Section -->
-            <section class="short-notes-section" id="short-notes">
-                <div class="short-notes-header">
-                    <div class="short-notes-title-group">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="short-notes-icon"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                        <h2>Executive Summary & Formula Sheet</h2>
+            <section class="topic-section" id="short-notes">
+                <div class="topic-header" onclick="toggleSection('content-short-notes')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
                     </div>
-                    <span class="badge">Lecture 03 Quick Ref</span>
+                    <h2>Executive Summary & Formula Sheet</h2>
                 </div>
-                <div class="short-notes-content">
+                <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
                     <p><strong>Core Concept:</strong> Traditional activations like Sigmoid squish values into (0,1), capping derivative \(\sigma'(z) \le 0.25\). When inputs are large (\(z=6\)), \(\sigma'(z) \approx 0.00247\), causing weight updates to freeze (Vanishing Gradient). Modern architectures use piece-wise linear or exponential activations (ReLU, Leaky ReLU, ELU) in hidden layers and Softmax at the output.</p>
-                    <div class="formula-block">
+                    <div class="box box-blue">
+                        <div class="box-title">Formula Sheet & Key Rules</div>
                         <ul>
                             <li><strong>Sigmoid Derivative:</strong> \(\sigma'(z) = \sigma(z)(1 - \sigma(z))\)</li>
                             <li><strong>ReLU:</strong> \(f(z) = \max(0, z)\); \(f'(z) = 1 \text{ if } z > 0 \text{ else } 0\)</li>
@@ -99,91 +104,136 @@
                             <li><strong>Softmax:</strong> \(\hat{y}_i = \frac{e^{z_i}}{\sum_{j} e^{z_j}}\)</li>
                         </ul>
                     </div>
+
+                    <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Handwritten Short Notes</h3>
+                    <div style="text-align: center; background: var(--bg-secondary, #f8f9fa); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-light); margin-bottom: 1.5rem;">
+                        <a href="../images/3.png" target="_blank" title="Click to view full size">
+                            <img src="../images/3.png" alt="Lecture 03 Short Notes" style="max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
+                        </a>
+                        <p style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-muted);">Click image to open high-resolution version in new tab</p>
+                    </div>
+                    <div class="topic-nav">
+                        <button class="btn" disabled="">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Next Topic</button>
+                    </div>
                 </div>
             </section>
 
             <!-- Topic 1 -->
-            <article class="topic-card" id="topic-1">
-                <div class="topic-header">
-                    <span class="topic-number">Topic 01</span>
+            <section class="topic-section" id="topic-1">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
                     <h2>1. The Vanishing Gradient Problem</h2>
                 </div>
-                <div class="topic-body">
+                <div class="collapsible-content" id="content-1" style="max-height: none;">
                     <div class="sub-topic" id="sub-1-1">
                         <h3>1.1 Sigmoid Derivative Saturation</h3>
-                        <p>For Sigmoid activation \(\sigma(z) = \frac{1}{1 + e^{-z}}\), the maximum value of the derivative occurs at \(z = 0\) where \(\sigma'(0) = 0.25\). As \(|z|\) grows, the derivative exponentially approaches zero. In deep networks, multiplying terms smaller than 0.25 layer after layer causes gradients to vanish, stopping early layers from updating weights.</p>
+                        <p>For Sigmoid activation: </p>
+<div class="formula-box">$$\sigma(z) = \frac{1}{1 + e^{-z}}$$</div>
+<p> The maximum value of the derivative occurs at \(z = 0\) where \(\sigma'(0) = 0.25\). As \(|z|\) grows, the derivative exponentially approaches zero. In deep networks, multiplying terms smaller than 0.25 layer after layer causes gradients to vanish, stopping early layers from updating weights.</p>
                     </div>
                     <div class="sub-topic" id="sub-1-2">
                         <h3>1.2 Mathematical Proof with Extreme Inputs</h3>
-                        <p>Consider a single neuron update rule: \(w_{\text{new}} = w_{\text{old}} - \alpha (\hat{y} - y) f'(z) x\). Let \(x=1, w=6, b=0, y=0, \alpha=1\). Then \(z = 6\). Computing \(\sigma(6) = 0.997521\), so error \((\hat{y} - y) = 0.997521\). However, the derivative \(\sigma'(6) = 0.997521 \times (1 - 0.997521) = 0.002472\). The weight update step is \(\Delta w = 1 \cdot (0.997521) \cdot (0.002472) \cdot 1 = 0.002466\). Despite the model being completely wrong (predicting 0.997 vs true 0), the weight barely changes!</p>
+                        <p>Consider a single neuron update rule: \(w_{\text{new}} = w_{\text{old}} - \alpha (\hat{y} - y) f'(z) x\). Let \(x=1, w=6, b=0, y=0, \alpha=1\). Then \(z = 6\). Computing \(\sigma(6) = 0.997521\), so error \((\hat{y} - y) = 0.997521\). However, the derivative \(\sigma'(6) = 0.997521 \times (1 - 0.997521) = 0.002472\).</p>
+                        
+                        <div class="box box-orange">
+                            <div class="box-title">The Contradiction</div>
+                            <p>Error was 99.75% of maximum, yet the step was only 0.0025. The culprit:</p>
+                            <div class="formula-box">Vanishing Gradient: When |z| is large, sigmoid is flat &rarr; &sigma;'(z) &approx; 0 &rarr; gradient &approx; 0 &rarr; no learning</div>
+                        </div>
+                    </div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('short-notes').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
                     </div>
                 </div>
-            </article>
+            </section>
 
             <!-- Topic 2 -->
-            <article class="topic-card" id="topic-2">
-                <div class="topic-header">
-                    <span class="topic-number">Topic 02</span>
+            <section class="topic-section" id="topic-2">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
                     <h2>2. Rectified Linear Unit (ReLU)</h2>
                 </div>
-                <div class="topic-body">
+                <div class="collapsible-content" id="content-2" style="max-height: none;">
                     <div class="sub-topic" id="sub-2-1">
                         <h3>2.1 Definition and Derivative</h3>
-                        <p>ReLU is defined as \(f(z) = \max(0, z)\). Its derivative is constant: \(f'(z) = 1\) for \(z > 0\), and \(f'(z) = 0\) for \(z < 0\). Because the derivative is exactly 1 on the positive domain, gradients flow back without scaling down, eliminating vanishing gradients for active neurons.</p>
+                        <p>ReLU Definition: </p>
+<div class="formula-box">$$f(z) = \max(0, z)$$</div>
+<p>Its derivative is constant: <div class="formula-box">$$f'(z) = 1 \text{ if } z > 0 \text{ else } 0$$</div>
+<p> Because the derivative is exactly 1 on the positive domain, gradients flow back without scaling down, eliminating vanishing gradients for active neurons.</p>
                     </div>
                     <div class="sub-topic" id="sub-2-2">
                         <h3>2.2 Dying ReLU Problem</h3>
                         <p>When \(z \le 0\), ReLU derivative is 0. If a large negative update pushes a neuron's bias/weights such that \(z < 0\) for all training examples, the neuron will always output 0 and receive 0 gradient. It becomes permanently "dead" and cannot recover.</p>
                     </div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
                 </div>
-            </article>
+            </section>
 
             <!-- Topic 3 -->
-            <article class="topic-card" id="topic-3">
-                <div class="topic-header">
-                    <span class="topic-number">Topic 03</span>
+            <section class="topic-section" id="topic-3">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
                     <h2>3. Leaky ReLU & Parametric ReLU</h2>
                 </div>
-                <div class="topic-body">
+                <div class="collapsible-content" id="content-3" style="max-height: none;">
                     <div class="sub-topic" id="sub-3-1">
                         <h3>3.1 Fixing the Dead Slope</h3>
-                        <p>Leaky ReLU introduces a small non-zero slope \(\alpha\) (e.g., \(\alpha = 0.01\)) for negative inputs: \(f(z) = z\) if \(z > 0\) else \(\alpha z\). This ensures that even when \(z < 0\), the derivative is \(\alpha \neq 0\), preventing neurons from dying completely.</p>
+                        <p>Leaky ReLU Definition: </p>
+<div class="formula-box">$$f(z) = \begin{cases} z & \text{if } z > 0 \\ \alpha z & \text{if } z \le 0 \end{cases} \quad (\text{typically } \alpha = 0.01)$$</div>
+<p>This ensures that even when \(z < 0\), the derivative is \(\alpha \neq 0\), preventing neurons from dying completely.</p>
                     </div>
                     <div class="sub-topic" id="sub-3-2">
                         <h3>3.2 Gradient Flow on Negative Inputs</h3>
                         <p>In Parametric ReLU (PReLU), the slope \(\alpha\) is treated as a learnable parameter updated during backpropagation alongside weights, allowing the model to determine the optimal leakiness for each layer.</p>
                     </div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
                 </div>
-            </article>
+            </section>
 
             <!-- Topic 4 -->
-            <article class="topic-card" id="topic-4">
-                <div class="topic-header">
-                    <span class="topic-number">Topic 04</span>
+            <section class="topic-section" id="topic-4">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
                     <h2>4. Exponential Linear Unit (ELU)</h2>
                 </div>
-                <div class="topic-body">
+                <div class="collapsible-content" id="content-4" style="max-height: none;">
                     <div class="sub-topic" id="sub-4-1">
                         <h3>4.1 Smooth Exponential Saturation</h3>
-                        <p>ELU is defined as \(f(z) = z\) if \(z > 0\) else \(\alpha(e^z - 1)\). For negative inputs, ELU smoothly saturates to a negative asymptote \(-\alpha\). Its derivative for \(z \le 0\) is \(f'(z) = f(z) + \alpha = \alpha e^z\).</p>
+                        <p>ELU Definition: <div class="formula-box">$$f(z) = \begin{cases} z & \text{if } z > 0 \\ \alpha(e^z - 1) & \text{if } z \le 0 \end{cases}$$</div>
+<p>Derivative for \(z \le 0\): <div class="formula-box">$$f'(z) = f(z) + \alpha = \alpha e^z$$</div>
+<p></p>
                     </div>
                     <div class="sub-topic" id="sub-4-2">
                         <h3>4.2 Mean Shift Reduction</h3>
                         <p>By bringing the average activation closer to zero (unlike ReLU which is strictly non-negative), ELU speeds up learning and reduces bias shift across layers, though it incurs higher computation cost due to the exponential function.</p>
                     </div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
                 </div>
-            </article>
+            </section>
 
             <!-- Topic 5 -->
-            <article class="topic-card" id="topic-5">
-                <div class="topic-header">
-                    <span class="topic-number">Topic 05</span>
+            <section class="topic-section" id="topic-5">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
                     <h2>5. Softmax Output Layer</h2>
                 </div>
-                <div class="topic-body">
+                <div class="collapsible-content" id="content-5" style="max-height: none;">
                     <div class="sub-topic" id="sub-5-1">
                         <h3>5.1 Probability Distribution Calculation</h3>
-                        <p>For multi-class classification with \(K\) classes, Softmax converts raw logits \(z_1, z_2, \dots, z_K\) into a normalized probability distribution \(\hat{y}_i = \frac{e^{z_i}}{\sum_{j=1}^{K} e^{z_j}}\), ensuring \(\sum_{i=1}^K \hat{y}_i = 1\) and \(\hat{y}_i > 0\).</p>
+                        <p>For multi-class classification with \(K\) classes, Softmax converts raw logits \(z_1, z_2, \dots, z_K\) into a normalized probability distribution: </p>
+<div class="formula-box">$$\hat{y}_i = \frac{e^{z_i}}{\sum_{j=1}^{K} e^{z_j}} \quad \text{where } \sum_{i=1}^K \hat{y}_i = 1$$</div>
+<p></p>
                     </div>
                     <div class="sub-topic" id="sub-5-2">
                         <h3>5.2 Multi-class Classification Worked Example</h3>
@@ -196,16 +246,20 @@
                             <li>\(\hat{y}_3 = 1.105171 / 11.212509 = 0.098575\) (9.9%)</li>
                         </ul>
                     </div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Next Topic</button>
+                    </div>
                 </div>
-            </article>
+            </section>
 
             <!-- Topic 6 -->
-            <article class="topic-card" id="topic-6">
-                <div class="topic-header">
-                    <span class="topic-number">Topic 06</span>
+            <section class="topic-section" id="topic-6">
+                <div class="topic-header" onclick="toggleSection('content-6')">
+                    <div class="topic-number">6</div>
                     <h2>6. Activation Function Comparison & Choice</h2>
                 </div>
-                <div class="topic-body">
+                <div class="collapsible-content" id="content-6" style="max-height: none;">
                     <div class="sub-topic" id="sub-6-1">
                         <h3>6.1 Trade-off Matrix</h3>
                         <p><strong>Sigmoid:</strong> Output range (0,1). Pros: Smooth, probability interpretation. Cons: Vanishing gradient, not zero-centered.</p>
@@ -217,12 +271,17 @@
                         <h3>6.2 Practical Selection Guidelines</h3>
                         <p>Default to <strong>ReLU</strong> for hidden layers in standard feedforward and convolutional networks. Use <strong>Leaky ReLU</strong> or <strong>ELU</strong> if dead neurons hinder convergence. Use <strong>Softmax</strong> for multi-class classification outputs and <strong>Sigmoid</strong> for binary output layers.</p>
                     </div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
                 </div>
-            </article>
+            </section>
 
         </main>
     </div>
 
-    <script src="../js/main.js"></script>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script src="../js/script.js"></script>
 </body>
 </html>

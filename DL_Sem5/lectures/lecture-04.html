@@ -7,6 +7,10 @@
     <meta content="Study notes for Deep Learning, Lecture 04 covering Multilayer Perceptrons (MLPs), resolving the XOR problem, tensor notation, parameter counting, and backpropagation error flow." name="description"/>
     <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>04</text></svg>" rel="icon"/>
     <link href="../css/style.css" rel="stylesheet"/>
+    <!-- KaTeX for LaTeX rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}]});"></script>
 </head>
 <body>
     <header>
@@ -74,24 +78,26 @@
                         <li><a href="#sub-6-2">6.2 End-to-End Weight Update Walkthrough</a></li>
                     </ul>
                 </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
             </ul>
         </aside>
 
         <!-- Main Content -->
-        <main id="mainContent">
+        <main id="notesContent">
             <!-- Short Notes Summary Section -->
-            <section class="short-notes-section" id="short-notes">
-                <div class="short-notes-header">
-                    <div class="short-notes-title-group">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="short-notes-icon"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                        <h2>Executive Summary & Formula Sheet</h2>
+            <section class="topic-section" id="short-notes">
+                <div class="topic-header" onclick="toggleSection('content-short-notes')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
                     </div>
-                    <span class="badge">Lecture 04 Quick Ref</span>
+                    <h2>Executive Summary & Formula Sheet</h2>
                 </div>
-                <div class="short-notes-content">
+                <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
+
                     <p><strong>Core Concept:</strong> A single perceptron cannot solve non-linearly separable functions like XOR. Adding a hidden layer transforms space into a new feature representation where points become linearly separable. Backpropagation uses the chain rule to recursively compute loss gradients with respect to every weight across layers.</p>
-                    <div class="formula-block">
-                        <ul>
+                    <div class="box box-blue">
+                        <div class="box-title">Formula Sheet & Key Rules</div>
+                        <ul style="list-style:none; padding-left:0;">
                             <li><strong>Forward Pass:</strong> \(\mathbf{z}^{[l]} = \mathbf{W}^{[l]} \mathbf{a}^{[l-1]} + \mathbf{b}^{[l]}\), \(\mathbf{a}^{[l]} = g(\mathbf{z}^{[l]})\)</li>
                             <li><strong>Parameter Count:</strong> For layer with \(N_{\text{in}}\) inputs and \(N_{\text{out}}\) neurons: \(\text{Params} = (N_{\text{in}} \times N_{\text{out}}) + N_{\text{out}}\)</li>
                             <li><strong>Output Error Signal:</strong> \(\delta^{[L]} = (\hat{y} - y) \odot g'(\mathbf{z}^{[L]})\)</li>
@@ -99,16 +105,21 @@
                             <li><strong>Weight Update Gradient:</strong> \(\frac{\partial \mathcal{L}}{\partial \mathbf{W}^{[l]}} = \delta^{[l]} (\mathbf{a}^{[l-1]})^T\)</li>
                         </ul>
                     </div>
+                    <div class="topic-nav">
+                        <button class="btn" disabled="">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Next Topic</button>
+                    </div>
                 </div>
             </section>
 
             <!-- Topic 1 -->
-            <article class="topic-card" id="topic-1">
-                <div class="topic-header">
-                    <span class="topic-number">Topic 01</span>
+            <section class="topic-section" id="topic-1">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
                     <h2>1. Resolving XOR with Hidden Layers</h2>
                 </div>
-                <div class="topic-body">
+                <div class="collapsible-content" id="content-1" style="max-height: none;">
+
                     <div class="sub-topic" id="sub-1-1">
                         <h3>1.1 Why Single Linear Boundary Fails</h3>
                         <p>XOR truth table outputs 1 for (0,1) and (1,0), and outputs 0 for (0,0) and (1,1). No single straight line \(w_1 x_1 + w_2 x_2 + b = 0\) can separate (0,1) and (1,0) from (0,0) and (1,1) simultaneously because the convex hulls of the two sets intersect.</p>
@@ -117,16 +128,22 @@
                         <h3>1.2 Combining OR and NAND Gates</h3>
                         <p>XOR can be expressed logically as \(x_1 \oplus x_2 = (x_1 \lor x_2) \land \neg(x_1 \land x_2)\). In a network, one hidden neuron computes OR (\(h_1\)), another computes NAND (\(h_2\)), and the output neuron computes AND(\(h_1, h_2\)). The hidden layer re-maps 2D input space into a 2D hidden space where (0,0) becomes (0,1), (1,1) becomes (1,0), and (0,1)/(1,0) both map to (1,1)—making them linearly separable!</p>
                     </div>
+                
+                                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('short-notes').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
                 </div>
-            </article>
+            </section>
 
             <!-- Topic 2 -->
-            <article class="topic-card" id="topic-2">
-                <div class="topic-header">
-                    <span class="topic-number">Topic 02</span>
+            <section class="topic-section" id="topic-2">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
                     <h2>2. Multilayer Perceptron (MLP) Architecture</h2>
                 </div>
-                <div class="topic-body">
+                <div class="collapsible-content" id="content-2" style="max-height: none;">
+
                     <div class="sub-topic" id="sub-2-1">
                         <h3>2.1 Input, Hidden, and Output Layers</h3>
                         <p>An MLP consists of an input layer (pass-through nodes), one or more hidden layers (dense linear combinations followed by non-linear activations), and an output layer producing predictions \(\hat{y}\).</p>
@@ -135,19 +152,27 @@
                         <h3>2.2 Weight Matrix & Bias Vector Notation</h3>
                         <p>\(W_{ij}^{[l]}\) represents the weight connecting neuron \(j\) in layer \(l-1\) to neuron \(i\) in layer \(l\). Bias vector \(b_i^{[l]}\) shifts the linear sum for neuron \(i\) in layer \(l\).</p>
                     </div>
+                
+                                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
                 </div>
-            </article>
+            </section>
 
             <!-- Topic 3 -->
-            <article class="topic-card" id="topic-3">
-                <div class="topic-header">
-                    <span class="topic-number">Topic 03</span>
+            <section class="topic-section" id="topic-3">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
                     <h2>3. Parameter Counting Rules</h2>
                 </div>
-                <div class="topic-body">
+                <div class="collapsible-content" id="content-3" style="max-height: none;">
+
                     <div class="sub-topic" id="sub-3-1">
                         <h3>3.1 Formula for Layer Parameters</h3>
-                        <p>For a fully connected layer with \(N_{\text{in}}\) input nodes and \(N_{\text{out}}\) output nodes: number of weights = \(N_{\text{in}} \times N_{\text{out}}\), number of biases = \(N_{\text{out}}\). Total parameters = \(N_{\text{out}} \times (N_{\text{in}} + 1)\).</p>
+                        <p>For a fully connected layer with \(N_{\text{in}}\) input nodes and \(N_{\text{out}}\) output nodes: </p>
+<div class="formula-box">$$\text{Total Parameters} = N_{\text{out}} \times (N_{\text{in}} + 1)$$</div>
+<p></p>
                     </div>
                     <div class="sub-topic" id="sub-3-2">
                         <h3>3.2 Worked Example: 3-3-1 Network</h3>
@@ -158,53 +183,73 @@
                             <li>Total Network Parameters = \(12 + 4 = 16\)</li>
                         </ul>
                     </div>
+                
+                                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
                 </div>
-            </article>
+            </section>
 
             <!-- Topic 4 -->
-            <article class="topic-card" id="topic-4">
-                <div class="topic-header">
-                    <span class="topic-number">Topic 04</span>
+            <section class="topic-section" id="topic-4">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
                     <h2>4. Forward Propagation Equations</h2>
                 </div>
-                <div class="topic-body">
+                <div class="collapsible-content" id="content-4" style="max-height: none;">
+
                     <div class="sub-topic" id="sub-4-1">
                         <h3>4.1 Layer-wise Computation Flow</h3>
-                        <p>Starting from inputs \(\mathbf{a}^{[0]} = \mathbf{x}\), each layer computes linear pre-activation \(\mathbf{z}^{[l]} = \mathbf{W}^{[l]}\mathbf{a}^{[l-1]} + \mathbf{b}^{[l]}\) and applies activation \(\mathbf{a}^{[l]} = g(\mathbf{z}^{[l]})\) sequentially until reaching \(\mathbf{a}^{[L]} = \hat{y}\).</p>
+                        <p>Starting from inputs \(\mathbf{a}^{[0]} = \mathbf{x}\), each layer computes: </p>
+<div class="formula-box">$$\mathbf{z}^{[l]} = \mathbf{W}^{[l]}\mathbf{a}^{[l-1]} + \mathbf{b}^{[l]}, \quad \mathbf{a}^{[l]} = g(\mathbf{z}^{[l]})$$</div>
+<p></p>
                     </div>
                     <div class="sub-topic" id="sub-4-2">
                         <h3>4.2 Matrix-Vector Multiplication Form</h3>
                         <p>Vectorizing computations allows modern hardware (GPUs) to compute activations for thousands of samples simultaneously using matrix multiplication \(\mathbf{Z}^{[l]} = \mathbf{W}^{[l]}\mathbf{A}^{[l-1]} + \mathbf{b}^{[l]}\).</p>
                     </div>
+                
+                                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
                 </div>
-            </article>
+            </section>
 
             <!-- Topic 5 -->
-            <article class="topic-card" id="topic-5">
-                <div class="topic-header">
-                    <span class="topic-number">Topic 05</span>
+            <section class="topic-section" id="topic-5">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
                     <h2>5. Backpropagation Error Derivatives</h2>
                 </div>
-                <div class="topic-body">
+                <div class="collapsible-content" id="content-5" style="max-height: none;">
+
                     <div class="sub-topic" id="sub-5-1">
                         <h3>5.1 Output Layer Gradient Derivation</h3>
                         <p>For loss \(\mathcal{L} = \frac{1}{2}(\hat{y} - y)^2\) and output activation \(\hat{y} = g(z^{[L]})\):</p>
-                        <p>\(\delta^{[L]} = \frac{\partial \mathcal{L}}{\partial z^{[L]}} = \frac{\partial \mathcal{L}}{\partial \hat{y}} \frac{\partial \hat{y}}{\partial z^{[L]}} = (\hat{y} - y) g'(z^{[L]})\)</p>
+                        <div class="formula-box">$$\delta^{[L]} = \frac{\partial \mathcal{L}}{\partial z^{[L]}} = (\hat{y} - y) \odot g'(z^{[L]})$$</div>
                     </div>
                     <div class="sub-topic" id="sub-5-2">
                         <h3>5.2 Hidden Layer Error Signal Backpropagation</h3>
-                        <p>By applying the chain rule backward, the error signal \(\delta^{[l]}\) at hidden layer \(l\) is computed by taking the weighted sum of future error signals \(\mathbf{W}^{[l+1]T}\delta^{[l+1]}\) and multiplying elementwise by local activation derivative \(g'(\mathbf{z}^{[l]})\).</p>
+                        <p>Hidden Layer Error Signal Backpropagation:</p><div class="formula-box">$$\delta^{[l]} = (\mathbf{W}^{[l+1]T} \delta^{[l+1]}) \odot g'(\mathbf{z}^{[l]})$$</div><div class="formula-box">$$\frac{\partial \mathcal{L}}{\partial \mathbf{W}^{[l]}} = \delta^{[l]} (\mathbf{a}^{[l-1]})^T$$</div>
+                    </div>
+                
+                                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Next Topic</button>
                     </div>
                 </div>
-            </article>
+            </section>
 
             <!-- Topic 6 -->
-            <article class="topic-card" id="topic-6">
-                <div class="topic-header">
-                    <span class="topic-number">Topic 06</span>
+            <section class="topic-section" id="topic-6">
+                <div class="topic-header" onclick="toggleSection('content-6')">
+                    <div class="topic-number">6</div>
                     <h2>6. Numerical Backpropagation Step-by-Step</h2>
                 </div>
-                <div class="topic-body">
+                <div class="collapsible-content" id="content-6" style="max-height: none;">
+
                     <div class="sub-topic" id="sub-6-1">
                         <h3>6.1 Squared Error Loss Setup</h3>
                         <p>Given network input \(x=1\), target \(y=1\), learning rate \(\alpha=0.5\), weights \(w^{[1]}=0.5, b^{[1]}=0, w^{[2]}=0.8, b^{[2]}=0\), and Sigmoid activations.</p>
@@ -221,12 +266,18 @@
                             <li>\(\frac{\partial \mathcal{L}}{\partial w^{[1]}} = \delta^{[1]} x = -0.0167 \times 1 = -0.0167 \implies w^{[1]}_{\text{new}} = 0.5 - 0.5(-0.0167) = 0.5084\)</li>
                         </ul>
                     </div>
+                
+                                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
                 </div>
-            </article>
+            </section>
 
         </main>
     </div>
 
-    <script src="../js/main.js"></script>
+    <script src="../js/script.js"></script>
+<button id="backToTop" onclick="scrollToTop()">↑</button>
 </body>
 </html>

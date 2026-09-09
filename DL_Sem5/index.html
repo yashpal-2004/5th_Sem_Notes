@@ -35,7 +35,7 @@
             <li><a href="../MCA/index.html">Modern Computer Architecture</a></li>
             <li><a href="../archive.html">Archive</a></li>
         </ul>
-        <div class="nav-stats">2 Lectures &bull; 12 Topics</div>
+        <div class="nav-stats">7 Lectures &bull; 42 Topics</div>
     </nav>
 
     <!-- Lectures Section -->
@@ -51,8 +51,7 @@
                         <div class="lecture-checkbox" onclick="toggleComplete(event, 'dl-l1')" title="Toggle completion status"></div>
                     </div>
                     <h2>Where it Begins: The Neuron & Decision Boundaries</h2>
-                    <p>Biological neurons, McCulloch & Pitts threshold logic gates (AND, OR, NOT), perceptron
-                        forward/backward propagation, linear separation, and the XOR limitation.</p>
+                    <p>Biological neurons, McCulloch & Pitts threshold logic gates (AND, OR, NOT), perceptron forward/backward propagation, linear separation, and the XOR limitation.</p>
                     <div class="lecture-card-header">
                         <span class="lecture-tag">Foundations</span>
                         <span class="lecture-stats">5 Topics</span>
@@ -66,11 +65,80 @@
                         <div class="lecture-checkbox" onclick="toggleComplete(event, 'dl-l2')" title="Toggle completion status"></div>
                     </div>
                     <h2>The Activation Function and the Update Rule</h2>
-                    <p>Understanding linear combination vs activation functions, chain rule derivations for weight
-                        updates, step function limitations, Sigmoid derivative math, and Tanh updates.</p>
+                    <p>Understanding linear combination vs activation functions, chain rule derivations for weight updates, step function limitations, Sigmoid derivative math, and Tanh updates.</p>
                     <div class="lecture-card-header">
                         <span class="lecture-tag">Activation & Update</span>
                         <span class="lecture-stats">7 Topics</span>
+                    </div>
+                </a>
+
+                <!-- Lecture 03 -->
+                <a href="lectures/lecture-03.html" class="lecture-card" data-lecture-id="dl-l3">
+                    <div class="lecture-card-top">
+                        <div class="lecture-number">03</div>
+                        <div class="lecture-checkbox" onclick="toggleComplete(event, 'dl-l3')" title="Toggle completion status"></div>
+                    </div>
+                    <h2>Modern Activations & Vanishing Gradients</h2>
+                    <p>Deep dive into Vanishing Gradients, ReLU, Leaky ReLU, ELU, and Softmax output layer classification with step-by-step mathematical update calculations.</p>
+                    <div class="lecture-card-header">
+                        <span class="lecture-tag">Activations & Softmax</span>
+                        <span class="lecture-stats">6 Topics</span>
+                    </div>
+                </a>
+
+                <!-- Lecture 04 -->
+                <a href="lectures/lecture-04.html" class="lecture-card" data-lecture-id="dl-l4">
+                    <div class="lecture-card-top">
+                        <div class="lecture-number">04</div>
+                        <div class="lecture-checkbox" onclick="toggleComplete(event, 'dl-l4')" title="Toggle completion status"></div>
+                    </div>
+                    <h2>Multilayer Perceptrons & Backpropagation</h2>
+                    <p>Resolving XOR via hidden representations, 3-3-1 MLP matrix notation, parameter counting, and full backpropagation error flow derivations for output and hidden layers.</p>
+                    <div class="lecture-card-header">
+                        <span class="lecture-tag">MLP & Backprop</span>
+                        <span class="lecture-stats">6 Topics</span>
+                    </div>
+                </a>
+
+                <!-- Lecture 05 -->
+                <a href="lectures/lecture-05.html" class="lecture-card" data-lecture-id="dl-l5">
+                    <div class="lecture-card-top">
+                        <div class="lecture-number">05</div>
+                        <div class="lecture-checkbox" onclick="toggleComplete(event, 'dl-l5')" title="Toggle completion status"></div>
+                    </div>
+                    <h2>Optimization & Learning-Rate Control</h2>
+                    <p>Gradient descent geometric intuition, Batch GD vs. SGD vs. Mini-batch GD, learning rate diagnosis (too small, oscillation, divergence), and schedules (Step Decay, Cosine, Warmup).</p>
+                    <div class="lecture-card-header">
+                        <span class="lecture-tag">Optimization & LR</span>
+                        <span class="lecture-stats">6 Topics</span>
+                    </div>
+                </a>
+
+                <!-- Lecture 06 -->
+                <a href="lectures/lecture-06.html" class="lecture-card" data-lecture-id="dl-l6">
+                    <div class="lecture-card-top">
+                        <div class="lecture-number">06</div>
+                        <div class="lecture-checkbox" onclick="toggleComplete(event, 'dl-l6')" title="Toggle completion status"></div>
+                    </div>
+                    <h2>Gradient Descent Mechanics & Loss Landscapes</h2>
+                    <p>Mathematical exploration of contours, steepness vs step size, local directional slope, loss surface trajectories, and choosing learning rate multipliers.</p>
+                    <div class="lecture-card-header">
+                        <span class="lecture-tag">Gradient Descent</span>
+                        <span class="lecture-stats">6 Topics</span>
+                    </div>
+                </a>
+
+                <!-- Lecture 07 -->
+                <a href="lectures/lecture-07.html" class="lecture-card" data-lecture-id="dl-l7">
+                    <div class="lecture-card-top">
+                        <div class="lecture-number">07</div>
+                        <div class="lecture-checkbox" onclick="toggleComplete(event, 'dl-l7')" title="Toggle completion status"></div>
+                    </div>
+                    <h2>Optimizers with Memory: Momentum, NAG, AdaGrad & Adam</h2>
+                    <p>EWMA smoothing, Momentum direction accumulation, Nesterov Accelerated Gradient (lookahead), AdaGrad/RMSProp per-coordinate scaling, and Adam/AdamW combined momentum decay.</p>
+                    <div class="lecture-card-header">
+                        <span class="lecture-tag">Adaptive Optimizers</span>
+                        <span class="lecture-stats">6 Topics</span>
                     </div>
                 </a>
 
@@ -83,16 +151,16 @@
         <h3 class="stats-title">DL Notes Metrics</h3>
         <div class="stats-grid">
             <div class="stat-item">
-                <div class="stat-val">2</div>
+                <div class="stat-val">7</div>
                 <div class="stat-label">Lectures Compiled</div>
             </div>
             <div class="stat-item">
-                <div class="stat-val">12</div>
+                <div class="stat-val">42</div>
                 <div class="stat-label">Topics</div>
             </div>
             <div class="stat-item">
-                <div class="stat-val">2</div>
-                <div class="stat-label">Diagrams Embedded</div>
+                <div class="stat-val">18</div>
+                <div class="stat-label">Diagrams & Worksheets</div>
             </div>
             <div class="stat-item">
                 <div class="stat-val">0%</div>
@@ -203,11 +271,11 @@
 
         function updateProgress() {
             const cards = document.querySelectorAll('.lecture-card');
-            const completed = document.querySelectorAll('.lecture-card.completed').length;
-            const rate = cards.length ? Math.round((completed / cards.length) * 100) : 0;
-            const progressVal = document.querySelector('.stats-grid .stat-item:last-child .stat-val');
-            if (progressVal) {
-                progressVal.innerText = rate + '%';
+            const completed = document.querySelectorAll('.lecture-card.completed');
+            const pct = cards.length > 0 ? Math.round((completed.length / cards.length) * 100) : 0;
+            const statsGrid = document.querySelector('.stats-grid');
+            if (statsGrid && statsGrid.children[3]) {
+                statsGrid.children[3].querySelector('.stat-val').innerText = pct + '%';
             }
         }
     </script>
