@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Modern Computer Architecture - Lecture 04</title>
+    <meta
+        content="Study notes for Modern Computer Architecture (CSA222), Lecture 04 covering Number Systems (Binary, Decimal, Hexadecimal), Signed Integers (Sign-Magnitude, 1's & 2's Complement), Binary Arithmetic, and Hardware Overflow Detection."
+        name="description" />
+    <link
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>04</text></svg>"
+        rel="icon" />
+    <link href="../css/style.css" rel="stylesheet" />
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}]});"></script>
+</head>
+
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Modern Computer Architecture</h1>
+            <p>Lecture 04 - Number Systems, Two's Complement & Overflow</p>
+            <a href="../index.html"
+                style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">←
+                Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/4.pdf"
+                style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;"
+                target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text" />
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 5</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            style="vertical-align: text-bottom; margin-right: 4px;">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>Short Notes</a></li>
+                <li>
+                    <a href="#topic-1">1. Positional Notation & Conversions<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 Binary, Decimal & Hexadecimal Bases</a></li>
+                        <li><a href="#sub-1-2">1.2 Conversion Methods & Powers of 2</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Signed Integers & Representations<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 Sign-Magnitude Representation</a></li>
+                        <li><a href="#sub-2-2">2.2 1's Complement Representation</a></li>
+                        <li><a href="#sub-2-3">2.3 2's Complement: The Hardware Winner</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Two's Complement Operations<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 Negation Algorithm (Invert + 1)</a></li>
+                        <li><a href="#sub-3-2">3.2 Unified Adder for Addition & Subtraction</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Arithmetic Overflow Detection<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 Unsigned Carry vs. Signed Overflow</a></li>
+                        <li><a href="#sub-4-2">4.2 Hardware Overflow Rule (\(C_{\text{in}} \oplus C_{\text{out}}\))</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Real-World Systems & Common Pitfalls<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 Real Failures (Ariane 5 & Gangnam Style)</a></li>
+                        <li><a href="#sub-5-2">5.2 Sign Extension & Casting Bugs</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round"
+                            stroke-linejoin="round" stroke-width="2"
+                            style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" x2="8" y1="13" y2="13"></line>
+                            <line x1="16" x2="8" y1="17" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>Original PDF</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Short Notes -->
+            <section id="short-notes" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-short-notes')">
+                    <div class="topic-number"
+                        style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                    </div>
+                    <h2>Short Notes &amp; Visual Summary</h2>
+                </div>
+                <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
+                    <p style="margin-bottom: 1rem;">Quick summary and key rules for Lecture 04:</p>
+                    
+                    <div class="box box-blue">
+                        <div class="box-title">Key Rules & Range Formulas</div>
+                        <ul>
+                            <li><strong>Unsigned \(n\)-bit Range:</strong> \(0 \text{ to } 2^n - 1\) (8-bit: \(0 \text{ to } 255\))</li>
+                            <li><strong>2's Complement \(n\)-bit Range:</strong> \(-2^{n-1} \text{ to } +2^{n-1} - 1\) (8-bit: \(-128 \text{ to } +127\))</li>
+                            <li><strong>2's Complement Negation Shortcut:</strong> Invert all bits and add 1 (\(-X = \bar{X} + 1\)).</li>
+                            <li><strong>Unified Subtraction Rule:</strong> \(A - B = A + (\bar{B} + 1)\). Subtraction is executed on an adder by setting \(C_{\text{in}}=1\) and inverting input \(B\).</li>
+                            <li><strong>Hardware Signed Overflow Formula:</strong> \(\text{Overflow} = C_{\text{in, MSB}} \oplus C_{\text{out, MSB}}\) (Overflow occurs if carry into MSB differs from carry out of MSB).</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 1 -->
+            <section class="topic-section" id="topic-1">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>Positional Notation & Conversions</h2>
+                </div>
+                <div class="collapsible-content" id="content-1">
+                    <h3 id="sub-1-1">1.1 Binary, Decimal & Hexadecimal Bases</h3>
+                    <p>Bits in silicon carry no inherent human meaning—a pattern of 8 bits like <code>11111111</code> is just a physical voltage state. The interpretation of binary sequences is a software/hardware convention.</p>
+                    <p>In positional numbering systems, the total value is calculated by multiplying each digit by its base raised to its position index:</p>
+                    <div class="formula-box">
+                        \(\text{Value} = \sum_{i=0}^{n-1} d_i \times b^i\)
+                    </div>
+                    <ul>
+                        <li><strong>Decimal (Base 10):</strong> Uses digits 0–9. Weights are powers of 10 (\(10^0=1, 10^1=10, 10^2=100\)).</li>
+                        <li><strong>Binary (Base 2):</strong> Uses digits 0 and 1. Weights are powers of 2 (\(1, 2, 4, 8, 16, 32, 64, 128\)).</li>
+                        <li><strong>Hexadecimal (Base 16):</strong> Uses digits 0–9 and letters A–F (\(A=10, B=11, C=12, D=13, E=14, F=15\)). Hex provides a compact representation where <strong>1 hex digit represents exactly 4 binary bits (a nibble)</strong>.</li>
+                    </ul>
+
+                    <h3 id="sub-1-2">1.2 Conversion Methods & Powers of 2</h3>
+                    <p>Fast conversions between representations are mandatory skills for low-level systems programming:</p>
+                    <div class="box box-green">
+                        <div class="box-title">Conversion Recipes</div>
+                        <ul>
+                            <li><strong>Binary to Decimal:</strong> Sum the positional weights of all 1-bits (e.g., \(101010_2 = 32 + 8 + 2 = 42_{10}\)).</li>
+                            <li><strong>Decimal to Binary:</strong> Repeatedly divide by 2 and read the remainders from bottom to top.</li>
+                            <li><strong>Hex to Binary:</strong> Convert each hex character into its 4-bit binary equivalent (e.g., \(\text{0x2A} \implies 2=0010_2, A=1010_2 \implies 00101010_2\)).</li>
+                        </ul>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" disabled="">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section class="topic-section" id="topic-2">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>Signed Integers & Representations</h2>
+                </div>
+                <div class="collapsible-content" id="content-2">
+                    <h3 id="sub-2-1">2.1 Sign-Magnitude Representation</h3>
+                    <p>To store negative numbers in binary, hardware engineers evaluated three historical formats. The simplest conceptual scheme is <strong>Sign-Magnitude</strong>, which reserves the most significant bit (MSB) as a sign flag (\(0 = \text{positive}, 1 = \text{negative}\)) while the remaining bits store the absolute magnitude.</p>
+                    
+                    <div class="box box-red">
+                        <div class="box-title">Fatal Defects of Sign-Magnitude</div>
+                        <ul>
+                            <li><strong>Dual Zero Problem:</strong> Contains two distinct bit patterns for zero: \(+0 = 00000000_2\) and \(-0 = 10000000_2\). This wastes silicon and complicates equality comparisons.</li>
+                            <li><strong>Separate ALU Hardware:</strong> Standard binary adders fail when adding a positive and negative number (e.g., \(+5 + (-5) \neq 0\)). Subtracting requires building a dedicated hardware subtractor unit.</li>
+                        </ul>
+                    </div>
+
+                    <h3 id="sub-2-2">2.2 1's Complement Representation</h3>
+                    <p><strong>1's Complement</strong> negates a number by inverting every bit (bitwise NOT). While it simplifies negation, it still suffers from two zeros (\(+0 = 00000000_2\) and \(-0 = 11111111_2\)) and requires end-around carry logic during addition.</p>
+
+                    <h3 id="sub-2-3">2.3 2's Complement: The Hardware Winner</h3>
+                    <p><strong>2's Complement</strong> is the universal standard for signed integer arithmetic in modern computers. It assigns a <strong>negative weight to the MSB</strong> (\(-2^{n-1}\)).</p>
+
+                    <div class="box box-blue">
+                        <div class="box-title">8-Bit 2's Complement Properties</div>
+                        <p><strong>MSB Weight:</strong> \(-128\). Other bit weights: \(+64, +32, +16, +8, +4, +2, +1\).</p>
+                        <ul>
+                            <li>\(+127 = 01111111_2 = (0 + 64 + 32 + 16 + 8 + 4 + 2 + 1)\)</li>
+                            <li>\(-128 = 10000000_2 = (-128 + 0)\)</li>
+                            <li>\(-1 = 11111111_2 = (-128 + 64 + 32 + 16 + 8 + 4 + 2 + 1)\)</li>
+                            <li>\(0 = 00000000_2\) (Exactly one unique zero representation!).</li>
+                        </ul>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section class="topic-section" id="topic-3">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>Two's Complement Operations</h2>
+                </div>
+                <div class="collapsible-content" id="content-3">
+                    <h3 id="sub-3-1">3.1 Negation Algorithm (Invert + 1)</h3>
+                    <p>To compute the negative equivalent of any number \(-X\) in 2's complement hardware:</p>
+                    
+                    <div class="formula-box">
+                        \(-X = \bar{X} + 1\)
+                    </div>
+
+                    <p><strong>Step-by-Step Example (Find \(-5\) in 8 bits):</strong></p>
+                    <ol>
+                        <li>Write \(+5\) in binary: <code>00000101</code></li>
+                        <li>Invert all bits (bitwise NOT): <code>11111010</code></li>
+                        <li>Add 1 to the result: <code>11111011</code> (This is \(-5\)).</li>
+                    </ol>
+
+                    <h3 id="sub-3-2">3.2 Unified Adder for Addition & Subtraction</h3>
+                    <p>The elegance of 2's complement is that <strong>subtraction is identical to addition of a negative number</strong> (\(A - B = A + (-B) = A + \bar{B} + 1\)).</p>
+
+                    <div class="box box-green">
+                        <div class="box-title">Unified Hardware Adder/Subtractor</div>
+                        <p>A single binary adder circuit performs both addition and subtraction. By feeding input \(B\) through XOR gates controlled by a <code>SUB</code> control signal and connecting <code>SUB</code> to the adder's initial carry-in (\(C_{\text{in}}\)):</p>
+                        <ul>
+                            <li>When <code>SUB = 0</code>: Passes \(B\) unchanged and \(C_{\text{in}}=0 \implies \text{Output} = A + B\).</li>
+                            <li>When <code>SUB = 1</code>: Inverts \(B\) to \(\bar{B}\) and sets \(C_{\text{in}}=1 \implies \text{Output} = A + \bar{B} + 1 = A - B\).</li>
+                        </ul>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section class="topic-section" id="topic-4">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>Arithmetic Overflow Detection</h2>
+                </div>
+                <div class="collapsible-content" id="content-4">
+                    <h3 id="sub-4-1">4.1 Unsigned Carry vs. Signed Overflow</h3>
+                    <p>Fixed-width registers cannot hold results that exceed their bit-width bounds. However, hardware distinguishes between two distinct types of out-of-range conditions:</p>
+                    <ul>
+                        <li><strong>Unsigned Carry Flag (\(C\)):</strong> Indicates that an unsigned operation exceeded \(2^n - 1\). Signified when the adder's final carry-out (\(C_{\text{out}}\)) equals 1.</li>
+                        <li><strong>Signed Overflow Flag (\(V\)):</strong> Indicates that a signed operation exceeded the 2's complement range (\([-128, +127]\) for 8 bits). Adding two positive numbers yields a negative result, or adding two negative numbers yields a positive result.</li>
+                    </ul>
+
+                    <h3 id="sub-4-2">4.2 Hardware Overflow Rule (\(C_{\text{in}} \oplus C_{\text{out}}\))</h3>
+                    <p>Computer hardware detects signed overflow instantaneously using a single XOR gate connected to the most significant bit (MSB) adder stage:</p>
+
+                    <div class="formula-box">
+                        \(\text{Overflow } (V) = C_{\text{in, MSB}} \oplus C_{\text{out, MSB}}\)
+                    </div>
+
+                    <div class="box box-orange">
+                        <div class="box-title">Overflow Rule Summary</div>
+                        <p>Signed overflow occurs <strong>if and only if</strong> the carry brought INTO the sign bit position differs from the carry generated OUT OF the sign bit position.</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 5 -->
+            <section class="topic-section" id="topic-5">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>Real-World Systems & Common Pitfalls</h2>
+                </div>
+                <div class="collapsible-content" id="content-5">
+                    <h3 id="sub-5-1">5.1 Real Failures (Ariane 5 & Gangnam Style)</h3>
+                    <p>Integer overflow and casting mismatches cause catastrophic software and hardware failures:</p>
+                    <ul>
+                        <li><strong>Ariane 5 Rocket Explosion (1996):</strong> A 64-bit floating-point value was cast into a 16-bit signed integer. The value exceeded 32,767, triggering an unhandled overflow exception that shut down the flight computer 37 seconds after launch, destroying a $500 million rocket.</li>
+                        <li><strong>YouTube Gangnam Style View Counter (2014):</strong> YouTube stored video view counts as a signed 32-bit integer (max value \(2,147,483,647\)). When Gangnam Style exceeded this limit, the counter wrapped around to negative numbers, forcing YouTube to upgrade view counters to 64-bit integers.</li>
+                    </ul>
+
+                    <h3 id="sub-5-2">5.2 Sign Extension & Casting Bugs</h3>
+                    <p>When expanding a smaller signed integer into a larger register (e.g., 8-bit to 32-bit), hardware must perform <strong>Sign Extension</strong> by replicating the MSB sign bit across all newly added upper bit positions (e.g., \(-5 = 11111011_2 \implies 11111111111111111111111111111011_2\)). Zero extension is used for unsigned data types.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <a href="lecture-05.html" class="btn"
+                            style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;">Next
+                            Lecture</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number"
+                        style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round"
+                            stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" x2="8" y1="13" y2="13"></line>
+                            <line x1="16" x2="8" y1="17" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for your reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()"
+                        style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous
+                            Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/4.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+
+</html>

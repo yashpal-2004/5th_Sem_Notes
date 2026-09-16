@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Modern Computer Architecture - Lecture 08</title>
+    <meta
+        content="Study notes for Modern Computer Architecture (CSA222), Lecture 08 covering Flip-Flop Types (SR, D, JK, T), Registers & Shift Registers, Asynchronous & Synchronous Counters, and Clock Frequency Dividers."
+        name="description" />
+    <link
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>08</text></svg>"
+        rel="icon" />
+    <link href="../css/style.css" rel="stylesheet" />
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}]});"></script>
+</head>
+
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Modern Computer Architecture</h1>
+            <p>Lecture 08 - Flip-Flop Types, Registers & Digital Counters</p>
+            <a href="../index.html"
+                style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">←
+                Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/8 Part_1.pdf"
+                style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;"
+                target="_blank">Open PDF Part 1 ↗</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/8 Part_2.pdf"
+                style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;"
+                target="_blank">Open PDF Part 2 ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text" />
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 5</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            style="vertical-align: text-bottom; margin-right: 4px;">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>Short Notes</a></li>
+                <li>
+                    <a href="#topic-1">1. The Flip-Flop Toolkit (SR, D, JK, T)<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 Characteristic Tables & Equations</a></li>
+                        <li><a href="#sub-1-2">1.2 JK Flip-Flop: Eliminating Forbidden State</a></li>
+                        <li><a href="#sub-1-3">1.3 T Flip-Flop: The Toggle & Counting Engine</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Multi-Bit Registers & Shift Registers<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 Parallel Load Registers with Clock Enable</a></li>
+                        <li><a href="#sub-2-2">2.2 Shift Registers (SISO, SIPO, PISO, PIPO)</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Asynchronous (Ripple) Counters<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 T Flip-Flop Frequency Divider (\(\div 2\))</a></li>
+                        <li><a href="#sub-3-2">3.2 Ripple Counter Ripple Delay & Glitch Limitations</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Synchronous Counters<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 Shared Clock Architecture & Lookahead Gates</a></li>
+                        <li><a href="#sub-4-2">4.2 Up/Down & Modulo-N Counter Design</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Practical Applications & Trade-offs<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 Timers, Baud Rate Generators & PWM</a></li>
+                        <li><a href="#sub-5-2">5.2 Excitation Tables & Counter Design Recipe</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round"
+                            stroke-linejoin="round" stroke-width="2"
+                            style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" x2="8" y1="13" y2="13"></line>
+                            <line x1="16" x2="8" y1="17" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>Original PDF</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Short Notes -->
+            <section id="short-notes" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-short-notes')">
+                    <div class="topic-number"
+                        style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                    </div>
+                    <h2>Short Notes &amp; Visual Summary</h2>
+                </div>
+                <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
+                    <p style="margin-bottom: 1rem;">Quick summary and key equations for Lecture 08:</p>
+                    
+                    <div class="box box-blue">
+                        <div class="box-title">Flip-Flop Characteristic Equations</div>
+                        <ul>
+                            <li><strong>D Flip-Flop:</strong> \(Q(n+1) = D\) (Data delay/copy).</li>
+                            <li><strong>JK Flip-Flop:</strong> \(Q(n+1) = J\bar{Q}_n + \bar{K}Q_n\) (\(J=1,K=1 \implies \text{Toggle }\bar{Q}_n\)).</li>
+                            <li><strong>T Flip-Flop:</strong> \(Q(n+1) = T \oplus Q_n\) (\(T=1 \implies \text{Toggle}\), \(T=0 \implies \text{Hold}\)).</li>
+                            <li><strong>Frequency Division Rule:</strong> A T flip-flop with \(T=1\) divides clock frequency by 2 (\(f_{\text{out}} = f_{\text{clk}} / 2^N\) for \(N\) stages).</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 1 -->
+            <section class="topic-section" id="topic-1">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>The Flip-Flop Toolkit (SR, D, JK, T)</h2>
+                </div>
+                <div class="collapsible-content" id="content-1">
+                    <h3 id="sub-1-1">1.1 Characteristic Tables & Equations</h3>
+                    <p>While a single flip-flop stores 1 bit, different internal gating designs determine how the stored bit updates on a clock edge. The four fundamental types constitute the complete digital design toolkit:</p>
+
+                    <div class="box box-blue">
+                        <div class="box-title">Characteristic Equations Summary</div>
+                        <ul>
+                            <li><strong>SR Flip-Flop:</strong> \(Q(n+1) = S + \bar{R}Q_n\) (Constraint: \(S \cdot R = 0\)).</li>
+                            <li><strong>D Flip-Flop:</strong> \(Q(n+1) = D\) (Default building block for CPU registers).</li>
+                            <li><strong>JK Flip-Flop:</strong> \(Q(n+1) = J\bar{Q}_n + \bar{K}Q_n\) (Universal flip-flop).</li>
+                            <li><strong>T Flip-Flop:</strong> \(Q(n+1) = T \oplus Q_n\) (Dedicated counting engine).</li>
+                        </ul>
+                    </div>
+
+                    <h3 id="sub-1-2">1.2 JK Flip-Flop: Eliminating Forbidden State</h3>
+                    <p>The <strong>JK Flip-Flop</strong> reclaims the illegal \(S=R=1\) state of the SR latch. When \(J=1\) and \(K=1\), the output <strong>toggles</strong> to its complement (\(Q \to \bar{Q}\)) on every clock edge without any race condition.</p>
+
+                    <h3 id="sub-1-3">1.3 T Flip-Flop: The Toggle & Counting Engine</h3>
+                    <p>By tying inputs \(J\) and \(K\) together into a single terminal \(T\), we form the <strong>T (Toggle) Flip-Flop</strong>:</p>
+                    <ul>
+                        <li>\(T = 0 \implies Q(n+1) = Q_n\) (Hold state).</li>
+                        <li>\(T = 1 \implies Q(n+1) = \bar{Q}_n\) (Toggle state).</li>
+                    </ul>
+
+                    <div class="topic-nav">
+                        <button class="btn" disabled="">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section class="topic-section" id="topic-2">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>Multi-Bit Registers & Shift Registers</h2>
+                </div>
+                <div class="collapsible-content" id="content-2">
+                    <h3 id="sub-2-1">2.1 Parallel Load Registers with Clock Enable</h3>
+                    <p>An \(N\)-bit register consists of \(N\) D flip-flops sharing a single clock line. To prevent overwriting the stored word on every cycle, each flip-flop is preceded by a 2:1 MUX controlled by a <strong>Load / Write-Enable (\(WE\))</strong> signal:</p>
+
+                    <div class="formula-box">
+                        \(D_i = WE \cdot \text{NewData}_i + \overline{WE} \cdot Q_i\)
+                    </div>
+
+                    <h3 id="sub-2-2">2.2 Shift Registers (SISO, SIPO, PISO, PIPO)</h3>
+                    <p>Connecting the output of flip-flop \(k\) to the input of flip-flop \(k+1\) creates a <strong>Shift Register</strong> that moves stored bits one position right or left on each clock pulse.</p>
+
+                    <div class="box box-green">
+                        <div class="box-title">Shift Register Topologies</div>
+                        <ul>
+                            <li><strong>SISO (Serial-In Serial-Out):</strong> Used for data delay lines and serial communication (UART).</li>
+                            <li><strong>SIPO (Serial-In Parallel-Out):</strong> Converts incoming serial byte streams into parallel 8-bit bus words.</li>
+                            <li><strong>PISO (Parallel-In Serial-Out):</strong> Converts parallel CPU register data into serial signals for transmission.</li>
+                            <li><strong>PIPO (Parallel-In Parallel-Out):</strong> Standard CPU pipeline register.</li>
+                        </ul>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section class="topic-section" id="topic-3">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>Asynchronous (Ripple) Counters</h2>
+                </div>
+                <div class="collapsible-content" id="content-3">
+                    <h3 id="sub-3-1">3.1 T Flip-Flop Frequency Divider (\(\div 2\))</h3>
+                    <p>Holding input \(T = 1\) on a flip-flop causes its output \(Q\) to toggle on every active clock edge. Because output \(Q\) completes one full cycle for every two input clock cycles, it functions as an exact <strong>divide-by-2 frequency divider</strong>.</p>
+
+                    <h3 id="sub-3-2">3.2 Ripple Counter Ripple Delay & Glitch Limitations</h3>
+                    <p>In an <strong>Asynchronous (Ripple) Counter</strong>, the external clock drives only the least significant bit (LSB) flip-flop. The output \(Q_k\) of stage \(k\) serves as the clock input for stage \(k+1\).</p>
+
+                    <div class="box box-red">
+                        <div class="box-title">The Ripple Carry Bottleneck</div>
+                        <p>Because the clock ripples sequentially through each stage, propagation delays accumulate linearly (\(N \times t_{\text{pcq}}\)). During state transitions (e.g., \(011_2 \to 100_2\)), intermediate transient states produce decoding glitches. Consequently, high-speed CPUs never use ripple counters.</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section class="topic-section" id="topic-4">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>Synchronous Counters</h2>
+                </div>
+                <div class="collapsible-content" id="content-4">
+                    <h3 id="sub-4-1">4.1 Shared Clock Architecture & Lookahead Gates</h3>
+                    <p>A <strong>Synchronous Counter</strong> connects the external clock line to <strong>every flip-flop simultaneously</strong>. All bit transitions occur at the exact same instant, eliminating ripple delays and decoding glitches.</p>
+                    <p>Each T flip-flop's toggle input \(T_k\) is driven by lookahead AND gates evaluating preceding bits:</p>
+                    <div class="formula-box">
+                        \(T_0 = 1, \quad T_1 = Q_0, \quad T_2 = Q_0 \cdot Q_1, \quad T_3 = Q_0 \cdot Q_1 \cdot Q_2\)
+                    </div>
+
+                    <h3 id="sub-4-2">4.2 Up/Down & Modulo-N Counter Design</h3>
+                    <p>Adding control MUXes permits switching between counting up (\(0, 1, 2...\)) and counting down. Adding clear logic when reaching a target count creates a <strong>Modulo-N Counter</strong> (e.g., Modulo-10 BCD counter).</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 5 -->
+            <section class="topic-section" id="topic-5">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>Practical Applications & Trade-offs</h2>
+                </div>
+                <div class="collapsible-content" id="content-5">
+                    <h3 id="sub-5-1">5.1 Timers, Baud Rate Generators & PWM</h3>
+                    <p>Digital counters are essential building blocks across processor microarchitecture and embedded microcontrollers:</p>
+                    <ul>
+                        <li><strong>Program Counter (PC):</strong> Holds the memory address of the next instruction to fetch, incrementing on each cycle.</li>
+                        <li><strong>Baud Rate Generators:</strong> Divide high-frequency system clocks down to precise UART serial frequencies (e.g., 115,200 bps).</li>
+                        <li><strong>Pulse Width Modulation (PWM):</strong> Controls motor speed and LED brightness by comparing a free-running counter against a threshold register.</li>
+                    </ul>
+
+                    <h3 id="sub-5-2">5.2 Excitation Tables & Counter Design Recipe</h3>
+                    <p>Designing custom counters (e.g., non-sequential sequence \(0 \to 2 \to 5 \to 1 \to 0\)) requires an <strong>Excitation Table</strong>—a reverse lookup table indicating what inputs (\(D, JK, \text{or } T\)) must be applied to achieve a desired state transition (\(Q_n \to Q_{n+1}\)).</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <a href="lecture-09.html" class="btn"
+                            style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;">Next
+                            Lecture</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number"
+                        style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round"
+                            stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" x2="8" y1="13" y2="13"></line>
+                            <line x1="16" x2="8" y1="17" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below are the original PDF documents for your reference:</p>
+                    <button class="btn" id="loadPdfBtn1" onclick="loadPDF(1)"
+                        style="margin-top: 1rem; display: block;">Load Original PDF Part 1</button>
+                    <div id="pdfContainer1" style="margin-top: 1rem;"></div>
+
+                    <button class="btn" id="loadPdfBtn2" onclick="loadPDF(2)"
+                        style="margin-top: 1rem; display: block;">Load Original PDF Part 2</button>
+                    <div id="pdfContainer2" style="margin-top: 1rem;"></div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous
+                            Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF(part) {
+            const container = document.getElementById('pdfContainer' + part);
+            const btn = document.getElementById('loadPdfBtn' + part);
+            const pdfFile = part === 1 ? '8 Part_1.pdf' : '8 Part_2.pdf';
+            if (container.innerHTML === '') {
+                container.innerHTML = `<embed src="../pdfs/${pdfFile}" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />`;
+                btn.innerText = `Hide PDF Part ${part}`;
+            } else {
+                container.innerHTML = '';
+                btn.innerText = `Load Original PDF Part ${part}`;
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Modern Computer Architecture - Lecture 06</title>
+    <meta
+        content="Study notes for Modern Computer Architecture (CSA222), Lecture 06 covering Latches, Flip-Flops & Timing: Level vs. Edge Triggering, Master-Slave D Flip-Flops, Setup Time, Hold Time, and Timing Violations."
+        name="description" />
+    <link
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>06</text></svg>"
+        rel="icon" />
+    <link href="../css/style.css" rel="stylesheet" />
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}]});"></script>
+</head>
+
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Modern Computer Architecture</h1>
+            <p>Lecture 06 - Latches, Flip-Flops & Timing Foundations</p>
+            <a href="../index.html"
+                style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">←
+                Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/6.pdf"
+                style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;"
+                target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text" />
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 5</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            style="vertical-align: text-bottom; margin-right: 4px;">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>Short Notes</a></li>
+                <li>
+                    <a href="#topic-1">1. Level vs. Edge Triggering<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 Level-Sensitive Window vs. Edge Moment</a></li>
+                        <li><a href="#sub-1-2">1.2 Why Registers Require Edge Triggering</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Master-Slave D Flip-Flop<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 Two-Stage Airlock Architecture</a></li>
+                        <li><a href="#sub-2-2">2.2 Step-by-Step Clock Phase Hand-off</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Latch vs. Flip-Flop Comparison<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 Comprehensive Architectural Matrix</a></li>
+                        <li><a href="#sub-3-2">3.2 Schematic Symbol Recognition</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Timing Parameters: Setup & Hold<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 Setup Time (\(t_{\text{setup}}\)) Definition</a></li>
+                        <li><a href="#sub-4-2">4.2 Hold Time (\(t_{\text{hold}}\)) & Aperture Window</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Timing Violations & Propagation Delays<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 Setup/Hold Violations</a></li>
+                        <li><a href="#sub-5-2">5.2 Propagation Delay (\(t_{\text{pcq}}\) & \(t_{\text{ccq}}\))</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round"
+                            stroke-linejoin="round" stroke-width="2"
+                            style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" x2="8" y1="13" y2="13"></line>
+                            <line x1="16" x2="8" y1="17" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>Original PDF</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Short Notes -->
+            <section id="short-notes" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-short-notes')">
+                    <div class="topic-number"
+                        style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                    </div>
+                    <h2>Short Notes &amp; Visual Summary</h2>
+                </div>
+                <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
+                    <p style="margin-bottom: 1rem;">Quick summary and key formulas for Lecture 06:</p>
+                    
+                    <div class="box box-blue">
+                        <div class="box-title">Key Definitions & Rules</div>
+                        <ul>
+                            <li><strong>Latch (Level-Triggered):</strong> Transparent during clock level (HIGH or LOW). Data races can occur.</li>
+                            <li><strong>Flip-Flop (Edge-Triggered):</strong> Samples input at one precise clock INSTANT (\(0 \to 1\) rising edge). Locks output for rest of cycle.</li>
+                            <li><strong>Setup Time (\(t_{\text{setup}}\)):</strong> Minimum time data \(D\) must be stable BEFORE the clock edge.</li>
+                            <li><strong>Hold Time (\(t_{\text{hold}}\)):</strong> Minimum time data \(D\) must remain stable AFTER the clock edge.</li>
+                            <li><strong>Maximum Clock Frequency Constraint:</strong> \(T_c \ge t_{\text{pcq}} + t_{\text{pd, combinational}} + t_{\text{setup}}\)</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 1 -->
+            <section class="topic-section" id="topic-1">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>Level vs. Edge Triggering</h2>
+                </div>
+                <div class="collapsible-content" id="content-1">
+                    <h3 id="sub-1-1">1.1 Level-Sensitive Window vs. Edge Moment</h3>
+                    <p>The transition from latches to flip-flops centers on how data sampling is gated by a clock signal:</p>
+
+                    <div class="box box-blue">
+                        <div class="box-title">Triggering Mechanisms</div>
+                        <ul>
+                            <li><strong>Level-Triggered (Latch):</strong> Active during an entire clock LEVEL (e.g., while \(\text{CLK}=1\)). The output continuously tracks changes on input line \(D\) throughout the high window (transparent).</li>
+                            <li><strong>Edge-Triggered (Flip-Flop):</strong> Active ONLY during the instantaneous transition of the clock (e.g., \(0 \to 1\) rising edge). It captures a single snapshot of \(D\) at that exact nanosecond moment and freezes the output for the remainder of the clock period.</li>
+                        </ul>
+                    </div>
+
+                    <h3 id="sub-1-2">1.2 Why Registers Require Edge Triggering</h3>
+                    <p>An edge is an instantaneous moment in time (\(0 \to 1\)), not a duration. By capturing data strictly on clock edges, pipelined CPU registers guarantee that data cannot race through multiple sequential stages within a single clock cycle.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" disabled="">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section class="topic-section" id="topic-2">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>Master-Slave D Flip-Flop</h2>
+                </div>
+                <div class="collapsible-content" id="content-2">
+                    <h3 id="sub-2-1">2.1 Two-Stage Airlock Architecture</h3>
+                    <p>An edge-triggered <strong>Master-Slave D Flip-Flop</strong> is constructed by connecting two D latches in series driven by inverted clock signals.</p>
+
+                    <div class="box box-green">
+                        <div class="box-title">Master-Slave Airlock Model</div>
+                        <p><strong>Stage 1 (Master Latch):</strong> Gated by \(\text{CLK}\).<br>
+                        <strong>Stage 2 (Slave Latch):</strong> Gated by \(\overline{\text{CLK}}\).</p>
+                        <p style="margin-top:0.5rem;">Because the Master and Slave latches are driven by complementary clock signals, <strong>they are never open at the same time</strong>. This acts as a two-stage airlock that prevents data from racing straight through.</p>
+                    </div>
+
+                    <h3 id="sub-2-2">2.2 Step-by-Step Clock Phase Hand-off</h3>
+                    <ol>
+                        <li><strong>When \(\text{CLK} = 1\):</strong> Master latch is open/transparent and tracks input \(D\). Slave latch is opaque and holds the previous output \(Q\).</li>
+                        <li><strong>On the Falling Edge (\(1 \to 0\)):</strong> Master latch closes and freezes the captured bit \(Q_{\text{master}}\). Simultaneously, Slave latch opens and passes \(Q_{\text{master}}\) to output \(Q\).</li>
+                    </ol>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section class="topic-section" id="topic-3">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>Latch vs. Flip-Flop Comparison</h2>
+                </div>
+                <div class="collapsible-content" id="content-3">
+                    <h3 id="sub-3-1">3.1 Comprehensive Architectural Matrix</h3>
+                    <p>Understanding when to use latches versus flip-flops is a core requirement in hardware design:</p>
+
+                    <table style="width:100%; border-collapse: collapse; margin: 1.5rem 0; font-size:0.95rem;">
+                        <thead>
+                            <tr style="background-color: var(--text-dark); color: var(--bg-beige);">
+                                <th style="padding:0.75rem; border: 1px solid var(--border-light);">Feature</th>
+                                <th style="padding:0.75rem; border: 1px solid var(--border-light);">Latch</th>
+                                <th style="padding:0.75rem; border: 1px solid var(--border-light);">Flip-Flop</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light); font-weight:bold;">Triggering</td>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light);">Clock LEVEL (High/Low)</td>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light);">Clock EDGE (Rising/Falling)</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light); font-weight:bold;">Transparency</td>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light);">Yes (while clock is high)</td>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light);">No (samples at edge instant)</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light); font-weight:bold;">Gate Count</td>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light);">Fewer (~1x size)</td>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light);">More (~2x size of latch)</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light); font-weight:bold;">Data Race Risk</td>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light);">High (requires careful timing)</td>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light);">Blocked (safe for pipelines)</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light); font-weight:bold;">Primary Use Case</td>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light);">Asynchronous buffering, SRAM</td>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light);">CPU Registers, PC, Pipelines</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3 id="sub-3-2">3.2 Schematic Symbol Recognition</h3>
+                    <p>In digital schematics, a <strong>Flip-Flop</strong> is identified by a small <strong>triangle symbol (\(>\))</strong> on the clock input pin, indicating edge-sensitivity. A latch has a plain clock pin without the triangle.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section class="topic-section" id="topic-4">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>Timing Parameters: Setup & Hold</h2>
+                </div>
+                <div class="collapsible-content" id="content-4">
+                    <h3 id="sub-4-1">4.1 Setup Time (\(t_{\text{setup}}\)) Definition</h3>
+                    <p>Flip-flops cannot capture signals that change simultaneously with the clock edge. <strong>Setup Time (\(t_{\text{setup}}\))</strong> is the minimum duration data input \(D\) must remain completely stable <strong>BEFORE</strong> the active clock edge arrives.</p>
+
+                    <h3 id="sub-4-2">4.2 Hold Time (\(t_{\text{hold}}\)) & Aperture Window</h3>
+                    <p><strong>Hold Time (\(t_{\text{hold}}\))</strong> is the minimum duration data input \(D\) must remain stable <strong>AFTER</strong> the active clock edge has passed.</p>
+
+                    <div class="box box-orange">
+                        <div class="box-title">The Camera Shutter Analogy</div>
+                        <p>Sampling data with a flip-flop is like taking a photo of a moving athlete. The athlete must stand completely still for a brief instant before AND after the shutter clicks (\(t_{\text{setup}} + t_{\text{hold}}\)); otherwise, the resulting image is blurred (corrupted bit).</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 5 -->
+            <section class="topic-section" id="topic-5">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>Timing Violations & Propagation Delays</h2>
+                </div>
+                <div class="collapsible-content" id="content-5">
+                    <h3 id="sub-5-1">5.1 Setup/Hold Violations</h3>
+                    <p>If data changes inside the setup or hold aperture window, a <strong>Timing Violation</strong> occurs. The flip-flop may capture an incorrect value or enter a dangerous state known as <strong>Metastability</strong> (detailed in Lecture 07).</p>
+
+                    <h3 id="sub-5-2">5.2 Propagation Delay (\(t_{\text{pcq}}\) & \(t_{\text{ccq}}\))</h3>
+                    <p>Flip-flop output \(Q\) does not update instantly on the clock edge; it incurs physical gate delays:</p>
+                    <ul>
+                        <li><strong>\(t_{\text{pcq}}\) (Propagation Delay Clock-to-Q):</strong> Maximum time after clock edge until output \(Q\) achieves a stable valid logic level.</li>
+                        <li><strong>\(t_{\text{ccq}}\) (Contamination Delay Clock-to-Q):</strong> Minimum time after clock edge before output \(Q\) begins changing.</li>
+                    </ul>
+
+                    <div class="formula-box">
+                        \(\text{Max Clock Speed } f_{\max} = \frac{1}{t_{\text{pcq}} + t_{\text{combinational, max}} + t_{\text{setup}}}\)
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <a href="lecture-07.html" class="btn"
+                            style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;">Next
+                            Lecture</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number"
+                        style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round"
+                            stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" x2="8" y1="13" y2="13"></line>
+                            <line x1="16" x2="8" y1="17" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for your reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()"
+                        style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous
+                            Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/6.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,629 @@
+PDF: c:/Users/nikhi/OneDrive/Desktop/NST 5th Sem Notes/MCA/pdfs/8 Part_1.pdf, Total pages: 45
+=== PAGE 1 ===
+Lecture: 0110
+Registers, Counters
+& State Machines
+Building Memory That Does Something
+Chain flip-flops together and a circuit can store words, count, and follow a plan.
+CSA222: Modern Computer Architecture
+
+=== PAGE 2 ===
+L06 · MODERN COMPUTER ARCHITECTURE 02 / 34
+One Flip-Flop = One Bit
+L5 gave us a reliable 1-bit memory. Today we build things worth remembering.
+↺
+⧗ ⧖ »
+The D flip-flop Edge-triggered & Timing rules But just ONE bit…
+safe
+Captures one bit on the Master-slave design Setup, hold, metastability A CPU needs 32-bit words,
+clock edge, holds it for the blocks data races — — the constraints that counters, and control. So
+cycle (L5). predictable updates. keep it working (L5). we chain them.
+The jump from 'store a bit' to 'store a word, count events, run a program' is what today is about.
+
+=== PAGE 3 ===
+L06 · MODERN COMPUTER ARCHITECTURE 03 / 34
+Today's Roadmap
+Three structures, each more capable than the last.
+1 2 3
+→ →
+Registers Counters State Machines
+n flip-flops in parallel = an n-bit Flip-flops that count clock pulses The general model of any
+word store. Add shifting for data — the basis of timers and sequential circuit: states,
+movement. addresses. transitions, outputs.
+The big idea: an FSM is the universal blueprint — registers and counters are just special cases of it. It's how
+a CPU 'thinks'.
+
+=== PAGE 4 ===
+
+
+=== PAGE 5 ===
+L06 · MODERN COMPUTER ARCHITECTURE 04 / 67
+0 PRIMARY DEFINITION
+A flip-flop is a one-bit memory that updates only on a clock
+edge. Change what feeds its input and you change what it does.
+The Flip-Flop
+Toolkit SR Set / Reset — the original latch
+D Delay — copies its input, one cycle later
+Four flip-flops, four truth tables — and the one
+reverse-lookup table that makes design possible.
+JK The universal one — SR with toggle
+T Toggle — flips on command. Counters live here.
+
+=== PAGE 6 ===
+L06 · MODERN COMPUTER ARCHITECTURE 05 / 67
+Latch vs Flip-Flop
+Both remember a bit. The difference is WHEN they are allowed to change.
+CLK / EN
+D
+Q latch
+Q flip-flop
+Same clock, same data — two very different outputs. The latch copies D the whole time EN is high; the flip-flop looks once, at the edge.
+LEVEL-TRIGGERED — LATCH EDGE-TRIGGERED — FLIP-FLOP
+Transparent: while the enable is high, Q follows D continuously. Any Q samples D at one instant only, then holds for the whole cycle. This
+wobble on D passes straight through. is why we can reason about timing at all.
+Everything from here on uses edge-triggered flip-flops. When this lecture says 'flip-flop', assume the rising clock edge.
+
+=== PAGE 7 ===
+L06 · MODERN COMPUTER ARCHITECTURE 06 / 67
+The SR Latch — Where Memory Starts
+Two NOR gates feeding each other. The simplest circuit that can remember.
+CHARACTERISTIC TABLE
+S R Q⁺ MEANING
+0 0 Q Hold — remembers the last value
+0 1 0 Reset the bit to 0
+1 0 1 Set the bit to 1
+1 1 – Forbidden — both outputs go 0
+THE FLAW
+S = R = 1 breaks the promise that Q and Q' are opposites — and
+when both inputs drop together the result is unpredictable.
+Fixing that forbidden row is exactly what the JK flip-flop is for — and the fix turns out to give us the toggle we need for counters.
+
+=== PAGE 8 ===
+L06 · MODERN COMPUTER ARCHITECTURE 07 / 67
+The D Flip-Flop — One Input, No Surprises
+Tie S and R together through an inverter and the forbidden state becomes unreachable.
+CHARACTERISTIC TABLE
+SYMBOL & PIN NAMES
+Q D Q(n+1) WHAT HAPPENED
+0 0 0 stayed at 0
+0 1 1 loaded a 1
+1 0 0 loaded a 0
+1 1 1 stayed at 1
+CHARACTERISTIC EQUATION
+Q(n+1) = D — the next state is simply whatever D
+was at the edge.
+WHY IT IS THE DEFAULT THE COST
+One data input means one thing can go wrong instead of four. Every
+A D flip-flop cannot toggle by itself — it only copies. To make it flip, you
+register, pipeline stage and state register in a modern CPU is built from
+must feed it the opposite of its own output. Hold that thought.
+D flip-flops.
+
+=== PAGE 9 ===
+L06 · MODERN COMPUTER ARCHITECTURE 08 / 67
+The JK Latch — Reclaiming the Fourth Row
+Same four input combinations as SR, but the illegal one is redefined as 'toggle'.
+CHARACTERISTIC TABLE
+J K Q⁺ MEANING
+0 0 Q Hold — no change
+0 1 0 Reset to 0
+1 0 1 Set to 1
+1 1 Q' TOGGLE — flip to the opposite
+CHARACTERISTIC EQUATION
+Q(n+1) = JQ̅ (n) + QK̅ (n)
+WHY THIS MATTERS TODAY
+The JK flip-flop can do everything SR and D can do, plus one new trick: toggle. Toggling is counting. Tie J and K together and you get the
+flip-flop the rest of this lecture depends on.
+
+=== PAGE 10 ===
+L06 · MODERN COMPUTER ARCHITECTURE 09 / 67
+The T Flip-Flop — The One Counters Are Made Of
+A single input with a single job: T = 1 means 'flip', T = 0 means 'stay'.
+CHARACTERISTIC TABLE
+SYMBOL
+T Q Q⁺ ACTION
+0 0 0 hold
+0 1 1 hold
+Remember this device. Every counter in the
+1 0 1 flip next two sections is a row of T flip-flops with
+different logic deciding when each one flips.
+1 1 0 flip
+CHARACTERISTIC EQUATION
+Q(n+1) = TQn’ + T’Qn = T XOR Qn
+TWO WAYS TO BUILD ONE
+1 · From a JK flip-flop 2 · From a D flip-flop
+Tie J and K to the same
+wire.
+
+=== PAGE 11 ===
+L06 · MODERN COMPUTER ARCHITECTURE 10 / 67
+Hold T at 1 and You Get a Divide-by-2
+A permanently toggling flip-flop halves the clock frequency. Chain them and you have a counter.
+CLK
+Q0 (÷2)
+Q1 (÷4)
+Q0 completes one cycle for every two clock cycles. Q1 is clocked by Q0, so it completes one cycle for every four. Each extra flip-flop halves the
+frequency again — and the bits you are looking at spell out 0, 1, 2, 3 in binary.
+AS A DIVIDER AS A COUNTER THE LINK
+Read the stages as bits and the same circuit is Counting and dividing are the same operation.
+n stages divide the clock by 2ⁿ. This is how a 32
+counting up in binary — same wires, different That is why one circuit serves timers, PWM
+768 Hz watch crystal becomes a 1 Hz tick.
+reading. and program counters.
+
+=== PAGE 12 ===
+L06 · MODERN COMPUTER ARCHITECTURE 11 / 67
+The Four Flip-Flops at a Glance
+One table to keep. Everything else in this lecture is built from these four rows.
+TYPE INPUTS WHAT IT DOES CHARACTERISTIC EQ. TYPICALLY USED FOR
+SR S, R Set, reset or hold — but S = R = 1 is illegal Q⁺ = S + R'·Q Latches, simple control
+D D Copies its input to the output on the edge Q⁺ = D Registers, pipeline stages, state registers
+Set, reset, hold — and toggle when both are
+JK J, K Q⁺ = J·Q' + K'·Q General-purpose sequential design
+1
+T T Flips when T = 1, holds when T = 0 Q⁺ = T XOR Q Counters and frequency dividers
+THEY ARE ALL THE SAME DEVICE WHAT REAL HARDWARE USES
+Every one of these is an SR latch pair with different logic bolted onto Modern chips and every FPGA use D flip-flops almost exclusively —
+the front. Choosing a flip-flop type is really choosing how much of they are the smallest and fastest. JK and T are design conveniences:
+the next-state logic you want built in already. you reason in T, the synthesis tool builds it out of D and an XOR.
+
+=== PAGE 13 ===
+L06 · MODERN COMPUTER ARCHITECTURE 13 / 67
+Preset, Clear and Reset
+Every real flip-flop has a back door that ignores the clock. Counters and state machines both need it.
+ASYNCHRONOUS SYNCHRONOUS
+THE EXTRA PINS
+When it acts Immediately On the next clock edge
+Needs the clock? No Yes
+None — it is ordinary
+Timing risk Can violate setup/hold
+logic
+Mod-N counter wrap,
+Typical use Power-on reset
+FSM restart
+Rule of thumb: one asynchronous reset for power-on, synchronous
+resets for everything the design does while it is running.
+WITHOUT A RESET WITH A RESET
+Flip-flops power up in a random state. A counter might start at 173, and
+One known starting point, guaranteed. Every FSM you draw from now
+a state machine might start in a state that has no way out. The circuit
+on gets a reset arrow pointing at its initial state — no exceptions.
+works perfectly in simulation and hangs on the bench.
+
+=== PAGE 14 ===
+L06 · MODERN COMPUTER ARCHITECTURE 05 / 34
+1
+PRIMARY DEFINITION
+A register is just a row of flip-flops
+sharing a clock — the fastest, closest
+memory a CPU has.
+Registers
+The foundational building blocks of CPU
+storage.   
+Flip-Flop Row Shared Clock Fastest Speed
+Multi-bit storage Atomic updates Closest to CPU
+
+=== PAGE 15 ===
+L06 · MODERN COMPUTER ARCHITECTURE 04 / 34
+From One Bit to Many
+Put flip-flops side by side, share a clock, and you store a whole word at once.
+Atomic Multi-Bit Storage
+All four bits are captured on the SAME clock edge —
+the word updates atomically, as one single unit.
+THE SYSTEM SECRET
+What is a CPU register?
+This is literally what a CPU register is: 32 or
+64 D-flip-flops sharing a single, synchronous
+clock. That is the entire secret.
+
+=== PAGE 16 ===
+L06 · MODERN COMPUTER ARCHITECTURE 06 / 34
+The Register
+Store, hold, and read back an n-bit value — the CPU's working scratchpad.
+BLOCK DIAGRAM WHERE REGISTERS LIVE
+The register file — 32 registers in MIPS/RISC-V — is a
+CPU's fastest storage.
+in (8 bits) out
+8-BIT REGISTER It serves as the immediate staging area for active
+operations, feeding data directly to execution units.
+D7 … D0
+Also: the program counter (PC), instruction register, and
+pipeline stage registers are all just registers.
+Faster than cache, faster than RAM — because it's
+flip-flops right next to the ALU.
+CLK
+
+=== PAGE 17 ===
+L06 · MODERN COMPUTER ARCHITECTURE 07 / 34
+The Load Enable
+A register must HOLD its value across clock edges until you choose to update it.
+THE PROBLEM ONE BIT'S PATH
+A plain flip-flop grabs D on EVERY clock edge. But a
+register should keep its value for many cycles, updating
+only when told.
+THE FIX — a load-enable MUX per bit:
+LOAD = 1 → feed new data in.
+LOAD = 0 → feed the flip-flop's OWN output back in (hold).
+A 2:1 MUX on each bit's D input chooses between 'new value' and
+'keep current'.
+The MUX + feedback loop = a register that remembers until LOAD says
+otherwise.
+
+=== PAGE 18 ===
+L06 · MODERN COMPUTER ARCHITECTURE 08 / 34
+The Shift Register
+Chain flip-flops output-to-input: each clock edge, every bit shifts one place.
+BLOCK DIAGRAM
+HOW IT SHIFTS
+Each flip-flop's output feeds the NEXT one's
+input. A bit entered at 'in' walks right, one FF
+per clock.
+It's a conveyor belt for bits — the basis of serial
+data transfer and multiply/divide-by-2 operations.
+
+=== PAGE 19 ===
+L06 · MODERN COMPUTER ARCHITECTURE 09 / 34
+Four Shift Register Types
+Named by how data goes IN and comes OUT: serial or parallel.
+SISO SIPO PISO PIPO
+Serial In, Serial Out Serial In, Parallel Out Parallel In, Serial Out Parallel In, Parallel
+Out
+One bit in, one bit out per Bits enter one at a time, Load a whole word, shift Load and read a full word
+clock — a pure delay line. read out all at once — it out bit by bit — — this is just a normal
+serial→parallel parallel→serial register with load.
+converter. converter.
+SIPO and PISO are the workhorses: they convert between serial links (few wires) and parallel buses (fast).
+
+=== PAGE 20 ===
+L06 · MODERN COMPUTER ARCHITECTURE 10 / 34
+What Shift Registers Do
+Small circuit, surprisingly many jobs.
+Serial ↔ parallel Multiply / divide by 2
+⇄
+×2
+UART, SPI, USB all send data one bit at a time over Shifting binary left multiplies by 2; shifting right
+few wires; shift registers reassemble it into bytes. divides by 2. Free arithmetic, no adder.
+Delay lines & buffers Pseudo-random (LFSR)
+⧗ ⚁
+A SISO register delays a signal by exactly N clock Add feedback via XOR and a shift register generates
+cycles — used in DSP and pipelines. long pseudo-random sequences — used in crypto &
+test.
+
+=== PAGE 21 ===
+L06 · MODERN COMPUTER ARCHITECTURE 11 / 34
+SECTION 02
+VISUALIZING CLOCK & COUNT
+2. Counters
+How a Counter Advances
+Each rising edge of the clock trigger increments the register state.
+The Beating Clock of Digital Systems
+CLK
+Flip-flops configured to count clock pulses, serving as the essential
+foundation for timing, addressing, and control flow.
+▲ ▲ ▲
+CORE APPLICATIONS
+ Timers & Clock Dividers
+Measuring precise time intervals and scaling frequencies.
+000 → 001 → 010 ...
+ Address Generation
+Stepping through memory locations sequentially.
+ The Program Counter (PC)
+STATE TRANSITION (N-BIT OVERFLOW)
+The engine driving instruction fetch and CPU execution flow.
+
+=== PAGE 22 ===
+L06 · MODERN COMPUTER ARCHITECTURE 12 / 34
+What Is a Counter?
+A register whose value advances by 1 on every clock pulse — it counts.
+A 3-BIT COUNTER CYCLES THROUGH 0 → 7 → 0… WHY COUNTERS MATTER
+The Program Counter (PC) is a counter — it
+000 → 001 → 010 → 011 → 100 → 101 → 110 → 111
+holds the address of the next instruction
+and increments each cycle.
+↺ wraps back to 000
+Also: timers, clock dividers, memory-refresh
+Each clock pulse = +1. logic, event counters — all built on this.
+After the max value (111 = 7), it rolls over to 000 — exactly like an
+odometer, or 8-bit overflow from L4.
+An n-bit counter counts 0 to 2ⁿ−1, then wraps. It's a register + an incrementer
++ feedback.
+
+=== PAGE 23 ===
+L06 · MODERN COMPUTER ARCHITECTURE 13 / 34
+Reading the Count as Waveforms
+Look at the bits over time and the pattern that makes counters buildable jumps out.
+THE RULE BEHIND IT
+CLK
+A bit flips exactly when every bit below it is 1.
+Q0 flips always. Q1 flips when Q0 = 1. Q2 flips
+Q0
+when Q1·Q0 = 1.
+Q1
+IN T FLIP-FLOP TERMS
+T0 = 1
+Q2
+T1 = Q0
+T2 = Q0·Q1
+value 0 1 2 3 4 5 6 7
+Q0 changes every clock. Q1 changes every second clock. Q2 changes every fourth.
+THAT IS THE WHOLE DESIGN
+Nothing else is needed for a plain binary
+up-counter. Two different circuits implement
+it — and choosing between them is the next
+four slides.
+
+=== PAGE 24 ===
+L06 · MODERN COMPUTER ARCHITECTURE 13 / 34
+Ripple (Asynchronous) Counter
+Each flip-flop's output clocks the next — simple, but the carry ripples.
+Only FF0 sees the real clock; each next FF is clocked by the previous output — the change 'ripples' along.
+⚠ The ripple delay means the count is briefly WRONG while it propagates — a
+problem at high speed.
+
+=== PAGE 25 ===
+L06 · MODERN COMPUTER ARCHITECTURE 32 / 67
+Why Ripple Counters Break at Speed
+Follow the count from 7 to 8 one gate delay at a time, and watch three wrong numbers appear on the pins.
+TIME AFTER EDGE Q3 Q2 Q1 Q0 VALUE ON PINS
+THE SPEED LIMIT
+The count is only valid after ALL n stages
+before 0 1 1 1 7 — correct
+have settled:
+1 × tpd 0 1 1 0 6 — wrong
+t_settle = n × t_pd
+2 × tpd 0 1 0 0 4 — wrong
+f_max = 1 / (n × t_pd)
+3 × tpd 0 0 0 0 0 — wrong
+8 — correct at PUT NUMBERS ON IT
+4 × tpd 1 0 0 0
+last
+At t_pd = 10 ns, a 4-bit ripple counter tops out near
+25 MHz — and a 16-bit one near 6 MHz. A modern
+Anything reading those pins during the ripple — a comparator, a decoder, a memory address bus —
+sees 6, then 4, then 0. CPU clock is 3 GHz.
+THE WAY OUT
+Give every flip-flop the same clock, and compute in
+advance which ones should flip.
+
+=== PAGE 26 ===
+L06 · MODERN COMPUTER ARCHITECTURE 14 / 34
+Synchronous Counter
+All flip-flops share ONE clock — they all update at the exact same instant.
+How It Works Key Advantage
+Combinational logic (the & gates) computes each FF's next bit; ✓ No ripple delay — the whole count is correct the instant
+the shared clock updates them all together. after the edge. This is what real designs use.
+
+=== PAGE 27 ===
+L06 · MODERN COMPUTER ARCHITECTURE 15 / 34
+Ripple vs Synchronous
+Same count sequence, very different timing behaviour.
+RIPPLE (async) SYNCHRONOUS
+Clocking Each FF clocks the next All FFs share one clock
+Speed Slow — carry ripples through Fast — all update at once
+Glitches Yes — transient wrong counts No — clean output
+Complexity Simple, fewer gates Needs next-state logic
+Real use Toy / low-speed dividers Everything performance-critical
+Trade-off in one line: ripple is cheaper to build; synchronous is the only one safe at real clock speeds.
+
+=== PAGE 28 ===
+L06 · MODERN COMPUTER ARCHITECTURE 16 / 34
+Mod-N & Divide-by Counters
+Reset early to count any range — or use a counter to slow a clock down.
+MOD-N: STOP EARLY DIVIDE-BY: SLOW THE CLOCK
+Each flip-flop in a counter toggles at HALF the rate of the
+A 3-bit counter naturally counts mod-8 (0–7). To count
+one before it.
+mod-6 (0–5), detect the value 6 and reset to 0.
+So bit 0 = clock ÷ 2, bit 1 = clock ÷ 4, bit 2 = clock ÷ 8…
+0 → 1 → 2 → 3 → 4 → 5
+A counter is a frequency divider for free. This is how a 32
+↺ reset at 6 kHz crystal becomes a 1 Hz tick in a watch.
+Used for: clock dividers, digital clocks (mod-60 for
+seconds!), any custom cycle length.
+
+=== PAGE 29 ===
+L06 · MODERN COMPUTER ARCHITECTURE 17 / 34
+Counters in the Wild
+Once you see them, they're everywhere.
+Program Counter Timers & delays
+PC ⧗
+Holds the address of the next instruction; Count clock ticks to measure time — every
+increments each cycle, or jumps on a branch. The microcontroller timer, watchdog, and PWM
+heart of instruction flow. generator is a counter.
+Frequency division Memory addressing
+▤
+÷
+Turn a fast crystal oscillator into slower usable Sequentially step through addresses in DMA
+clocks — watches, UART baud rates, display refresh. transfers, refresh cycles, and scan-out logic.
+
+=== PAGE 30 ===
+19 / 34
+3. Finite State Machines
+The universal model of sequential logic: a set of states, rules to move
+between them, and outputs. This is how a CPU 'thinks'.
+
+=== PAGE 31 ===
+L06 · MODERN COMPUTER ARCHITECTURE 20 / 34
+What Is a Finite State Machine?
+A circuit that is always in exactly ONE of a finite set of states, and moves between them on rules.
+THREE INGREDIENTS EVERYDAY EXAMPLE
+States A traffic light is an FSM.
+1
+A finite list of situations the machine can be in (e.g.
+IDLE, RUNNING, DONE). States: GREEN, YELLOW, RED.
+Transitions: timed (green→yellow→red→green).
+Transitions Outputs: which lamp is lit.
+2
+Rules for moving between states, based on current
+A vending machine, an elevator, a game character's AI, a
+state + inputs.
+network protocol — all FSMs. This model is everywhere.
+Outputs
+3
+What the machine produces in each state (or during
+each transition).
+
+=== PAGE 32 ===
+L06 · MODERN COMPUTER ARCHITECTURE 21 / 34
+Two Flavours: Moore vs Mealy
+The difference is simply WHERE the output comes from.
+MOORE MACHINE MEALY MACHINE
+Output depends on the STATE only Output depends on STATE + INPUT
+The output is written inside each state circle The output is written on each transition arrow
+It changes only when the state changes It can react to an input within the same cycle
+Simpler to reason about, and glitch-free Often needs fewer states
+May need more states to do the same job Output can glitch when the input glitches
+Output appears one cycle after the input Output appears in the same cycle as the input
+Rule of thumb: Moore = 'output in the circle', Mealy = 'output on the arrow'. Both compute the same things.
+
+=== PAGE 33 ===
+L06 · MODERN COMPUTER ARCHITECTURE 22 / 34
+The Anatomy of Any FSM
+Every sequential circuit is this same three-part structure.
+
+=== PAGE 34 ===
+L06 · MODERN COMPUTER ARCHITECTURE 23 / 34
+The State Diagram
+The picture that captures an FSM: circles are states, arrows are transitions.
+HOW TO READ IT
+Each circle = one state.
+Each arrow = a transition, labelled with the
+input/condition that triggers it.
+Follow the arrows and you can trace exactly
+what the machine does for any input
+sequence.
+This diagram IS the design — everything else is
+just translating it to gates.
+
+=== PAGE 35 ===
+L06 · MODERN COMPUTER ARCHITECTURE 23 / 34
+The State Diagram
+The picture that captures an FSM: circles are states, arrows are transitions.
+TRAFFIC LIGHT — A THREE-STATE MOORE MACHINE
+HOW TO READ IT
+Each circle = one state.
+timer
+GREEN YELLOW
+Each arrow = a transition, labelled with the
+input/condition that triggers it.
+Follow the arrows and you can trace exactly
+timer timer what the machine does for any input
+sequence.
+This diagram IS the design — everything else is
+just translating it to gates.
+RED
+
+=== PAGE 36 ===
+L06 · MODERN COMPUTER ARCHITECTURE 24 / 34
+The State Table
+The same FSM, written as a table — the bridge from diagram to hardware.
+Current State Input Next State Output
+GREEN expired YELLOW Go
+YELLOW expired RED Slow
+RED expired GREEN Stop
+any not expired (same) (hold)
+Why a table? It lists every (state, input) → (next state, output). Encode the states as bits, and each column becomes a
+truth table you minimise with K-maps (L2) into gates.
+
+=== PAGE 37 ===
+L06 · MODERN COMPUTER ARCHITECTURE 25 / 34
+FSM Design Flow
+Six steps from a word problem to a working circuit — always the same recipe.
+1 Understand 2 State diagram 3 State table
+List the states and what Draw circles and arrows Tabulate every
+triggers each transition. — the visual spec. state/input →
+next-state/output.
+4 Encode states 5 Derive logic 6 Build
+Assign a bit pattern to K-map each next-state & Flip-flops for the state
+each state (00, 01, 10…). output bit into gates. register + that logic.
+
+=== PAGE 38 ===
+L06 · MODERN COMPUTER ARCHITECTURE 27 / 34
+FSMs Run the World
+Once you know the pattern, you'll see state machines in everything you build.
+The CPU control unit Communication protocols
+⚙ ⇄
+Fetch → Decode → Execute → Writeback is literally TCP connection states, USB handshakes, traffic-light
+an FSM. It sequences every instruction (Module 4). controllers — all specified as FSMs.
+Software & games Embedded control
+◆ ▣
+UI flows, game AI ('patrol → chase → attack'), regex Washing machines, elevators, vending machines,
+engines, parsers — FSMs in code, not gates. engine controllers — physical FSMs everywhere.
+
+=== PAGE 39 ===
+L06 · MODERN COMPUTER ARCHITECTURE 29 / 34
+The Big Picture: Datapath + Control
+Everything in this course so far now snaps together into a computer.
+control signals
+DATAPATH
+CONTROL
+(FSM)
+registers · ALU · MUXes · adders
+today L3 – L6
+status flags
+The control unit is an FSM (today). The datapath is registers + ALU + MUXes (L3–L6). Together they're a CPU.
+This is exactly where Module 3 & 4 pick up — you now have every building block a processor needs.
+
+=== PAGE 40 ===
+L06 · MODERN COMPUTER ARCHITECTURE 30 / 34
+Common Mistakes to Avoid
+The slips that cost marks — and cause real design bugs.
+Register without load enable Moore/Mealy confusion
+✕ ✕
+A plain register overwrites every clock. Real ones need a Moore output = state only (in the circle). Mealy = state +
+load/hold control, or they can't keep a value. input (on the arrow). Know which you're drawing.
+Ripple counter at high speed Forgetting the reset state
+✕ ✕
+The carry ripple makes intermediate counts briefly wrong. Every FSM needs a defined power-on state, or it starts in a
+Use synchronous counters for anything fast. random, possibly illegal state.
+Wrong select/state-bit count Unreachable / dead states
+✕ ✕
+N states need ⌈log₂N⌉ flip-flops (binary). Miscounting After encoding, unused bit patterns can trap the FSM.
+breaks the whole encoding. Handle them (usually route to reset).
+
+=== PAGE 41 ===
+L06 · MODERN COMPUTER ARCHITECTURE 31 / 34
+Key Takeaways
+Five sentences — from a stored bit to a thinking machine.
+01 A register is n flip-flops sharing a clock — the CPU's fastest storage; add a load-enable MUX so it holds until told to update.
+02 A shift register moves bits along a chain each clock — enabling serial↔parallel conversion and free multiply/divide-by-2.
+03 A counter advances by 1 each clock; synchronous (shared clock) beats ripple (chained) for speed and glitch-free counts.
+04 A finite state machine — states, transitions, outputs — is the universal model; registers and counters are special cases of it.
+05 FSM design is a fixed recipe: diagram → table → encode states → K-map the logic → build with a state register + gates.
+
+=== PAGE 42 ===
+L06 · MODERN COMPUTER ARCHITECTURE 32 / 34
+Practice & Homework
+Design, trace, and build state machines.
+01 02 03
+Shift & Count FSM from Words Divide the Clock
+Trace a 4-bit shift register loading Design a '110' sequence detector: How many flip-flops divide a 1 MHz
+1011 over 4 clocks. Then draw a 3-bit state diagram, state table, and binary clock down to 1 kHz? Show the
+synchronous counter's Q outputs. encoding. divide-by math.
+EXIT TICKET
+1. How many flip-flops does a mod-12 counter need, and why?
+2. In one line: the difference between a Moore and a Mealy machine.
+3. Draw the state diagram for a circuit that detects the input sequence '11'.
+
+=== PAGE 43 ===
+L06 · MODERN COMPUTER ARCHITECTURE 33 / 34
+Rapid-Fire Recap
+Three questions — shout the answers.
+Q1 A register is built from… flip-flops
+Q2 Synchronous counters share one… clock
+Q3 A Moore output depends only on… the state
+All three instant? You've completed the digital-logic foundation — Module 3 builds the datapath on top of it.
+
+=== PAGE 44 ===
+END OF L06 · MODULE 2 COMPLETE
+States, and a
+machine that runs.
+NEXT — MODULE 3
+The Datapath & Instruction Set — assemble registers, ALU, and control into a
+processor that actually executes machine instructions.
+
+=== PAGE 45 ===
+Thanks
+for
+watching!
+

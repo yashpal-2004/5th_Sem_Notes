@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Modern Computer Architecture - Lecture 07</title>
+    <meta
+        content="Study notes for Modern Computer Architecture (CSA222), Lecture 07 covering Advanced Sequential Systems & Timing: Metastability, Synchronizer Chains, Static Timing Analysis (STA), Critical Path Bottlenecks, and Overclocking Risk."
+        name="description" />
+    <link
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>07</text></svg>"
+        rel="icon" />
+    <link href="../css/style.css" rel="stylesheet" />
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}]});"></script>
+</head>
+
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Modern Computer Architecture</h1>
+            <p>Lecture 07 - Metastability, Synchronizers & Static Timing Analysis</p>
+            <a href="../index.html"
+                style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">←
+                Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/7.pdf"
+                style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;"
+                target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text" />
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 5</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            style="vertical-align: text-bottom; margin-right: 4px;">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>Short Notes</a></li>
+                <li>
+                    <a href="#topic-1">1. The Physics of Metastability<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 Ball-on-a-Hill Physical Model</a></li>
+                        <li><a href="#sub-1-2">1.2 System State Divergence Hazards</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Asynchronous Clock Domain Crossing<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 Unavoidable Metastability in Asynchronous Inputs</a></li>
+                        <li><a href="#sub-2-2">2.2 Synchronizer Chains (2-FF & 3-FF Cascades)</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Mean Time Between Failures (MTBF)<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 Exponential Resolution Formula</a></li>
+                        <li><a href="#sub-3-2">3.2 Engineering MTBF for System Reliability</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Real-World Clock Speeds & Critical Path<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 Calculating Clock Period (e.g., 3.5 GHz = 0.29 ns)</a></li>
+                        <li><a href="#sub-4-2">4.2 Critical Path & Static Timing Analysis (STA)</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Overclocking Hazards & Verification<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 Setup Time Margin Shrinkage & Thermal Drift</a></li>
+                        <li><a href="#sub-5-2">5.2 Timing Verification Tools (Synopsys PrimeTime)</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round"
+                            stroke-linejoin="round" stroke-width="2"
+                            style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" x2="8" y1="13" y2="13"></line>
+                            <line x1="16" x2="8" y1="17" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>Original PDF</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Short Notes -->
+            <section id="short-notes" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-short-notes')">
+                    <div class="topic-number"
+                        style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                    </div>
+                    <h2>Short Notes &amp; Visual Summary</h2>
+                </div>
+                <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
+                    <p style="margin-bottom: 1rem;">Quick summary and key formulas for Lecture 07:</p>
+                    
+                    <div class="box box-blue">
+                        <div class="box-title">Key Equations & Timing Constraints</div>
+                        <ul>
+                            <li><strong>Metastability Definition:</strong> When a flip-flop experiences a setup/hold violation, its output hovers at an invalid intermediate voltage (neither 0 nor 1) for an unpredictable settling duration.</li>
+                            <li><strong>MTBF Formula:</strong> \(\text{MTBF} = \frac{e^{\left(t_r / \tau\right)}}{T_o \cdot f \cdot f_D}\) (Exponentially increases with resolution time \(t_r\)).</li>
+                            <li><strong>Synchronizer Chain:</strong> Cascading 2 or 3 D flip-flops in series to resolve asynchronous inputs before driving core CPU logic.</li>
+                            <li><strong>Critical Path Constraint:</strong> \(T_{\text{clk}} \ge t_{\text{pcq}} + t_{\text{logic, max}} + t_{\text{setup}} + t_{\text{skew}}\)</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 1 -->
+            <section class="topic-section" id="topic-1">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>The Physics of Metastability</h2>
+                </div>
+                <div class="collapsible-content" id="content-1">
+                    <h3 id="sub-1-1">1.1 Ball-on-a-Hill Physical Model</h3>
+                    <p>When a flip-flop's setup or hold time is violated, the internal feedback loop is caught mid-transition. Physically, this is modeled as a <strong>ball balanced on the sharp peak of a hill</strong> between two valleys (0 and 1).</p>
+                    <p>Instead of snapping to logic 0 or 1 instantly, the voltage lingers in an intermediate analog range for an indeterminate resolution time before randomly tipping into 0 or 1.</p>
+
+                    <h3 id="sub-1-2">1.2 System State Divergence Hazards</h3>
+                    <div class="box box-red">
+                        <div class="box-title">System-Wide Failure Hazard</div>
+                        <p>If a metastable signal feeds into multiple downstream logic branches, one gate may interpret the invalid voltage as a 0 while another interprets it as a 1. This causes the CPU state to diverge, crashing the operating system or corrupting memory.</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" disabled="">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section class="topic-section" id="topic-2">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>Asynchronous Clock Domain Crossing</h2>
+                </div>
+                <div class="collapsible-content" id="content-2">
+                    <h3 id="sub-2-1">2.1 Unavoidable Metastability in Asynchronous Inputs</h3>
+                    <p>Metastability cannot be eliminated 100% when signals cross between independent clock domains (e.g., external PCIe devices, network cards, user buttons). Because the external signal changes at random times relative to the CPU clock, setup/hold violations will physically happen.</p>
+
+                    <h3 id="sub-2-2">2.2 Synchronizer Chains (2-FF & 3-FF Cascades)</h3>
+                    <p>To safely handle asynchronous inputs, chip designers pass the raw signal through a <strong>Synchronizer Chain</strong> (2 or 3 D flip-flops connected in series driven by the destination clock).</p>
+
+                    <div class="box box-green">
+                        <div class="box-title">Synchronizer Airlock Principle</div>
+                        <p>If Flip-Flop 1 becomes metastable, it is granted an entire clock cycle (\(T_{\text{clk}}\)) to settle before Flip-Flop 2 samples its output. This exponential delay drops the probability of a system crash to near zero.</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section class="topic-section" id="topic-3">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>Mean Time Between Failures (MTBF)</h2>
+                </div>
+                <div class="collapsible-content" id="content-3">
+                    <h3 id="sub-3-1">3.1 Exponential Resolution Formula</h3>
+                    <p>The reliability of a synchronizer is quantified by its <strong>Mean Time Between Failures (MTBF)</strong>:</p>
+
+                    <div class="formula-box">
+                        \(\text{MTBF} = \frac{e^{\left(t_r / \tau\right)}}{T_o \cdot f \cdot f_D}\)
+                    </div>
+                    <p>Where \(t_r\) is the available settling time, \(\tau\) and \(T_o\) are transistor parameters, \(f\) is the clock frequency, and \(f_D\) is the data transition rate.</p>
+
+                    <h3 id="sub-3-2">3.2 Engineering MTBF for System Reliability</h3>
+                    <p>Because \(t_r\) sits in the exponent, adding a second synchronizer flip-flop increases the MTBF from a few seconds to <strong>billions of years</strong>—ensuring the hardware will be obsolete long before a metastability failure occurs.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section class="topic-section" id="topic-4">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>Real-World Clock Speeds & Critical Path</h2>
+                </div>
+                <div class="collapsible-content" id="content-4">
+                    <h3 id="sub-4-1">4.1 Calculating Clock Period (e.g., 3.5 GHz = 0.29 ns)</h3>
+                    <p>A CPU clock frequency determines the allowable window for all combinational arithmetic between registers:</p>
+                    <div class="formula-box">
+                        \(T_{\text{clk}} = \frac{1}{f} \implies \text{At } 3.5\text{ GHz}, T_{\text{clk}} = \frac{1}{3.5 \times 10^9} \approx 0.285\text{ ns } (285\text{ ps})\)
+                    </div>
+
+                    <h3 id="sub-4-2">4.2 Critical Path & Static Timing Analysis (STA)</h3>
+                    <p>The <strong>Critical Path</strong> is the longest, slowest combinational logic path between any two register flip-flops in the processor. This single slowest path establishes the absolute maximum operating frequency of the chip.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 5 -->
+            <section class="topic-section" id="topic-5">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>Overclocking Hazards & Verification</h2>
+                </div>
+                <div class="collapsible-content" id="content-5">
+                    <h3 id="sub-5-1">5.1 Setup Time Margin Shrinkage & Thermal Drift</h3>
+                    <p>Overclocking forces the clock period \(T_{\text{clk}}\) below factory specifications. As \(T_{\text{clk}}\) shrinks, the timing safety margin disappears. Thermal expansion and voltage drops increase gate delays, causing setup violations and silent data corruption.</p>
+
+                    <h3 id="sub-5-2">5.2 Timing Verification Tools (Synopsys PrimeTime)</h3>
+                    <p>Before a multi-billion transistor chip is fabricated, Electronic Design Automation (EDA) software like <strong>Synopsys PrimeTime</strong> performs <strong>Static Timing Analysis (STA)</strong> to verify that every path meets setup and hold constraints across all operating temperatures and voltages.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <a href="lecture-08.html" class="btn"
+                            style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;">Next
+                            Lecture</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number"
+                        style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round"
+                            stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" x2="8" y1="13" y2="13"></line>
+                            <line x1="16" x2="8" y1="17" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for your reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()"
+                        style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous
+                            Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/7.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+
+</html>
