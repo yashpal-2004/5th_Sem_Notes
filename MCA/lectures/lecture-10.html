@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Modern Computer Architecture - Lecture 10</title>
+    <meta
+        content="Study notes for Modern Computer Architecture (CSA222), Lecture 10 covering Memory Technologies & Architectures: SRAM (6T Cell), DRAM (1T1C Cell), Refresh Overhead, Memory Hierarchy, and von Neumann Architecture."
+        name="description" />
+    <link
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>10</text></svg>"
+        rel="icon" />
+    <link href="../css/style.css" rel="stylesheet" />
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}]});"></script>
+</head>
+
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Modern Computer Architecture</h1>
+            <p>Lecture 10 - Memory Technologies: SRAM vs. DRAM & Architecture</p>
+            <a href="../index.html"
+                style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">←
+                Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/10.pdf"
+                style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;"
+                target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text" />
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 5</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            style="vertical-align: text-bottom; margin-right: 4px;">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>Short Notes</a></li>
+                <li>
+                    <a href="#topic-1">1. Static RAM (SRAM) & 6T Cell<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 The 6-Transistor (6T) SRAM Cell Anatomy</a></li>
+                        <li><a href="#sub-1-2">1.2 Self-Reinforcing Latch Feedback & Non-Destructive Reads</a></li>
+                        <li><a href="#sub-1-3">1.3 CPU Cache Applications (L1 / L2 / L3)</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Dynamic RAM (DRAM) & 1T1C Cell<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 The 1-Transistor 1-Capacitor (1T1C) Cell</a></li>
+                        <li><a href="#sub-2-2">2.2 Charge Leakage & Periodic Refresh Overhead</a></li>
+                        <li><a href="#sub-2-3">2.3 Destructive Reads & Sense Amplifiers</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. SRAM vs. DRAM Comprehensive Matrix<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 Density, Speed, Power, and Cost Trade-offs</a></li>
+                        <li><a href="#sub-3-2">3.2 Physical Silicon Footprint Comparison</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. The Memory Hierarchy & Memory Wall<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 Layered Memory Pyramid (Registers to Disk)</a></li>
+                        <li><a href="#sub-4-2">4.2 The Memory Wall: CPU Speed vs. DRAM Latency Gap</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. System Organization & von Neumann Principle<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 Stored-Program Concept ("Programs ARE Data")</a></li>
+                        <li><a href="#sub-5-2">5.2 Bus Architectures & CPU Interconnects</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round"
+                            stroke-linejoin="round" stroke-width="2"
+                            style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" x2="8" y1="13" y2="13"></line>
+                            <line x1="16" x2="8" y1="17" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>Original PDF</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Short Notes -->
+            <section id="short-notes" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-short-notes')">
+                    <div class="topic-number"
+                        style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                    </div>
+                    <h2>Short Notes &amp; Visual Summary</h2>
+                </div>
+                <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
+                    <p style="margin-bottom: 1rem;">Quick summary and key architectural trade-offs for Lecture 10:</p>
+                    
+                    <div class="box box-blue">
+                        <div class="box-title">Key Memory Trade-offs & Specs</div>
+                        <ul>
+                            <li><strong>SRAM (Static RAM):</strong> 6 Transistors per cell (4T bistable latch + 2T access). Blazing fast (~1-2 ns), non-destructive reads, no refresh needed. Expensive & bulky; used for CPU Caches (L1/L2/L3).</li>
+                            <li><strong>DRAM (Dynamic RAM):</strong> 1 Transistor + 1 Capacitor (1T1C). Extremely dense (~6x SRAM bit density) & cheap. Charge leaks from capacitor in ms; requires periodic refresh (~every 64 ms). Slower (~50-100 ns) with destructive reads. Used for Main Memory (RAM).</li>
+                            <li><strong>Memory Hierarchy:</strong> Layers memory technologies from fastest/smallest at top (Registers \(\to\) SRAM Caches) to slowest/largest at bottom (DRAM Main Memory \(\to\) NVMe SSD).</li>
+                            <li><strong>The Memory Wall:</strong> The growing performance gap between ultra-fast CPU clock speeds (GHz) and relatively slow DRAM access latency (50-100 ns).</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 1 -->
+            <section class="topic-section" id="topic-1">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>Static RAM (SRAM) & 6T Cell</h2>
+                </div>
+                <div class="collapsible-content" id="content-1">
+                    <h3 id="sub-1-1">1.1 The 6-Transistor (6T) SRAM Cell Anatomy</h3>
+                    <p><strong>Static RAM (SRAM)</strong> stores bits using active transistor feedback. Each 1-bit SRAM cell is constructed from <strong>6 Transistors (6T)</strong>:</p>
+                    <ul>
+                        <li><strong>4 Transistors:</strong> Form two cross-coupled CMOS inverters that act as a bistable latch.</li>
+                        <li><strong>2 Transistors (\(M_5, M_6\)):</strong> Act as access pass-gates connecting the internal storage nodes (\(Q, \bar{Q}\)) to the complementary Bit Lines (\(BL, \overline{BL}\)) when the Word Line (\(WL\)) is driven high.</li>
+                    </ul>
+
+                    <h3 id="sub-1-2">1.2 Self-Reinforcing Latch Feedback & Non-Destructive Reads</h3>
+                    <div class="box box-blue">
+                        <div class="box-title">Active Self-Healing Storage</div>
+                        <p>Because the cross-coupled inverters are powered by \(V_{DD}\), the feedback loop actively holding \(Q\) and \(\bar{Q}\) is <strong>self-reinforcing and self-healing</strong>. Any minor charge leakage is corrected immediately by the power supply. Reading an SRAM cell is <strong>non-destructive</strong> because bit line sensing does not discharge the bistable latch.</p>
+                    </div>
+
+                    <h3 id="sub-1-3">1.3 CPU Cache Applications (L1 / L2 / L3)</h3>
+                    <p>Because SRAM requires 6 transistors per bit, it occupies substantial silicon die area and is expensive. Consequently, SRAM is reserved for speed-critical on-chip <strong>CPU Caches (L1, L2, and L3)</strong> where sub-nanosecond response times are mandatory.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" disabled="">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section class="topic-section" id="topic-2">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>Dynamic RAM (DRAM) & 1T1C Cell</h2>
+                </div>
+                <div class="collapsible-content" id="content-2">
+                    <h3 id="sub-2-1">2.1 The 1-Transistor 1-Capacitor (1T1C) Cell</h3>
+                    <p><strong>Dynamic RAM (DRAM)</strong> sacrifices active feedback to achieve maximum silicon density. Each bit is stored as electrical charge on a microscopic trench capacitor using a <strong>1-Transistor + 1-Capacitor (1T1C)</strong> cell:</p>
+                    <ul>
+                        <li><strong>Charged Capacitor (\(+V_{DD}\)):</strong> Logical 1.</li>
+                        <li><strong>Discharged Capacitor (\(0\text{V}\)):</strong> Logical 0.</li>
+                        <li><strong>1 Access Transistor:</strong> Connects the storage capacitor to the Bit Line when Word Line is activated.</li>
+                    </ul>
+
+                    <h3 id="sub-2-2">2.2 Charge Leakage & Periodic Refresh Overhead</h3>
+                    <div class="box box-red">
+                        <div class="box-title">The Leaky Capacitor Problem</div>
+                        <p>Unlike SRAM, DRAM stores bits <strong>passively</strong>. Charge on the tiny capacitor leaks away through the silicon substrate within milliseconds. To prevent data corruption, a dedicated memory controller must perform a <strong>Refresh Cycle</strong> across every row roughly every 64 ms (reading and rewriting the charge). During refresh, memory accesses are briefly stalled.</p>
+                    </div>
+
+                    <h3 id="sub-2-3">2.3 Destructive Reads & Sense Amplifiers</h3>
+                    <p>Reading a DRAM cell connects the capacitor to a long bit line, causing the capacitor to dump its tiny charge. This process is <strong>destructive</strong> (drains the cell) and produces a minuscule voltage shift on the bit line. Sensitive <strong>Sense Amplifiers</strong> detect this tiny voltage shift, amplify it to full logic levels, and <strong>immediately write the bit back into the cell</strong>.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section class="topic-section" id="topic-3">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>SRAM vs. DRAM Comprehensive Matrix</h2>
+                </div>
+                <div class="collapsible-content" id="content-3">
+                    <h3 id="sub-3-1">3.1 Density, Speed, Power, and Cost Trade-offs</h3>
+                    <p>No single memory technology is simultaneously fast, dense, and cheap. The engineering trade-offs between SRAM and DRAM are summarized below:</p>
+
+                    <table style="width:100%; border-collapse: collapse; margin: 1.5rem 0; font-size:0.95rem;">
+                        <thead>
+                            <tr style="background-color: var(--text-dark); color: var(--bg-beige);">
+                                <th style="padding:0.75rem; border: 1px solid var(--border-light);">Feature</th>
+                                <th style="padding:0.75rem; border: 1px solid var(--border-light);">SRAM (Static RAM)</th>
+                                <th style="padding:0.75rem; border: 1px solid var(--border-light);">DRAM (Dynamic RAM)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light); font-weight:bold;">Cell Construction</td>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light);">6 Transistors (6T)</td>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light);">1 Transistor + 1 Capacitor (1T1C)</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light); font-weight:bold;">Bit Density</td>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light);">Low (Bulky, 6T footprint)</td>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light);">High (~6x more bits/\(\text{mm}^2\))</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light); font-weight:bold;">Access Latency</td>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light);">Blazing Fast (~1–2 ns)</td>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light);">Slower (~50–100 ns)</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light); font-weight:bold;">Refresh Needed?</td>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light);">No (Holds while powered)</td>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light);">Yes (Periodic refresh every ~64 ms)</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light); font-weight:bold;">Read Nature</td>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light);">Non-destructive</td>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light);">Destructive (Requires write-back)</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light); font-weight:bold;">Cost per Bit</td>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light);">High (Expensive)</td>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light);">Low (Very cheap per GB)</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light); font-weight:bold;">Primary Role</td>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light);">CPU Caches (L1, L2, L3)</td>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light);">Main System RAM (DDR4/DDR5)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3 id="sub-3-2">3.2 Physical Silicon Footprint Comparison</h3>
+                    <p>Replacing a 6T SRAM cell with a 1T1C DRAM cell reduces cell area by roughly 83%. This density ratio explains why a CPU die can only fit a few megabytes of SRAM cache, while motherboard DIMM sticks hold 16 to 64 gigabytes of DRAM.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section class="topic-section" id="topic-4">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>The Memory Hierarchy & Memory Wall</h2>
+                </div>
+                <div class="collapsible-content" id="content-4">
+                    <h3 id="sub-4-1">4.1 Layered Memory Pyramid (Registers to Disk)</h3>
+                    <p>Modern computer systems combine multiple memory technologies into a hierarchical pyramid, exploiting <strong>Locality of Reference</strong> (Temporal and Spatial) to create the illusion of a memory system that is as fast as registers and as large as a hard drive.</p>
+
+                    <div class="box box-green">
+                        <div class="box-title">The Memory Hierarchy Pyramid</div>
+                        <ol>
+                            <li><strong>CPU Registers (Flip-Flops):</strong> &lt; 1 ns, ~1 KB capacity, extreme cost.</li>
+                            <li><strong>L1 / L2 / L3 Caches (SRAM):</strong> 1–10 ns, 32 KB – 64 MB capacity, high cost.</li>
+                            <li><strong>Main Memory (DRAM):</strong> 50–100 ns, 8 GB – 128 GB capacity, moderate cost.</li>
+                            <li><strong>Secondary Storage (NVMe SSD / Hard Disk):</strong> 10–100 \(\mu\text{s}\), 1 TB – 16 TB, very low cost.</li>
+                        </ol>
+                    </div>
+
+                    <h3 id="sub-4-2">4.2 The Memory Wall: CPU Speed vs. DRAM Latency Gap</h3>
+                    <p>Over the past 40 years, CPU clock speeds improved by ~50% per year, while DRAM access latency improved by only ~7% per year. This growing performance divergence is known as <strong>The Memory Wall</strong>. High-performance CPUs spend significant idle cycles waiting for DRAM memory requests unless hardware caches absorb the latency.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 5 -->
+            <section class="topic-section" id="topic-5">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>System Organization & von Neumann Principle</h2>
+                </div>
+                <div class="collapsible-content" id="content-5">
+                    <h3 id="sub-5-1">5.1 Stored-Program Concept ("Programs ARE Data")</h3>
+                    <p>The foundational blueprint of modern computing is the <strong>von Neumann Architecture</strong>, centered on the <strong>Stored-Program Concept</strong>: instruction code and user data reside in the exact same memory space as binary numbers.</p>
+
+                    <div class="box box-orange">
+                        <div class="box-title">Why Stored-Program is Revolutionary</div>
+                        <ul>
+                            <li><strong>Software Flexibility:</strong> Operating systems load programs into memory by copying instruction bytes from disk to RAM and jumping to their entry address.</li>
+                            <li><strong>Compilers & JITs:</strong> Compilers emit machine instructions as data output. Just-In-Time (JIT) engines inside web browsers generate machine code at runtime and execute it.</li>
+                        </ul>
+                    </div>
+
+                    <h3 id="sub-5-2">5.2 Bus Architectures & CPU Interconnects</h3>
+                    <p>The CPU communicates with memory and I/O peripherals over three primary system buses: the <strong>Address Bus</strong> (specifies location), the <strong>Data Bus</strong> (carries words), and the <strong>Control Bus</strong> (signals Read/Write commands).</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <a href="#original-pdf" class="btn"
+                            style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;"
+                            onclick="document.getElementById('original-pdf').scrollIntoView()">Next Section</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number"
+                        style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round"
+                            stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" x2="8" y1="13" y2="13"></line>
+                            <line x1="16" x2="8" y1="17" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for your reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()"
+                        style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous
+                            Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/10.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+
+</html>
