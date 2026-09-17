@@ -33,6 +33,7 @@
             <li><a href="../AML/index.html">Advanced Machine Learning</a></li>
             <li><a href="../DL_Sem5/index.html">Deep Learning</a></li>
             <li><a href="../CN/index.html">Computer Networks</a></li>
+            <li><a href="../assignments.html">Assignments</a></li>
             <li><a href="../archive.html">Archive</a></li>
         </ul>
         <div class="nav-stats">10 Lectures &bull; 50 Topics</div>
@@ -332,25 +333,28 @@
         </div>
     </footer>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            // Initial load
-            await syncWithCloud();
-            renderUI();
+    <script type="module">
+        import { listenChecklistProgress, setChecklistProgress } from '../js/firebase-service.js';
 
-            // Poll for updates in background every 3 seconds
-            setInterval(async () => {
-                const changed = await syncWithCloud();
-                if (changed) {
-                    renderUI();
-                }
-            }, 3000);
+        let checklistState = {};
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Listen for Realtime Firebase Checklist Updates
+            listenChecklistProgress((data) => {
+                checklistState = data;
+                renderUI();
+            });
+
+            window.toggleComplete = toggleComplete;
+            window.openAllNotes = openAllNotes;
+            window.openAllPDFs = openAllPDFs;
+            window.openAllShortNotes = openAllShortNotes;
         });
 
         function renderUI() {
             document.querySelectorAll('.lecture-card').forEach(card => {
                 const id = card.getAttribute('data-lecture-id');
-                if (localStorage.getItem('nst-completed-' + id) === 'true') {
+                if (checklistState[id] === true || localStorage.getItem('nst-completed-' + id) === 'true') {
                     card.classList.add('completed');
                 } else {
                     card.classList.remove('completed');
@@ -359,65 +363,18 @@
             updateProgress();
         }
 
-        async function syncWithCloud() {
-            try {
-                const res = await fetch('https://keyvalue.immanuel.co/api/KeyVal/GetValue/tjjy72bz/progress');
-                if (res.ok) {
-                    const cloudDataStr = await res.json();
-                    if (cloudDataStr && cloudDataStr !== '""' && cloudDataStr !== 'null') {
-                        const cleanStr = cloudDataStr.replace(/"/g, '');
-                        const items = cleanStr.split(',');
-                        let changed = false;
-                        items.forEach(item => {
-                            const [shortKey, val] = item.split('_');
-                            if (shortKey && val) {
-                                const currentLocal = localStorage.getItem('nst-completed-' + shortKey);
-                                const newLocal = val === '1' ? 'true' : 'false';
-                                if (currentLocal !== newLocal) {
-                                    localStorage.setItem('nst-completed-' + shortKey, newLocal);
-                                    changed = true;
-                                }
-                            }
-                        });
-                        return changed;
-                    }
-                }
-            } catch (err) {
-                console.warn('Failed to sync progress with cloud.', err);
-            }
-            return false;
-        }
-
         async function toggleComplete(event, id) {
             event.preventDefault();
             event.stopPropagation();
             const card = document.querySelector(`.lecture-card[data-lecture-id="${id}"]`);
-            const isCompleted = card.classList.toggle('completed');
+            const isCompleted = !card.classList.contains('completed');
+            
+            // Update local and Firebase
             localStorage.setItem('nst-completed-' + id, isCompleted);
+            card.classList.toggle('completed', isCompleted);
             updateProgress();
-
-            // Push updated progress to cloud
-            await pushProgress();
-        }
-
-        async function pushProgress() {
-            const progressList = [];
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                if (key.startsWith('nst-completed-')) {
-                    const val = localStorage.getItem(key) === 'true' ? '1' : '0';
-                    const shortKey = key.replace('nst-completed-', '');
-                    progressList.push(`${shortKey}_${val}`);
-                }
-            }
-            const progressStr = progressList.join(',');
-            try {
-                await fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/tjjy72bz/progress/${progressStr}`, {
-                    method: 'POST'
-                });
-            } catch (err) {
-                console.warn('Failed to upload progress to cloud.', err);
-            }
+            
+            await setChecklistProgress(id, isCompleted);
         }
 
         function updateProgress() {

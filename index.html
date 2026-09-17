@@ -160,6 +160,7 @@
             <li><a href="AML/index.html">Advanced Machine Learning</a></li>
             <li><a href="CN/index.html">Computer Networks</a></li>
             <li><a href="MCA/index.html">Modern Computer Architecture</a></li>
+            <li><a href="assignments.html">Assignments</a></li>
             <li><a href="archive.html">Archive</a></li>
         </ul>
         <div style="display:flex;align-items:center;gap:12px;">
@@ -330,14 +331,18 @@
         </div>
     </footer>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', async () => {
+    <script type="module">
+        import { listenChecklistProgress } from './js/firebase-service.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
             const subjectLectures = {
                 dl: ['dl-l1', 'dl-l2', 'dl-l3', 'dl-l4', 'dl-l5', 'dl-l6', 'dl-l7'],
                 aml: ['aml-l1', 'aml-l2', 'aml-l3', 'aml-l4'],
                 cn: ['cn-l1', 'cn-l2', 'cn-l3', 'cn-l4', 'cn-l5', 'cn-l6'],
                 mca: ['mca-l1', 'mca-l2', 'mca-l3', 'mca-l4', 'mca-l5', 'mca-l6', 'mca-l7', 'mca-l8', 'mca-l9', 'mca-l10']
             };
+
+            let checklistState = {};
 
             function renderUI() {
                 let totalLectures = 0;
@@ -346,7 +351,7 @@
                 for (const [subj, ids] of Object.entries(subjectLectures)) {
                     let completed = 0;
                     ids.forEach(id => {
-                        if (localStorage.getItem('nst-completed-' + id) === 'true') {
+                        if (checklistState[id] === true || localStorage.getItem('nst-completed-' + id) === 'true') {
                             completed++;
                         }
                     });
@@ -367,36 +372,6 @@
                 const progressVal = document.querySelector('.stats-grid .stat-item:last-child .stat-val');
                 if (progressVal) {
                     progressVal.innerText = rate + '%';
-                }
-            }
-
-            async function syncWithCloud() {
-                try {
-                    const res = await fetch('https://keyvalue.immanuel.co/api/KeyVal/GetValue/tjjy72bz/progress');
-                    if (res.ok) {
-                        const cloudDataStr = await res.json();
-                        if (cloudDataStr && cloudDataStr !== '""' && cloudDataStr !== 'null') {
-                            const cleanStr = cloudDataStr.replace(/"/g, '');
-                            const items = cleanStr.split(',');
-                            let changed = false;
-                            items.forEach(item => {
-                                const [shortKey, val] = item.split('_');
-                                if (shortKey && val) {
-                                    const currentLocal = localStorage.getItem('nst-completed-' + shortKey);
-                                    const newLocal = val === '1' ? 'true' : 'false';
-                                    if (currentLocal !== newLocal) {
-                                        localStorage.setItem('nst-completed-' + shortKey, newLocal);
-                                        changed = true;
-                                    }
-                                }
-                            });
-                            if (changed) {
-                                renderUI();
-                            }
-                        }
-                    }
-                } catch (err) {
-                    console.warn('Failed to sync progress with cloud.', err);
                 }
             }
 
@@ -443,13 +418,13 @@
                 }
             }
 
-            // Initial load
-            await syncWithCloud();
-            renderUI();
-            updateTimeline();
+            // Initial load & real-time listener
+            listenChecklistProgress((data) => {
+                checklistState = data;
+                renderUI();
+            });
 
-            // Poll for updates in background every 3 seconds
-            setInterval(syncWithCloud, 3000);
+            updateTimeline();
         });
     </script>
 </body>
