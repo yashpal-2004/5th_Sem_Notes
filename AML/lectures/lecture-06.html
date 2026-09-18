@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Advanced Machine Learning - Lecture 06</title>
+    <meta content="Study notes for Advanced Machine Learning (CSA333), Lecture 06 covering Stochastic & Mini-Batch Gradient Descent." name="description"/>
+    <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>06</text></svg>" rel="icon"/>
+    <link href="../css/style.css" rel="stylesheet"/>
+</head>
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Advanced Machine Learning</h1>
+            <p>Lecture 06 - Stochastic & Mini-Batch Gradient Descent</p>
+            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/6.PDF" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text"/>
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 4</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>Short Notes</a></li>
+                <li>
+                    <a href="#topic-1">1. Revision and Motivation<span class="sub-count">0</span></a>
+                    <ul class="sub-index">
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Stochastic Gradient Descent (SGD)<span class="sub-count">0</span></a>
+                    <ul class="sub-index">
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Mathematical Comparison: Batch GD vs SGD<span class="sub-count">0</span></a>
+                    <ul class="sub-index">
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Mini-Batch Gradient Descent<span class="sub-count">0</span></a>
+                    <ul class="sub-index">
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Short Notes -->
+            <section id="short-notes" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-short-notes')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                    </div>
+                    <h2>Short Notes &amp; Visual Summary</h2>
+                </div>
+                <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
+                    <p style="margin-bottom: 1rem;">Handwritten / quick summary notes for Lecture 06:</p>
+                    <div style="text-align: center; background: var(--bg-secondary, #f8f9fa); padding: 1rem; border-radius: 8px; border: 1px solid var(--gray-border);">
+                        <p style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-muted);">No handwritten notes available for this lecture yet.</p>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 1 -->
+            <section id="topic-1" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>Revision and Motivation</h2>
+                </div>
+                <div id="content-1" class="collapsible-content">
+                    
+<p>In Batch Gradient Descent (BGD), we compute the gradient of the average cost over all m examples and then update &theta; once.</p>
+<ul>
+    <li><strong>Stable direction:</strong> Every sample contributes, so noisy gradients average out.</li>
+    <li><strong>Good for small datasets:</strong> Exact gradients are affordable when data fits in memory.</li>
+</ul>
+<p>However, BGD demands an exact full-data gradient before it moves. This causes high cost/update and memory pressure for large datasets.</p>
+    
+                    
+                    <div class="topic-nav">
+                        <a href="lecture-05.html" class="btn" style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;">Previous Lecture</a>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 2 -->
+            <section id="topic-2" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>Stochastic Gradient Descent (SGD)</h2>
+                </div>
+                <div id="content-2" class="collapsible-content">
+                    
+<p>SGD asks one randomly chosen example for a quick direction and updates immediately.</p>
+<div class="formula-box">&theta;<sub>t+1</sub> = &theta;<sub>t</sub> - &alpha; &nabla;J<sub>i<sub>t</sub></sub>(&theta;<sub>t</sub>)</div>
+<div style="background: var(--bg-secondary); border-left: 4px solid var(--blue); padding: 1rem; border-radius: 4px; margin-top: 1rem;">
+    <strong>KEY INSIGHT:</strong> SGD is not training on only one sample forever! One update uses one sample, but one epoch uses every sample once.
+</div>
+    
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 3 -->
+            <section id="topic-3" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>Mathematical Comparison: Batch GD vs SGD</h2>
+                </div>
+                <div id="content-3" class="collapsible-content">
+                    
+<p>The key idea is simple: same objective, different gradient estimator.</p>
+<ul>
+    <li><strong>Updates per Epoch:</strong> BGD has 1. SGD has m.</li>
+    <li><strong>Cost per Update:</strong> BGD is O(md). SGD is O(d).</li>
+    <li><strong>Path:</strong> BGD is smooth. SGD is noisy but often fast in early progress.</li>
+</ul>
+    
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 4 -->
+            <section id="topic-4" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>Mini-Batch Gradient Descent</h2>
+                </div>
+                <div id="content-4" class="collapsible-content">
+                    
+<p>Mini-batch GD splits the shuffled dataset into small groups called mini-batches. Each update uses the average gradient over one mini-batch of size b.</p>
+<p>Workflow:</p>
+<ol>
+    <li>Shuffle the dataset at the start of each epoch.</li>
+    <li>Split it into mini-batches of size b.</li>
+    <li>Compute the average gradient over the first mini-batch and update &theta; immediately.</li>
+    <li>Continue until every sample has been used once.</li>
+</ol>
+<div class="formula-box">grad = grad + &nabla;J<sub>i</sub>(&theta;) <br> grad = grad/|B<sub>k</sub>| <br> &theta; := &theta; - &alpha; &middot; grad</div>
+    
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <a href="lecture-07.html" class="btn" style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;">Next Lecture</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for your reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/6.PDF" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>

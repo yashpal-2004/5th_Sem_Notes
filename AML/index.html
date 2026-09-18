@@ -36,21 +36,44 @@
             <li><a href="../assignments.html">Assignments</a></li>
             <li><a href="../archive.html">Archive</a></li>
         </ul>
-        <div class="nav-stats">4 Lectures &bull; 24 Topics</div>
+        <div class="nav-stats">9 Lectures &bull; 61 Topics</div>
     </nav>
 
     <!-- Lectures Section -->
     <section class="coursework-section">
         <div class="coursework-container">
-            <h3 class="section-label">Compiled Lectures</h3>
+                        <div class="section-header-row">
+                <h3 class="section-label">Compiled Lectures</h3>
+                <div class="bulk-actions">
+                    <button class="bulk-btn" onclick="openAllNotes()" title="Open all 9 HTML Lecture Notes in separate tabs">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                        Open All HTML Notes
+                    </button>
+                    <button class="bulk-btn" onclick="openAllPDFs()" title="Open all 9 Lecture PDFs in separate tabs">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                        Open All PDFs
+                    </button>
+                    <button class="bulk-btn" onclick="openAllShortNotes()" title="Open all 9 Short Notes Images in separate tabs">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                        Open All Short Notes
+                    </button>
+                </div>
+            </div>
             <div class="lectures-grid">
 
                 <!-- Lecture 01 -->
-                <a href="lectures/lecture-01.html" class="lecture-card" data-lecture-id="aml-l1">
+                <div class="lecture-card" data-lecture-id="aml-l1" onclick="window.location.href='lectures/lecture-01.html'">
                     <div class="lecture-card-top">
                         <div class="lecture-number">01</div>
-                        <div class="lecture-checkbox" onclick="toggleComplete(event, 'aml-l1')"
-                            title="Toggle completion status"></div>
+                        <div class="lecture-card-actions">
+                            <a href="pdfs/1.pdf" target="_blank" class="card-action-btn" title="Open Original PDF" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            </a>
+                            <a href="images/1.png" target="_blank" class="card-action-btn" title="Open Short Notes Image" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                            </a>
+                            <div class="lecture-checkbox" onclick="toggleComplete(event, 'aml-l1')" title="Toggle completion status"></div>
+                        </div>
                     </div>
                     <h2>Setting the Foundation: From Code to Learning</h2>
                     <p>Understanding traditional programming rigidity, the machine learning paradigm flip,
@@ -60,14 +83,21 @@
                         <span class="lecture-tag">Foundations</span>
                         <span class="lecture-stats">6 Topics</span>
                     </div>
-                </a>
+                </div>
 
                 <!-- Lecture 02 -->
-                <a href="lectures/lecture-02.html" class="lecture-card" data-lecture-id="aml-l2">
+                <div class="lecture-card" data-lecture-id="aml-l2" onclick="window.location.href='lectures/lecture-02.html'">
                     <div class="lecture-card-top">
                         <div class="lecture-number">02</div>
-                        <div class="lecture-checkbox" onclick="toggleComplete(event, 'aml-l2')"
-                            title="Toggle completion status"></div>
+                        <div class="lecture-card-actions">
+                            <a href="pdfs/2.pdf" target="_blank" class="card-action-btn" title="Open Original PDF" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            </a>
+                            <a href="images/2.png" target="_blank" class="card-action-btn" title="Open Short Notes Image" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                            </a>
+                            <div class="lecture-checkbox" onclick="toggleComplete(event, 'aml-l2')" title="Toggle completion status"></div>
+                        </div>
                     </div>
                     <h2>The ML Project Lifecycle (Part 1)</h2>
                     <p>Translating business objectives into quantifiable ML goals, evaluating resource constraints,
@@ -77,14 +107,21 @@
                         <span class="lecture-tag">Project Lifecycle</span>
                         <span class="lecture-stats">5 Topics</span>
                     </div>
-                </a>
+                </div>
 
                 <!-- Lecture 03 -->
-                <a href="lectures/lecture-03.html" class="lecture-card" data-lecture-id="aml-l3">
+                <div class="lecture-card" data-lecture-id="aml-l3" onclick="window.location.href='lectures/lecture-03.html'">
                     <div class="lecture-card-top">
                         <div class="lecture-number">03</div>
-                        <div class="lecture-checkbox" onclick="toggleComplete(event, 'aml-l3')"
-                            title="Toggle completion status"></div>
+                        <div class="lecture-card-actions">
+                            <a href="pdfs/3.pdf" target="_blank" class="card-action-btn" title="Open Original PDF" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            </a>
+                            <a href="images/3.png" target="_blank" class="card-action-btn" title="Open Short Notes Image" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                            </a>
+                            <div class="lecture-checkbox" onclick="toggleComplete(event, 'aml-l3')" title="Toggle completion status"></div>
+                        </div>
                     </div>
                     <h2>Simple Linear Regression Using the OLS Method</h2>
                     <p>From scatter plots to the best-fit line: residuals, three loss functions (signed/absolute/squared), closed-form OLS derivation of slope m and intercept c using partial derivatives.</p>
@@ -92,14 +129,21 @@
                         <span class="lecture-tag">Regression & OLS</span>
                         <span class="lecture-stats">6 Topics</span>
                     </div>
-                </a>
+                </div>
 
                 <!-- Lecture 04 -->
-                <a href="lectures/lecture-04.html" class="lecture-card" data-lecture-id="aml-l4">
+                <div class="lecture-card" data-lecture-id="aml-l4" onclick="window.location.href='lectures/lecture-04.html'">
                     <div class="lecture-card-top">
                         <div class="lecture-number">04</div>
-                        <div class="lecture-checkbox" onclick="toggleComplete(event, 'aml-l4')"
-                            title="Toggle completion status"></div>
+                        <div class="lecture-card-actions">
+                            <a href="pdfs/4.pdf" target="_blank" class="card-action-btn" title="Open Original PDF" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            </a>
+                            <a href="images/4.png" target="_blank" class="card-action-btn" title="Open Short Notes Image" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                            </a>
+                            <div class="lecture-checkbox" onclick="toggleComplete(event, 'aml-l4')" title="Toggle completion status"></div>
+                        </div>
                     </div>
                     <h2>Multiple Linear Regression Using the OLS Method</h2>
                     <p>From SLR to MLR: design matrix X, matrix prediction ŷ=Xβ, residual vectors, expanding the OLS loss, three matrix calculus identities, and the Normal Equation β*=(XᵀX)⁻¹Xᵀy.</p>
@@ -107,7 +151,117 @@
                         <span class="lecture-tag">MLR & Matrix OLS</span>
                         <span class="lecture-stats">7 Topics</span>
                     </div>
-                </a>
+                </div>
+
+                <!-- Lecture 05 -->
+                <div class="lecture-card" data-lecture-id="aml-l5" onclick="window.location.href='lectures/lecture-05.html'">
+                    <div class="lecture-card-top">
+                        <div class="lecture-number">05</div>
+                        <div class="lecture-card-actions">
+                            <a href="pdfs/5.PDF" target="_blank" class="card-action-btn" title="Open Original PDF" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            </a>
+                            <a href="images/5.png" target="_blank" class="card-action-btn" title="Open Short Notes Image" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                            </a>
+                            <div class="lecture-checkbox" onclick="toggleComplete(event, 'aml-l5')" title="Toggle completion status"></div>
+                        </div>
+                    </div>
+                    <h2>Batch Gradient Descent for Multiple Linear Regression</h2>
+                    <p>Limitations of OLS, introduction to gradient descent, derivation of the batch gradient descent update for MSE, and hyperparameters tuning.</p>
+                    <div class="lecture-card-header">
+                        <span class="lecture-tag">Gradient Descent</span>
+                        <span class="lecture-stats">6 Topics</span>
+                    </div>
+                </div>
+
+                <!-- Lecture 06 -->
+                <div class="lecture-card" data-lecture-id="aml-l6" onclick="window.location.href='lectures/lecture-06.html'">
+                    <div class="lecture-card-top">
+                        <div class="lecture-number">06</div>
+                        <div class="lecture-card-actions">
+                            <a href="pdfs/6.PDF" target="_blank" class="card-action-btn" title="Open Original PDF" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            </a>
+                            <a href="images/6.png" target="_blank" class="card-action-btn" title="Open Short Notes Image" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                            </a>
+                            <div class="lecture-checkbox" onclick="toggleComplete(event, 'aml-l6')" title="Toggle completion status"></div>
+                        </div>
+                    </div>
+                    <h2>Stochastic & Mini-Batch Gradient Descent</h2>
+                    <p>Revision and motivation for SGD, mathematical comparison between BGD and SGD, advantages and limitations, and an introduction to Mini-Batch Gradient Descent.</p>
+                    <div class="lecture-card-header">
+                        <span class="lecture-tag">Stochastic GD</span>
+                        <span class="lecture-stats">12 Topics</span>
+                    </div>
+                </div>
+
+                <!-- Lecture 07 -->
+                <div class="lecture-card" data-lecture-id="aml-l7" onclick="window.location.href='lectures/lecture-07.html'">
+                    <div class="lecture-card-top">
+                        <div class="lecture-number">07</div>
+                        <div class="lecture-card-actions">
+                            <a href="pdfs/7.PDF" target="_blank" class="card-action-btn" title="Open Original PDF" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            </a>
+                            <a href="images/7.png" target="_blank" class="card-action-btn" title="Open Short Notes Image" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                            </a>
+                            <div class="lecture-checkbox" onclick="toggleComplete(event, 'aml-l7')" title="Toggle completion status"></div>
+                        </div>
+                    </div>
+                    <h2>Regression and Classification Evaluation Metrics</h2>
+                    <p>Training loss vs evaluation metrics, MAE, MAPE, MSE, RMSE, R-squared, Confusion Matrix, Precision, Recall, F1 score, and macro/weighted/micro averages.</p>
+                    <div class="lecture-card-header">
+                        <span class="lecture-tag">Metrics</span>
+                        <span class="lecture-stats">10 Topics</span>
+                    </div>
+                </div>
+
+                <!-- Lecture 08 -->
+                <div class="lecture-card" data-lecture-id="aml-l8" onclick="window.location.href='lectures/lecture-08.html'">
+                    <div class="lecture-card-top">
+                        <div class="lecture-number">08</div>
+                        <div class="lecture-card-actions">
+                            <a href="pdfs/8.PDF" target="_blank" class="card-action-btn" title="Open Original PDF" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            </a>
+                            <a href="images/8.png" target="_blank" class="card-action-btn" title="Open Short Notes Image" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                            </a>
+                            <div class="lecture-checkbox" onclick="toggleComplete(event, 'aml-l8')" title="Toggle completion status"></div>
+                        </div>
+                    </div>
+                    <h2>Bias, Variance and the Bias-Variance Tradeoff</h2>
+                    <p>Understanding Bias and Variance, Estimators, Diagnosing High Bias and High Variance, and Learning Curves.</p>
+                    <div class="lecture-card-header">
+                        <span class="lecture-tag">Bias & Variance</span>
+                        <span class="lecture-stats">4 Topics</span>
+                    </div>
+                </div>
+
+                <!-- Lecture 09 -->
+                <div class="lecture-card" data-lecture-id="aml-l9" onclick="window.location.href='lectures/lecture-09.html'">
+                    <div class="lecture-card-top">
+                        <div class="lecture-number">09</div>
+                        <div class="lecture-card-actions">
+                            <a href="pdfs/9.PDF" target="_blank" class="card-action-btn" title="Open Original PDF" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            </a>
+                            <a href="images/9.png" target="_blank" class="card-action-btn" title="Open Short Notes Image" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                            </a>
+                            <div class="lecture-checkbox" onclick="toggleComplete(event, 'aml-l9')" title="Toggle completion status"></div>
+                        </div>
+                    </div>
+                    <h2>Feature Selection</h2>
+                    <p>Why feature selection is important, Filter Methods vs Wrapper Methods, and Validation Discipline to avoid Data Leakage.</p>
+                    <div class="lecture-card-header">
+                        <span class="lecture-tag">Feature Selection</span>
+                        <span class="lecture-stats">4 Topics</span>
+                    </div>
+                </div>
 
             </div>
         </div>
@@ -118,11 +272,11 @@
         <h3 class="stats-title">AML Notes Metrics</h3>
         <div class="stats-grid">
             <div class="stat-item">
-                <div class="stat-val">4</div>
+                <div class="stat-val">9</div>
                 <div class="stat-label">Lectures Compiled</div>
             </div>
             <div class="stat-item">
-                <div class="stat-val">24</div>
+                <div class="stat-val">61</div>
                 <div class="stat-label">Topics</div>
             </div>
             <div class="stat-item">
@@ -161,6 +315,10 @@
                     renderUI();
                 }
             }, 3000);
+
+            window.openAllNotes = openAllNotes;
+            window.openAllPDFs = openAllPDFs;
+            window.openAllShortNotes = openAllShortNotes;
         });
 
         function renderUI() {
@@ -243,6 +401,25 @@
             const progressVal = document.querySelector('.stats-grid .stat-item:last-child .stat-val');
             if (progressVal) {
                 progressVal.innerText = rate + '%';
+            }
+        }
+
+        function openAllNotes() {
+            for (let i = 1; i <= 9; i++) {
+                const num = String(i).padStart(2, '0');
+                window.open(`lectures/lecture-${num}.html`, '_blank');
+            }
+        }
+
+        function openAllPDFs() {
+            for (let i = 1; i <= 9; i++) {
+                window.open(`pdfs/${i}.pdf`, '_blank');
+            }
+        }
+
+        function openAllShortNotes() {
+            for (let i = 1; i <= 9; i++) {
+                window.open(`images/${i}.png`, '_blank');
             }
         }
     </script>

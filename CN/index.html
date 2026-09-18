@@ -42,15 +42,38 @@
     <!-- Lectures Section -->
     <section class="coursework-section">
         <div class="coursework-container">
-            <h3 class="section-label">Compiled Lectures</h3>
+                        <div class="section-header-row">
+                <h3 class="section-label">Compiled Lectures</h3>
+                <div class="bulk-actions">
+                    <button class="bulk-btn" onclick="openAllNotes()" title="Open all 6 HTML Lecture Notes in separate tabs">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                        Open All HTML Notes
+                    </button>
+                    <button class="bulk-btn" onclick="openAllPDFs()" title="Open all 6 Lecture PDFs in separate tabs">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                        Open All PDFs
+                    </button>
+                    <button class="bulk-btn" onclick="openAllShortNotes()" title="Open all 6 Short Notes Images in separate tabs">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                        Open All Short Notes
+                    </button>
+                </div>
+            </div>
             <div class="lectures-grid">
 
                 <!-- Lecture 01 -->
-                <a href="lectures/lecture-01.html" class="lecture-card" data-lecture-id="cn-l1">
+                <div class="lecture-card" data-lecture-id="cn-l1" onclick="window.location.href='lectures/lecture-01.html'">
                     <div class="lecture-card-top">
                         <div class="lecture-number">01</div>
-                        <div class="lecture-checkbox" onclick="toggleComplete(event, 'cn-l1')"
-                            title="Toggle completion status"></div>
+                        <div class="lecture-card-actions">
+                            <a href="pdfs/1.pdf" target="_blank" class="card-action-btn" title="Open Original PDF" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            </a>
+                            <a href="images/1.png" target="_blank" class="card-action-btn" title="Open Short Notes Image" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                            </a>
+                            <div class="lecture-checkbox" onclick="toggleComplete(event, 'cn-l1')" title="Toggle completion status"></div>
+                        </div>
                     </div>
                     <h2>Introduction: The Cloud, Infrastructure & Top-Down Layers</h2>
                     <p>Understanding data center connectivity, network classifications (PAN, LAN, MAN, WAN), subsea
@@ -59,14 +82,21 @@
                         <span class="lecture-tag">Introduction</span>
                         <span class="lecture-stats">5 Topics</span>
                     </div>
-                </a>
+                </div>
 
                 <!-- Lecture 02 -->
-                <a href="lectures/lecture-02.html" class="lecture-card" data-lecture-id="cn-l2">
+                <div class="lecture-card" data-lecture-id="cn-l2" onclick="window.location.href='lectures/lecture-02.html'">
                     <div class="lecture-card-top">
                         <div class="lecture-number">02</div>
-                        <div class="lecture-checkbox" onclick="toggleComplete(event, 'cn-l2')"
-                            title="Toggle completion status"></div>
+                        <div class="lecture-card-actions">
+                            <a href="pdfs/2.pdf" target="_blank" class="card-action-btn" title="Open Original PDF" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            </a>
+                            <a href="images/2.png" target="_blank" class="card-action-btn" title="Open Short Notes Image" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                            </a>
+                            <div class="lecture-checkbox" onclick="toggleComplete(event, 'cn-l2')" title="Toggle completion status"></div>
+                        </div>
                     </div>
                     <h2>Moving Data Through the Core: Switching, Delays & Bottlenecks</h2>
                     <p>Comparing circuit switching vs packet switching, store-and-forward rule, calculating transmission
@@ -75,14 +105,21 @@
                         <span class="lecture-tag">Network Core</span>
                         <span class="lecture-stats">5 Topics</span>
                     </div>
-                </a>
+                </div>
 
                 <!-- Lecture 03 -->
-                <a href="lectures/lecture-03.html" class="lecture-card" data-lecture-id="cn-l3">
+                <div class="lecture-card" data-lecture-id="cn-l3" onclick="window.location.href='lectures/lecture-03.html'">
                     <div class="lecture-card-top">
                         <div class="lecture-number">03</div>
-                        <div class="lecture-checkbox" onclick="toggleComplete(event, 'cn-l3')"
-                            title="Toggle completion status"></div>
+                        <div class="lecture-card-actions">
+                            <a href="pdfs/3.pdf" target="_blank" class="card-action-btn" title="Open Original PDF" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            </a>
+                            <a href="images/3.png" target="_blank" class="card-action-btn" title="Open Short Notes Image" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                            </a>
+                            <div class="lecture-checkbox" onclick="toggleComplete(event, 'cn-l3')" title="Toggle completion status"></div>
+                        </div>
                     </div>
                     <h2>The OSI and TCP/IP Reference Models</h2>
                     <p>Understanding layering mechanics, OSI 7-layer stacks, TCP/IP mappings, headers, encapsulation, and Layer 2/3 addressing scopes.</p>
@@ -90,14 +127,21 @@
                         <span class="lecture-tag">Layering Models</span>
                         <span class="lecture-stats">5 Topics</span>
                     </div>
-                </a>
+                </div>
 
                 <!-- Lecture 04 -->
-                <a href="lectures/lecture-04.html" class="lecture-card" data-lecture-id="cn-l4">
+                <div class="lecture-card" data-lecture-id="cn-l4" onclick="window.location.href='lectures/lecture-04.html'">
                     <div class="lecture-card-top">
                         <div class="lecture-number">04</div>
-                        <div class="lecture-checkbox" onclick="toggleComplete(event, 'cn-l4')"
-                            title="Toggle completion status"></div>
+                        <div class="lecture-card-actions">
+                            <a href="pdfs/4.pdf" target="_blank" class="card-action-btn" title="Open Original PDF" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            </a>
+                            <a href="images/4.png" target="_blank" class="card-action-btn" title="Open Short Notes Image" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                            </a>
+                            <div class="lecture-checkbox" onclick="toggleComplete(event, 'cn-l4')" title="Toggle completion status"></div>
+                        </div>
                     </div>
                     <h2>Networking Devices, Topologies & The Cloud Network</h2>
                     <p>Compares Hubs, Switches, Routers, and Gateways, visual physical topologies (Mesh, Star, Hybrid), and Cloud datacenter models.</p>
@@ -105,14 +149,21 @@
                         <span class="lecture-tag">Infrastructure</span>
                         <span class="lecture-stats">5 Topics</span>
                     </div>
-                </a>
+                </div>
 
                 <!-- Lecture 05 -->
-                <a href="lectures/lecture-05.html" class="lecture-card" data-lecture-id="cn-l5">
+                <div class="lecture-card" data-lecture-id="cn-l5" onclick="window.location.href='lectures/lecture-05.html'">
                     <div class="lecture-card-top">
                         <div class="lecture-number">05</div>
-                        <div class="lecture-checkbox" onclick="toggleComplete(event, 'cn-l5')"
-                            title="Toggle completion status"></div>
+                        <div class="lecture-card-actions">
+                            <a href="pdfs/5.pdf" target="_blank" class="card-action-btn" title="Open Original PDF" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            </a>
+                            <a href="images/5.png" target="_blank" class="card-action-btn" title="Open Short Notes Image" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                            </a>
+                            <div class="lecture-checkbox" onclick="toggleComplete(event, 'cn-l5')" title="Toggle completion status"></div>
+                        </div>
                     </div>
                     <h2>Application Layer: Architecture, Protocols & APIs</h2>
                     <p>Client/Server vs P2P models, HTTP stateless request/response, cookie-based sessions, HTTP versions (1.0 to 3.0), QUIC over UDP, and REST APIs.</p>
@@ -120,14 +171,21 @@
                         <span class="lecture-tag">Application Layer</span>
                         <span class="lecture-stats">5 Topics</span>
                     </div>
-                </a>
+                </div>
 
                 <!-- Lecture 06 -->
-                <a href="lectures/lecture-06.html" class="lecture-card" data-lecture-id="cn-l6">
+                <div class="lecture-card" data-lecture-id="cn-l6" onclick="window.location.href='lectures/lecture-06.html'">
                     <div class="lecture-card-top">
                         <div class="lecture-number">06</div>
-                        <div class="lecture-checkbox" onclick="toggleComplete(event, 'cn-l6')"
-                            title="Toggle completion status"></div>
+                        <div class="lecture-card-actions">
+                            <a href="pdfs/6.pdf" target="_blank" class="card-action-btn" title="Open Original PDF" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            </a>
+                            <a href="images/6.png" target="_blank" class="card-action-btn" title="Open Short Notes Image" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                            </a>
+                            <div class="lecture-checkbox" onclick="toggleComplete(event, 'cn-l6')" title="Toggle completion status"></div>
+                        </div>
                     </div>
                     <h2>HTTPS & TLS Handshake: Securing the Web</h2>
                     <p>Cryptography core goals (CIA), Symmetric vs Asymmetric encryption logic, SSL/TLS handshake stages, Certificates, and AWS ACM setup.</p>
@@ -135,7 +193,7 @@
                         <span class="lecture-tag">Security</span>
                         <span class="lecture-stats">5 Topics</span>
                     </div>
-                </a>
+                </div>
 
             </div>
         </div>
@@ -189,6 +247,10 @@
                     renderUI();
                 }
             }, 3000);
+
+            window.openAllNotes = openAllNotes;
+            window.openAllPDFs = openAllPDFs;
+            window.openAllShortNotes = openAllShortNotes;
         });
 
         function renderUI() {
@@ -271,6 +333,25 @@
             const progressVal = document.querySelector('.stats-grid .stat-item:last-child .stat-val');
             if (progressVal) {
                 progressVal.innerText = rate + '%';
+            }
+        }
+
+        function openAllNotes() {
+            for (let i = 1; i <= 6; i++) {
+                const num = String(i).padStart(2, '0');
+                window.open(`lectures/lecture-${num}.html`, '_blank');
+            }
+        }
+
+        function openAllPDFs() {
+            for (let i = 1; i <= 6; i++) {
+                window.open(`pdfs/${i}.pdf`, '_blank');
+            }
+        }
+
+        function openAllShortNotes() {
+            for (let i = 1; i <= 6; i++) {
+                window.open(`images/${i}.png`, '_blank');
             }
         }
     </script>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Advanced Machine Learning - Lecture 07</title>
+    <meta content="Study notes for Advanced Machine Learning (CSA333), Lecture 07 covering Regression and Classification Evaluation Metrics." name="description"/>
+    <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>07</text></svg>" rel="icon"/>
+    <link href="../css/style.css" rel="stylesheet"/>
+</head>
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Advanced Machine Learning</h1>
+            <p>Lecture 07 - Regression and Classification Evaluation Metrics</p>
+            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/7.PDF" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text"/>
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 4</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>Short Notes</a></li>
+                <li>
+                    <a href="#topic-1">1. Training Has Ended; Evaluation Begins<span class="sub-count">0</span></a>
+                    <ul class="sub-index">
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Regression Error Metrics<span class="sub-count">0</span></a>
+                    <ul class="sub-index">
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. R2 and Adjusted R2<span class="sub-count">0</span></a>
+                    <ul class="sub-index">
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Classification Evaluation Metrics<span class="sub-count">0</span></a>
+                    <ul class="sub-index">
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Short Notes -->
+            <section id="short-notes" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-short-notes')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                    </div>
+                    <h2>Short Notes &amp; Visual Summary</h2>
+                </div>
+                <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
+                    <p style="margin-bottom: 1rem;">Handwritten / quick summary notes for Lecture 07:</p>
+                    <div style="text-align: center; background: var(--bg-secondary, #f8f9fa); padding: 1rem; border-radius: 8px; border: 1px solid var(--gray-border);">
+                        <p style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-muted);">No handwritten notes available for this lecture yet.</p>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 1 -->
+            <section id="topic-1" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>Training Has Ended; Evaluation Begins</h2>
+                </div>
+                <div id="content-1" class="collapsible-content">
+                    
+<p>The same expression can play both roles. MSE is a loss when it guides learning and an evaluation metric when it judges a finished model.</p>
+<ul>
+    <li><strong>Training loss:</strong> Guides parameter updates during training.</li>
+    <li><strong>Evaluation metric:</strong> Judges a fixed model after training (on validation or test data).</li>
+</ul>
+    
+                    
+                    <div class="topic-nav">
+                        <a href="lecture-06.html" class="btn" style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;">Previous Lecture</a>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 2 -->
+            <section id="topic-2" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>Regression Error Metrics</h2>
+                </div>
+                <div id="content-2" class="collapsible-content">
+                    
+<p>Signed residuals show direction, but positive and negative values can cancel.</p>
+<ul>
+    <li><strong>MAE (Mean Absolute Error):</strong> Easy to interpret. Hides direction.</li>
+    <li><strong>MAPE:</strong> A scale-free percentage. Undefined at y=0.</li>
+    <li><strong>MSE (Mean Squared Error):</strong> Strongly penalizes large misses; useful in optimization.</li>
+    <li><strong>RMSE (Root Mean Squared Error):</strong> Keeps large-error penalty but returns to target unit.</li>
+</ul>
+<div class="formula-box">MAE = (1/n) &Sigma; |e<sub>i</sub>|</div>
+<div class="formula-box">MSE = (1/n) &Sigma; e<sub>i</sub><sup>2</sup></div>
+    
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 3 -->
+            <section id="topic-3" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>R2 and Adjusted R2</h2>
+                </div>
+                <div id="content-3" class="collapsible-content">
+                    
+<p>R-squared compares the leftover variation with original variation.</p>
+<div class="formula-box">R<sup>2</sup> = 1 - (RSS / TSS)</div>
+<p>Adding a predictor cannot increase RSS; therefore training R<sup>2</sup> cannot decrease. Adjusted R<sup>2</sup> penalizes unnecessary features.</p>
+<div class="formula-box">R<sup>2</sup><sub>adj</sub> = 1 - (1 - R<sup>2</sup>) &middot; (n - 1) / (n - p - 1)</div>
+    
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+            <!-- Topic 4 -->
+            <section id="topic-4" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>Classification Evaluation Metrics</h2>
+                </div>
+                <div id="content-4" class="collapsible-content">
+                    
+<p>Accuracy tells how often the complete label was correct, but it does not identify the type or direction of error.</p>
+<ul>
+    <li><strong>Precision:</strong> TP / (TP + FP) - Among predicted positives, how many are correct?</li>
+    <li><strong>Recall / TPR:</strong> TP / (TP + FN) - Among actual positives, how many are found?</li>
+    <li><strong>F1 Score:</strong> Harmonic balance of precision and recall.</li>
+</ul>
+<div class="formula-box">F1 = 2 &middot; (Precision &middot; Recall) / (Precision + Recall)</div>
+    
+                    
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <a href="lecture-08.html" class="btn" style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;">Next Lecture</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for your reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/7.PDF" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>
