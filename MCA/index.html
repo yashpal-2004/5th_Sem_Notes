@@ -36,7 +36,7 @@
             <li><a href="../assignments.html">Assignments</a></li>
             <li><a href="../archive.html">Archive</a></li>
         </ul>
-        <div class="nav-stats">10 Lectures &bull; 50 Topics</div>
+        <div class="nav-stats">11 Lectures &bull; 55 Topics</div>
     </nav>
 
     <!-- Lectures Section -->
@@ -294,6 +294,29 @@
                     </div>
                 </div>
 
+                <!-- Lecture 11 -->
+                <div class="lecture-card" data-lecture-id="mca-l11" onclick="window.location.href='lectures/lecture-11.html'">
+                    <div class="lecture-card-top">
+                        <div class="lecture-number">11</div>
+                        <div class="lecture-card-actions">
+                            <a href="pdfs/11.pdf" target="_blank" class="card-action-btn" title="Open Original PDF" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            </a>
+                            <a href="pdfs/11.pdf" target="_blank" class="card-action-btn" title="Open Short Notes PDF" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                            </a>
+                            <div class="lecture-checkbox" onclick="toggleComplete(event, 'mca-l11')"
+                                title="Toggle completion status"></div>
+                        </div>
+                    </div>
+                    <h2>Von Neumann vs. Harvard Architecture &amp; Bottleneck</h2>
+                    <p>Stored-program concept, single shared bus contention, von Neumann bottleneck, pure Harvard dual-bus topology, Modified Harvard split L1 caches, and memory bandwidth calculations.</p>
+                    <div class="lecture-card-header">
+                        <span class="lecture-tag">Architecture &amp; Buses</span>
+                        <span class="lecture-stats">5 Topics</span>
+                    </div>
+                </div>
+
             </div>
         </div>
     </section>
@@ -303,11 +326,11 @@
         <h3 class="stats-title">MCA Notes Metrics</h3>
         <div class="stats-grid">
             <div class="stat-item">
-                <div class="stat-val">10</div>
+                <div class="stat-val">11</div>
                 <div class="stat-label">Lectures Compiled</div>
             </div>
             <div class="stat-item">
-                <div class="stat-val">50</div>
+                <div class="stat-val">55</div>
                 <div class="stat-label">Topics</div>
             </div>
             <div class="stat-item">
@@ -388,20 +411,20 @@
         }
 
         function openAllNotes() {
-            for (let i = 1; i <= 10; i++) {
+            for (let i = 1; i <= 11; i++) {
                 const num = String(i).padStart(2, '0');
                 window.open(`lectures/lecture-${num}.html`, '_blank');
             }
         }
 
         function openAllPDFs() {
-            for (let i = 1; i <= 10; i++) {
+            for (let i = 1; i <= 11; i++) {
                 window.open(`pdfs/${i}.pdf`, '_blank');
             }
         }
 
         function openAllShortNotes() {
-            for (let i = 1; i <= 10; i++) {
+            for (let i = 1; i <= 11; i++) {
                 window.open(`images/${i}.png`, '_blank');
             }
         }

@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Modern Computer Architecture - Lecture 11</title>
+    <meta
+        content="Study notes for Modern Computer Architecture (CSA222), Lecture 11 covering Computer Organization: von Neumann Architecture, Stored-Program Concept, von Neumann Bottleneck, Harvard Architecture, and Modified Harvard Split L1 Caches."
+        name="description" />
+    <link
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>11</text></svg>"
+        rel="icon" />
+    <link href="../css/style.css" rel="stylesheet" />
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}]});"></script>
+</head>
+
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Modern Computer Architecture</h1>
+            <p>Lecture 11 - Computer Organization: Von Neumann vs. Harvard Architecture &amp; The Bottleneck</p>
+            <a href="../index.html"
+                style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">←
+                Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/11.pdf"
+                style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;"
+                target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text" />
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 5</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            style="vertical-align: text-bottom; margin-right: 4px;">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>Short Notes</a></li>
+                <li>
+                    <a href="#topic-1">1. Von Neumann Architecture &amp; Stored-Program<span class="sub-count">4</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 The Stored-Program Concept (1945 Blueprint)</a></li>
+                        <li><a href="#sub-1-2">1.2 Unified Memory Space: Code &amp; Data Coexistence</a></li>
+                        <li><a href="#sub-1-3">1.3 The Four Classic Components</a></li>
+                        <li><a href="#sub-1-4">1.4 "Programs ARE Data" &amp; Security Implications</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. The Von Neumann Bottleneck<span class="sub-count">4</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 Single Shared Bus Limitation</a></li>
+                        <li><a href="#sub-2-2">2.2 Bus Contention &amp; Execution Stalls</a></li>
+                        <li><a href="#sub-2-3">2.3 IPC Caps &amp; The Widening Frequency Gap</a></li>
+                        <li><a href="#sub-2-4">2.4 Architectural Responses to the Bottleneck</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Harvard Architecture &amp; Parallel Buses<span class="sub-count">4</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 Dual Memory &amp; Dual Bus Topology</a></li>
+                        <li><a href="#sub-3-2">3.2 Simultaneous Instruction &amp; Data Access</a></li>
+                        <li><a href="#sub-3-3">3.3 Historical Origins: Harvard Mark I (1944)</a></li>
+                        <li><a href="#sub-3-4">3.4 Application Domains: DSPs &amp; Microcontrollers</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Modified Harvard Architecture (Modern Hybrid)<span class="sub-count">4</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 Hybrid Topology: Von Neumann Outside, Harvard Inside</a></li>
+                        <li><a href="#sub-4-2">4.2 Split L1-I and L1-D Caches over Unified DRAM</a></li>
+                        <li><a href="#sub-4-3">4.3 Hardware Cache Coherence Management</a></li>
+                        <li><a href="#sub-4-4">4.4 Real-World Processor Classification</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Quantitative Bandwidth &amp; Comparison Matrix<span class="sub-count">4</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 Von Neumann vs. Harvard Comparison Matrix</a></li>
+                        <li><a href="#sub-5-2">5.2 Worked Calculation: Memory Bandwidth Analysis</a></li>
+                        <li><a href="#sub-5-3">5.3 Exam Pitfalls &amp; Misconceptions</a></li>
+                        <li><a href="#sub-5-4">5.4 Exit Ticket &amp; Rapid-Fire Questions</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round"
+                            stroke-linejoin="round" stroke-width="2"
+                            style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" x2="8" y1="13" y2="13"></line>
+                            <line x1="16" x2="8" y1="17" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>Original PDF</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Short Notes -->
+            <section id="short-notes" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-short-notes')">
+                    <div class="topic-number"
+                        style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                    </div>
+                    <h2>Short Notes &amp; Visual Summary</h2>
+                </div>
+                <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
+                    <p style="margin-bottom: 1rem;">Quick summary and core architectural blueprints for Lecture 11:</p>
+                    
+                    <div class="box box-blue">
+                        <div class="box-title">Key Computer Organization Takeaways</div>
+                        <ul>
+                            <li><strong>Von Neumann Architecture (1945):</strong> Features a single unified memory holding both program code and data, accessed via a single shared system bus. Simple and universal, but limited by serial memory access.</li>
+                            <li><strong>The Von Neumann Bottleneck:</strong> Because instructions and data must take turns crossing the single shared bus, the CPU frequently stalls waiting for memory transfers, capping achievable IPC.</li>
+                            <li><strong>Harvard Architecture:</strong> Features separate memories and separate buses for instructions (I-Bus) and data (D-Bus). Enables simultaneous instruction fetch and data read/write in the exact same clock cycle.</li>
+                            <li><strong>Modified Harvard Architecture:</strong> The universal modern hybrid (x86-64, ARM, Apple M-series). Uses unified main DRAM (von Neumann style) for software flexibility, combined with split L1-I and L1-D caches (Harvard style) inside the CPU die for maximum parallel throughput.</li>
+                        </ul>
+                    </div>
+
+                    <div style="text-align: center; background: var(--bg-secondary, #f8f9fa); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--gray-border); margin-top: 1rem;">
+                        <div style="font-weight: 700; font-size: 1.1rem; color: var(--text-dark); margin-bottom: 0.5rem;">Visual Blueprint Comparison</div>
+                        <div style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 1rem; text-align: left; margin-top: 1rem;">
+                            <div style="flex: 1; min-width: 260px; background: white; padding: 1rem; border-radius: 6px; border: 1px solid var(--border-light); display: flex; flex-direction: column; justify-content: space-between;">
+                                <div>
+                                    <h4 style="color: var(--blue); margin-bottom: 0.75rem;">Von Neumann Model</h4>
+                                    <div style="display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.78rem; font-weight: 600; flex-wrap: wrap; margin-bottom: 0.75rem; background: var(--bg-beige); padding: 0.6rem; border-radius: 6px;">
+                                        <span style="background: rgba(124, 58, 237, 0.1); color: var(--blue); padding: 3px 7px; border-radius: 5px;">CPU</span>
+                                        <svg width="16" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16l-4-4m0 0l4-4m-4 4h18"/><path d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                                        <span style="background: #132219; color: white; padding: 3px 7px; border-radius: 5px;">Shared Bus</span>
+                                        <svg width="16" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16l-4-4m0 0l4-4m-4 4h18"/><path d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                                        <span style="background: rgba(124, 58, 237, 0.1); color: var(--blue); padding: 3px 7px; border-radius: 5px;">Memory</span>
+                                    </div>
+                                </div>
+                                <ul style="font-size: 0.82rem; margin-top: 0.5rem; padding-left: 1.2rem;">
+                                    <li>1 Bus, 1 Memory Space</li>
+                                    <li>Sequential 2-Cycle Fetch &amp; Access</li>
+                                    <li>Software flexibility, low cost</li>
+                                </ul>
+                            </div>
+                            <div style="flex: 1; min-width: 260px; background: white; padding: 1rem; border-radius: 6px; border: 1px solid var(--border-light); display: flex; flex-direction: column; justify-content: space-between;">
+                                <div>
+                                    <h4 style="color: var(--green); margin-bottom: 0.75rem;">Pure Harvard Model</h4>
+                                    <div style="display: flex; flex-direction: column; gap: 6px; font-size: 0.75rem; font-weight: 600; margin-bottom: 0.75rem; background: var(--bg-beige); padding: 0.6rem; border-radius: 6px;">
+                                        <div style="display: flex; align-items: center; justify-content: center; gap: 6px;">
+                                            <span style="background: rgba(67, 160, 71, 0.1); color: var(--green); padding: 2px 6px; border-radius: 4px;">CPU</span>
+                                            <span style="font-size: 0.65rem; color: var(--green); font-weight: 700; background: rgba(67,160,71,0.15); padding: 1px 4px; border-radius: 3px;">I-BUS</span>
+                                            <svg width="14" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16l-4-4m0 0l4-4m-4 4h18"/><path d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                                            <span style="background: rgba(67, 160, 71, 0.1); color: var(--green); padding: 2px 6px; border-radius: 4px;">I-RAM</span>
+                                        </div>
+                                        <div style="display: flex; align-items: center; justify-content: center; gap: 6px;">
+                                            <span style="background: rgba(67, 160, 71, 0.1); color: var(--green); padding: 2px 6px; border-radius: 4px;">CPU</span>
+                                            <span style="font-size: 0.65rem; color: var(--green); font-weight: 700; background: rgba(67,160,71,0.15); padding: 1px 4px; border-radius: 3px;">D-BUS</span>
+                                            <svg width="14" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16l-4-4m0 0l4-4m-4 4h18"/><path d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                                            <span style="background: rgba(67, 160, 71, 0.1); color: var(--green); padding: 2px 6px; border-radius: 4px;">D-RAM</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <ul style="font-size: 0.82rem; margin-top: 0.5rem; padding-left: 1.2rem;">
+                                    <li>2 Buses, 2 Physical Memories</li>
+                                    <li>Parallel 1-Cycle Fetch + Access</li>
+                                    <li>DSP &amp; Microcontroller determinism</li>
+                                </ul>
+                            </div>
+                            <div style="flex: 1; min-width: 260px; background: white; padding: 1rem; border-radius: 6px; border: 1px solid var(--border-light); display: flex; flex-direction: column; justify-content: space-between;">
+                                <div>
+                                    <h4 style="color: var(--orange); margin-bottom: 0.75rem;">Modified Harvard (Modern)</h4>
+                                    <div style="display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 0.72rem; font-weight: 600; flex-wrap: wrap; margin-bottom: 0.75rem; background: var(--bg-beige); padding: 0.6rem; border-radius: 6px;">
+                                        <span style="background: rgba(251, 140, 0, 0.12); color: #d97706; padding: 2px 5px; border-radius: 4px;">CPU Core</span>
+                                        <svg width="12" height="10" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16l-4-4m0 0l4-4m-4 4h18"/><path d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                                        <span style="background: rgba(251, 140, 0, 0.12); color: #d97706; padding: 2px 5px; border-radius: 4px;">Split L1</span>
+                                        <svg width="12" height="10" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16l-4-4m0 0l4-4m-4 4h18"/><path d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                                        <span style="background: rgba(251, 140, 0, 0.12); color: #d97706; padding: 2px 5px; border-radius: 4px;">Unified L2/L3</span>
+                                        <svg width="12" height="10" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16l-4-4m0 0l4-4m-4 4h18"/><path d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                                        <span style="background: rgba(251, 140, 0, 0.12); color: #d97706; padding: 2px 5px; border-radius: 4px;">DRAM</span>
+                                    </div>
+                                </div>
+                                <ul style="font-size: 0.82rem; margin-top: 0.5rem; padding-left: 1.2rem;">
+                                    <li>Harvard on-chip (Split L1 Cache)</li>
+                                    <li>Von Neumann off-chip (Unified DRAM)</li>
+                                    <li>Universal modern PC &amp; Mobile standard</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 1 -->
+            <section class="topic-section" id="topic-1">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>Von Neumann Architecture &amp; Stored-Program Concept</h2>
+                </div>
+                <div class="collapsible-content" id="content-1">
+                    <h3 id="sub-1-1">1.1 The Stored-Program Concept (1945 Blueprint)</h3>
+                    <p>Prior to 1945, early electromechanical and electronic calculating machines (such as the ENIAC) were <strong>hardwired</strong> for specific calculations. Reprogramming required technicians to physically manipulate patch cables, flip toggle switches, and rewire physical circuits over hours or days.</p>
+                    <p>In 1945, mathematician <strong>John von Neumann</strong> (synthesizing ideas from J. Presper Eckert, John Mauchly, and Alan Turing) formalized the <strong>Stored-Program Concept</strong> in his famous <em>"First Draft of a Report on the EDVAC"</em>. The radical core insight was:</p>
+                    <div class="box box-blue">
+                        <div class="box-title">The Stored-Program Principle</div>
+                        <p>A computer's program code (instructions) can be encoded as binary numbers and stored inside the <strong>same electronic memory</strong> as user data. To run a completely different program, the machine does not need rewiring; it simply loads a different sequence of numbers into memory.</p>
+                    </div>
+
+                    <h3 id="sub-1-2">1.2 Unified Memory Space: Code &amp; Data Coexistence</h3>
+                    <p>In a von Neumann architecture, instructions and data share a single address space and reside side-by-side in main memory. The CPU hardware differentiates between an instruction word and a data value solely based on the current context of execution (e.g., whether the address was fetched during an Instruction Fetch cycle pointed to by the Program Counter):</p>
+                    
+                    <table style="width:100%; border-collapse: collapse; margin: 1.2rem 0; font-size: 0.9rem;">
+                        <thead>
+                            <tr style="background-color: var(--text-dark); color: var(--bg-beige);">
+                                <th style="padding:0.6rem; border: 1px solid var(--border-light);">Hex Address</th>
+                                <th style="padding:0.6rem; border: 1px solid var(--border-light);">Memory Contents (32-bit Hex)</th>
+                                <th style="padding:0.6rem; border: 1px solid var(--border-light);">Hardware Interpretation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light); font-weight:bold;">0x00000000</td>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light); font-family: monospace;">0x8D210040</td>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light);">Instruction: <code>lw r1, 0x40(r0)</code></td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light); font-weight:bold;">0x00000004</td>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light); font-family: monospace;">0x00221820</td>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light);">Instruction: <code>add r3, r1, r2</code></td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light); font-weight:bold;">0x00000008</td>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light); font-family: monospace;">0xAD230044</td>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light);">Instruction: <code>sw r3, 0x44(r0)</code></td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light); font-weight:bold;">0x00000040</td>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light); font-family: monospace;">0x0000002A</td>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light);">Data Variable: Integer value <code>42</code></td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light); font-weight:bold;">0x00000044</td>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light); font-family: monospace;">0x00000000</td>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light);">Data Variable: Output buffer location</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3 id="sub-1-3">1.3 The Four Classic Components</h3>
+                    <p>Every von Neumann machine relies on four fundamental functional units connected via a common bus:</p>
+                    <ol>
+                        <li><strong>Control Unit (CU):</strong> The "conductor" of the processor. Implemented as a Finite State Machine (FSM), it fetches instructions from memory, decodes them, and generates control signals for all other units.</li>
+                        <li><strong>Arithmetic Logic Unit (ALU):</strong> Performs digital arithmetic operations (addition, subtraction, multiplication) and logical operations (AND, OR, XOR, shifts).</li>
+                        <li><strong>Unified Memory Unit:</strong> A linear array of addressable storage locations holding both code and data.</li>
+                        <li><strong>Input/Output (I/O) System:</strong> Interfaces with external peripherals (keyboard, display, disks, network interfaces).</li>
+                    </ol>
+
+                    <h3 id="sub-1-4">1.4 "Programs ARE Data" &amp; Security Implications</h3>
+                    <p>Treating code as data enables essential software innovations, but also introduces significant security attack vectors:</p>
+                    <div class="box box-orange">
+                        <div class="box-title">Superpower &amp; Vulnerability of Unified Memory</div>
+                        <ul>
+                            <li><strong>Compilers &amp; Assemblers:</strong> Compilers process source text files and write compiled machine instructions into memory as output data.</li>
+                            <li><strong>Operating System Loaders:</strong> An OS loads an executable binary file by copying its bytes from disk into RAM memory buffers and setting the CPU Program Counter to the entry point.</li>
+                            <li><strong>Just-In-Time (JIT) Compilation:</strong> Runtimes for JavaScript (V8 in Chrome), Java (JVM), and Python (PyPy) generate machine code dynamically at runtime and execute it immediately.</li>
+                            <li><strong>Security Risks (Buffer Overflow / Code Injection):</strong> Attackers who exploit stack buffer overflows can overwrite return addresses or inject malicious shellcode into data buffers and trick the CPU into executing data as instructions. (Mitigated in modern OSes by NX/DEP bits: Never Execute / Data Execution Prevention).</li>
+                        </ul>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" disabled="">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section class="topic-section" id="topic-2">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>The Von Neumann Bottleneck</h2>
+                </div>
+                <div class="collapsible-content" id="content-2">
+                    <h3 id="sub-2-1">2.1 Single Shared Bus Limitation</h3>
+                    <p>In a standard von Neumann machine, a <strong>single shared system bus</strong> (composed of Address lines, Data lines, and Control signals) connects the CPU to memory. Because there is only one set of physical wires, the bus can perform only <strong>one memory transaction at a time</strong>.</p>
+
+                    <h3 id="sub-2-2">2.2 Bus Contention &amp; Execution Stalls</h3>
+                    <div class="box box-red">
+                        <div class="box-title">The Von Neumann Bottleneck Defined</div>
+                        <p>The <strong>Von Neumann Bottleneck</strong> (a term coined by Turing Award winner John Backus in 1977) is the throughput limitation caused by sharing a single bus between instruction fetches and data memory accesses. The CPU cannot simultaneously fetch a new instruction AND load or store a data operand from memory in the same clock cycle.</p>
+                    </div>
+
+                    <p>Consider a memory-referencing instruction like <code>LOAD R1, [0x1004]</code>:</p>
+                    <ul>
+                        <li><strong>Clock Cycle 1 (Instruction Fetch):</strong> The CPU uses the bus to fetch the instruction word <code>LOAD R1, [0x1004]</code> from code memory. The bus is 100% occupied by instruction traffic.</li>
+                        <li><strong>Clock Cycle 2 (Data Access):</strong> The CPU decodes the instruction and uses the same bus to read the data word stored at memory address <code>0x1004</code>. The bus is now occupied by data traffic.</li>
+                    </ul>
+                    <p>Because the instruction fetch and data read must happen <strong>sequentially</strong>, the instruction requires a minimum of 2 bus cycles. While the CPU's ALU is capable of executing operations in sub-nanosecond clock cycles, it sits idle (stalled) waiting for the single bus to transfer bytes.</p>
+
+                    <h3 id="sub-2-3">2.3 IPC Caps &amp; The Widening Frequency Gap</h3>
+                    <p>Over four decades of semiconductor advancement, CPU transistor switching speeds and clock frequencies grew exponentially (~50% per year), whereas DRAM main memory bus latency improved at a much slower rate (~7% per year). This divergence means that high-speed CPUs spend an increasing proportion of their time completely starved of data.</p>
+                    
+                    <h3 id="sub-2-4">2.4 Architectural Responses to the Bottleneck</h3>
+                    <p>Computer architects developed three major techniques to widen or bypass the von Neumann bottleneck:</p>
+                    <ol>
+                        <li><strong>Hardware Caching (SRAM):</strong> Placing small, ultra-fast on-chip SRAM caches near the CPU core to service requests without touching main memory.</li>
+                        <li><strong>Wider &amp; Faster Buses:</strong> Expanding bus width from 16-bit to 32-bit, 64-bit, and 128-bit, along with multi-channel memory controllers (Dual-Channel DDR5).</li>
+                        <li><strong>Harvard-Style Split Bus Paths:</strong> Physically separating the paths for instruction fetches and data accesses — leading directly to the Harvard and Modified Harvard architectures.</li>
+                    </ol>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section class="topic-section" id="topic-3">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>Harvard Architecture &amp; Parallel Buses</h2>
+                </div>
+                <div class="collapsible-content" id="content-3">
+                    <h3 id="sub-3-1">3.1 Dual Memory &amp; Dual Bus Topology</h3>
+                    <p>To eliminate bus contention entirely, the <strong>Harvard Architecture</strong> physically segregates the memory subsystem into two independent blocks with two dedicated set of buses:</p>
+                    <ul>
+                        <li><strong>Instruction Memory &amp; Instruction Bus (I-Bus):</strong> Dedicated exclusively to fetching program instructions.</li>
+                        <li><strong>Data Memory &amp; Data Bus (D-Bus):</strong> Dedicated exclusively to reading and writing data variables.</li>
+                    </ul>
+
+                    <h3 id="sub-3-2">3.2 Simultaneous Instruction &amp; Data Access</h3>
+                    <div class="box box-green">
+                        <div class="box-title">Parallel Memory Access in 1 Cycle</div>
+                        <p>Because the CPU possesses separate I-Bus and D-Bus interfaces, it can <strong>fetch the next instruction over the I-Bus</strong> at the exact same moment it <strong>reads or writes a data operand over the D-Bus</strong>. What required 2 sequential cycles in von Neumann takes only <strong>1 cycle in Harvard</strong>, up to doubling memory throughput.</p>
+                    </div>
+
+                    <h3 id="sub-3-3">3.3 Historical Origins: Harvard Mark I (1944)</h3>
+                    <p>The design gets its name from the <strong>Harvard Mark I</strong> computer built by Howard Aiken at Harvard University in 1944:</p>
+                    <ul>
+                        <li><strong>Physical Separation:</strong> The Mark I stored instructions on 24-channel <strong>punched paper tape</strong>, while data numbers were stored in 72 electro-mechanical <strong>rotary dial switches and relay counters</strong>.</li>
+                        <li><strong>Mechanical Necessity to Architectural Feature:</strong> The physical impossibility of putting punched tape into electrical relays naturally created separate paths. Today, Harvard architecture refers to electronic on-chip splits rather than paper tape and relays.</li>
+                    </ul>
+
+                    <h3 id="sub-3-4">3.4 Application Domains: DSPs &amp; Microcontrollers</h3>
+                    <p>True Harvard architecture is preferred in domain-specific processors where deterministic timing and high signal processing throughput outweigh the flexibility of unified memory:</p>
+                    <ul>
+                        <li><strong>Digital Signal Processors (DSPs):</strong> Real-time audio/video filtering, Fast Fourier Transforms (FFT), and radio baseband processing require continuous streaming of data coefficients while executing loop instructions without pipeline stalls.</li>
+                        <li><strong>Microcontrollers (MCUs):</strong> Chips like the <strong>ATmega328P (Arduino Uno)</strong> feature true Harvard topology: program instructions live in non-volatile <strong>Flash memory</strong> (32 KB) over an instruction bus, while variables live in volatile <strong>SRAM</strong> (2 KB) over a data bus.</li>
+                        <li><strong>Real-Time Embedded Systems:</strong> Systems requiring hard real-time guarantees benefit from predictable, deterministic clock cycle counts immune to bus contention.</li>
+                    </ul>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section class="topic-section" id="topic-4">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>Modified Harvard Architecture (Modern Hybrid)</h2>
+                </div>
+                <div class="collapsible-content" id="content-4">
+                    <h3 id="sub-4-1">4.1 Hybrid Topology: Von Neumann Outside, Harvard Inside</h3>
+                    <p>Pure Harvard architecture suffers from rigid memory partitioning: if a program fills up Instruction memory while Data memory has free space, the extra RAM cannot be reallocated for code. Furthermore, compilers and OS loaders become complex when dealing with completely separate address spaces.</p>
+                    <p>Modern general-purpose processors (Intel Core i9, AMD Ryzen, ARM Cortex-A78, Apple M1/M2/M3) solve this trade-off by implementing a <strong>Modified Harvard Architecture</strong>:</p>
+
+                    <div class="box box-blue">
+                        <div class="box-title">The Modified Harvard Hybrid Rule</div>
+                        <ul>
+                            <li><strong>Outside the CPU Chip (Main System RAM):</strong> Appears as a single, unified main DRAM memory with one unified address space — pure <strong>von Neumann style</strong>. Software sees one continuous memory.</li>
+                            <li><strong>Inside the CPU Core (Level 1 Caches):</strong> The L1 cache is physically split into a dedicated <strong>L1 Instruction Cache (L1-I)</strong> and a dedicated <strong>L1 Data Cache (L1-D)</strong> with independent internal pipelines — pure <strong>Harvard style</strong>.</li>
+                        </ul>
+                    </div>
+
+                    <h3 id="sub-4-2">4.2 Split L1-I and L1-D Caches over Unified DRAM</h3>
+                    <p>The CPU execution pipeline fetches instructions from the L1-I cache over an internal instruction pipeline, while memory load/store instructions access the L1-D cache over an internal data pipeline simultaneously. If a cache miss occurs at L1, requests fall back to a <strong>unified L2 and L3 cache</strong> and ultimately to unified DRAM main memory.</p>
+
+                    <h3 id="sub-4-3">4.3 Hardware Cache Coherence Management</h3>
+                    <p>Because code and data are split at L1 but unified in main memory, self-modifying code or JIT compiler output (writing new code as data into L1-D) creates a potential consistency hazard. The processor's <strong>Hardware Cache Coherence Unit</strong> automatically invalidates stale entries in L1-I when L1-D is written to, preserving the illusion of a single unified memory for software.</p>
+
+                    <h3 id="sub-4-4">4.4 Real-World Processor Classification</h3>
+                    <table style="width:100%; border-collapse: collapse; margin: 1.2rem 0; font-size: 0.9rem;">
+                        <thead>
+                            <tr style="background-color: var(--text-dark); color: var(--bg-beige);">
+                                <th style="padding:0.6rem; border: 1px solid var(--border-light);">Processor / Platform</th>
+                                <th style="padding:0.6rem; border: 1px solid var(--border-light);">Architectural Classification</th>
+                                <th style="padding:0.6rem; border: 1px solid var(--border-light);">Memory &amp; Bus Layout Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light); font-weight:bold;">ATmega328P (Arduino)</td>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light); color: var(--green); font-weight:bold;">True Harvard</td>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light);">Physical Flash for instructions, physical SRAM for data, completely separate address spaces.</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light); font-weight:bold;">ARM Cortex-M4 (Embedded)</td>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light); color: var(--orange); font-weight:bold;">Modified Harvard</td>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light);">Bus matrix with I-Code and D-Code internal buses targeting a unified 32-bit linear address space.</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light); font-weight:bold;">x86-64 (Intel / AMD Desktop)</td>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light); color: var(--blue); font-weight:bold;">Modified Harvard</td>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light);">Unified main DRAM &amp; L2/L3 caches (von Neumann) paired with split 32KB L1-I and 32KB L1-D caches per core.</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light); font-weight:bold;">Apple Silicon (M1 / M2 / M3)</td>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light); color: var(--blue); font-weight:bold;">Modified Harvard</td>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light);">Ultra-wide split L1 caches (192KB L1-I + 128KB L1-D on P-cores) over unified L2 and unified System Memory.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 5 -->
+            <section class="topic-section" id="topic-5">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>Quantitative Bandwidth &amp; Comparison Matrix</h2>
+                </div>
+                <div class="collapsible-content" id="content-5">
+                    <h3 id="sub-5-1">5.1 Von Neumann vs. Harvard Comparison Matrix</h3>
+                    <p>The table below presents the full architectural comparison required for examinations:</p>
+
+                    <table style="width:100%; border-collapse: collapse; margin: 1.5rem 0; font-size:0.92rem;">
+                        <thead>
+                            <tr style="background-color: var(--text-dark); color: var(--bg-beige);">
+                                <th style="padding:0.75rem; border: 1px solid var(--border-light);">Criterion</th>
+                                <th style="padding:0.75rem; border: 1px solid var(--border-light);">Von Neumann Architecture</th>
+                                <th style="padding:0.75rem; border: 1px solid var(--border-light);">Harvard Architecture</th>
+                                <th style="padding:0.75rem; border: 1px solid var(--border-light);">Modified Harvard Architecture</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light); font-weight:bold;">Memory Units</td>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light);">1 Unified Memory (Code + Data)</td>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light);">2 Separate Memories (I-RAM &amp; D-RAM)</td>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light);">Unified System DRAM + Split L1 Cache</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light); font-weight:bold;">Bus Structure</td>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light);">1 Shared System Bus</td>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light);">2 Independent Buses (I-Bus &amp; D-Bus)</td>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light);">Split internal L1 buses; unified outer bus</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light); font-weight:bold;">Cycle Efficiency</td>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light);">2 Cycles (Sequential Fetch &amp; Load)</td>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light);">1 Cycle (Simultaneous Fetch + Load)</td>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light);">1 Cycle at L1 Cache level</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light); font-weight:bold;">Memory Throughput</td>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light);">Bottlenecked by single bus</td>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light);">Up to 2x higher throughput</td>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light);">Near 2x pipeline throughput via L1</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light); font-weight:bold;">Hardware Complexity</td>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light);">Low (Fewer pins, wires, &amp; die area)</td>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light);">High (Double pin count &amp; bus wiring)</td>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light);">Moderate to High (Cache coherence logic)</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light); font-weight:bold;">Programming Flexibility</td>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light);">High (Programs ARE data; free allocation)</td>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light);">Low (Rigid partitioned memory spaces)</td>
+                                <td style="padding:0.6rem; border: 1px solid var(--border-light);">High (Single linear software address space)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3 id="sub-5-2">5.2 Worked Calculation: Memory Bandwidth Analysis</h3>
+                    <p>To quantify the von Neumann bottleneck versus Harvard parallel throughput, consider the following standard architectural problem:</p>
+                    
+                    <div class="box box-green">
+                        <div class="box-title">Problem Statement</div>
+                        <p>A CPU operates at a clock frequency of \(f = 1\text{ GHz}\) (\(1 \times 10^9\text{ cycles/second}\)). On every clock cycle, the CPU pipeline fetches one 32-bit instruction word and reads one 32-bit data operand from memory.</p>
+                        <p><strong>Required:</strong> Calculate the required memory bus bandwidth for both von Neumann and Harvard architectures, and explain how bus saturation occurs.</p>
+                    </div>
+
+                    <div style="background: white; padding: 1.25rem; border-radius: 8px; border: 1px solid var(--border-light); margin: 1rem 0;">
+                        <h4 style="color: var(--blue); margin-bottom: 0.75rem;">Step-by-Step Mathematical Solution</h4>
+                        <ol style="line-height: 1.8;">
+                            <li><strong>Total Data Movement per Cycle:</strong>
+                                $$\text{Bits per cycle} = \text{Instruction Size} + \text{Data Size} = 32\text{ bits} + 32\text{ bits} = 64\text{ bits/cycle}$$
+                            </li>
+                            <li><strong>Total Required Bandwidth (\(B_{\text{total}}\)):</strong>
+                                $$B_{\text{total}} = 64\text{ bits/cycle} \times 1 \times 10^9\text{ cycles/second} = 64 \times 10^9\text{ bits/second} = 64\text{ Gbit/s}$$
+                                $$\text{Converting to Bytes/sec:} \quad B_{\text{total}} = \frac{64\text{ Gbit/s}}{8\text{ bits/Byte}} = 8\text{ GB/s}$$
+                            </li>
+                            <li><strong>Von Neumann Architecture Bandwidth Analysis:</strong>
+                                <p>Because a von Neumann processor has only <strong>ONE single bus</strong>, that single bus must carry the entire \(8\text{ GB/s}\) workload. If the single bus is rated at only \(4\text{ GB/s}\), the bus saturates 100%, causing the CPU pipeline to stall for 1 extra clock cycle per instruction. Max achievable IPC drops to 0.5.</p>
+                            </li>
+                            <li><strong>Harvard Architecture Bandwidth Analysis:</strong>
+                                <p>A Harvard processor splits the workload across <strong>TWO independent buses</strong>:</p>
+                                $$\text{I-Bus Bandwidth} = 32\text{ bits} \times 1 \times 10^9\text{ Hz} = 32\text{ Gbit/s} = 4\text{ GB/s}$$
+                                $$\text{D-Bus Bandwidth} = 32\text{ bits} \times 1 \times 10^9\text{ Hz} = 32\text{ Gbit/s} = 4\text{ GB/s}$$
+                                <p>Each bus operates concurrently at \(4\text{ GB/s}\). Neither bus saturates, allowing the CPU to sustain a maximum IPC of 1.0 without stalling.</p>
+                            </li>
+                        </ol>
+                    </div>
+
+                    <h3 id="sub-5-3">5.3 Exam Pitfalls &amp; Misconceptions</h3>
+                    <div class="box box-red">
+                        <div class="box-title">Top 5 Exam Mistakes to Avoid</div>
+                        <ul>
+                            <li><strong>Misconception 1: "Harvard Architecture has infinite bandwidth and no bottlenecks."</strong><br>
+                            <em>Correction:</em> Harvard eliminates the <em>fetch-vs-data bus collision</em> bottleneck, but total system memory latency (DRAM delay) still limits absolute speed.</li>
+                            <li><strong>Misconception 2: "Modern PCs are pure Harvard because they have L1-I and L1-D caches."</strong><br>
+                            <em>Correction:</em> Modern PCs are <strong>Modified Harvard</strong> because main memory (DRAM) and lower-level caches (L2/L3) remain unified in a von Neumann space.</li>
+                            <li><strong>Misconception 3: Swapping the definitions under pressure.</strong><br>
+                            <em>Correction:</em> Remember: <strong>Von Neumann = 1</strong> (One memory, one bus). <strong>Harvard = 2</strong> (Two memories, two buses).</li>
+                            <li><strong>Misconception 4: Conflating Bus Width with Address Space.</strong><br>
+                            <em>Correction:</em> Bus width (e.g., 64-bit data bus) refers to parallel wire count per transfer. Architecture topology (Harvard vs von Neumann) refers to bus separation.</li>
+                            <li><strong>Misconception 5: Forgetting that Harvard incurs a hardware cost.</strong><br>
+                            <em>Correction:</em> Harvard doubles memory decoder logic, bus routing, and chip pinout count, making silicon die area more expensive.</li>
+                        </ul>
+                    </div>
+
+                    <h3 id="sub-5-4">5.4 Exit Ticket &amp; Rapid-Fire Questions</h3>
+                    <div style="background: var(--bg-mint); padding: 1.25rem; border-radius: 8px; border: 1px solid var(--border-light); margin-top: 1rem;">
+                        <h4 style="color: var(--text-dark); margin-bottom: 0.75rem;">Self-Assessment Check</h4>
+                        <ol style="line-height: 1.8;">
+                            <li><strong>Q1:</strong> What specific hardware component creates the von Neumann bottleneck?<br>
+                            <em>Answer:</em> The single shared system bus connecting CPU to unified memory.</li>
+                            <li><strong>Q2:</strong> Why can a Harvard processor perform an instruction fetch and a data read in 1 cycle?<br>
+                            <em>Answer:</em> Because it possesses separate instruction (I-Bus) and data (D-Bus) buses that operate simultaneously.</li>
+                            <li><strong>Q3:</strong> Which cache level in a modern Intel or AMD CPU implements Harvard architecture?<br>
+                            <em>Answer:</em> The Level 1 (L1) cache, which is physically split into L1-I and L1-D.</li>
+                        </ol>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <a href="#original-pdf" class="btn"
+                            style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;"
+                            onclick="document.getElementById('original-pdf').scrollIntoView()">Next Section</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number"
+                        style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round"
+                            stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" x2="8" y1="13" y2="13"></line>
+                            <line x1="16" x2="8" y1="17" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for your reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()"
+                        style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous
+                            Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/11.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+
+</html>
