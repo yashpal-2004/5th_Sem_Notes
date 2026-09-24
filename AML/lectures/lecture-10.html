@@ -122,16 +122,26 @@
                     <h2>Short Notes &amp; Visual Summary</h2>
                 </div>
                 <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
-                    <p style="margin-bottom: 1rem;">Quick summary and key concepts for Lecture 10 (PCA):</p>
+                    <p style="margin-bottom: 1rem;">Handwritten summary sheet and core concepts for Lecture 10 (PCA):</p>
+
+                    <!-- Embedded Handwritten Summary Image -->
+                    <div style="text-align: center; margin-bottom: 1.5rem;">
+                        <img src="../images/10.png" alt="Lecture 10 Handwritten Short Notes &amp; Summary Sheet" 
+                             style="max-width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--border-light); box-shadow: var(--shadow);" />
+                        <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.5rem; font-style: italic;">
+                            Handwritten Summary Sheet — Lecture 10: Dimensionality Reduction &amp; Principal Component Analysis (PCA)
+                        </p>
+                    </div>
 
                     <div class="box box-blue">
-                        <div class="box-title">Key PCA Principles</div>
-                        <ul>
-                            <li><strong>Goal:</strong> Reduce the number of features (\(p \to k\)) while preserving maximum variance/signal and removing noise/redundancy.</li>
-                            <li><strong>Selection vs. Extraction:</strong> Feature Selection keeps a subset of existing feature axes. Feature Extraction (PCA) rotates coordinates to construct new orthogonal axes \(PC_1, PC_2, \dots\) that align with true maximum variance.</li>
-                            <li><strong>Mean Centering:</strong> Mandatory first step (\(X_c = X - \mathbf{1}\mu^\top\)) so that variance is measured relative to the data centroid.</li>
-                            <li><strong>Eigendecomposition:</strong> The principal directions \(v_j\) are the unit <strong>eigenvectors</strong> of the sample covariance matrix \(S\), and the variance captured along \(v_j\) equals the corresponding <strong>eigenvalue</strong> \(\lambda_j\).</li>
-                            <li><strong>Explained Variance Ratio (EVR):</strong> \(\text{EVR}_j = \frac{\lambda_j}{\sum_{\ell=1}^p \lambda_\ell}\). Select \(k\) components based on scree plot elbow or cumulative variance threshold (\(\ge 90\%\)).</li>
+                        <div class="box-title">Key PCA Takeaways &amp; Core Formulas</div>
+                        <ul style="line-height: 1.6;">
+                            <li><strong>Curse of Dimensionality:</strong> High feature spaces (\(p\)) cause data sparsity, distance metric breakdown, overfitting, and \(O(p^2)\) computational bloat. Dimensionality reduction preserves maximum signal while discarding noise.</li>
+                            <li><strong>Selection vs. Extraction:</strong> Feature Selection discards columns (\(\{x_1, x_2, \dots\}\)); Feature Extraction (PCA) rotates axes to form orthogonal principal components (\(PC_1, PC_2, \dots\)) as linear combinations of all original features.</li>
+                            <li><strong>Mean Centering (\(X_c = X - \mathbf{1}\mu^\top\)):</strong> Essential pre-processing so that sample variance is measured relative to the data centroid origin \((0,0,\dots,0)\).</li>
+                            <li><strong>Variance &amp; Reconstruction Duality:</strong> Maximizing projected variance \(\text{Var}(z)\) along unit direction \(u\) is mathematically identical to minimizing sum of squared reconstruction errors \(\sum \|e_i\|^2\).</li>
+                            <li><strong>Covariance Matrix &amp; Eigendecomposition:</strong> Sample covariance matrix \(S = \frac{1}{n-1}X_c^\top X_c\). Eigendecomposition \(S v = \lambda v\) yields eigenvectors \(v_j\) (principal component direction vectors) and eigenvalues \(\lambda_j\) (variance explained along \(v_j\)).</li>
+                            <li><strong>Explained Variance Ratio (EVR):</strong> \(\text{EVR}_j = \frac{\lambda_j}{\sum_{\ell=1}^p \lambda_\ell}\). Components are chosen via scree plot elbow or \(\ge 90\%\) cumulative variance cutoff.</li>
                         </ul>
                     </div>
                 </div>

@@ -122,16 +122,25 @@
                     <h2>Short Notes &amp; Visual Summary</h2>
                 </div>
                 <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
-                    <p style="margin-bottom: 1rem;">Quick summary and core takeaways for Lecture 11 (Regularization):</p>
+                    <p style="margin-bottom: 1rem;">Handwritten summary sheet and core concepts for Lecture 11 (Regularization):</p>
+
+                    <!-- Embedded Handwritten Summary Image -->
+                    <div style="text-align: center; margin-bottom: 1.5rem;">
+                        <img src="../images/11.png" alt="Lecture 11 Handwritten Short Notes &amp; Summary Sheet" 
+                             style="max-width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--border-light); box-shadow: var(--shadow);" />
+                        <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.5rem; font-style: italic;">
+                            Handwritten Summary Sheet — Lecture 11: L1 (Lasso) &amp; L2 (Ridge) Regularization
+                        </p>
+                    </div>
 
                     <div class="box box-blue">
-                        <div class="box-title">Key Regularization Takeaways</div>
-                        <ul>
-                            <li><strong>Symptom of Overfitting:</strong> Abnormally large coefficient magnitudes (\(w_j \to \infty\)), causing hypersensitivity to small input variations (High Variance).</li>
-                            <li><strong>Regularization Goal:</strong> Add a penalty term \(P(w)\) to the loss function to penalize large weights, trading a tiny increase in training bias for a dramatic reduction in variance.</li>
-                            <li><strong>Ridge Regression (L2):</strong> Penalty \(= \lambda \sum w_j^2\). Shrinks coefficients toward zero, handles multicollinearity by guaranteeing matrix invertibility \((X^\top X + \lambda I)^{-1}\), but <em>never sets coefficients to exact zero</em>.</li>
-                            <li><strong>Lasso Regression (L1):</strong> Penalty \(= \lambda \sum |w_j|\). Sharp diamond constraint region forces uninformative feature weights to <em>exact zero (\(w_j = 0\))</em>, providing automatic feature selection and sparse models.</li>
-                            <li><strong>Mandatory Preprocessing:</strong> Features MUST be standardized before regularizing so that feature scales do not distort penalty strength.</li>
+                        <div class="box-title">Key Regularization Takeaways &amp; Core Formulas</div>
+                        <ul style="line-height: 1.6;">
+                            <li><strong>Overfitting Symptom:</strong> Abnormally large coefficient weights (\(w_j \to \infty\)), creating extreme sensitivity to small input fluctuations. Regularization trades a minor increase in bias for a massive variance reduction.</li>
+                            <li><strong>Ridge Regression (L2):</strong> Penalty \(P(w) = \lambda \sum w_j^2\). Normal equation \(\hat{\beta}_{\text{Ridge}} = (X^\top X + \lambda I)^{-1} X^\top y\). Shrinks weights toward zero and solves multicollinearity by making \((X^\top X + \lambda I)\) strictly positive definite &amp; invertible. Never sets weights to exact zero.</li>
+                            <li><strong>Lasso Regression (L1):</strong> Penalty \(P(w) = \lambda \sum |w_j|\). Sharp diamond constraint boundaries intersect level curves at corners, driving uninformative weights to <em>exact zero (\(w_j = 0\))</em> for automatic feature selection &amp; sparse models.</li>
+                            <li><strong>Mandatory Feature Scaling:</strong> Features MUST be standardized (\(z_{ij} = \frac{x_{ij}-\mu_j}{s_j}\)) prior to regularization so feature magnitude differences do not distort penalty application.</li>
+                            <li><strong>Cross-Validation for \(\lambda^*\):</strong> Use K-Fold Cross-Validation to select optimal \(\lambda^*\) that minimizes validation error without underfitting (large \(\lambda\)) or overfitting (\(\lambda=0\)).</li>
                         </ul>
                     </div>
                 </div>
