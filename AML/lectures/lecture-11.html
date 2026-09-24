@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Advanced Machine Learning - Lecture 11</title>
+    <meta
+        content="Study notes for Advanced Machine Learning (CSA333), Lecture 11 covering Regularization: Overfitting & Coefficient Explosion, L2 Regularization (Ridge Regression), L1 Regularization (Lasso Regression), Bias-Variance Tradeoff, and Multi-feature Normal Equations."
+        name="description" />
+    <link
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>11</text></svg>"
+        rel="icon" />
+    <link href="../css/style.css" rel="stylesheet" />
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Advanced Machine Learning</h1>
+            <p>Lecture 11 - Regularization: L1 (Lasso) &amp; L2 (Ridge) Regression</p>
+            <a href="../index.html"
+                style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">←
+                Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/11.PDF"
+                style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;"
+                target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text" />
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 5</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            style="vertical-align: text-bottom; margin-right: 4px;">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>Short Notes</a></li>
+                <li>
+                    <a href="#topic-1">1. Overfitting &amp; Coefficient Explosion<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 Why Do We Need Regularization?</a></li>
+                        <li><a href="#sub-1-2">1.2 Coefficient Magnitude as Overfitting Symptom</a></li>
+                        <li><a href="#sub-1-3">1.3 Definition of Regularized Loss</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. L2 Regularization: Ridge Regression<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 Ridge Loss Function (\(\mathcal{L} + \lambda m^2\))</a></li>
+                        <li><a href="#sub-2-2">2.2 2D Closed-Form Slope Derivation</a></li>
+                        <li><a href="#sub-2-3">2.3 Bias-Variance Tradeoff Adjustment</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Multi-Feature Ridge &amp; Key Properties<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 Matrix Normal Equation \(\beta_{\text{Ridge}} = (X^\top X + \lambda I)^{-1} X^\top y\)</a></li>
+                        <li><a href="#sub-3-2">3.2 Multicollinearity &amp; Guaranteed Invertibility</a></li>
+                        <li><a href="#sub-3-3">3.3 Asymmetric Shrinkage &amp; Non-Zero Limits</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. L1 Regularization: Lasso Regression<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 Lasso Loss Function (\(\mathcal{L} + \lambda \sum |w_j|\))</a></li>
+                        <li><a href="#sub-4-2">4.2 Automatic Feature Selection (Sparsity)</a></li>
+                        <li><a href="#sub-4-3">4.3 L1 vs. L2 Geometric Constraint Boundaries</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Comparison Matrix &amp; Practical Workflow<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 OLS vs. Ridge vs. Lasso Comparison Matrix</a></li>
+                        <li><a href="#sub-5-2">5.2 Feature Scaling Requirement Before Regularization</a></li>
+                        <li><a href="#sub-5-3">5.3 Hyperparameter Tuning via Cross-Validation</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round"
+                            stroke-linejoin="round" stroke-width="2"
+                            style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" x2="8" y1="13" y2="13"></line>
+                            <line x1="16" x2="8" y1="17" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>Original PDF</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Short Notes -->
+            <section id="short-notes" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-short-notes')">
+                    <div class="topic-number"
+                        style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                    </div>
+                    <h2>Short Notes &amp; Visual Summary</h2>
+                </div>
+                <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
+                    <p style="margin-bottom: 1rem;">Quick summary and core takeaways for Lecture 11 (Regularization):</p>
+
+                    <div class="box box-blue">
+                        <div class="box-title">Key Regularization Takeaways</div>
+                        <ul>
+                            <li><strong>Symptom of Overfitting:</strong> Abnormally large coefficient magnitudes (\(w_j \to \infty\)), causing hypersensitivity to small input variations (High Variance).</li>
+                            <li><strong>Regularization Goal:</strong> Add a penalty term \(P(w)\) to the loss function to penalize large weights, trading a tiny increase in training bias for a dramatic reduction in variance.</li>
+                            <li><strong>Ridge Regression (L2):</strong> Penalty \(= \lambda \sum w_j^2\). Shrinks coefficients toward zero, handles multicollinearity by guaranteeing matrix invertibility \((X^\top X + \lambda I)^{-1}\), but <em>never sets coefficients to exact zero</em>.</li>
+                            <li><strong>Lasso Regression (L1):</strong> Penalty \(= \lambda \sum |w_j|\). Sharp diamond constraint region forces uninformative feature weights to <em>exact zero (\(w_j = 0\))</em>, providing automatic feature selection and sparse models.</li>
+                            <li><strong>Mandatory Preprocessing:</strong> Features MUST be standardized before regularizing so that feature scales do not distort penalty strength.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 1 -->
+            <section class="topic-section" id="topic-1">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>Overfitting &amp; Coefficient Explosion</h2>
+                </div>
+                <div class="collapsible-content" id="content-1">
+                    <h3 id="sub-1-1">1.1 Why Do We Need Regularization?</h3>
+                    <p>When training machine learning models, an unconstrained model often fits every noisy data point in the training set. While training loss drops to zero, the model memorizes random noise rather than learning true underlying patterns, leading to poor test generalization (Overfitting).</p>
+
+                    <h3 id="sub-1-2">1.2 Coefficient Magnitude as Overfitting Symptom</h3>
+                    <div class="box box-red">
+                        <div class="box-title">The Coefficient Explosion Symptom</div>
+                        <p>Overfitted models exhibit abnormally large coefficient values (\(m \to \infty\)). A steep slope means a tiny change in input \(\Delta x\) produces a massive jump in prediction \(\Delta \hat{y}\), creating extreme hypersensitivity and high variance.</p>
+                    </div>
+
+                    <div style="background: white; padding: 1rem; border-radius: 6px; border: 1px solid var(--border-light); margin: 1rem 0;">
+                        <h4 style="color: var(--blue); margin-bottom: 0.5rem;">Comparison Example: Gentle vs. Overfit Model</h4>
+                        <ul>
+                            <li><strong>Model A (Gentle, Robust):</strong> \(\hat{y} = 2x + 10 \implies\) Change of \(\Delta x = 0.5\) yields \(\Delta \hat{y} = 1.0\).</li>
+                            <li><strong>Model B (Overfit, High Variance):</strong> \(\hat{y} = 30x - 18 \implies\) Change of \(\Delta x = 0.5\) yields \(\Delta \hat{y} = 15.0\).</li>
+                        </ul>
+                        <p>Model B contorts to hit training outliers, creating high variance on unseen data.</p>
+                    </div>
+
+                    <h3 id="sub-1-3">1.3 Definition of Regularized Loss</h3>
+                    <p>Regularization modifies the cost function by appending a penalty term dependent on model weights:</p>
+                    $$\mathcal{L}_{\text{regularized}}(w) = \mathcal{L}_{\text{data}}(w) + \lambda P(w)$$
+                    <p>Where \(\lambda \ge 0\) is the regularization hyperparameter controlling penalty intensity.</p>
+
+                    <div class="topic-nav">
+                        <a href="lecture-10.html" class="btn" style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;">Previous Lecture</a>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section class="topic-section" id="topic-2">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>L2 Regularization: Ridge Regression</h2>
+                </div>
+                <div class="collapsible-content" id="content-2">
+                    <h3 id="sub-2-1">2.1 Ridge Loss Function (\(\mathcal{L} + \lambda m^2\))</h3>
+                    <p>In simple linear regression (\(y = mx + c\)), <strong>Ridge Regression (L2)</strong> adds a penalty proportional to the squared slope:</p>
+                    $$\mathcal{L}_{\text{Ridge}}(m, c) = \sum_{i=1}^n (y_i - m x_i - c)^2 + \lambda m^2$$
+
+                    <h3 id="sub-2-2">2.2 2D Closed-Form Slope Derivation</h3>
+                    <div style="background: white; padding: 1rem; border-radius: 6px; border: 1px solid var(--border-light); margin: 1rem 0;">
+                        <h4 style="color: var(--blue); margin-bottom: 0.5rem;">Step-by-Step Derivation</h4>
+                        <ol style="line-height: 1.8;">
+                            <li><strong>Partial derivative w.r.t. intercept \(c\):</strong>
+                                $$\frac{\partial \mathcal{L}_{\text{Ridge}}}{\partial c} = -2 \sum_{i=1}^n (y_i - m x_i - c) = 0 \implies c = \bar{y} - m\bar{x}$$
+                            </li>
+                            <li><strong>Substitute \(c = \bar{y} - m\bar{x}\) back into Loss:</strong>
+                                $$\mathcal{L}_{\text{Ridge}}(m) = \sum_{i=1}^n \left[(y_i - \bar{y}) - m(x_i - \bar{x})\right]^2 + \lambda m^2$$
+                            </li>
+                            <li><strong>Differentiate w.r.t. slope \(m\) and set to 0:</strong>
+                                $$\frac{d \mathcal{L}_{\text{Ridge}}}{dm} = -2 \sum_{i=1}^n (x_i - \bar{x})\left[(y_i - \bar{y}) - m(x_i - \bar{x})\right] + 2\lambda m = 0$$
+                                $$-\sum_{i=1}^n (x_i - \bar{x})(y_i - \bar{y}) + m \sum_{i=1}^n (x_i - \bar{x})^2 + \lambda m = 0$$
+                            </li>
+                            <li><strong>Solve for \(m_{\text{Ridge}}\):</strong>
+                                $$m_{\text{Ridge}} = \frac{\sum_{i=1}^n (x_i - \bar{x})(y_i - \bar{y})}{\sum_{i=1}^n (x_i - \bar{x})^2 + \lambda}$$
+                            </li>
+                        </ol>
+                    </div>
+
+                    <h3 id="sub-2-3">2.3 Bias-Variance Tradeoff Adjustment</h3>
+                    <p>Notice that hyperparameter \(\lambda\) sits directly in the denominator of \(m_{\text{Ridge}}\):</p>
+                    <ul>
+                        <li><strong>\(\lambda = 0\):</strong> Standard OLS slope. High variance if data is noisy.</li>
+                        <li><strong>\(\lambda > 0\):</strong> Denominator increases, shrinking slope \(m\) toward zero. The model accepts a small increase in Bias (slightly higher training error) to achieve a massive reduction in Variance on test data.</li>
+                        <li><strong>\(\lambda \to \infty\):</strong> \(m_{\text{Ridge}} \to 0\), producing a flat horizontal line \(\hat{y} = \bar{y}\) (Underfitting).</li>
+                    </ul>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section class="topic-section" id="topic-3">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>Multi-Feature Ridge &amp; Key Properties</h2>
+                </div>
+                <div class="collapsible-content" id="content-3">
+                    <h3 id="sub-3-1">3.1 Matrix Normal Equation \(\beta_{\text{Ridge}} = (X^\top X + \lambda I)^{-1} X^\top y\)</h3>
+                    <p>For multiple linear regression with \(p\) features, the total Ridge loss in matrix form is:</p>
+                    $$\mathcal{L}_{\text{Ridge}}(\beta) = (y - X\beta)^\top (y - X\beta) + \lambda \beta^\top \beta$$
+                    <p>Setting the gradient \(\nabla_\beta \mathcal{L} = 0\) yields the <strong>Ridge Normal Equation</strong>:</p>
+                    $$\beta_{\text{Ridge}} = (X^\top X + \lambda I)^{-1} X^\top y$$
+
+                    <h3 id="sub-3-2">3.2 Multicollinearity &amp; Guaranteed Invertibility</h3>
+                    <div class="box box-green">
+                        <div class="box-title">Why Ridge Handles Multicollinearity</div>
+                        <p>In standard OLS, when features are highly correlated (multicollinear), \(X^\top X\) is singular or near-singular, making \((X^\top X)^{-1}\) fail or explode. Adding \(\lambda I\) adds positive numbers \(\lambda > 0\) to the main diagonal of \(X^\top X\), guaranteeing that \((X^\top X + \lambda I)\) is strictly positive definite and <strong>always invertible</strong>.</p>
+                    </div>
+
+                    <h3 id="sub-3-3">3.3 Asymmetric Shrinkage &amp; Non-Zero Limits</h3>
+                    <ul>
+                        <li><strong>Coefficients Never Reach Exact Zero:</strong> In Ridge (L2), weights shrink asymptotically as \(\lambda \to \infty\), becoming tiny (e.g., \(10^{-5}\)), but <em>never reach exact zero</em>. All original features remain in the model.</li>
+                        <li><strong>Asymmetric Shrinkage:</strong> Because penalty is \(\lambda w_j^2\), larger coefficients pay quadratically higher penalties (\(w_1 = 5000 \implies 2.5\times 10^7 \lambda\)). Thus, larger weights are penalized much more aggressively than small weights.</li>
+                    </ul>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section class="topic-section" id="topic-4">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>L1 Regularization: Lasso Regression</h2>
+                </div>
+                <div class="collapsible-content" id="content-4">
+                    <h3 id="sub-4-1">4.1 Lasso Loss Function (\(\mathcal{L} + \lambda \sum |w_j|\))</h3>
+                    <p><strong>Lasso (Least Absolute Shrinkage and Selection Operator)</strong> applies an L1 penalty proportional to the sum of absolute coefficient values:</p>
+                    $$\mathcal{L}_{\text{Lasso}}(w) = \sum_{i=1}^n (y_i - \hat{y}_i)^2 + \lambda \sum_{j=1}^p |w_j|$$
+
+                    <h3 id="sub-4-2">4.2 Automatic Feature Selection (Sparsity)</h3>
+                    <div class="box box-blue">
+                        <div class="box-title">Lasso as Automatic Feature Selection</div>
+                        <p>Unlike Ridge, Lasso drives uninformative or redundant feature weights to <strong>exact zero (\(w_j = 0\))</strong>. This produces a <strong>sparse model</strong> containing only a subset of non-zero features, performing automatic feature selection.</p>
+                    </div>
+
+                    <h3 id="sub-4-3">4.3 L1 vs. L2 Geometric Constraint Boundaries</h3>
+                    <p>Consider regularized regression as minimizing OLS error subject to a hard constraint region:</p>
+                    <ul>
+                        <li><strong>L2 (Ridge) Constraint:</strong> \(w_1^2 + w_2^2 \le r^2\) forms a <em>smooth circle/sphere</em>. The expanding elliptical OLS loss contours touch the smooth circle boundary at non-zero points \((w_1, w_2)\).</li>
+                        <li><strong>L1 (Lasso) Constraint:</strong> \(|w_1| + |w_2| \le r\) forms a <em>diamond/rhombus</em> with sharp corners directly on the coordinate axes (\((r, 0)\) or \((0, r)\)). Elliptical loss contours frequently intersect these sharp corners first, driving \(w_1 = 0\) or \(w_2 = 0\).</li>
+                    </ul>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 5 -->
+            <section class="topic-section" id="topic-5">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>Comparison Matrix &amp; Practical Workflow</h2>
+                </div>
+                <div class="collapsible-content" id="content-5">
+                    <h3 id="sub-5-1">5.1 OLS vs. Ridge vs. Lasso Comparison Matrix</h3>
+                    <table style="width:100%; border-collapse: collapse; margin: 1.2rem 0; font-size:0.9rem;">
+                        <thead>
+                            <tr style="background-color: var(--text-dark); color: var(--bg-beige);">
+                                <th style="padding:0.6rem; border: 1px solid var(--border-light);">Feature</th>
+                                <th style="padding:0.6rem; border: 1px solid var(--border-light);">OLS Regression</th>
+                                <th style="padding:0.6rem; border: 1px solid var(--border-light);">Ridge (L2)</th>
+                                <th style="padding:0.6rem; border: 1px solid var(--border-light);">Lasso (L1)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light); font-weight:bold;">Penalty Term</td>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light);">None (\(\lambda = 0\))</td>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light); font-weight:bold; color: var(--blue);">\(\lambda \sum w_j^2\) (L2 norm)</td>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light); font-weight:bold; color: var(--green);">\(\lambda \sum |w_j|\) (L1 norm)</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light); font-weight:bold;">Coefficients = 0?</td>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light);">No</td>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light);">No (Shrinks near 0, never exact 0)</td>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light); font-weight:bold; color: var(--green);">Yes (Drives uninformative \(w_j \to 0\))</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light); font-weight:bold;">Feature Selection</td>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light);">No</td>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light);">No (Retains all \(p\) features)</td>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light); font-weight:bold; color: var(--green);">Yes (Automatic Sparse Selection)</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light); font-weight:bold;">Closed-Form Solution</td>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light);">\((X^\top X)^{-1} X^\top y\)</td>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light);">\((X^\top X + \lambda I)^{-1} X^\top y\)</td>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light);">No closed-form (Coordinate Descent)</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light); font-weight:bold;">Multicollinearity</td>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light);">Fails (Singular matrix)</td>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light); font-weight:bold; color: var(--blue);">Excellent (Always invertible)</td>
+                                <td style="padding:0.5rem; border: 1px solid var(--border-light);">Selects one feature arbitrarily</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3 id="sub-5-2">5.2 Feature Scaling Requirement Before Regularization</h3>
+                    <div class="box box-red">
+                        <div class="box-title">Standardization is Mandatory</div>
+                        <p>Because regularization penalizes absolute coefficient values \(w_j\), features with smaller raw scales (e.g. Income in Millions) naturally require larger weights \(w_j\) and will be penalized unfairly. <strong>Always standardize features (\(z\)-score scaling) prior to running Ridge or Lasso.</strong></p>
+                    </div>
+
+                    <h3 id="sub-5-3">5.3 Hyperparameter Tuning via Cross-Validation</h3>
+                    <p>Hyperparameter \(\lambda\) controls model complexity. Use \(K\)-Fold Cross-Validation on the training set to select the optimal \(\lambda^*\) that minimizes validation MSE:</p>
+                    <ul>
+                        <li><strong>Too Small \(\lambda\):</strong> High variance, overfitting.</li>
+                        <li><strong>Optimal \(\lambda^*\):</strong> Lowest cross-validation error (optimal Bias-Variance tradeoff).</li>
+                        <li><strong>Too Large \(\lambda\):</strong> High bias, underfitting.</li>
+                    </ul>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <a href="#original-pdf" class="btn"
+                            style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;"
+                            onclick="document.getElementById('original-pdf').scrollIntoView()">Next Section</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number"
+                        style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round"
+                            stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" x2="8" y1="13" y2="13"></line>
+                            <line x1="16" x2="8" y1="17" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for your reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()"
+                        style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous
+                            Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/11.PDF" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+
+</html>
