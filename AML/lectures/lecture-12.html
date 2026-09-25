@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Advanced Machine Learning - Lecture 12</title>
+    <meta
+        content="Study notes for Advanced Machine Learning (CSA333), Lecture 12 covering Polynomial Regression & Assumptions of Linear Regression: Feature Transformation, Degree vs. Overfitting, Linearity, Normality of Residuals, Homoscedasticity, Autocorrelation, and Mathematical Singularity Proof of Multicollinearity."
+        name="description" />
+    <link
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>12</text></svg>"
+        rel="icon" />
+    <link href="../css/style.css" rel="stylesheet" />
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Advanced Machine Learning</h1>
+            <p>Lecture 12 - Polynomial Regression &amp; Assumptions of Linear Regression</p>
+            <a href="../index.html"
+                style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">←
+                Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/12.pdf"
+                style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;"
+                target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text" />
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 5</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            style="vertical-align: text-bottom; margin-right: 4px;">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>Short Notes</a></li>
+                <li>
+                    <a href="#topic-1">1. Polynomial Regression as Feature Transformation<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 Failure of Constant Slope &amp; Curved Data</a></li>
+                        <li><a href="#sub-1-2">1.2 Feature Mapping \(\phi(x) = (x, x^2)\) &amp; Design Matrix</a></li>
+                        <li><a href="#sub-1-3">1.3 3D Mental Model: From 2D Curve to 3D Plane</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Polynomial Degree &amp; Overfitting Risk<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 Degree-\(n\) Model Formulation</a></li>
+                        <li><a href="#sub-2-2">2.2 Degree vs. Overfitting Duality</a></li>
+                        <li><a href="#sub-2-3">2.3 Training Error vs. Generalization Tradeoff</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. The 5 Assumptions of Linear Regression<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 Inference vs. Prediction &amp; Residual Notation</a></li>
+                        <li><a href="#sub-3-2">3.2 Assumption 1: Linearity of Relationships</a></li>
+                        <li><a href="#sub-3-3">3.3 Assumption 2: Normality of Residuals (\(e \sim \mathcal{N}(0, \sigma^2)\))</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Residual Diagnostics &amp; Assumption Failures<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 Assumption 3: Homoscedasticity vs. Heteroscedasticity</a></li>
+                        <li><a href="#sub-4-2">4.2 Assumption 4: No Autocorrelation of Errors</a></li>
+                        <li><a href="#sub-4-3">4.3 Diagnostic Plots &amp; Remedial Transformations</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Multicollinearity &amp; Matrix Singularity Proof<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 Definition &amp; Linear Dependence Setup</a></li>
+                        <li><a href="#sub-5-2">5.2 Mathematical Proof of \(X^\top X\) Singularity</a></li>
+                        <li><a href="#sub-5-3">5.3 3×3 Numerical Matrix Breakdown &amp; VIF</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round"
+                            stroke-linejoin="round" stroke-width="2"
+                            style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" x2="8" y1="13" y2="13"></line>
+                            <line x1="16" x2="8" y1="17" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>Original PDF</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Short Notes -->
+            <section id="short-notes" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-short-notes')">
+                    <div class="topic-number"
+                        style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                    </div>
+                    <h2>Short Notes &amp; Visual Summary</h2>
+                </div>
+                <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
+                    <p style="margin-bottom: 1rem;">Handwritten summary sheet and core concepts for Lecture 12 (Polynomial Regression &amp; Linear Model Assumptions):</p>
+
+                    <!-- Embedded Handwritten Summary Image -->
+                    <div style="text-align: center; margin-bottom: 1.5rem;">
+                        <img src="../images/12.png" alt="Lecture 12 Handwritten Short Notes &amp; Summary Sheet" 
+                             style="max-width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--border-light); box-shadow: var(--shadow);" />
+                        <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.5rem; font-style: italic;">
+                            Handwritten Summary Sheet — Lecture 12: Polynomial Regression &amp; Assumptions of Linear Regression
+                        </p>
+                    </div>
+
+                    <div class="box box-blue">
+                        <div class="box-title">Core Lecture Takeaways &amp; Key Formulas</div>
+                        <ul style="line-height: 1.6;">
+                            <li><strong>Polynomial Regression as Feature Transformation:</strong> It is NOT a new learning algorithm. We construct non-linear input features (\(\phi(x) = (x, x^2, \dots, x^n)\)) while keeping optimization linear in parameters \(\beta\). A 2D parabolic curve is represented as a flat linear hyperplane in 3D feature space \((x, x^2, y)\).</li>
+                            <li><strong>Degree vs. Overfitting Duality:</strong> Degree 1 underfits (constant slope); Degree 2 provides optimal curvature (1 bend); Degree \(n\) creates up to \(n-1\) bends. Excessively high degrees (e.g., \(n=8\)) fit random noise, inflating validation error.</li>
+                            <li><strong>The 5 Core Assumptions:</strong> (1) <strong>Linearity</strong> (\(\mathbb{E}[y|X] = \beta_0 + \sum \beta_j x_j\)); (2) <strong>Normality of Residuals</strong> (\(e_i \sim \mathcal{N}(0, \sigma^2)\)); (3) <strong>Homoscedasticity</strong> (\(\text{Var}(e_i) = \sigma^2\)); (4) <strong>No Autocorrelation</strong> (\(\text{Cov}(e_i, e_j) = 0\)); (5) <strong>No Multicollinearity</strong> (independent input features).</li>
+                            <li><strong>Inference vs. Prediction Impact:</strong> Multicollinearity destabilizes coefficient estimates \(\beta\) (ruining interpretability/inference), but has less impact on pure target prediction \(\hat{y}\).</li>
+                            <li><strong>Perfect Multicollinearity Proof:</strong> If feature column \(X_k\) is an exact linear combination of other columns, \(X c = \mathbf{0}\) for \(c \ne \mathbf{0}\), implying \((X^\top X) c = \mathbf{0}\). Thus, \(\det(X^\top X) = 0\), making \(X^\top X\) singular and non-invertible for OLS \(\hat{\beta} = (X^\top X)^{-1} X^\top y\).</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 1 -->
+            <section class="topic-section" id="topic-1">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>Polynomial Regression as Feature Transformation</h2>
+                </div>
+                <div class="collapsible-content" id="content-1">
+                    <h3 id="sub-1-1">1.1 Failure of Constant Slope &amp; Curved Data</h3>
+                    <p>Standard linear regression models assume a strictly constant rate of change: \(y = \beta_0 + \beta_1 x\). In real-world datasets, output metrics often accelerate non-linearly. For instance, in an internship stipend model based on project depth score \(x \in [1, 10]\):</p>
+                    <ul>
+                        <li>Moving from score 2 to 4 yields a small stipend increase.</li>
+                        <li>Moving from score 8 to 10 yields a disproportionately larger increase due to unlocking elite recruitment tiers.</li>
+                    </ul>
+                    <p>Because a simple straight line cannot bend, fitting standard OLS onto curved scatter plots forces severe systematic underfitting.</p>
+
+                    <h3 id="sub-1-2">1.2 Feature Mapping \(\phi(x) = (x, x^2)\) &amp; Design Matrix Setup</h3>
+                    <p>Rather than designing a new non-linear optimization algorithm, we apply a <strong>feature transformation</strong> \(\phi(x)\) that expands the input space:</p>
+                    $$\phi(x) = (x, x^2)$$
+                    <p>The regression model becomes:</p>
+                    $$y = \beta_0 + \beta_1 x + \beta_2 x^2$$
+                    <p>Even though the target is non-linear with respect to raw feature \(x\), it remains <strong>strictly linear in its parameters</strong> \(\beta_0, \beta_1, \beta_2\). Thus, standard Ordinary Least Squares (OLS) and Gradient Descent apply directly without modification.</p>
+
+                    <div class="box box-green">
+                        <div class="box-title">Sample Feature Matrix Transformation</div>
+                        <table style="width:100%; border-collapse: collapse; margin-top:0.5rem;">
+                            <thead>
+                                <tr style="border-bottom: 2px solid var(--border-light); text-align:left;">
+                                    <th style="padding:6px;">Student</th>
+                                    <th style="padding:6px;">Raw \(x\)</th>
+                                    <th style="padding:6px;">Transformed \(x^2\)</th>
+                                    <th style="padding:6px;">Target \(y\) (Stipend ×1000)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td style="padding:6px;">A</td><td style="padding:6px;">2</td><td style="padding:6px;">4</td><td style="padding:6px;">24</td></tr>
+                                <tr><td style="padding:6px;">B</td><td style="padding:6px;">4</td><td style="padding:6px;">16</td><td style="padding:6px;">42</td></tr>
+                                <tr><td style="padding:6px;">C</td><td style="padding:6px;">6</td><td style="padding:6px;">36</td><td style="padding:6px;">62</td></tr>
+                                <tr><td style="padding:6px;">D</td><td style="padding:6px;">8</td><td style="padding:6px;">64</td><td style="padding:6px;">91</td></tr>
+                                <tr><td style="padding:6px;">E</td><td style="padding:6px;">10</td><td style="padding:6px;">100</td><td style="padding:6px;">128</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3 id="sub-1-3">1.3 3D Mental Model: From 2D Curve to 3D Plane</h3>
+                    <p>Let \(z = x^2\). Substituting \(z\) yields a standard multiple linear equation: \(y = \beta_0 + \beta_1 x + \beta_2 z\). This represents a flat 2D plane embedded within 3D space \((x, z, y)\). When this flat plane is projected back down onto the 2D parabolic manifold \(z = x^2\), it appears as a smooth curved line in original \((x, y)\) space.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" disabled="">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section class="topic-section" id="topic-2">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>Polynomial Degree &amp; Overfitting Risk</h2>
+                </div>
+                <div class="collapsible-content" id="content-2">
+                    <h3 id="sub-2-1">2.1 Degree-\(n\) Model Formulation</h3>
+                    <p>A degree-\(n\) polynomial regression expands feature space up to the \(n\)-th power of \(x\):</p>
+                    $$y = \beta_0 + \beta_1 x + \beta_2 x^2 + \dots + \beta_n x^n = \beta_0 + \sum_{j=1}^n \beta_j x^j$$
+                    <p>The maximum degree \(n\) dictates the maximum number of inflection points (bends) the fitted curve can exhibit, which equals \(n-1\):</p>
+                    <ul>
+                        <li><strong>Degree 1 (\(n=1\)):</strong> \(y = \beta_0 + \beta_1 x\) &rarr; 0 bends (Straight line).</li>
+                        <li><strong>Degree 2 (\(n=2\)):</strong> \(y = \beta_0 + \beta_1 x + \beta_2 x^2\) &rarr; 1 bend (Parabola / U-shape).</li>
+                        <li><strong>Degree 3 (\(n=3\)):</strong> \(y = \beta_0 + \dots + \beta_3 x^3\) &rarr; 2 bends (S-curve).</li>
+                        <li><strong>Degree \(n\):</strong> Design matrix \(X\) contains \(n+1\) columns (including intercept column of ones).</li>
+                    </ul>
+
+                    <h3 id="sub-2-2">2.2 Degree vs. Overfitting Duality</h3>
+                    <p>As polynomial degree increases, model capacity grows exponentially. While a low degree (\(n=1\)) underfits curved data, an excessively high degree (\(n=8\) or \(n=20\)) fits random noise in the training set.</p>
+
+                    <div class="box box-orange">
+                        <div class="box-title">Model Capacity Comparison</div>
+                        <ul>
+                            <li><strong>Degree 1 (Underfitting):</strong> High training error, high validation error. Rigid model fails to capture true signal.</li>
+                            <li><strong>Degree 2 (Optimal Fit):</strong> Low training error, low validation error. Captures underlying physics/trend without fitting noise.</li>
+                            <li><strong>Degree 8+ (Overfitting):</strong> Near-zero training error, extreme validation error. Curve twists wildly to pass through every individual data point.</li>
+                        </ul>
+                    </div>
+
+                    <h3 id="sub-2-3">2.3 Training Error vs. Generalization Tradeoff</h3>
+                    <p>A higher-degree polynomial always achieves equal or lower training MSE because it possesses more free parameters. However, lower training error does <strong>not</strong> imply a superior model. Cross-validation must be used to select degree \(n^*\) that minimizes out-of-sample generalization error.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section class="topic-section" id="topic-3">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>The 5 Assumptions of Linear Regression</h2>
+                </div>
+                <div class="collapsible-content" id="content-3">
+                    <h3 id="sub-3-1">3.1 Inference vs. Prediction &amp; Residual Notation</h3>
+                    <p>Linear Regression relies on five fundamental statistical assumptions to ensure that parameter estimates \(\hat{\beta}\) are unbiased, minimum variance (BLUE under Gauss-Markov theorem), and statistically valid for inference.</p>
+                    <p><strong>Residual Definition:</strong> The difference between observed value \(y_i\) and predicted value \(\hat{y}_i\):</p>
+                    $$e_i = y_i - \hat{y}_i$$
+
+                    <h3 id="sub-3-2">3.2 Assumption 1: Linearity of Relationships</h3>
+                    <p><strong>Statement:</strong> The expected value of target \(y\) is a linear combination of independent feature variables \(x_j\).</p>
+                    <ul>
+                        <li><strong>Check:</strong> Scatter plots of \(y\) vs. \(x_j\) and Residuals vs. Fitted Values (\(\hat{y}\)). Residuals should be randomly scattered around zero without systematic curvature.</li>
+                        <li><strong>Remedy if Violated:</strong> Apply non-linear feature transformations (Log, Square Root) or add polynomial terms (\(x^2\)).</li>
+                    </ul>
+
+                    <h3 id="sub-3-3">3.3 Assumption 2: Normality of Residuals (\(e \sim \mathcal{N}(0, \sigma^2)\))</h3>
+                    <p><strong>Statement:</strong> The error terms \(e_i\) follow a normal distribution with mean zero and constant variance \(\sigma^2\).</p>
+                    $$\mathbb{E}[e_i] = 0, \quad e_i \sim \mathcal{N}(0, \sigma^2)$$
+                    <ul>
+                        <li><strong>Check:</strong> Histogram of residuals (should form a symmetric bell curve centered at 0) or Q-Q plot (points should align along 45-degree diagonal).</li>
+                        <li><strong>Impact:</strong> Crucial for calculating valid hypothesis testing \(p\)-values, confidence intervals, and standard errors for coefficients \(\beta\).</li>
+                    </ul>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section class="topic-section" id="topic-4">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>Residual Diagnostics &amp; Assumption Failures</h2>
+                </div>
+                <div class="collapsible-content" id="content-4">
+                    <h3 id="sub-4-1">4.1 Assumption 3: Homoscedasticity vs. Heteroscedasticity</h3>
+                    <p><strong>Homoscedasticity:</strong> The error term variance \(\text{Var}(e_i) = \sigma^2\) is constant across all predicted values \(\hat{y}\).</p>
+                    <p><strong>Heteroscedasticity:</strong> Error variance systematically changes (e.g., residual spread widens like a funnel as \(\hat{y}\) increases).</p>
+
+                    <div class="box box-red">
+                        <div class="box-title">Consequences of Heteroscedasticity</div>
+                        <p>While OLS coefficient estimates \(\hat{\beta}\) remain unbiased, their estimated standard errors are incorrect (underestimated). This inflates \(t\)-statistics and leads to false statistical significance claims.</p>
+                        <p><strong>Remedy:</strong> Logarithmic transformation \(\log(y)\), Box-Cox transform, or Weighted Least Squares (WLS).</p>
+                    </div>
+
+                    <h3 id="sub-4-2">4.2 Assumption 4: No Autocorrelation of Errors</h3>
+                    <p><strong>Statement:</strong> Error terms are mutually independent across observations: \(\text{Cov}(e_i, e_j) = 0\) for \(i \ne j\).</p>
+                    <ul>
+                        <li><strong>Check:</strong> Plot residuals against time index or observation sequence order. Durbin-Watson Test statistic \(d \approx 2\) indicates no autocorrelation.</li>
+                        <li><strong>Violation:</strong> Common in time-series data where consecutive errors display positive or negative correlation trends.</li>
+                    </ul>
+
+                    <h3 id="sub-4-3">4.3 Diagnostic Plots &amp; Remedial Transformations</h3>
+                    <table style="width:100%; border-collapse: collapse; margin-top:0.5rem;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--border-light); text-align:left;">
+                                <th style="padding:6px;">Residual Pattern</th>
+                                <th style="padding:6px;">Violated Assumption</th>
+                                <th style="padding:6px;">Recommended Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td style="padding:6px;">U-shaped / Parabolic curve vs. \(\hat{y}\)</td><td style="padding:6px;">Linearity</td><td style="padding:6px;">Add polynomial terms (\(x^2\))</td></tr>
+                            <tr><td style="padding:6px;">Funnel / Cone shape (widening error)</td><td style="padding:6px;">Homoscedasticity</td><td style="padding:6px;">Apply \(\log(y)\) or \(\sqrt{y}\) transform</td></tr>
+                            <tr><td style="padding:6px;">Right / Left skewed histogram</td><td style="padding:6px;">Normality</td><td style="padding:6px;">Target transformation or robust regression</td></tr>
+                            <tr><td style="padding:6px;">Cyclical / Trending sequence plot</td><td style="padding:6px;">No Autocorrelation</td><td style="padding:6px;">Add autoregressive lag features</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 5 -->
+            <section class="topic-section" id="topic-5">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>Multicollinearity &amp; Matrix Singularity Proof</h2>
+                </div>
+                <div class="collapsible-content" id="content-5">
+                    <h3 id="sub-5-1">5.1 Definition &amp; Linear Dependence Setup</h3>
+                    <p><strong>Multicollinearity</strong> occurs when two or more input features in a multiple regression model are highly linearly correlated, making it impossible to isolate the individual contribution of each feature on target \(y\).</p>
+                    <p>Consider two features \(X_1\) and \(X_2\) predicting \(Y\):</p>
+                    $$Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \varepsilon_1$$
+                    <p>If \(X_1\) and \(X_2\) are highly correlated (\(X_1 = a_0 + a_1 X_2 + \varepsilon_2\)), substituting \(X_1\) reduces the model to effectively a function of \(X_2\) alone, causing coefficients \(\beta_1\) and \(\beta_2\) to become unstable and produce huge standard errors.</p>
+
+                    <h3 id="sub-5-2">5.2 Mathematical Proof that \(X^\top X\) Is Singular</h3>
+                    <p>Recall the closed-form Ordinary Least Squares (OLS) normal equation for weights \(\hat{\beta}\):</p>
+                    $$\hat{\beta} = (X^\top X)^{-1} X^\top y$$
+
+                    <div class="box box-blue">
+                        <div class="box-title">Mathematical Proof of Non-Invertibility</div>
+                        <ol style="line-height: 1.6;">
+                            <li><strong>Linear Dependence Assumption:</strong> If columns of design matrix \(X\) are perfectly linearly dependent, there exists a non-zero column vector \(c \ne \mathbf{0}\) such that:
+                            $$X c = \mathbf{0}$$</li>
+                            <li><strong>Premultiply by \(X^\top\):</strong>
+                            $$X^\top (X c) = X^\top \mathbf{0} \implies (X^\top X) c = \mathbf{0}$$</li>
+                            <li><strong>Implication for Kernel / Nullspace:</strong> Because \(c \ne \mathbf{0}\) maps to \(\mathbf{0}\), the matrix \(X^\top X\) maps a non-zero vector to zero.</li>
+                            <li><strong>Singularity &amp; Zero Determinant:</strong> Thus, the columns of \(X^\top X\) are linearly dependent, which means:
+                            $$\det(X^\top X) = 0$$</li>
+                            <li><strong>Conclusion:</strong> The inverse matrix \((X^\top X)^{-1}\) does <strong>not exist</strong>. OLS cannot compute closed-form estimates \(\hat{\beta}\).</li>
+                        </ol>
+                    </div>
+
+                    <h3 id="sub-5-3">5.3 3×3 Numerical Matrix Breakdown &amp; VIF</h3>
+                    <p>Consider a design matrix \(X\) where Column 3 is the exact sum of Column 1 and Column 2 (\(C_3 = C_1 + C_2\)):</p>
+                    $$X = \begin{bmatrix} 1 & 1 & 2 \\ 1 & 2 & 3 \\ 1 & 3 & 4 \end{bmatrix}$$
+                    <p>Computing \(X^\top X\):</p>
+                    $$X^\top X = \begin{bmatrix} 1 & 1 & 1 \\ 1 & 2 & 3 \\ 2 & 3 & 4 \end{bmatrix} \begin{bmatrix} 1 & 1 & 2 \\ 1 & 2 & 3 \\ 1 & 3 & 4 \end{bmatrix} = \begin{bmatrix} 3 & 6 & 9 \\ 6 & 14 & 20 \\ 9 & 20 & 29 \end{bmatrix}$$
+                    <p>Evaluating determinant: \(\det(X^\top X) = 3(14 \cdot 29 - 20 \cdot 20) - 6(6 \cdot 29 - 20 \cdot 9) + 9(6 \cdot 20 - 14 \cdot 9) = 3(6) - 6(-6) + 9(-6) = 18 + 36 - 54 = 0\).</p>
+                    <p>Since \(\det(X^\top X) = 0\), matrix inversion fails.</p>
+
+                    <div class="box box-green">
+                        <div class="box-title">Variance Inflation Factor (VIF) Diagnostic</div>
+                        <p>To detect multicollinearity in non-perfect cases, compute VIF for feature \(j\):</p>
+                        $$\text{VIF}_j = \frac{1}{1 - R_j^2}$$
+                        <p>Where \(R_j^2\) is the \(R^2\) score from regressing feature \(X_j\) on all other features. A \(\text{VIF} > 10\) indicates severe multicollinearity that requires dropping or combining correlated features.</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <a href="#original-pdf" class="btn"
+                            style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;"
+                            onclick="document.getElementById('original-pdf').scrollIntoView()">Next Section</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number"
+                        style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round"
+                            stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" x2="8" y1="13" y2="13"></line>
+                            <line x1="16" x2="8" y1="17" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for your reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()"
+                        style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous
+                            Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/12.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,460 @@
+--- PAGE 1 ---
+Advanced Machine Learning Worksheet 08 — Lecture 8 (TEACHER COPY)
+A D V A N C E D M A C H I N E L E A R N I N G·W O R K S H E E T 0 8
+Polynomial Regression & Assumptions of Linear Regression
+Feature Transformation·Overfitting·Five Assumptions
+TEACHER COPY— Lecture 8
+PART I: POLYNOMIAL REGRESSION
+SECTION 1 Start from the Failure of a Straight Line
+▷HOOK
+Suppose we want to predict theinternship stipendof an NST student using one feature: a
+project depth score(1 = basic project, 10 = strong, production-like portfolio).
+At first, higher project depth should produce higher stipend. But the relationship may not rise at
+a constant rate.
+•Moving from score 2 to 4 may help a little.
+• Moving from score 8 to 10 may helpmuch more, because strong projects unlock better
+companies and referrals.
+The scatter plot maycurve upward.
+Visual: Linear vs. Curved Scatter
+Project Depth Score (x)
+Stipend (y) (×1000)
+(a) Linear Relationship
+1 2 3 4 5 6
+10
+20
+30
+40
+50
+Project Depth Score (x)
+Stipend (y) (×1000)
+(b) Curved Relationship
+1 2 3 4 5 6
+10
+20
+30
+40
+50
+The ordinary one-feature Linear Regression model is:
+y=β 0 +β 1x
+This has onlyone slope. The slope is constant. Ifx increases by one unit, the predicted value changes
+by the same amount everywhere.
+But in the scatter plot, the effect of one more unit of project depth seems larger at high values ofx
+than at low values. We need a model whoseslope can changeasxchanges.
+1
+--- PAGE 2 ---
+Advanced Machine Learning Worksheet 08 — Lecture 8 (TEACHER COPY)
+SECTION 2 The Simple Idea: Create a New Featurex2
+▷HOOK
+Do not think of Polynomial Regression as a completely new algorithm. Think of it as afeature
+transformation: creating a new input column from an existing input column.
+For example:
+•If the original feature value isx= 4, the new feature isx2 = 16.
+•Ifx= 8, thenx 2 = 64.
+Notice thatx 2 grows faster whenxis large. This gives the model a way tobend upward.
+Example Dataset — NST Internship Stipend
+Student Raw featurexNew featurex 2 Targety(stipend in×1000)
+A 24 24
+B 416 42
+C 636 62
+D 864 91
+E 10100 128
+After adding this new feature, the model becomes:
+y=β 0 +β 1x+β 2x2
+Visual: One Input Column Becomes Two Model Features
+Original feature
+x
+2
+4
+6
+8
+10
+Feature map
+ϕ(x) = (x,x 2 )
+Transformed features
+x x 2
+2 4
+4 16
+6 36
+8 64
+10 100
+createx 2 addx 2
+⋆KEY INSIGHT
+Afeature spaceis the coordinate system formed by the features we give to the model.
+•With only one featurex, every student is located byonecoordinate.
+•With two featuresxandx 2, every student is located bytwocoordinates.
+The targetythen becomes the vertical axis.
+SECTION 3 The 3D Mental Model: A Curve Becomes a Plane
+▷HOOK
+Let us renamex2 asz for one minute:z =x2. Then the model becomesy =β0 +β1x +β2z. This
+is the equation of aplanein three-dimensional space with axesx,z, andy.
+Visual: From 2D curve to 3D plane
+2
+--- PAGE 3 ---
+Advanced Machine Learning Worksheet 08 — Lecture 8 (TEACHER COPY)
+In the original graph, we saw a curve. But after addingx2, the model is fitting aplane. When the
+fitted plane is viewed only along the path wherez =x2, it appears as a curve in the original(x,y )plot.
+♦TAKEAWAY
+Polynomial Regression is not a new algorithm. We gaveLinear Regression a better coordinate
+system. The model is still linear in its parametersβ0,β 1,β 2. It is only non-linear in the original
+featurex.
+SECTION 4 Generalizing to Higher-Degree Polynomial Features
+Apolynomial degreeis the highest power ofxused in the model:
+•Degree 1:y=β 0 +β 1x(straight line)
+•Degree 2:y=β 0 +β 1x+β 2x2 (can create a U-shape or upward bend)
+•Degree 3:y=β 0 +β 1x+β 2x2 +β 3x3 (can bend more flexibly)
+The general degree-npolynomial regression model is:
+y=β 0 +β 1x+β 2x2 +···+β nxn
+Visual: Increasing degree and the risk of overfitting
+3
+--- PAGE 4 ---
+Advanced Machine Learning Worksheet 08 — Lecture 8 (TEACHER COPY)
+x
+y
+Degree 1
+(Underfits)
+x
+y
+Degree 2
+(Good fit)
+x
+y
+Degree 8
+(Overfits)
+△WARNING — OVERFITTING
+Overfittingmeans the model captures accidental fluctuations in the training data instead of the
+stable pattern that will repeat on future data. A very high-degree polynomial can twist itself to
+reduce training error, but that does not guarantee better prediction on new students.
+Classroom question:If a degree-8 curve passes closer to every training point than a degree-2
+curve, should we automatically prefer degree 8?
+Expected answer:No. Lower training error is not enough. The curve must represent the
+underlying relationship, not thenoise in one dataset.
+PRACTICE P1·POLYNOMIAL REGRESSION
+(a) Go back to the Example Dataset table in Section 2. Fill in thex2 column for all five students.
+Answer:2 2 = 4,4 2 = 16,6 2 = 36,8 2 = 64,10 2 = 100.
+(b) A degree-2 polynomial has the formy =β0 +β1x +β2x2. How many feature columns does
+the design matrixXhave (including the intercept column of ones)?
+3 columns (1,x,x2)
+(c) Complete the table:
+Degree No. of feature columns (incl. intercept) Can the curve bend?
+12 No (straight line)
+23 Yes (one bend)
+56 Yes (up to 4 bends)
+n n+ 1 Yes (up ton−1bends)
+(d) True or False:Polynomial Regression uses a different optimization algorithm than Linear
+Regression. [F]
+Justify: It uses the same OLS or GD. We only changed the features, not the
+algorithm.
+(e)Assertion–Reason:
+Assertion (A):A degree-20 polynomial on 25 data points will likely have lower training
+error than a degree-2 polynomial.
+Reason (R):A higher-degree polynomial has more parameters and can twist itself to pass
+closer to every training point.
+(i) Both A and R are true, and R is the correct explanation of A. [✓]
+(ii) Both A and R are true, but R is not the correct explanation of A. [ ]
+(iii) A is true but R is false. [ ]
+(iv) A is false but R is true. [ ]
+4
+--- PAGE 5 ---
+Advanced Machine Learning Worksheet 08 — Lecture 8 (TEACHER COPY)
+PART II: THE FIVE ASSUMPTIONS OF LINEAR REGRESSION
+WHY ASSUMPTIONS MATTER
+Polynomial Regression showed us an important lesson: Linear Regression is powerful when the
+representation of the data matches the real pattern. But after choosing a model, we still need to
+ask whether the model isbehaving in a trustworthy way.
+Linear Regression relies on several assumptions to ensure the validity and reliability of the
+estimates and inferences. Here,inferencemeans understanding the relationship between
+variables, interpreting coefficients, and making statements about how changes in inputs affect
+the output.
+Notation:
+•Residual= actual value−predicted value:e=y−ˆy
+The five key assumptions:
+1. Linearity
+2. Normality of Residuals
+3. Homoscedasticity
+4. No Autocorrelation of Errors
+5. No (or little) Multicollinearity
+SECTION 5 Assumption 1 — Linearity
+▷HOOK
+The assumption:There is alinear relationshipbetween the independent variables and
+the dependent variable. The model assumes that changes in the independent variables lead to
+proportional changes in the dependent variable.
+Visual: Linearity satisfied vs. violated
+Independent Variable (x)
+Dependent Variable (y)
+Linear Relationship
+Independent Variable (x)
+Dependent Variable (y)
+Nonlinear Relationship
+Linearity means the central trend should be well represented by a straight line.
+A curved pattern suggests violation of the linearity assumption.
+Linearity doesnotmean every point must lie exactly on a line. It means thecentral trendshould
+be reasonably represented by a straight line or by a linear combination of features.
+How to check this assumption:
+1.Scatter plots:Create scatter plots ofyagainst each independent variable.
+2. Residual plots:Plot residuals against predicted values. Residuals should berandomly
+scattered around zero.
+5
+--- PAGE 6 ---
+Advanced Machine Learning Worksheet 08 — Lecture 8 (TEACHER COPY)
+3. Polynomial terms:Add polynomial terms and compare model fit. If the new model significantly
+improves, linearity may be violated.
+What to do when the assumption fails:
+•Transformations:Apply logarithmic, square-root, or other transformations.
+•Polynomial Regression:Add polynomial terms to capture non-linear relationships.
+SECTION 6 Assumption 2 — Normality of Residuals
+▷HOOK
+The assumption:The error terms (residuals) are assumed to roughly follow anormal distri-
+butionwith mean zero and varianceσ2.
+Mean zeromeans the residuals are centered around zero.
+Normal distributionmeans most residuals are small, and very large positive or negative
+residuals are rare.
+How to check:
+Histogram of residuals— plot a histogram and check whether it resembles a bell-shaped curve
+centered around zero.
+6
+--- PAGE 7 ---
+Advanced Machine Learning Worksheet 08 — Lecture 8 (TEACHER COPY)
+Residual value
+Frequency
+Roughly Normal (Good)
+0
+Residual value
+Frequency
+Skewed (Problematic)
+0
+We are not expecting a perfect bell curve. We are checking whether the residuals areroughly
+symmetric around zeroand whether extreme errors are not happening too often.
+SECTION 7 Assumption 3 — Homoscedasticity
+▷HOOK
+The assumption:The spread of the error terms (residuals) should beconstantacross all levels
+of the independent variables. If the spread changes systematically, it leads toheteroscedasticity.
+How to check:Create a scatter plot of residuals against predicted values.
+Predicted value (ˆy)
+Residual (e)
+Homoscedasticity (Good)
+0
+Predicted value (ˆy)
+Residual (e)
+Heteroscedasticity (Bad)
+0
+What to do when the assumption fails:
+• Transformations:Apply logarithmic, square-root, or inverse transformations to stabilize the
+variance.
+SECTION 8 Assumption 4 — No Autocorrelation of Errors
+▷HOOK
+The assumption:There should be no apparent correlation or pattern in the residuals.Inde-
+pendence of errorsmeans one residual should not help us predict the next residual.
+This is especially important when data has a natural order (time series).
+Visual: Healthy random residuals vs. autocorrelation pattern
+7
+--- PAGE 8 ---
+Advanced Machine Learning Worksheet 08 — Lecture 8 (TEACHER COPY)
+If residuals move in a pattern, the model has left some structure in the data unexplained.
+PRACTICE P2·IDENTIFY THE ASSUMPTION
+For each residual plot described below, identifywhich assumptionis violated.
+Residual behaviour Violated assumption
+(a) Residuals form a clear U-shaped curve when plotted againstˆy. Linearity
+(b) Residual spread grows wider asˆyincreases (funnel shape). Homoscedasticity
+(c) Histogram of residuals is heavily skewed to the right. Normality
+(d) Residuals in a time-series model show long runs of positive
+values followed by long runs of negative values.
+Autocorrelation
+SECTION 9 Assumption 5 — No Multicollinearity
+▷HOOK
+Multicollinearityoccurs when two or more independent variables in a regression model are
+highly correlated. They exhibit a strong linear relationship, making it difficult to isolate the
+individual effect of each variable on the dependent variable.
+9.1 The Setup
+Suppose we have two featuresX1 andX 2, and we want to predictY:
+Y=β 0 +β 1X1 +β 2X2 +ε 1
+Here,ε 1 represents the part ofYnot explained by the model.
+IfX 1 andX 2 are highly correlated, then:
+X1 =a 0 +a 1X2 +ε 2
+If we substituteX1 into the equation forY, the model becomes:
+Y≈C 0 +C 1X2 +ε 3
+So, effectively,Ybecomes a linear function ofX 2 only.
+9.2 Inference vs. Prediction
+8
+--- PAGE 9 ---
+Advanced Machine Learning Worksheet 08 — Lecture 8 (TEACHER COPY)
+⋆KEY INSIGHT
+•If the goal isinference, multicollinearity isbadbecauseβ 1 andβ 2 become unreliable.
+• If the goal isprediction only, multicollinearity is usuallyless harmful. The model may still
+predict well, but the individual coefficient values may not be trustworthy.
+9.3 Perfect Multicollinearity
+IfX 1 andX 2 areperfectlycorrelated:
+X1 =a 0 +a 1X2 (no error term)
+Recall the OLS equation:
+ˆβ= (X ⊤X)−1 X⊤y
+When columns ofXare a perfect linear combination,X⊤Xbecomessingular.
+9.4 Proof thatX ⊤XIs Singular
+Step 1: Suppose the columns ofXare linearly dependent. There exists a non-zero vectorcsuch
+that:
+X c=0
+Step 2:Multiply both sides byX⊤:
+X⊤X c=X ⊤0
+Step 3:Therefore:
+X⊤X c=0
+Step 4:Butc̸=0. SoX ⊤Xsends a non-zero vector to zero.
+Therefore,X⊤Xhasdependent columns.
+Step 5:SoX ⊤Xissingular .
+Step 6:Therefore:det(X ⊤X) =0
+Step 7:Hence:(X ⊤X)−1 does not exist
+9.5 Numerical Example:3×3Matrix
+X=
+
+
+1 1 2
+1 2 3
+1 3 4
+
+
+Here, Column 3 = Column 1 + Column 2. The columns are linearly dependent.
+ComputeX⊤X:
+X⊤X=
+
+
+3 6 9
+6 14 20
+9 20 29
+
+
+Verify:det(X ⊤X) =0
+Therefore,X⊤Xissingular and(X⊤X)−1 does not exist .
+9
+--- PAGE 10 ---
+Advanced Machine Learning Worksheet 08 — Lecture 8 (TEACHER COPY)
+PRACTICE P3·MULTICOLLINEARITY DETECTIVE
+A data science team builds a model to predict monthly sales revenue using:
+Feature Description
+X1 Number of website visitors
+X2 Number of page views
+X3 Marketing spend (in×1000)
+X4 Number of social media ad clicks
+X5 Temperature in the city (Celsius)
+(a) Which pairs aremost likelyto exhibit multicollinearity?
+Pair 1:X 1 andX 2
+Reason: More visitors typically means more page views; they are highly corre-
+lated.
+Pair 2:X 3 andX 4
+Reason: Higher marketing spend directly drives more social media ad clicks.
+(b) IfX 1 andX 2 have correlation0.98, andβ 1 = 15.2,β 2 =−14.8, what is wrong?
+Coefficients are unstable and nearly cancel each other. Individually they are
+unreliable.
+(c) If the goal is only prediction, should they worry? [✓] No
+Justify: For prediction only, multicollinearity is less harmful. The model can
+still predict well.
+(d) IfX 4 = 0.5×X 3 exactly, what problem will OLS encounter?
+Perfect multicollinearity:X⊤Xis singular,det = 0, OLS cannot compute ˆβ.
+SECTION 10 Closing Summary
+▷HOOK
+This lecture covered two major themes: how to extend Linear Regression to model curves, and
+how to verify that Linear Regression is trustworthy.
+Part I — Polynomial Regression summary:
+Concept Key idea
+Feature transformation Create new columns (e.g.x2) from existing
+features
+Degree-npolynomial y = β0 +··· +βnxn; each power is a new
+column
+3D mental model A curve in 2D becomes a plane in 3D fea-
+ture space
+Overfitting risk High-degree polynomials can fit noise, not
+the real pattern
+10
+--- PAGE 11 ---
+Advanced Machine Learning Worksheet 08 — Lecture 8 (TEACHER COPY)
+Part II — Five Assumptions summary:
+Assumption What it says How to check What to do if violated
+Linearity Linear relation between
+xandy
+Scatter / residual plots Transformations, poly
+terms
+Normality of
+Residuals
+Residuals∼N(0,σ 2) Histogram of residuals Transform target, more
+data
+Homoscedasticity Constant residual
+spread
+Residual vsˆyplot Log / sqrt transforma-
+tion
+No Autocorrela-
+tion
+Residuals are indepen-
+dent
+Residual vs time plot Add time features
+No Multicollinear-
+ity
+Features not highly cor-
+related
+Correlation matrix, VIF Drop or combine fea-
+tures
+PRACTICE P4·COMPREHENSIVE CHALLENGE
+(a)Match the Column.
+Scenario Action
+1 Scatter plot ofy vs x shows a clear U-
+shape.
+(A) Check histogram of residuals
+2 Two features have correlation>0.95. (B) Apply log or sqrt transformation
+3 Residual spread widens asˆyincreases. (C) Add polynomial terms
+4 Team wants to know if residuals are bell-
+shaped.
+(D) Remove one of the correlated fea-
+tures
+Answers:1→C 2→D 3→B 4→A
+(b)True or False:
+Statement T/F Justification
+Polynomial Regression requires a different training
+algorithm than Linear Regression.
+[F] Same algorithm, differ-
+ent features
+If R2 increases when we addx3, the cubic term is
+always useful.
+[F] R2 can increase for use-
+less features
+Heteroscedasticity means unequal error spread across
+prediction range.
+[T] Exactly the definition
+Multicollinearity always makes predictions inaccu-
+rate.
+[F] Predictions can be fine;
+only coefficients are af-
+fected
+Linearity requires every data point to lie exactly on
+a line.
+[F] Only the central trend
+must be linear
+(c) Find the Mistake.“In perfect multicollinearity,X⊤Xhas a determinant of 1, so it is
+invertible.”
+The determinant is 0 (not 1).X⊤Xis singular and non-invertible.
+11
+--- PAGE 12 ---
+Advanced Machine Learning Worksheet 08 — Lecture 8 (TEACHER COPY)
+(d) Predict the Outcome.An ML engineer uses: square footage, number of rooms, and total
+area of all rooms (= sq. footage×fraction). What problem?
+The third feature is a linear combination of the first two, causing multicollinearity.
+X⊤Xmay be singular.
+BY THE END OF THIS SHEET, YOU CAN
+□Explain why a straight line fails on curved data and how polynomial features fix it.
+□Describe Polynomial Regression as a feature transformation, not a new algorithm.
+□Visualize how a 2D curve becomes a plane in 3D feature space.
+□Identify the risk of overfitting with high-degree polynomials.
+□State and explain each of the five assumptions of Linear Regression.
+□Check each assumption using scatter plots, residual plots, or histograms.
+□Explain why perfect multicollinearity makes(X⊤X)−1 impossible.
+□Distinguish when multicollinearity matters (inference) vs. when it does not (prediction).
+12
+--- PAGE 13 ---
+Advanced Machine Learning Worksheet 08 — Lecture 8 (TEACHER COPY)
+Answer Key
+P1 (a) x2 values: 4, 16, 36, 64, 100. (b) 3 columns (intercept,x, x2). (c) Degree 1: 2 cols, no
+bend. Degree 2: 3 cols, yes (one bend). Degree 5: 6 cols, yes (up to 4 bends). Degreen: n + 1
+cols, yes (up ton− 1bends). (d) False. Same algorithm (OLS or GD); only features change.
+(e) (i) Both A and R are true, and R is the correct explanation of A.
+P2(a) Linearity. (b) Homoscedasticity. (c) Normality. (d) Autocorrelation.
+P3 (a) Pair 1:X1 & X2 (visitors and page views). Pair 2:X3 & X4 (marketing spend and ad
+clicks). (b) Coefficients nearly cancel; individually unreliable. (c) No; for prediction only,
+multicollinearity is less harmful. (d) Perfect multicollinearity:X⊤Xis singular, OLS fails.
+P4 (a) 1→C, 2→D, 3→B, 4→A. (b) F, F, T, F, F. (c) The determinant is 0, not 1. (d) The third
+feature is a linear combination⇒multicollinearity.
+Worksheet 08·AML·Lecture 8: Polynomial Regression & Assumptions of Linear Regression.
+13
