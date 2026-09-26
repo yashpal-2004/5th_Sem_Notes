@@ -1,38 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Advanced Machine Learning - Lecture 10</title>
-    <meta
-        content="Study notes for Advanced Machine Learning (CSA333), Lecture 10 covering Dimensionality Reduction and Principal Component Analysis (PCA): Feature Selection vs. Feature Extraction, Mean Centering, Covariance Matrix, Eigendecomposition, and Explained Variance Ratio."
-        name="description" />
-    <link
-        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>10</text></svg>"
-        rel="icon" />
-    <link href="../css/style.css" rel="stylesheet" />
-    <!-- KaTeX for math rendering -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}, {left: '$', right: '$', display: false}]});"></script>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Advanced Machine Learning - Lecture 09</title>
+    <meta content="Study notes for Advanced Machine Learning (CSA333), Lecture 09 covering Feature Selection." name="description"/>
+    <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>09</text></svg>" rel="icon"/>
+    <link href="../css/style.css" rel="stylesheet"/>
 </head>
-
 <body>
     <header>
         <div class="header-titles">
             <h1>Advanced Machine Learning</h1>
-            <p>Lecture 10 - Dimensionality Reduction &amp; Principal Component Analysis (PCA)</p>
-            <a href="../index.html"
-                style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">←
-                Back to Dashboard</a>
+            <p>Lecture 09 - Feature Selection</p>
+            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
             <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
-            <a href="../pdfs/10.PDF"
-                style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;"
-                target="_blank">Open PDF in New Tab ↗</a>
+            <a href="../pdfs/9.PDF" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
         </div>
         <div class="search-container">
-            <input id="searchInput" placeholder="Search notes..." type="text" />
+            <input id="searchInput" placeholder="Search notes..." type="text"/>
         </div>
     </header>
     <div class="container">
@@ -40,335 +26,139 @@
         <aside>
             <div class="aside-header">
                 <h3>Table of Contents</h3>
-                <div class="topic-count">Total Topics: 5</div>
+                <div class="topic-count">Total Topics: 4</div>
             </div>
             <ul class="index-list" id="indexList">
-                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16"
-                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round"
-                            style="vertical-align: text-bottom; margin-right: 4px;">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                            <polyline points="14 2 14 8 20 8"></polyline>
-                            <line x1="16" y1="13" x2="8" y2="13"></line>
-                            <line x1="16" y1="17" x2="8" y2="17"></line>
-                        </svg>Short Notes</a></li>
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>Short Notes</a></li>
                 <li>
-                    <a href="#topic-1">1. Why Dimensionality Reduction?<span class="sub-count">3</span></a>
+                    <a href="#topic-1">1. Why Feature Selection?<span class="sub-count">0</span></a>
                     <ul class="sub-index">
-                        <li><a href="#sub-1-1">1.1 The Curse of High Dimensionality</a></li>
-                        <li><a href="#sub-1-2">1.2 Feature Selection vs. Feature Extraction</a></li>
-                        <li><a href="#sub-1-3">1.3 Principal Component Analysis (PCA) Defined</a></li>
                     </ul>
                 </li>
                 <li>
-                    <a href="#topic-2">2. Building Blocks &amp; Data Preprocessing<span class="sub-count">3</span></a>
+                    <a href="#topic-2">2. Filter Methods<span class="sub-count">0</span></a>
                     <ul class="sub-index">
-                        <li><a href="#sub-2-1">2.1 Notation &amp; Data Matrix Setup</a></li>
-                        <li><a href="#sub-2-2">2.2 Step 1: Mean Centering (\(X_c = X - \mathbf{1}\mu^\top\))</a></li>
-                        <li><a href="#sub-2-3">2.3 Standardization: When Scale Matters</a></li>
                     </ul>
                 </li>
                 <li>
-                    <a href="#topic-3">3. Formulation: Maximizing Variance<span class="sub-count">3</span></a>
+                    <a href="#topic-3">3. Wrapper Methods<span class="sub-count">0</span></a>
                     <ul class="sub-index">
-                        <li><a href="#sub-3-1">3.1 1D Projection onto Unit Direction \(u\)</a></li>
-                        <li><a href="#sub-3-2">3.2 Variance vs. Reconstruction Error Duality</a></li>
-                        <li><a href="#sub-3-3">3.3 Derivation of Variance Formula (\(u^\top S u\))</a></li>
                     </ul>
                 </li>
                 <li>
-                    <a href="#topic-4">4. Covariance &amp; Eigendecomposition<span class="sub-count">3</span></a>
+                    <a href="#topic-4">4. Validation Discipline: Avoid the Leakage Trap<span class="sub-count">0</span></a>
                     <ul class="sub-index">
-                        <li><a href="#sub-4-1">4.1 Sample Covariance Matrix \(S = \frac{1}{n-1} X_c^\top X_c\)</a></li>
-                        <li><a href="#sub-4-2">4.2 Eigenvalues (\(\lambda_j\)) and Eigenvectors (\(v_j\))</a></li>
-                        <li><a href="#sub-4-3">4.3 Component Ordering &amp; Score Calculation</a></li>
                     </ul>
                 </li>
-                <li>
-                    <a href="#topic-5">5. PCA Pipeline &amp; Scree Plots<span class="sub-count">3</span></a>
-                    <ul class="sub-index">
-                        <li><a href="#sub-5-1">5.1 Step-by-Step ML Pipeline &amp; Data Leakage</a></li>
-                        <li><a href="#sub-5-2">5.2 Explained Variance Ratio &amp; Scree Plots</a></li>
-                        <li><a href="#sub-5-3">5.3 When PCA Fails &amp; Limitations</a></li>
-                    </ul>
-                </li>
-                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round"
-                            stroke-linejoin="round" stroke-width="2"
-                            style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                            <polyline points="14 2 14 8 20 8"></polyline>
-                            <line x1="16" x2="8" y1="13" y2="13"></line>
-                            <line x1="16" x2="8" y1="17" y2="17"></line>
-                            <polyline points="10 9 9 9 8 9"></polyline>
-                        </svg>Original PDF</a></li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
             </ul>
         </aside>
-
         <!-- Main Content -->
         <main id="notesContent">
             <!-- Short Notes -->
             <section id="short-notes" class="topic-section">
                 <div class="topic-header" onclick="toggleSection('content-short-notes')">
-                    <div class="topic-number"
-                        style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                            <polyline points="14 2 14 8 20 8"></polyline>
-                            <line x1="16" y1="13" x2="8" y2="13"></line>
-                            <line x1="16" y1="17" x2="8" y2="17"></line>
-                        </svg>
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
                     </div>
                     <h2>Short Notes &amp; Visual Summary</h2>
                 </div>
                 <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
-                    <p style="margin-bottom: 1rem;">Handwritten summary sheet and core concepts for Lecture 10 (PCA):</p>
-
-                    <!-- Embedded Handwritten Summary Image -->
-                    <div style="text-align: center; margin-bottom: 1.5rem;">
-                        <img src="../images/10.png" alt="Lecture 10 Handwritten Short Notes &amp; Summary Sheet" 
-                             style="max-width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--border-light); box-shadow: var(--shadow);" />
-                        <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.5rem; font-style: italic;">
-                            Handwritten Summary Sheet — Lecture 10: Dimensionality Reduction &amp; Principal Component Analysis (PCA)
-                        </p>
-                    </div>
-
-                    <div class="box box-blue">
-                        <div class="box-title">Key PCA Takeaways &amp; Core Formulas</div>
-                        <ul style="line-height: 1.6;">
-                            <li><strong>Curse of Dimensionality:</strong> High feature spaces (\(p\)) cause data sparsity, distance metric breakdown, overfitting, and \(O(p^2)\) computational bloat. Dimensionality reduction preserves maximum signal while discarding noise.</li>
-                            <li><strong>Selection vs. Extraction:</strong> Feature Selection discards columns (\(\{x_1, x_2, \dots\}\)); Feature Extraction (PCA) rotates axes to form orthogonal principal components (\(PC_1, PC_2, \dots\)) as linear combinations of all original features.</li>
-                            <li><strong>Mean Centering (\(X_c = X - \mathbf{1}\mu^\top\)):</strong> Essential pre-processing so that sample variance is measured relative to the data centroid origin \((0,0,\dots,0)\).</li>
-                            <li><strong>Variance &amp; Reconstruction Duality:</strong> Maximizing projected variance \(\text{Var}(z)\) along unit direction \(u\) is mathematically identical to minimizing sum of squared reconstruction errors \(\sum \|e_i\|^2\).</li>
-                            <li><strong>Covariance Matrix &amp; Eigendecomposition:</strong> Sample covariance matrix \(S = \frac{1}{n-1}X_c^\top X_c\). Eigendecomposition \(S v = \lambda v\) yields eigenvectors \(v_j\) (principal component direction vectors) and eigenvalues \(\lambda_j\) (variance explained along \(v_j\)).</li>
-                            <li><strong>Explained Variance Ratio (EVR):</strong> \(\text{EVR}_j = \frac{\lambda_j}{\sum_{\ell=1}^p \lambda_\ell}\). Components are chosen via scree plot elbow or \(\ge 90\%\) cumulative variance cutoff.</li>
-                        </ul>
+                    <p style="margin-bottom: 1rem;">Handwritten / quick summary notes for Lecture 09:</p>
+                    <div style="text-align: center; background: var(--bg-secondary, #f8f9fa); padding: 1rem; border-radius: 8px; border: 1px solid var(--gray-border);">
+                        <p style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-muted);">No handwritten notes available for this lecture yet.</p>
                     </div>
                 </div>
             </section>
-
             <!-- Topic 1 -->
-            <section class="topic-section" id="topic-1">
+            <section id="topic-1" class="topic-section">
                 <div class="topic-header" onclick="toggleSection('content-1')">
                     <div class="topic-number">1</div>
-                    <h2>Why Dimensionality Reduction?</h2>
+                    <h2>Why Feature Selection?</h2>
                 </div>
-                <div class="collapsible-content" id="content-1">
-                    <h3 id="sub-1-1">1.1 The Curse of High Dimensionality</h3>
-                    <p>When a dataset contains many features (\(p\)), each observation represents a point in \(p\)-dimensional space. While more features provide richer inputs, performance does not grow indefinitely. Beyond a certain point, uninformative or redundant features add random noise, inflate variance, and trigger an \(O(p^2)\) computational cost explosion.</p>
-
-                    <div class="box box-orange">
-                        <div class="box-title">Image Representation Example</div>
-                        <p>Consider identifying an object inside an image of size \(m \times m\) pixels (\(p = m^2\)):</p>
-                        <ul>
-                            <li><strong>Full Image (\(m \times m\)):</strong> Contains the target object along with vast uninformative background pixels.</li>
-                            <li><strong>Cropped Object (\(f \times f\)):</strong> Contains 100% of the useful signal for shape recognition.</li>
-                        </ul>
-                        <p>Model accuracy plateaus at \(f^2\) pixels, whereas processing the full \(m^2\) image multiplies computation without adding predictive value.</p>
-                    </div>
-
-                    <h3 id="sub-1-2">1.2 Feature Selection vs. Feature Extraction</h3>
-                    <table style="width:100%; border-collapse: collapse; margin: 1.2rem 0; font-size:0.92rem;">
-                        <thead>
-                            <tr style="background-color: var(--text-dark); color: var(--bg-beige);">
-                                <th style="padding:0.6rem; border: 1px solid var(--border-light);">Method</th>
-                                <th style="padding:0.6rem; border: 1px solid var(--border-light);">Mechanism</th>
-                                <th style="padding:0.6rem; border: 1px solid var(--border-light);">Pros &amp; Cons</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td style="padding:0.5rem; border: 1px solid var(--border-light); font-weight:bold;">Feature Selection</td>
-                                <td style="padding:0.5rem; border: 1px solid var(--border-light);">Keeps a subset of original feature axes \(\{x_1, x_2\}\) and discards axis \(x_3\) completely.</td>
-                                <td style="padding:0.5rem; border: 1px solid var(--border-light);">Preserves original feature interpretability, but loses information if signal is spread diagonally across features.</td>
-                            </tr>
-                            <tr>
-                                <td style="padding:0.5rem; border: 1px solid var(--border-light); font-weight:bold;">Feature Extraction (PCA)</td>
-                                <td style="padding:0.5rem; border: 1px solid var(--border-light);">Constructs new rotated orthogonal axes: \(PC_1 = w_1 x_1 + w_2 x_2 + \dots + w_p x_p\).</td>
-                                <td style="padding:0.5rem; border: 1px solid var(--border-light);">Captures maximum variance along diagonal spreads; however, components become linear combinations of all features.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <h3 id="sub-1-3">1.3 Principal Component Analysis (PCA) Defined</h3>
-                    <div class="box box-green">
-                        <div class="box-title">Definition of PCA</div>
-                        <p><strong>Principal Component Analysis (PCA)</strong> is an <em>unsupervised linear feature-extraction technique</em> that finds a new set of orthogonal coordinate axes (principal components) along which the variance of the data is maximized.</p>
-                    </div>
-
+                <div id="content-1" class="collapsible-content">
+                    
+<p>Feature selection is the process of choosing a smaller subset of relevant features while preserving, or ideally improving, performance on unseen data.</p>
+<ul>
+    <li><strong>Relevant:</strong> Carries stable information that helps predict the target.</li>
+    <li><strong>Redundant:</strong> Repeats information already carried by another feature.</li>
+    <li><strong>Irrelevant:</strong> Varies but does not carry a stable relationship with the target.</li>
+</ul>
+<div style="background: var(--bg-secondary); border-left: 4px solid var(--blue); padding: 1rem; border-radius: 4px; margin-top: 1rem;">
+    <strong>TAKEAWAY:</strong> Feature selection tries to remove redundant and irrelevant inputs without discarding genuinely useful signal.
+</div>
+    
+                    
                     <div class="topic-nav">
-                        <a href="lecture-09.html" class="btn" style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;">Previous Lecture</a>
+                        <a href="lecture-08.html" class="btn" style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;">Previous Lecture</a>
                         <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
                     </div>
                 </div>
             </section>
-
             <!-- Topic 2 -->
-            <section class="topic-section" id="topic-2">
+            <section id="topic-2" class="topic-section">
                 <div class="topic-header" onclick="toggleSection('content-2')">
                     <div class="topic-number">2</div>
-                    <h2>Building Blocks &amp; Data Preprocessing</h2>
+                    <h2>Filter Methods</h2>
                 </div>
-                <div class="collapsible-content" id="content-2">
-                    <h3 id="sub-2-1">2.1 Notation &amp; Data Matrix Setup</h3>
-                    <ul>
-                        <li>\(n\): Number of training observations (rows).</li>
-                        <li>\(p\): Number of original features (columns).</li>
-                        <li>\(k\): Number of retained principal components (\(k \le p\)).</li>
-                        <li>\(X \in \mathbb{R}^{n \times p}\): Original uncentered data matrix.</li>
-                        <li>\(\mu \in \mathbb{R}^{p \times 1}\): Column mean vector where \(\mu_j = \frac{1}{n}\sum_{i=1}^n x_{ij}\).</li>
-                        <li>\(X_c \in \mathbb{R}^{n \times p}\): Mean-centered data matrix.</li>
-                        <li>\(S \in \mathbb{R}^{p \times p}\): Sample covariance matrix.</li>
-                    </ul>
-
-                    <h3 id="sub-2-2">2.2 Step 1: Mean Centering (\(X_c = X - \mathbf{1}\mu^\top\))</h3>
-                    <p>Before applying PCA, we must subtract feature means from every observation:</p>
-                    $$X_c = X - \mathbf{1}\mu^\top$$
-                    <p>Where \(\mathbf{1} \in \mathbb{R}^{n \times 1}\) is a column vector of ones, making \(\mathbf{1}\mu^\top\) an \(n \times p\) matrix replicating the mean row across all observations.</p>
-
-                    <div class="box box-red">
-                        <div class="box-title">Why Mean Centering is Compulsory</div>
-                        <p>PCA measures variance relative to the coordinate origin \((0, 0, \dots, 0)\). If data is not mean-centered, the offset from the origin distorts the variance calculation, forcing the first principal component to point toward the mean rather than the direction of true spread.</p>
-                    </div>
-
-                    <div style="background: white; padding: 1rem; border-radius: 6px; border: 1px solid var(--border-light); margin: 1rem 0;">
-                        <h4 style="color: var(--blue); margin-bottom: 0.5rem;">Numerical Running Example (3 Houses, 2 Features)</h4>
-                        <p>Consider 3 houses (\(n=3\)) measured by Bedroom area (\(f_1\)) and Washroom area (\(f_2\)):</p>
-                        $$X = \begin{bmatrix} 2 & 1 \\ 4 & 3 \\ 6 & 5 \end{bmatrix}, \quad \mu = \begin{bmatrix} 4 \\ 3 \end{bmatrix} \implies \mathbf{1}\mu^\top = \begin{bmatrix} 4 & 3 \\ 4 & 3 \\ 4 & 3 \end{bmatrix}$$
-                        $$X_c = X - \mathbf{1}\mu^\top = \begin{bmatrix} 2-4 & 1-3 \\ 4-4 & 3-3 \\ 6-4 & 5-3 \end{bmatrix} = \begin{bmatrix} -2 & -2 \\ 0 & 0 \\ 2 & 2 \end{bmatrix}$$
-                    </div>
-
-                    <h3 id="sub-2-3">2.3 Standardization: When Scale Matters</h3>
-                    <p>If features are measured in different units (e.g., House Price in Rupees vs. Age in Years), divide each centered feature by its sample standard deviation \(s_j\):</p>
-                    $$z_{ij} = \frac{x_{ij} - \mu_j}{s_j}, \quad s_j = \sqrt{\frac{1}{n-1}\sum_{i=1}^n (x_{ij} - \mu_j)^2}$$
-                    <ul>
-                        <li><strong>Use Centering Only:</strong> When features share comparable units and original variance magnitudes carry meaningful domain signal.</li>
-                        <li><strong>Use Standardization:</strong> When features have different units or wildly different variance scales, preventing large-scale variables from dominating PCA artificially.</li>
-                    </ul>
-
+                <div id="content-2" class="collapsible-content">
+                    
+<p>A filter method acts like an admission gate. It evaluates a feature using a simple structural or statistical rule.</p>
+<ul>
+    <li><strong>Duplicate Removal:</strong> Removes exact copies of a column.</li>
+    <li><strong>Variance Threshold:</strong> Removes features that barely change. <div class="formula-box">Var(f<sub>j</sub>) < &tau;</div></li>
+    <li><strong>Pearson Correlation:</strong> Removes features with low correlation to the target. <div class="formula-box">|r<sub>jY</sub>| < 0.30</div></li>
+</ul>
+<p>Filter methods are fast and scalable but usually ignore interactions among multiple features.</p>
+    
+                    
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
                         <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
                     </div>
                 </div>
             </section>
-
             <!-- Topic 3 -->
-            <section class="topic-section" id="topic-3">
+            <section id="topic-3" class="topic-section">
                 <div class="topic-header" onclick="toggleSection('content-3')">
                     <div class="topic-number">3</div>
-                    <h2>Formulation: Maximizing Variance</h2>
+                    <h2>Wrapper Methods</h2>
                 </div>
-                <div class="collapsible-content" id="content-3">
-                    <h3 id="sub-3-1">3.1 1D Projection onto Unit Direction \(u\)</h3>
-                    <p>Let \(u \in \mathbb{R}^{p \times 1}\) be a unit direction vector (\(\|u\| = 1\)). The scalar projection length of a centered observation \(x_i\) onto \(u\) is given by the dot product:</p>
-                    $$z_i = u^\top x_i$$
-
-                    <h3 id="sub-3-2">3.2 Variance vs. Reconstruction Error Duality</h3>
-                    <p>By Pythagorean decomposition, the squared norm of observation \(x_i\) decomposes into projected length \(z_i^2\) and orthogonal reconstruction error \(\|e_i\|^2\):</p>
-                    $$\|x_i\|^2 = z_i^2 + \|e_i\|^2$$
-                    <p>Since the total norm \(\sum \|x_i\|^2\) is fixed by the dataset, <strong>maximizing projected variance is mathematically equivalent to minimizing total reconstruction error</strong>:</p>
-                    $$\max_{\|u\|=1} \text{Var}(z) \iff \min_{\|u\|=1} \sum_{i=1}^n \|e_i\|^2$$
-
-                    <h3 id="sub-3-3">3.3 Derivation of Variance Formula (\(u^\top S u\))</h3>
-                    <p>The sample variance of the projected scalar coordinates \(z_i = u^\top x_i\) (since mean \(\bar{z} = 0\)) is:</p>
-                    $$\text{Var}(z) = \frac{1}{n-1} \sum_{i=1}^n (u^\top x_i)^2 = \frac{1}{n-1} \sum_{i=1}^n (u^\top x_i)(x_i^\top u) = u^\top \left( \frac{1}{n-1} \sum_{i=1}^n x_i x_i^\top \right) u$$
-                    $$\text{Var}(z) = u^\top S u$$
-                    <p>Where \(S = \frac{1}{n-1} X_c^\top X_c\) is the \(p \times p\) sample covariance matrix.</p>
-
+                <div id="content-3" class="collapsible-content">
+                    
+<p>A wrapper method "wraps" model training and validation around the feature-selection process.</p>
+<ul>
+    <li><strong>Exhaustive Search:</strong> Evaluates every nonempty subset (2<sup>p</sup> - 1 subsets). Computationally expensive.</li>
+    <li><strong>Backward Elimination:</strong> Starts with all features, removes the worst one iteratively.</li>
+    <li><strong>Sequential Forward Selection:</strong> Starts with no features, adds the best one iteratively.</li>
+</ul>
+<p>Wrapper methods directly optimize performance for the chosen model but are computationally expensive and can overfit.</p>
+    
+                    
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
                         <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
                     </div>
                 </div>
             </section>
-
             <!-- Topic 4 -->
-            <section class="topic-section" id="topic-4">
+            <section id="topic-4" class="topic-section">
                 <div class="topic-header" onclick="toggleSection('content-4')">
                     <div class="topic-number">4</div>
-                    <h2>Covariance &amp; Eigendecomposition</h2>
+                    <h2>Validation Discipline: Avoid the Leakage Trap</h2>
                 </div>
-                <div class="collapsible-content" id="content-4">
-                    <h3 id="sub-4-1">4.1 Sample Covariance Matrix \(S = \frac{1}{n-1} X_c^\top X_c\)</h3>
-                    <p>Sample covariance measures how two centered features \(f_j\) and \(f_k\) co-vary linearly:</p>
-                    $$\text{Cov}(f_j, f_k) = \frac{1}{n-1} \sum_{i=1}^n (x_{ij} - \mu_j)(x_{ik} - \mu_k)$$
-                    <p>The matrix product \(S = \frac{1}{n-1} X_c^\top X_c\) constructs all pairwise feature covariances simultaneously:</p>
-
-                    <div style="background: white; padding: 1rem; border-radius: 6px; border: 1px solid var(--border-light); margin: 1rem 0;">
-                        <h4 style="color: var(--blue); margin-bottom: 0.5rem;">Continuing Running Example</h4>
-                        $$S = \frac{1}{3-1} \begin{bmatrix} -2 & 0 & 2 \\ -2 & 0 & 2 \end{bmatrix} \begin{bmatrix} -2 & -2 \\ 0 & 0 \\ 2 & 2 \end{bmatrix} = \frac{1}{2} \begin{bmatrix} 8 & 8 \\ 8 & 8 \end{bmatrix} = \begin{bmatrix} 4 & 4 \\ 4 & 4 \end{bmatrix}$$
-                    </div>
-
-                    <h3 id="sub-4-2">4.2 Eigenvalues (\(\lambda_j\)) and Eigenvectors (\(v_j\))</h3>
-                    <p>Maximizing \(u^\top S u\) subject to \(\|u\|=1\) using Lagrange multipliers yields the characteristic matrix equation:</p>
-                    $$S v = \lambda v \iff |S - \lambda I| = 0$$
-                    <ul>
-                        <li><strong>Eigenvectors (\(v_j\)):</strong> Unit direction vectors specifying the principal component axes.</li>
-                        <li><strong>Eigenvalues (\(\lambda_j\)):</strong> Scalar values representing the exact variance captured along \(v_j\).</li>
-                    </ul>
-
-                    <div style="background: white; padding: 1rem; border-radius: 6px; border: 1px solid var(--border-light); margin: 1rem 0;">
-                        <h4 style="color: var(--blue); margin-bottom: 0.5rem;">Eigenvalues &amp; Eigenvectors for Running Example</h4>
-                        $$|S - \lambda I| = \begin{vmatrix} 4-\lambda & 4 \\ 4 & 4-\lambda \end{vmatrix} = (4-\lambda)^2 - 16 = 0 \implies \lambda^2 - 8\lambda = 0$$
-                        $$\lambda_1 = 8, \quad \lambda_2 = 0$$
-                        $$\text{For } \lambda_1 = 8: \quad v_1 = \frac{1}{\sqrt{2}} \begin{bmatrix} 1 \\ 1 \end{bmatrix} \quad (\text{Overall House Size})$$
-                        $$\text{For } \lambda_2 = 0: \quad v_2 = \frac{1}{\sqrt{2}} \begin{bmatrix} 1 \\ -1 \end{bmatrix} \quad (\text{Allocation Difference})$$
-                    </div>
-
-                    <h3 id="sub-4-3">4.3 Component Ordering &amp; Score Calculation</h3>
-                    <p>Sort eigenpairs by descending eigenvalues (\(\lambda_1 \ge \lambda_2 \ge \dots \ge \lambda_p\)). Select the top \(k\) eigenvectors to form projection matrix \(W_k = [v_1, v_2, \dots, v_k] \in \mathbb{R}^{p \times k}\). The transformed lower-dimensional scores \(Z \in \mathbb{R}^{n \times k}\) are:</p>
-                    $$Z = X_c W_k$$
-
+                <div id="content-4" class="collapsible-content">
+                    
+<p>Feature selection is part of teaching your model. It is not a harmless step you can do before properly splitting your data.</p>
+<div style="background: var(--bg-secondary); border-left: 4px solid var(--red); padding: 1rem; border-radius: 4px; margin-top: 1rem;">
+    <strong>WARNING:</strong> Selecting features using the entire dataset and then splitting it leads to data leakage.
+</div>
+<p><strong>Right way:</strong> Inside every cross-validation fold, perform feature selection using <strong>only</strong> the training portion of that fold.</p>
+    
+                    
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
-                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Topic 5 -->
-            <section class="topic-section" id="topic-5">
-                <div class="topic-header" onclick="toggleSection('content-5')">
-                    <div class="topic-number">5</div>
-                    <h2>PCA Pipeline &amp; Scree Plots</h2>
-                </div>
-                <div class="collapsible-content" id="content-5">
-                    <h3 id="sub-5-1">5.1 Step-by-Step ML Pipeline &amp; Data Leakage</h3>
-                    <ol>
-                        <li><strong>Split Data:</strong> Perform train-test split FIRST before any preprocessing.</li>
-                        <li><strong>Fit Parameters on Train Only:</strong> Compute training feature means \(\mu_{tr}\), standard deviations \(s_{tr}\), and projection matrix \(W_k\) on training data exclusively.</li>
-                        <li><strong>Transform Train &amp; Test:</strong> Apply stored training statistics:
-                            $$Z_{train} = X_{c, train} W_k, \quad Z_{test} = (X_{test} - \mathbf{1}_{test}\mu_{tr}^\top) W_k$$
-                        </li>
-                    </ol>
-
-                    <div class="box box-red">
-                        <div class="box-title">Never Leak Test Data into PCA</div>
-                        <p>Never re-fit PCA or re-compute feature means on test/validation data. Fitting PCA on the full dataset before splitting leaks test distribution information into training, producing unrealistically optimistic evaluation scores.</p>
-                    </div>
-
-                    <h3 id="sub-5-2">5.2 Explained Variance Ratio &amp; Scree Plots</h3>
-                    <p>Total variance equals the trace of the covariance matrix \(\text{trace}(S) = \sum_{j=1}^p \lambda_j\). The Explained Variance Ratio (EVR) of component \(j\) is:</p>
-                    $$\text{EVR}_j = \frac{\lambda_j}{\sum_{\ell=1}^p \lambda_\ell}, \quad \text{Cumulative EVR}_k = \frac{\sum_{j=1}^k \lambda_j}{\sum_{\ell=1}^p \lambda_\ell}$$
-                    <ul>
-                        <li><strong>Scree Plot (Elbow Rule):</strong> A bar/line plot of eigenvalues ordered by index. Choose \(k\) at the "elbow" point where additional components yield diminishing returns.</li>
-                        <li><strong>Cumulative Variance Cutoff:</strong> Retain the minimum \(k\) reaching 90% or 95% total variance.</li>
-                    </ul>
-
-                    <h3 id="sub-5-3">5.3 When PCA Fails &amp; Limitations</h3>
-                    <div class="box box-orange">
-                        <div class="box-title">Limitations of PCA</div>
-                        <ul>
-                            <li><strong>Non-Linear Manifolds:</strong> PCA is a <em>linear transformation</em>. It fails on non-linear data distributions (e.g., concentric circles, Swiss roll). Use kernel PCA or t-SNE / UMAP for non-linear structures.</li>
-                            <li><strong>Sensitivity to Outliers:</strong> Outliers dramatically inflate sample variance, pulling principal components toward outlier spikes.</li>
-                            <li><strong>Interpretability Loss:</strong> Principal components \(PC_j\) are linear combinations of all original variables, losing direct feature semantics.</li>
-                        </ul>
-                    </div>
-
-                    <div class="topic-nav">
-                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
-                        <a href="lecture-11.html" class="btn" style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;">Next Lecture →</a>
+                        <a href="lecture-10.html" class="btn" style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;">Next Lecture →</a>
                     </div>
                 </div>
             </section>
@@ -376,28 +166,18 @@
             <!-- Original PDF -->
             <section class="topic-section" id="original-pdf">
                 <div class="topic-header" onclick="toggleSection('content-pdf')">
-                    <div class="topic-number"
-                        style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
-                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round"
-                            stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                            <polyline points="14 2 14 8 20 8"></polyline>
-                            <line x1="16" x2="8" y1="13" y2="13"></line>
-                            <line x1="16" x2="8" y1="17" y2="17"></line>
-                            <polyline points="10 9 9 9 8 9"></polyline>
-                        </svg>
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                     </div>
                     <h2>Original PDF Notes</h2>
                 </div>
                 <div class="collapsible-content" id="content-pdf">
                     <p>Below is the original PDF document for your reference:</p>
-                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()"
-                        style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
                     <div id="pdfContainer" style="margin-top: 1rem;"></div>
                     <div class="topic-nav">
-                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous
-                            Topic</button>
-                        <a href="lecture-11.html" class="btn" style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;">Next Lecture →</a>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <a href="lecture-10.html" class="btn" style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;">Next Lecture →</a>
                     </div>
                 </div>
             </section>
@@ -409,7 +189,7 @@
             const container = document.getElementById('pdfContainer');
             const btn = document.getElementById('loadPdfBtn');
             if (container.innerHTML === '') {
-                container.innerHTML = '<embed src="../pdfs/10.PDF" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                container.innerHTML = '<embed src="../pdfs/9.PDF" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
                 btn.innerText = "Hide PDF";
             } else {
                 container.innerHTML = '';
@@ -419,5 +199,4 @@
     </script>
     <script src="../js/script.js"></script>
 </body>
-
 </html>

@@ -3,19 +3,19 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Advanced Machine Learning - Lecture 09</title>
-    <meta content="Study notes for Advanced Machine Learning (CSA333), Lecture 09 covering Feature Selection." name="description"/>
-    <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>09</text></svg>" rel="icon"/>
+    <title>Advanced Machine Learning - Lecture 08</title>
+    <meta content="Study notes for Advanced Machine Learning (CSA333), Lecture 08 covering Bias, Variance and the Bias-Variance Tradeoff." name="description"/>
+    <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>08</text></svg>" rel="icon"/>
     <link href="../css/style.css" rel="stylesheet"/>
 </head>
 <body>
     <header>
         <div class="header-titles">
             <h1>Advanced Machine Learning</h1>
-            <p>Lecture 09 - Feature Selection</p>
+            <p>Lecture 08 - Bias, Variance and the Bias-Variance Tradeoff</p>
             <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
             <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
-            <a href="../pdfs/9.PDF" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+            <a href="../pdfs/8.PDF" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
         </div>
         <div class="search-container">
             <input id="searchInput" placeholder="Search notes..." type="text"/>
@@ -31,22 +31,22 @@
             <ul class="index-list" id="indexList">
                 <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>Short Notes</a></li>
                 <li>
-                    <a href="#topic-1">1. Why Feature Selection?<span class="sub-count">0</span></a>
+                    <a href="#topic-1">1. Understanding Bias and Variance<span class="sub-count">0</span></a>
                     <ul class="sub-index">
                     </ul>
                 </li>
                 <li>
-                    <a href="#topic-2">2. Filter Methods<span class="sub-count">0</span></a>
+                    <a href="#topic-2">2. The Bias-Variance Tradeoff<span class="sub-count">0</span></a>
                     <ul class="sub-index">
                     </ul>
                 </li>
                 <li>
-                    <a href="#topic-3">3. Wrapper Methods<span class="sub-count">0</span></a>
+                    <a href="#topic-3">3. Diagnosing High Bias and High Variance<span class="sub-count">0</span></a>
                     <ul class="sub-index">
                     </ul>
                 </li>
                 <li>
-                    <a href="#topic-4">4. Validation Discipline: Avoid the Leakage Trap<span class="sub-count">0</span></a>
+                    <a href="#topic-4">4. Learning Curves Give Another Clue<span class="sub-count">0</span></a>
                     <ul class="sub-index">
                     </ul>
                 </li>
@@ -64,7 +64,7 @@
                     <h2>Short Notes &amp; Visual Summary</h2>
                 </div>
                 <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
-                    <p style="margin-bottom: 1rem;">Handwritten / quick summary notes for Lecture 09:</p>
+                    <p style="margin-bottom: 1rem;">Handwritten / quick summary notes for Lecture 08:</p>
                     <div style="text-align: center; background: var(--bg-secondary, #f8f9fa); padding: 1rem; border-radius: 8px; border: 1px solid var(--gray-border);">
                         <p style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-muted);">No handwritten notes available for this lecture yet.</p>
                     </div>
@@ -74,23 +74,21 @@
             <section id="topic-1" class="topic-section">
                 <div class="topic-header" onclick="toggleSection('content-1')">
                     <div class="topic-number">1</div>
-                    <h2>Why Feature Selection?</h2>
+                    <h2>Understanding Bias and Variance</h2>
                 </div>
                 <div id="content-1" class="collapsible-content">
                     
-<p>Feature selection is the process of choosing a smaller subset of relevant features while preserving, or ideally improving, performance on unseen data.</p>
+<p>We represent randomness with random noise (&epsilon;).</p>
+<div class="formula-box">Y = f(X) + &epsilon;</div>
 <ul>
-    <li><strong>Relevant:</strong> Carries stable information that helps predict the target.</li>
-    <li><strong>Redundant:</strong> Repeats information already carried by another feature.</li>
-    <li><strong>Irrelevant:</strong> Varies but does not carry a stable relationship with the target.</li>
+    <li><strong>f(X):</strong> The true hidden relationship.</li>
+    <li><strong>&epsilon;:</strong> Random noise (irreducible error).</li>
 </ul>
-<div style="background: var(--bg-secondary); border-left: 4px solid var(--blue); padding: 1rem; border-radius: 4px; margin-top: 1rem;">
-    <strong>TAKEAWAY:</strong> Feature selection tries to remove redundant and irrelevant inputs without discarding genuinely useful signal.
-</div>
+<p>Using the training dataset, we build a model: f&#770;(x). This is called an estimator of the true function. If the training sample data changes, the estimator also changes. So, f&#770;(x) is random.</p>
     
                     
                     <div class="topic-nav">
-                        <a href="lecture-08.html" class="btn" style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;">Previous Lecture</a>
+                        <a href="lecture-07.html" class="btn" style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;">Previous Lecture</a>
                         <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
                     </div>
                 </div>
@@ -99,17 +97,16 @@
             <section id="topic-2" class="topic-section">
                 <div class="topic-header" onclick="toggleSection('content-2')">
                     <div class="topic-number">2</div>
-                    <h2>Filter Methods</h2>
+                    <h2>The Bias-Variance Tradeoff</h2>
                 </div>
                 <div id="content-2" class="collapsible-content">
                     
-<p>A filter method acts like an admission gate. It evaluates a feature using a simple structural or statistical rule.</p>
+<p>When you try to decrease the bias of a model, its variance automatically starts increasing. We aim to reach the model complexity where the total error is minimum.</p>
+<div class="formula-box">MSE = Bias<sup>2</sup> + Variance + Var(&epsilon;)</div>
 <ul>
-    <li><strong>Duplicate Removal:</strong> Removes exact copies of a column.</li>
-    <li><strong>Variance Threshold:</strong> Removes features that barely change. <div class="formula-box">Var(f<sub>j</sub>) < &tau;</div></li>
-    <li><strong>Pearson Correlation:</strong> Removes features with low correlation to the target. <div class="formula-box">|r<sub>jY</sub>| < 0.30</div></li>
+    <li><strong>High Bias:</strong> Models are too simple and cannot fit the data well (Underfitting).</li>
+    <li><strong>High Variance:</strong> Models fit the training data perfectly but vary wildly on new data (Overfitting).</li>
 </ul>
-<p>Filter methods are fast and scalable but usually ignore interactions among multiple features.</p>
     
                     
                     <div class="topic-nav">
@@ -122,17 +119,15 @@
             <section id="topic-3" class="topic-section">
                 <div class="topic-header" onclick="toggleSection('content-3')">
                     <div class="topic-number">3</div>
-                    <h2>Wrapper Methods</h2>
+                    <h2>Diagnosing High Bias and High Variance</h2>
                 </div>
                 <div id="content-3" class="collapsible-content">
                     
-<p>A wrapper method "wraps" model training and validation around the feature-selection process.</p>
+<p>In practice, we look at training and validation accuracy to diagnose problems.</p>
 <ul>
-    <li><strong>Exhaustive Search:</strong> Evaluates every nonempty subset (2<sup>p</sup> - 1 subsets). Computationally expensive.</li>
-    <li><strong>Backward Elimination:</strong> Starts with all features, removes the worst one iteratively.</li>
-    <li><strong>Sequential Forward Selection:</strong> Starts with no features, adds the best one iteratively.</li>
+    <li><strong>High Bias:</strong> Training accuracy is low (e.g. 70%), Validation accuracy is similar (e.g. 68%).</li>
+    <li><strong>High Variance:</strong> Training accuracy is high (e.g. 99%), Validation accuracy is much lower (e.g. 82%).</li>
 </ul>
-<p>Wrapper methods directly optimize performance for the chosen model but are computationally expensive and can overfit.</p>
     
                     
                     <div class="topic-nav">
@@ -145,20 +140,20 @@
             <section id="topic-4" class="topic-section">
                 <div class="topic-header" onclick="toggleSection('content-4')">
                     <div class="topic-number">4</div>
-                    <h2>Validation Discipline: Avoid the Leakage Trap</h2>
+                    <h2>Learning Curves Give Another Clue</h2>
                 </div>
                 <div id="content-4" class="collapsible-content">
                     
-<p>Feature selection is part of teaching your model. It is not a harmless step you can do before properly splitting your data.</p>
-<div style="background: var(--bg-secondary); border-left: 4px solid var(--red); padding: 1rem; border-radius: 4px; margin-top: 1rem;">
-    <strong>WARNING:</strong> Selecting features using the entire dataset and then splitting it leads to data leakage.
-</div>
-<p><strong>Right way:</strong> Inside every cross-validation fold, perform feature selection using <strong>only</strong> the training portion of that fold.</p>
+<p>A learning curve shows how the training and validation errors change as we increase the amount of training data.</p>
+<ul>
+    <li><strong>High Bias:</strong> Both errors remain high, even after adding more data.</li>
+    <li><strong>High Variance:</strong> Training error is very low, but validation error is much higher. As more data is added, validation error often decreases.</li>
+</ul>
     
                     
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
-                        <a href="lecture-10.html" class="btn" style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;">Next Lecture →</a>
+                        <a href="lecture-09.html" class="btn" style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;">Next Lecture</a>
                     </div>
                 </div>
             </section>
@@ -177,7 +172,7 @@
                     <div id="pdfContainer" style="margin-top: 1rem;"></div>
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
-                        <a href="lecture-10.html" class="btn" style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;">Next Lecture →</a>
+                        <button class="btn" disabled="">Next Topic</button>
                     </div>
                 </div>
             </section>
@@ -189,7 +184,7 @@
             const container = document.getElementById('pdfContainer');
             const btn = document.getElementById('loadPdfBtn');
             if (container.innerHTML === '') {
-                container.innerHTML = '<embed src="../pdfs/9.PDF" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                container.innerHTML = '<embed src="../pdfs/8.PDF" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
                 btn.innerText = "Hide PDF";
             } else {
                 container.innerHTML = '';
