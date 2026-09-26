@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Computer Networks - Lecture 11</title>
+    <meta content="Study notes for Computer Networks (CSAI321), Lecture 11 covering Flow Control (rwnd), Congestion Principles, TCP AIMD, Slow Start, and TCP Tahoe/Reno state machines." name="description" />
+    <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>11</text></svg>" rel="icon" />
+    <link href="../css/style.css" rel="stylesheet" />
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Computer Networks Foundations</h1>
+            <p>Lecture 11 - TCP Congestion Control & Flow Control</p>
+            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/11.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text" />
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 5</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>Short Notes</a></li>
+                <li>
+                    <a href="#topic-1">1. Network Congestion Principles & Cost of Congestion<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 Definition of Congestion</a></li><li><a href="#sub-1-2">1.2 Causes & Costs of Congestion</a></li><li><a href="#sub-1-3">1.3 Congestion Collapse Scenario</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. TCP Flow Control: The Receive Window (rwnd)<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 Flow Control vs. Congestion Control</a></li><li><a href="#sub-2-2">2.2 TCP Receive Buffer Architecture</a></li><li><a href="#sub-2-3">2.3 The rwnd Matching Equation</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. TCP Congestion Control Principles & State Machine<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 The Congestion Window (cwnd)</a></li><li><a href="#sub-3-2">3.2 Dynamic Transmission Limit Formula</a></li><li><a href="#sub-3-3">3.3 Three States: Slow Start, Congestion Avoidance, Fast Recovery</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Additive Increase / Multiplicative Decrease (AIMD)<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 AIMD Sawtooth Pattern</a></li><li><a href="#sub-4-2">4.2 Additive Increase (+1 MSS per RTT)</a></li><li><a href="#sub-4-3">4.3 Multiplicative Decrease (Halving cwnd)</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. TCP Flavors & Modern Extensions<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 TCP Tahoe vs. TCP Reno</a></li><li><a href="#sub-5-2">5.2 Fast Retransmit via 3 Duplicate ACKs</a></li><li><a href="#sub-5-3">5.3 TCP CUBIC Standard</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Short Notes -->
+            <section id="short-notes" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-short-notes')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                    </div>
+                    <h2>Short Notes &amp; Visual Summary</h2>
+                </div>
+                <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
+                    <p style="margin-bottom: 1rem;">Core architectural takeaways for Lecture 11:</p>
+                    <div class="box box-blue">
+                        <div class="box-title">Key Architectural Concepts</div>
+                        <ul>
+                            <li><strong>Primary Topic Objective:</strong> Detailed analysis and formal protocol mechanisms for TCP Congestion Control & Flow Control.</li>
+                            <li><strong>Core Layer Position:</strong> Operation within the TCP/IP Network Protocol Stack with rigorous state management and packet processing rules.</li>
+                            <li><strong>Engineering Tradeoffs:</strong> Balancing protocol overhead, latency, reliability, and security across distributed environments.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="topic-section" id="topic-1">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>Network Congestion Principles & Cost of Congestion</h2>
+                </div>
+                <div class="collapsible-content" id="content-1">
+                    
+                    <h3 id="sub-1-1">1.1 Definition of Congestion</h3>
+                    <p>Network <strong>Congestion</strong> occurs when too many sources attempt to send data through a network link faster than link routers can process and buffer it.</p>
+                    <h3 id="sub-1-2">1.2 Causes & Costs of Congestion</h3>
+                    <ul>
+                        <li>High queueing delays as router buffers fill up.</li>
+                        <li>Packet drops when router buffers overflow.</li>
+                        <li>Wasted link capacity due to spurious retransmissions of delayed packets.</li>
+                    </ul>
+                
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('short-notes').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="topic-section" id="topic-2">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>TCP Flow Control: The Receive Window (rwnd)</h2>
+                </div>
+                <div class="collapsible-content" id="content-2">
+                    
+                    <h3 id="sub-2-1">2.1 Flow Control vs. Congestion Control</h3>
+                    <ul>
+                        <li><strong>Flow Control:</strong> Speed-matching service preventing a fast sender from overwhelming a slow receiving application's buffer.</li>
+                        <li><strong>Congestion Control:</strong> Mechanism preventing sender traffic from overwhelming intermediate network router buffers.</li>
+                    </ul>
+                    <h3 id="sub-2-2">2.2 TCP Receive Buffer Architecture</h3>
+                    <p>The receiver advertises available buffer space in the TCP header <strong>Receive Window (rwnd)</strong> field.</p>
+                    $$rwnd = RcvBuffer - [LastByteRcvd - LastByteRead]$$
+                
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="topic-section" id="topic-3">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>TCP Congestion Control Principles & State Machine</h2>
+                </div>
+                <div class="collapsible-content" id="content-3">
+                    
+                    <h3 id="sub-3-1">3.1 The Congestion Window (cwnd)</h3>
+                    <p>TCP sender maintains a state variable <strong>cwnd (Congestion Window)</strong> limiting max unacked data in flight:</p>
+                    $$\text{LastByteSent} - \text{LastByteAcked} \le \min(cwnd, rwnd)$$
+                    <h3 id="sub-3-2">3.2 Dynamic Transmission Limit Formula</h3>
+                    <p>The effective transmission rate is roughly $\frac{cwnd}{RTT}$ bytes/sec.</p>
+                
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="topic-section" id="topic-4">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>Additive Increase / Multiplicative Decrease (AIMD)</h2>
+                </div>
+                <div class="collapsible-content" id="content-4">
+                    
+                    <h3 id="sub-4-1">4.1 AIMD Sawtooth Pattern</h3>
+                    <p>TCP probes for available bandwidth by linearly increasing $cwnd$ until loss occurs, then abruptly halving $cwnd$, creating a characteristic <strong>sawtooth wave pattern</strong>.</p>
+                    <div class="box box-blue">
+                        <div class="box-title">AIMD Rules</div>
+                        <ul>
+                            <li><strong>Additive Increase:</strong> $cwnd = cwnd + 1 \text{ MSS}$ for every RTT without loss.</li>
+                            <li><strong>Multiplicative Decrease:</strong> $cwnd = cwnd / 2$ upon detecting packet loss via triple duplicate ACKs.</li>
+                        </ul>
+                    </div>
+                
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="topic-section" id="topic-5">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>TCP Flavors & Modern Extensions</h2>
+                </div>
+                <div class="collapsible-content" id="content-5">
+                    
+                    <h3 id="sub-5-1">5.1 TCP Tahoe vs. TCP Reno</h3>
+                    <ul>
+                        <li><strong>TCP Tahoe:</strong> On any loss (timeout OR 3 dup ACKs), resets $cwnd = 1 \text{ MSS}$ and enters Slow Start.</li>
+                        <li><strong>TCP Reno:</strong> Distinguishes loss types. On 3 dup ACKs, cuts $cwnd = cwnd / 2$ and enters Fast Recovery (bypasses Slow Start). On Timeout, resets $cwnd = 1 \text{ MSS}$.</li>
+                    </ul>
+                    <h3 id="sub-5-2">5.2 Fast Retransmit via 3 Duplicate ACKs</h3>
+                    <p>Receiving 3 duplicate ACKs triggers immediate retransmission of missing segment before timer expiration.</p>
+                
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('original-pdf').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" x2="8" y1="13" y2="13"></line>
+                            <line x1="16" x2="8" y1="17" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/11.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>

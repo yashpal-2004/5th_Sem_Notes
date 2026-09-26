@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Computer Networks - Lecture 08</title>
+    <meta content="Study notes for Computer Networks (CSAI321), Lecture 08 covering Socket Abstractions, Byte Ordering, TCP/UDP Socket System Calls, and I/O Multiplexing." name="description" />
+    <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>08</text></svg>" rel="icon" />
+    <link href="../css/style.css" rel="stylesheet" />
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Computer Networks Foundations</h1>
+            <p>Lecture 08 - The Socket API & Network Programming</p>
+            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/8.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text" />
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 5</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>Short Notes</a></li>
+                <li>
+                    <a href="#topic-1">1. Socket Abstraction & Transport Layer Interface<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 The Socket Abstraction</a></li><li><a href="#sub-1-2">1.2 Operating System File Descriptor Model</a></li><li><a href="#sub-1-3">1.3 Address Structs: sockaddr & sockaddr_in</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Byte Ordering & Network Data Representation<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 Big-Endian vs. Little-Endian Architectures</a></li><li><a href="#sub-2-2">2.2 Network Byte Order Standard</a></li><li><a href="#sub-2-3">2.3 Conversion Functions (htons, htonl, ntohs, ntohl)</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. TCP Socket Lifecycle & Connection Workflow<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 Passive Server Workflow (bind, listen, accept)</a></li><li><a href="#sub-3-2">3.2 Active Client Workflow (connect)</a></li><li><a href="#sub-3-3">3.3 Reliable Stream Data Exchange (send, recv, close)</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. UDP Datagram Sockets & Connectionless I/O<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 UDP System Call Overview</a></li><li><a href="#sub-4-2">4.2 Datagram Transfer (sendto & recvfrom)</a></li><li><a href="#sub-4-3">4.3 Preservation of Message Boundaries</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Advanced I/O Models & Multiplexing<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 Blocking vs. Non-Blocking Sockets</a></li><li><a href="#sub-5-2">5.2 Scalability Limits of Thread-Per-Connection</a></li><li><a href="#sub-5-3">5.3 I/O Multiplexing (select, poll, epoll)</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Short Notes -->
+            <section id="short-notes" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-short-notes')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                    </div>
+                    <h2>Short Notes &amp; Visual Summary</h2>
+                </div>
+                <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
+                    <p style="margin-bottom: 1rem;">Core architectural takeaways for Lecture 08:</p>
+                    <div class="box box-blue">
+                        <div class="box-title">Key Architectural Concepts</div>
+                        <ul>
+                            <li><strong>Primary Topic Objective:</strong> Detailed analysis and formal protocol mechanisms for The Socket API & Network Programming.</li>
+                            <li><strong>Core Layer Position:</strong> Operation within the TCP/IP Network Protocol Stack with rigorous state management and packet processing rules.</li>
+                            <li><strong>Engineering Tradeoffs:</strong> Balancing protocol overhead, latency, reliability, and security across distributed environments.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="topic-section" id="topic-1">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>Socket Abstraction & Transport Layer Interface</h2>
+                </div>
+                <div class="collapsible-content" id="content-1">
+                    
+                    <h3 id="sub-1-1">1.1 The Socket Abstraction</h3>
+                    <p>A <strong>Socket</strong> is an operating system abstraction representing an end-point of communication between an application process and the network protocol stack. Developed as part of Berkeley Software Distribution (BSD Unix) in 1983, the Socket API serves as the standard interface for network programming.</p>
+                    <h3 id="sub-1-2">1.2 Operating System File Descriptor Model</h3>
+                    <p>In Unix-like operating systems, "everything is a file". A created socket is assigned an integer <strong>File Descriptor (FD)</strong>. Applications read from and write to sockets using standard system call interfaces (e.g., <code>read()</code>, <code>write()</code>, <code>close()</code>).</p>
+                    <h3 id="sub-1-3">1.3 Address Structs: sockaddr & sockaddr_in</h3>
+                    <p>Socket operations require specifying IP addresses and port numbers using C structures defined in <code>&lt;netinet/in.h&gt;</code>:</p>
+                    $$\text{Socket Address} = (\text{IP Address}, \text{Port Number})$$
+                    <div class="box box-blue">
+                        <div class="box-title">struct sockaddr_in Definition (IPv4)</div>
+                        <pre style="background:var(--bg-beige); padding:0.8rem; border-radius:6px; font-size:0.85rem;">
+struct sockaddr_in {
+    sa_family_t    sin_family; // AF_INET for IPv4
+    in_port_t      sin_port;   // 16-bit Port (Network Byte Order)
+    struct in_addr sin_addr;   // 32-bit IPv4 Address
+};</pre>
+                    </div>
+                
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('short-notes').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="topic-section" id="topic-2">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>Byte Ordering & Network Data Representation</h2>
+                </div>
+                <div class="collapsible-content" id="content-2">
+                    
+                    <h3 id="sub-2-1">2.1 Big-Endian vs. Little-Endian Architectures</h3>
+                    <p>Computer architectures store multi-byte integers in memory differently:</p>
+                    <ul>
+                        <li><strong>Little-Endian (x86, x86-64, ARM):</strong> Stores the least significant byte (LSB) at the lowest memory address.</li>
+                        <li><strong>Big-Endian (Network Order, SPARC, legacy MIPS):</strong> Stores the most significant byte (MSB) at the lowest memory address.</li>
+                    </ul>
+                    <h3 id="sub-2-2">2.2 Network Byte Order Standard</h3>
+                    <p>To prevent data corruption during network transmission between heterogeneous CPU architectures, the Internet Protocol suite mandates <strong>Big-Endian</strong> as the universal <strong>Network Byte Order</strong>.</p>
+                    <h3 id="sub-2-3">2.3 Conversion Functions (htons, htonl, ntohs, ntohl)</h3>
+                    <div class="box box-green">
+                        <div class="box-title">POSIX Endian Conversion Functions</div>
+                        <ul>
+                            <li><code>htons(uint16_t hostshort)</code>: Host to Network Short (16-bit, for Port numbers).</li>
+                            <li><code>htonl(uint32_t hostlong)</code>: Host to Network Long (32-bit, for IPv4 addresses).</li>
+                            <li><code>ntohs(uint16_t netshort)</code>: Network to Host Short.</li>
+                            <li><code>ntohl(uint32_t netlong)</code>: Network to Host Long.</li>
+                        </ul>
+                    </div>
+                
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="topic-section" id="topic-3">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>TCP Socket Lifecycle & Connection Workflow</h2>
+                </div>
+                <div class="collapsible-content" id="content-3">
+                    
+                    <h3 id="sub-3-1">3.1 Passive Server Workflow (bind, listen, accept)</h3>
+                    <p>A TCP server follows a structured sequence of system calls to establish passive listening queues:</p>
+                    <ol>
+                        <li><code>socket(AF_INET, SOCK_STREAM, 0)</code>: Allocates a TCP stream socket descriptor.</li>
+                        <li><code>bind(sockfd, addr, len)</code>: Associates the socket with a specific local IP address and port number.</li>
+                        <li><code>listen(sockfd, backlog)</code>: Converts socket to passive mode; <code>backlog</code> defines max pending connections.</li>
+                        <li><code>accept(sockfd, addr, len)</code>: Blocks until a client completes 3-way handshake; returns a <em>new connected socket descriptor</em> dedicated to that client.</li>
+                    </ol>
+                    <h3 id="sub-3-2">3.2 Active Client Workflow (connect)</h3>
+                    <p>A TCP client creates a socket and calls <code>connect(sockfd, server_addr, len)</code>, triggering the 3-way TCP handshake (SYN, SYN-ACK, ACK) with the remote server.</p>
+                    <h3 id="sub-3-3">3.3 Reliable Stream Data Exchange (send, recv, close)</h3>
+                    <p>TCP is a byte-stream service with no message boundaries. Calls to <code>send()</code> and <code>recv()</code> transmit raw bytes. Calling <code>close(sockfd)</code> initiates TCP 4-wave connection termination (FIN, ACK).</p>
+                
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="topic-section" id="topic-4">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>UDP Datagram Sockets & Connectionless I/O</h2>
+                </div>
+                <div class="collapsible-content" id="content-4">
+                    
+                    <h3 id="sub-4-1">4.1 UDP System Call Overview</h3>
+                    <p>UDP sockets are created with <code>socket(AF_INET, SOCK_DGRAM, 0)</code>. Because UDP is connectionless, there are no handshakes, no <code>listen()</code>, and no <code>accept()</code> calls.</p>
+                    <h3 id="sub-4-2">4.2 Datagram Transfer (sendto & recvfrom)</h3>
+                    <p>Every UDP message must explicitly specify destination addressing metadata on every call:</p>
+                    <ul>
+                        <li><code>sendto(sockfd, buf, len, flags, dest_addr, addrlen)</code>: Sends an independent datagram.</li>
+                        <li><code>recvfrom(sockfd, buf, len, flags, src_addr, addrlen)</code>: Receives a datagram and captures the sender's IP/port.</li>
+                    </ul>
+                    <h3 id="sub-4-3">4.3 Preservation of Message Boundaries</h3>
+                    <p>Unlike TCP byte-streams, UDP preserves <strong>message boundaries</strong>. A single <code>sendto()</code> call of 500 bytes results in exactly one <code>recvfrom()</code> call receiving 500 bytes (or truncating if buffer is too small).</p>
+                
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="topic-section" id="topic-5">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>Advanced I/O Models & Multiplexing</h2>
+                </div>
+                <div class="collapsible-content" id="content-5">
+                    
+                    <h3 id="sub-5-1">5.1 Blocking vs. Non-Blocking Sockets</h3>
+                    <p>By default, socket operations (<code>accept()</code>, <code>recv()</code>, <code>connect()</code>) are <strong>blocking</strong>: the executing thread sleeps until the OS kernel completes the operation or returns an error.</p>
+                    <h3 id="sub-5-2">5.2 Scalability Limits of Thread-Per-Connection</h3>
+                    <p>Spawning one thread per connected client suffers severe context-switching and memory overheads when scaling to 10,000+ concurrent connections (The C10K Problem).</p>
+                    <h3 id="sub-5-3">5.3 I/O Multiplexing (select, poll, epoll)</h3>
+                    <div class="box box-orange">
+                        <div class="box-title">Linux Event-Driven I/O Progression</div>
+                        <ul>
+                            <li><code>select()</code>: $O(N)$ linear scanning of file descriptor sets; limited to 1024 descriptors by default.</li>
+                            <li><code>poll()</code>: Removes 1024 cap, but still suffers $O(N)$ kernel-user copying and array scanning.</li>
+                            <li><code>epoll()</code>: Linux $O(1)$ event-notification mechanism. Kernel uses callbacks to populate an event list; used by high-performance servers like NGINX and Node.js.</li>
+                        </ul>
+                    </div>
+                
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('original-pdf').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" x2="8" y1="13" y2="13"></line>
+                            <line x1="16" x2="8" y1="17" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/8.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>

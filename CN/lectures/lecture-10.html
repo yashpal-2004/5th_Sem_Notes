@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Computer Networks - Lecture 10</title>
+    <meta content="Study notes for Computer Networks (CSAI321), Lecture 10 covering Reliable Data Transfer (rdt 1.0 to 3.0), Stop-and-Wait Bottlenecks, Go-Back-N (GBN), and Selective Repeat (SR)." name="description" />
+    <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>10</text></svg>" rel="icon" />
+    <link href="../css/style.css" rel="stylesheet" />
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Computer Networks Foundations</h1>
+            <p>Lecture 10 - Principles of Reliable Data Transfer (rdt)</p>
+            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/10.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text" />
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 5</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>Short Notes</a></li>
+                <li>
+                    <a href="#topic-1">1. The Reliable Data Transfer (rdt) Problem Framework<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 Unreliable Network Channel Model</a></li><li><a href="#sub-1-2">1.2 Layered Interface Primitives</a></li><li><a href="#sub-1-3">1.3 Finite State Machine (FSM) Formalism</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Building Blocks of Reliability: rdt 1.0 to rdt 3.0<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 rdt 1.0: Reliable Channel Baseline</a></li><li><a href="#sub-2-2">2.2 rdt 2.0/2.1/2.2: Handling Bit Corruption (ACKs, NAKs, Sequence Numbers)</a></li><li><a href="#sub-2-3">2.3 rdt 3.0: Handling Packet Loss with Countdown Timers</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Stop-and-Wait Protocol & Utilization Bottleneck<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 Stop-and-Wait Operational Flow</a></li><li><a href="#sub-3-2">3.2 Sender Channel Utilization Formula</a></li><li><a href="#sub-3-3">3.3 Mathematical Example Breakdown</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Pipelined Protocols: Go-Back-N (GBN)<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 Pipelining & Sliding Window Concept</a></li><li><a href="#sub-4-2">4.2 Go-Back-N Sender & Receiver Windows</a></li><li><a href="#sub-4-3">4.3 Cumulative ACKs & Timeout Retransmissions</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Pipelined Protocols: Selective Repeat (SR)<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 Selective Repeat Individual ACKs</a></li><li><a href="#sub-5-2">5.2 Out-of-Order Buffering</a></li><li><a href="#sub-5-3">5.3 Sequence Number Space Constraint</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Short Notes -->
+            <section id="short-notes" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-short-notes')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                    </div>
+                    <h2>Short Notes &amp; Visual Summary</h2>
+                </div>
+                <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
+                    <p style="margin-bottom: 1rem;">Core architectural takeaways for Lecture 10:</p>
+                    <div class="box box-blue">
+                        <div class="box-title">Key Architectural Concepts</div>
+                        <ul>
+                            <li><strong>Primary Topic Objective:</strong> Detailed analysis and formal protocol mechanisms for Principles of Reliable Data Transfer (rdt).</li>
+                            <li><strong>Core Layer Position:</strong> Operation within the TCP/IP Network Protocol Stack with rigorous state management and packet processing rules.</li>
+                            <li><strong>Engineering Tradeoffs:</strong> Balancing protocol overhead, latency, reliability, and security across distributed environments.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="topic-section" id="topic-1">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>The Reliable Data Transfer (rdt) Problem Framework</h2>
+                </div>
+                <div class="collapsible-content" id="content-1">
+                    
+                    <h3 id="sub-1-1">1.1 Unreliable Network Channel Model</h3>
+                    <p>The core challenge of the Transport Layer is providing a <strong>Reliable Data Transfer (rdt)</strong> service on top of an inherently unreliable underlying Network Layer (IP) that can drop, corrupt, duplicate, or reorder packets.</p>
+                    <h3 id="sub-1-2">1.2 Layered Interface Primitives</h3>
+                    <ul>
+                        <li><code>rdt_send()</code>: Called by high-level app layer to pass data payload down.</li>
+                        <li><code>udt_send()</code>: Called by rdt protocol to transmit packet over unreliable channel.</li>
+                        <li><code>rdt_rcv()</code>: Called by network layer when a packet arrives at receiving host.</li>
+                        <li><code>deliver_data()</code>: Called by rdt to pass validated payload up to application.</li>
+                    </ul>
+                
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('short-notes').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="topic-section" id="topic-2">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>Building Blocks of Reliability: rdt 1.0 to rdt 3.0</h2>
+                </div>
+                <div class="collapsible-content" id="content-2">
+                    
+                    <h3 id="sub-2-1">2.1 rdt 1.0: Reliable Channel Baseline</h3>
+                    <p>Assumes underlying channel is completely reliable (no bit errors, no lost packets). FSM needs only 1 state for sender and receiver.</p>
+                    <h3 id="sub-2-2">2.2 rdt 2.0/2.1/2.2: Handling Bit Corruption</h3>
+                    <ul>
+                        <li><strong>rdt 2.0:</strong> Adds Checksums, Positive ACKs, and Negative ACKs (NAKs). <em>Flaw:</em> NAK/ACK corruption causes duplicate packet delivery.</li>
+                        <li><strong>rdt 2.1:</strong> Adds 1-bit Sequence Numbers (0 or 1) to packets. Receiver detects duplicate packets.</li>
+                        <li><strong>rdt 2.2:</strong> Eliminates NAKs entirely by sending duplicate ACKs for the last correctly received packet sequence number.</li>
+                    </ul>
+                    <h3 id="sub-2-3">2.3 rdt 3.0: Handling Packet Loss with Countdown Timers</h3>
+                    <p><strong>rdt 3.0 (Alternating Bit Protocol)</strong> handles packet loss by introducing a <strong>countdown timer</strong> at the sender. If ACK is not received within timeout period, the sender retransmits packet.</p>
+                
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="topic-section" id="topic-3">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>Stop-and-Wait Protocol & Utilization Bottleneck</h2>
+                </div>
+                <div class="collapsible-content" id="content-3">
+                    
+                    <h3 id="sub-3-1">3.1 Stop-and-Wait Operational Flow</h3>
+                    <p>In rdt 3.0, the sender transmits 1 packet and stops, waiting for receiver's ACK before transmitting the next packet.</p>
+                    <h3 id="sub-3-2">3.2 Sender Channel Utilization Formula</h3>
+                    $$\text{Transmission Delay } t_{\text{trans}} = \frac{L}{R}$$
+                    $$U_{\text{sender}} = \frac{t_{\text{trans}}}{\text{RTT} + t_{\text{trans}}} = \frac{L / R}{\text{RTT} + L / R}$$
+                    <h3 id="sub-3-3">3.3 Mathematical Example Breakdown</h3>
+                    <div class="box box-red">
+                        <div class="box-title">The Stop-and-Wait Efficiency Disaster</div>
+                        <p>Consider a 1 Gbps link ($R = 10^9$ b/s), 30 ms RTT, 1 KB packet ($L = 8000$ bits):</p>
+                        $$t_{\text{trans}} = \frac{8000}{10^9} = 0.008 \text{ ms}$$
+                        $$U_{\text{sender}} = \frac{0.008}{30 + 0.008} = 0.000267 \quad (\text{Only } 0.027\% \text{ utilization!})$$
+                    </div>
+                
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="topic-section" id="topic-4">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>Pipelined Protocols: Go-Back-N (GBN)</h2>
+                </div>
+                <div class="collapsible-content" id="content-4">
+                    
+                    <h3 id="sub-4-1">4.1 Pipelining & Sliding Window Concept</h3>
+                    <p>Pipelining allows the sender to have up to $N$ unacknowledged packets in flight simultaneously, increasing channel utilization by factor $N$.</p>
+                    <h3 id="sub-4-2">4.2 Go-Back-N Sender & Receiver Windows</h3>
+                    <p>Sender window size is $N$. The receiver has a window size of 1 (accepts packets strictly in order).</p>
+                    <h3 id="sub-4-3">4.3 Cumulative ACKs & Timeout Retransmissions</h3>
+                    <ul>
+                        <li><strong>Cumulative ACK:</strong> ACK($n$) indicates all packets up to and including sequence $n$ have been received correctly.</li>
+                        <li><strong>Single Timer:</strong> Timer tracks oldest unacked packet. On timeout, GBN retransmits <em>all</em> $N$ unacked packets in current window.</li>
+                    </ul>
+                
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="topic-section" id="topic-5">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>Pipelined Protocols: Selective Repeat (SR)</h2>
+                </div>
+                <div class="collapsible-content" id="content-5">
+                    
+                    <h3 id="sub-5-1">5.1 Selective Repeat Individual ACKs</h3>
+                    <p>Selective Repeat (SR) avoids GBN's unnecessary retransmissions by having the receiver individually acknowledge every correctly received packet.</p>
+                    <h3 id="sub-5-2">5.2 Out-of-Order Buffering</h3>
+                    <p>The SR receiver maintains a buffer of size $N$ to hold out-of-order packets until missing lower-sequence packets arrive.</p>
+                    <h3 id="sub-5-3">5.3 Sequence Number Space Constraint</h3>
+                    <div class="box box-green">
+                        <div class="box-title">SR Sequence Space Rule</div>
+                        <p>To avoid ambiguity when sequence numbers wrap around, window size $N$ must satisfy:</p>
+                        $$N_{\text{sender}} + N_{\text{receiver}} \le 2^k \implies N \le 2^{k-1}$$
+                    </div>
+                
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('original-pdf').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" x2="8" y1="13" y2="13"></line>
+                            <line x1="16" x2="8" y1="17" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/10.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>

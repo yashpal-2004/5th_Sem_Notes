@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Computer Networks - Lecture 07</title>
+    <meta content="Study notes for Computer Networks (CSAI321), Lecture 07 covering Email Architecture, SMTP, POP3 vs IMAP, MIME encoding, and DNS MX Records." name="description" />
+    <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>07</text></svg>" rel="icon" />
+    <link href="../css/style.css" rel="stylesheet" />
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Computer Networks Foundations</h1>
+            <p>Lecture 07 - Electronic Mail Protocols: SMTP, POP3, IMAP & DNS MX</p>
+            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/7.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text" />
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 5</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>Short Notes</a></li>
+                <li>
+                    <a href="#topic-1">1. Electronic Mail Architecture & Core Components<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 User Agents & Mail Servers</a></li><li><a href="#sub-1-2">1.2 Spooling & Message Queue System</a></li><li><a href="#sub-1-3">1.3 Asynchronous Email Delivery</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Simple Mail Transfer Protocol (SMTP)<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 SMTP Mechanics & Push Protocol Paradigm</a></li><li><a href="#sub-2-2">2.2 TCP Port 25 & Handshake Commands</a></li><li><a href="#sub-2-3">2.3 In-Band Command Execution & Response Codes</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Mail Access Protocols: POP3 vs. IMAP<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 The Need for Pull Protocols</a></li><li><a href="#sub-3-2">3.2 POP3 (Post Office Protocol v3)</a></li><li><a href="#sub-3-3">3.3 IMAP (Internet Message Access Protocol)</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. MIME Extension & Binary Content Encoding<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 ASCII Limitation of Legacy SMTP</a></li><li><a href="#sub-4-2">4.2 MIME Headers (RFC 2045)</a></li><li><a href="#sub-4-3">4.3 Base64 & Quoted-Printable Encoding Algorithms</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Email Infrastructure & Security Alignment<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 DNS MX (Mail Exchanger) Records</a></li><li><a href="#sub-5-2">5.2 Email Spoofing & Security Vulnerabilities</a></li><li><a href="#sub-5-3">5.3 Authentication Frameworks: SPF, DKIM & DMARC</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Short Notes -->
+            <section id="short-notes" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-short-notes')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                    </div>
+                    <h2>Short Notes &amp; Visual Summary</h2>
+                </div>
+                <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
+                    <p style="margin-bottom: 1rem;">Core architectural takeaways for Lecture 07:</p>
+                    <div class="box box-blue">
+                        <div class="box-title">Key Architectural Concepts</div>
+                        <ul>
+                            <li><strong>Primary Topic Objective:</strong> Detailed analysis and formal protocol mechanisms for Electronic Mail Protocols: SMTP, POP3, IMAP & DNS MX.</li>
+                            <li><strong>Core Layer Position:</strong> Operation within the TCP/IP Network Protocol Stack with rigorous state management and packet processing rules.</li>
+                            <li><strong>Engineering Tradeoffs:</strong> Balancing protocol overhead, latency, reliability, and security across distributed environments.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="topic-section" id="topic-1">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>Electronic Mail Architecture & Core Components</h2>
+                </div>
+                <div class="collapsible-content" id="content-1">
+                    
+                    <h3 id="sub-1-1">1.1 User Agents & Mail Servers</h3>
+                    <p>Electronic mail (email) is a high-level distributed application consisting of three main structural components: <strong>User Agents (UAs)</strong>, <strong>Mail Servers</strong>, and the <strong>Simple Mail Transfer Protocol (SMTP)</strong>.</p>
+                    <ul>
+                        <li><strong>User Agent (UA):</strong> Software allowing users to read, compose, reply to, forward, and organize messages (e.g., Outlook, Apple Mail, Thunderbird, Webmail interfaces like Gmail).</li>
+                        <li><strong>Mail Server:</strong> The core infrastructure hosting user mailboxes, managing outgoing/incoming message queues, and executing background routing protocols.</li>
+                    </ul>
+                    <h3 id="sub-1-2">1.2 Spooling & Message Queue System</h3>
+                    <p>When a user sends a message, it does not travel directly to the recipient's personal device. Instead, the sender's User Agent pushes the email to their local mail server's <strong>outgoing message queue (spool)</strong>.</p>
+                    <p>If the recipient's mail server is temporarily unreachable or offline, the sender's server holds the message in its queue and retries transmission periodically (typically every 15–30 minutes for up to several days) before generating a non-delivery report (bounce email).</p>
+                    <h3 id="sub-1-3">1.3 Asynchronous Email Delivery</h3>
+                    <p>Email delivery operates asynchronously. The sender and recipient do not need to be online simultaneously. Communication happens in two distinct stages: (1) Push via SMTP from sender UA to sender mail server, and across mail servers; (2) Pull via POP3/IMAP/HTTP from recipient mail server to recipient UA.</p>
+                
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('short-notes').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="topic-section" id="topic-2">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>Simple Mail Transfer Protocol (SMTP)</h2>
+                </div>
+                <div class="collapsible-content" id="content-2">
+                    
+                    <h3 id="sub-2-1">2.1 SMTP Mechanics & Push Protocol Paradigm</h3>
+                    <p><strong>SMTP (Simple Mail Transfer Protocol)</strong> is a legacy client-server protocol (RFC 5321) used to transfer mail messages reliably across TCP connections. SMTP is strictly a <strong>push protocol</strong>: the client initiating the TCP connection is always the party pushing a message.</p>
+                    <h3 id="sub-2-2">2.2 TCP Port 25 & Handshake Commands</h3>
+                    <p>SMTP operates over <strong>TCP port 25</strong> (standard server-to-server relay) or <strong>port 587</strong> (authenticated client-to-server submission). The session consists of plain ASCII text commands sent by the client and 3-digit status codes returned by the server.</p>
+                    <div class="box box-blue">
+                        <div class="box-title">Core SMTP Command Sequence</div>
+                        <ul>
+                            <li><code>HELO / EHLO</code>: Client identifies itself to the SMTP server.</li>
+                            <li><code>MAIL FROM: &lt;sender@domain.com&gt;</code>: Identifies the message originator.</li>
+                            <li><code>RCPT TO: &lt;recipient@domain.com&gt;</code>: Identifies the target mailbox recipient.</li>
+                            <li><code>DATA</code>: Signals the start of the message body (terminated by a single dot <code>.</code> on its own line).</li>
+                            <li><code>QUIT</code>: Terminates the SMTP session.</li>
+                        </ul>
+                    </div>
+                    <h3 id="sub-2-3">2.3 In-Band Command Execution & Response Codes</h3>
+                    <p>SMTP commands and message payload share the exact same TCP stream (in-band transmission). Server responses begin with 3-digit numerical codes followed by explanatory text:</p>
+                    <ul>
+                        <li><code>220</code>: Service Ready</li>
+                        <li><code>250</code>: Requested mail action okay / completed</li>
+                        <li><code>354</code>: Start mail input; end with <code>&lt;CR&gt;&lt;LF&gt;.&lt;CR&gt;&lt;LF&gt;</code></li>
+                        <li><code>550</code>: Requested action not taken (e.g., mailbox unavailable)</li>
+                    </ul>
+                
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="topic-section" id="topic-3">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>Mail Access Protocols: POP3 vs. IMAP</h2>
+                </div>
+                <div class="collapsible-content" id="content-3">
+                    
+                    <h3 id="sub-3-1">3.1 The Need for Pull Protocols</h3>
+                    <p>SMTP cannot be used to deliver emails directly to a recipient's user agent because end-user devices are frequently turned off, mobile, or behind NAT firewalls. Therefore, recipient mail servers hold incoming messages in mailboxes until the user agent uses a <strong>pull protocol</strong> to fetch them.</p>
+                    <h3 id="sub-3-2">3.2 POP3 (Post Office Protocol v3)</h3>
+                    <p><strong>POP3 (RFC 1939)</strong> operates on TCP port 110 (or 995 over TLS). It follows an extremely simple 3-phase workflow: <em>Authorization</em>, <em>Transaction</em>, and <em>Update</em>.</p>
+                    <ul>
+                        <li><strong>Download-and-Delete Mode:</strong> Messages are downloaded to the client device and permanently deleted from the mail server.</li>
+                        <li><strong>Download-and-Keep Mode:</strong> Messages are retained on the server, but client states (e.g., read/unread status) are localized to one device.</li>
+                        <li><strong>Limitation:</strong> Does not support server-side folder creation or multi-device synchronization.</li>
+                    </ul>
+                    <h3 id="sub-3-3">3.3 IMAP (Internet Message Access Protocol)</h3>
+                    <p><strong>IMAP (RFC 3501)</strong> operates on TCP port 143 (or 993 over TLS). Unlike POP3, IMAP maintains state across multiple devices by storing all messages, folders, and flag metadata directly on the central mail server.</p>
+                    <div class="box box-green">
+                        <div class="box-title">POP3 vs IMAP Architectural Comparison</div>
+                        <table style="width:100%; border-collapse:collapse; margin-top:0.5rem;">
+                            <thead>
+                                <tr style="border-bottom: 2px solid var(--border-light); text-align:left;">
+                                    <th style="padding:6px;">Feature</th>
+                                    <th style="padding:6px;">POP3</th>
+                                    <th style="padding:6px;">IMAP</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td style="padding:6px;">Server State</td><td style="padding:6px;">Stateless across sessions</td><td style="padding:6px;">Stateful (folder tree & flags)</td></tr>
+                                <tr><td style="padding:6px;">Multi-Device Sync</td><td style="padding:6px;">Poor / Unsynchronized</td><td style="padding:6px;">Full multi-device synchronization</td></tr>
+                                <tr><td style="padding:6px;">Bandwidth Efficiency</td><td style="padding:6px;">Downloads full messages</td><td style="padding:6px;">Header-only preview & selective fetch</td></tr>
+                                <tr><td style="padding:6px;">Offline Access</td><td style="padding:6px;">Full offline access (local copies)</td><td style="padding:6px;">Requires local caching config</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="topic-section" id="topic-4">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>MIME Extension & Binary Content Encoding</h2>
+                </div>
+                <div class="collapsible-content" id="content-4">
+                    
+                    <h3 id="sub-4-1">4.1 ASCII Limitation of Legacy SMTP</h3>
+                    <p>Original SMTP was restricted to 7-bit ASCII text formatting. Non-ASCII characters (Unicode, foreign alphabets) and binary attachments (images, audio, PDF files, executables) could not be transmitted natively over 7-bit ASCII SMTP streams.</p>
+                    <h3 id="sub-4-2">4.2 MIME Headers (RFC 2045)</h3>
+                    <p><strong>MIME (Multipurpose Internet Mail Extensions)</strong> extends the structure of email headers to declare arbitrary content types and encoding methods without modifying underlying SMTP protocol rules.</p>
+                    <div class="box box-blue">
+                        <div class="box-title">Key MIME Header Lines</div>
+                        <ul>
+                            <li><code>MIME-Version: 1.0</code></li>
+                            <li><code>Content-Type: multipart/mixed; boundary="----=_NextPart"</code></li>
+                            <li><code>Content-Transfer-Encoding: base64</code></li>
+                        </ul>
+                    </div>
+                    <h3 id="sub-4-3">4.3 Base64 & Quoted-Printable Encoding Algorithms</h3>
+                    <p>Binary attachments are encoded into 7-bit ASCII strings prior to SMTP transmission:</p>
+                    <ul>
+                        <li><strong>Base64 Encoding:</strong> Groups binary data into 3-byte blocks (24 bits), splits them into four 6-bit integers, and maps each 6-bit integer (0–63) to printable ASCII characters <code>[A-Z, a-z, 0-9, +, /]</code>. Introduces a fixed 33% size expansion overhead.</li>
+                        <li><strong>Quoted-Printable:</strong> Used for mostly-text content containing occasional non-ASCII bytes. Replaces non-ASCII bytes with an equals sign followed by two hexadecimal digits (e.g., <code>=E2=82=AC</code> for €).</li>
+                    </ul>
+                
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="topic-section" id="topic-5">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>Email Infrastructure & Security Alignment</h2>
+                </div>
+                <div class="collapsible-content" id="content-5">
+                    
+                    <h3 id="sub-5-1">5.1 DNS MX (Mail Exchanger) Records</h3>
+                    <p>When a mail server needs to send an email to <code>user@example.com</code>, it performs a DNS query requesting the <strong>MX (Mail Exchanger) record</strong> for <code>example.com</code>. The DNS response returns the domain name and priority preference of the destination mail server.</p>
+                    <h3 id="sub-5-2">5.2 Email Spoofing & Security Vulnerabilities</h3>
+                    <p>Because SMTP <code>MAIL FROM</code> and header <code>From:</code> fields are plain ASCII strings supplied by the client, malicious actors can easily forge sender addresses (Email Spoofing) to execute phishing attacks.</p>
+                    <h3 id="sub-5-3">5.3 Authentication Frameworks: SPF, DKIM & DMARC</h3>
+                    <div class="box box-orange">
+                        <div class="box-title">Email Anti-Spoofing Triad</div>
+                        <ul>
+                            <li><strong>SPF (Sender Policy Framework):</strong> Domain owners publish a DNS TXT record listing all IP addresses authorized to send mail on behalf of their domain.</li>
+                            <li><strong>DKIM (DomainKeys Identified Mail):</strong> Outgoing mail servers append a cryptographic digital signature (RSA/Ed25519) to header lines. Receiving servers verify the signature using the domain's public key published in DNS.</li>
+                            <li><strong>DMARC:</strong> Combines SPF and DKIM validation checks, allowing domain owners to specify policy rules (<code>none</code>, <code>quarantine</code>, <code>reject</code>) for handling unauthenticated emails.</li>
+                        </ul>
+                    </div>
+                
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('original-pdf').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" x2="8" y1="13" y2="13"></line>
+                            <line x1="16" x2="8" y1="17" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/7.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>

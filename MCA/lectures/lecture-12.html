@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Modern Computer Architecture - Lecture 12</title>
+    <meta
+        content="Study notes for Modern Computer Architecture (CSA222), Lecture 12 covering Instruction Set Architecture (ISA) design principles, CISC vs RISC philosophies, x86 micro-op decoding, load/store architecture, and RISC-V open ISA."
+        name="description" />
+    <link
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>12</text></svg>"
+        rel="icon" />
+    <link href="../css/style.css" rel="stylesheet" />
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}]});"></script>
+</head>
+
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Modern Computer Architecture</h1>
+            <p>Lecture 12 - ISA Design Principles: RISC vs CISC Architecture &amp; Hardware/Software Interface</p>
+            <a href="../index.html"
+                style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">←
+                Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/12.pdf"
+                style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;"
+                target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text" />
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 5</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            style="vertical-align: text-bottom; margin-right: 4px;">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>Short Notes</a></li>
+                <li>
+                    <a href="#topic-1">1. The ISA Abstraction &amp; Interface<span class="sub-count">4</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 The Hardware/Software Contract</a></li>
+                        <li><a href="#sub-1-2">1.2 State Elements &amp; Program Counter (PC)</a></li>
+                        <li><a href="#sub-1-3">1.3 Instruction Semantics &amp; Machine Code</a></li>
+                        <li><a href="#sub-1-4">1.4 Hardware Decoder Complexity</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. CISC Philosophy (Complex Instruction Set)<span class="sub-count">4</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 Rich Variable-Length Encodings (x86, VAX)</a></li>
+                        <li><a href="#sub-2-2">2.2 Direct Memory-to-Memory Operations</a></li>
+                        <li><a href="#sub-2-3">2.3 Code Density &amp; Memory Efficiency</a></li>
+                        <li><a href="#sub-2-4">2.4 Pipelining Bottlenecks in CISC</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. RISC Philosophy (Reduced Instruction Set)<span class="sub-count">4</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 Fixed 32-Bit Encodings (MIPS, ARM, RISC-V)</a></li>
+                        <li><a href="#sub-3-2">3.2 Load/Store Architecture Constraints</a></li>
+                        <li><a href="#sub-3-3">3.3 Pipelining &amp; Single-Cycle Execution</a></li>
+                        <li><a href="#sub-3-4">3.4 Compiler Burden &amp; Instruction Expansion</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Hardware vs Compiler Trade-Offs<span class="sub-count">4</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 Shifting Complexity: Hardware to Compiler</a></li>
+                        <li><a href="#sub-4-2">4.2 Code Size vs. Decoder Simplicity</a></li>
+                        <li><a href="#sub-4-3">4.3 Memory Access Uniformity</a></li>
+                        <li><a href="#sub-4-4">4.4 Hardware/Software Trade-off Matrix</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Modern Convergence &amp; RISC-V Open ISA<span class="sub-count">4</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 CISC Outside, RISC Inside (Micro-op Decoding)</a></li>
+                        <li><a href="#sub-5-2">5.2 ARM &amp; Apple Silicon Efficiency Dominance</a></li>
+                        <li><a href="#sub-5-3">5.3 RISC-V Open ISA &amp; Modular Extensions</a></li>
+                        <li><a href="#sub-5-4">5.4 Comparison Matrix &amp; Self-Assessment</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round"
+                            stroke-linejoin="round" stroke-width="2"
+                            style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" x2="8" y1="13" y2="13"></line>
+                            <line x1="16" x2="8" y1="17" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>Original PDF</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Short Notes -->
+            <section id="short-notes" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-short-notes')">
+                    <div class="topic-number"
+                        style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                    </div>
+                    <h2>Short Notes &amp; Visual Summary</h2>
+                </div>
+                <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
+                    <p style="margin-bottom: 1rem;">Quick summary and architectural takeaways for Lecture 12:</p>
+
+                    <div class="box box-blue">
+                        <div class="box-title">Key ISA Architectural Takeaways</div>
+                        <ul>
+                            <li><strong>ISA Definition:</strong> The Instruction Set Architecture is the boundary contract between compilers (software) and CPU logic (hardware). It defines instructions, registers, memory modes, and execution semantics.</li>
+                            <li><strong>CISC Philosophy (x86, VAX):</strong> Focuses on rich, multi-byte variable length instructions (1 to 15 bytes) that perform complex tasks (e.g. memory-to-memory math) to optimize precious RAM footprint.</li>
+                            <li><strong>RISC Philosophy (MIPS, ARM, RISC-V):</strong> Employs uniform, fixed-length instructions (typically 32 bits) and a strict <em>Load/Store architecture</em> (only <code>lw</code>/<code>sw</code> access memory; ALU operates strictly on registers).</li>
+                            <li><strong>Modern Convergence:</strong> Modern x86 processors (Intel Core, AMD Zen) decode legacy CISC instructions on-the-fly into fixed RISC-like micro-operations (&mu;-ops) for superscalar execution.</li>
+                        </ul>
+                    </div>
+
+                    <div style="text-align: center; background: var(--bg-secondary, #f8f9fa); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--gray-border); margin-top: 1rem;">
+                        <div style="font-weight: 700; font-size: 1.1rem; color: var(--text-dark); margin-bottom: 0.5rem;">CISC vs. RISC Execution Pipeline Model</div>
+                        <div style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 1rem; text-align: left; margin-top: 1rem;">
+                            <div style="flex: 1; min-width: 260px; background: white; padding: 1rem; border-radius: 6px; border: 1px solid var(--border-light); display: flex; flex-direction: column; justify-content: space-between;">
+                                <div>
+                                    <h4 style="color: #7c3aed; margin-bottom: 0.75rem;">CISC (Complex)</h4>
+                                    <p style="font-size: 0.85rem; color: var(--text-muted);">Variable Length (1-15 Bytes)</p>
+                                    <div style="background: rgba(124, 58, 237, 0.08); padding: 0.6rem; border-radius: 6px; font-size: 0.8rem; margin: 0.5rem 0;">
+                                        <code>ADD [EBX], EAX</code> (Memory + Register)
+                                    </div>
+                                </div>
+                                <ul style="font-size: 0.82rem; margin-top: 0.5rem; padding-left: 1.2rem;">
+                                    <li>High code density</li>
+                                    <li>Complex, multi-stage hardware decoder</li>
+                                    <li>Harder to pipeline cleanly</li>
+                                </ul>
+                            </div>
+                            <div style="flex: 1; min-width: 260px; background: white; padding: 1rem; border-radius: 6px; border: 1px solid var(--border-light); display: flex; flex-direction: column; justify-content: space-between;">
+                                <div>
+                                    <h4 style="color: var(--blue); margin-bottom: 0.75rem;">RISC (Reduced)</h4>
+                                    <p style="font-size: 0.85rem; color: var(--text-muted);">Fixed Length (32 Bits)</p>
+                                    <div style="background: rgba(2, 132, 199, 0.08); padding: 0.6rem; border-radius: 6px; font-size: 0.8rem; margin: 0.5rem 0;">
+                                        <code>lw t0, 0(s0); add t1, t0, t2; sw t1, 0(s0)</code>
+                                    </div>
+                                </div>
+                                <ul style="font-size: 0.82rem; margin-top: 0.5rem; padding-left: 1.2rem;">
+                                    <li>Strict Load/Store memory rule</li>
+                                    <li>Simple single-cycle decoder</li>
+                                    <li>Ideal for high-frequency pipelining</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 1 -->
+            <section class="topic-section" id="topic-1">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>The ISA Abstraction &amp; Hardware/Software Interface</h2>
+                </div>
+                <div class="collapsible-content" id="content-1">
+                    
+                    <h3 id="sub-1-1">1.1 The Hardware/Software Contract</h3>
+                    <p>The <strong>Instruction Set Architecture (ISA)</strong> forms the crucial contract between computer software and silicon hardware. High-level languages (C++, Python, Java) are compiled down to machine instructions specified by the ISA. Silicon engineers implement execution units (ALUs, control logic, pipeline stages) to execute these exact instructions.</p>
+                    
+                    <h3 id="sub-1-2">1.2 State Elements &amp; Program Counter (PC)</h3>
+                    <p>An ISA exposes a formal architectural state to the programmer:</p>
+                    <ul>
+                        <li><strong>Program Counter (PC):</strong> Holds the memory address of the current or next instruction to execute.</li>
+                        <li><strong>Register File:</strong> A small array of ultra-fast storage locations (e.g. 32 registers of 32 bits each in MIPS/RV32).</li>
+                        <li><strong>Memory Address Space:</strong> Byte-addressable linear array of memory locations (\(2^{32}\) bytes for 32-bit ISAs).</li>
+                        <li><strong>Condition Codes / Flags:</strong> Status bits (e.g. Zero, Carry, Overflow, Negative in x86/ARM).</li>
+                    </ul>
+
+                    <h3 id="sub-1-3">1.3 Instruction Semantics &amp; Machine Code</h3>
+                    <p>Instructions specify operational semantics: opcode (what operation to perform), source operands (where inputs come from), and destination (where the result is stored).</p>
+
+                    <h3 id="sub-1-4">1.4 Hardware Decoder Complexity</h3>
+                    <p>The control logic must decode incoming binary instruction streams. Instruction complexity dictates decoder size: fixed-field encodings require minimal wiring, while variable-byte encodings require sequential multi-cycle decoding networks.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" disabled="">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section class="topic-section" id="topic-2">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>CISC Philosophy (Complex Instruction Set Computing)</h2>
+                </div>
+                <div class="collapsible-content" id="content-2">
+                    
+                    <h3 id="sub-2-1">2.1 Rich Variable-Length Encodings (x86, VAX)</h3>
+                    <p><strong>CISC (Complex Instruction Set Computer)</strong> originated in an era (1970s–1980s) when main memory was extremely small and expensive. CISC ISAs aimed to provide rich instructions that mirrored high-level language statements directly.</p>
+                    <ul>
+                        <li>Instruction lengths vary from 1 byte to 15 bytes in x86.</li>
+                        <li>Single instructions can perform memory fetch, ALU calculation, and memory writeback.</li>
+                    </ul>
+
+                    <h3 id="sub-2-2">2.2 Direct Memory-to-Memory Operations</h3>
+                    <p>In CISC architectures like x86 or VAX-11, ALU operations can take memory addresses directly as operands:</p>
+                    $$\text{ADD [EBX + 4], EAX} \quad \implies \quad \text{Memory}[\text{EBX}+4] \leftarrow \text{Memory}[\text{EBX}+4] + \text{EAX}$$
+
+                    <h3 id="sub-2-3">2.3 Code Density &amp; Memory Efficiency</h3>
+                    <p>Because single instructions encode complex tasks, compiled program binary size is small. Highly dense code reduced memory requirements on early computer systems.</p>
+
+                    <h3 id="sub-2-4">2.4 Pipelining Bottlenecks in CISC</h3>
+                    <p>Variable instruction lengths and complex multi-cycle operations make standard clock-pipelining extremely challenging. Instruction fetch cannot know where instruction 2 starts until instruction 1's length is fully decoded.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section class="topic-section" id="topic-3">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>RISC Philosophy (Reduced Instruction Set Computing)</h2>
+                </div>
+                <div class="collapsible-content" id="content-3">
+                    
+                    <h3 id="sub-3-1">3.1 Fixed 32-Bit Encodings (MIPS, ARM, RISC-V)</h3>
+                    <p><strong>RISC (Reduced Instruction Set Computer)</strong> emerged from IBM, Berkeley, and Stanford research (Hennessy &amp; Patterson). RISC enforces uniform, fixed-length (typically 32-bit) instructions with fixed field positions, allowing instant hardware decoding.</p>
+
+                    <h3 id="sub-3-2">3.2 Load/Store Architecture Constraints</h3>
+                    <p>The hallmark rule of RISC is the strict <strong>Load/Store restriction</strong>:</p>
+                    <div class="box box-blue">
+                        <strong>Rule:</strong> Memory access is strictly restricted to specialized <code>Load</code> (<code>lw</code>) and <code>Store</code> (<code>sw</code>) instructions. All arithmetic, logical, and comparison instructions MUST operate exclusively on internal registers.
+                    </div>
+
+                    <h3 id="sub-3-3">3.3 Pipelining &amp; Single-Cycle Execution</h3>
+                    <p>Fixed instructions allow instruction fetch, decode, execute, memory access, and writeback to execute in a streamlined 5-stage pipeline, targeting an ideal <strong>Execution Time Formula</strong>:</p>
+                    $$\text{CPU Time} = \text{Instruction Count} \times \text{CPI} \times \text{Clock Period}$$
+                    <p>RISC lowers <strong>CPI (Cycles Per Instruction)</strong> to approximately 1.0 by simplifying pipeline execution.</p>
+
+                    <h3 id="sub-3-4">3.4 Compiler Burden &amp; Instruction Expansion</h3>
+                    <p>Because RISC instructions are simple, a program requires more total instructions than its CISC counterpart. The compiler assumes responsibility for scheduling register usage and optimizing instruction sequences.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section class="topic-section" id="topic-4">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>Hardware vs Compiler Complexity Trade-Offs</h2>
+                </div>
+                <div class="collapsible-content" id="content-4">
+                    
+                    <h3 id="sub-4-1">4.1 Shifting Complexity: Hardware to Compiler</h3>
+                    <p>Neither CISC nor RISC eliminates intrinsic program complexity. CISC places complexity into complex hardware decoders and microcode ROMs; RISC shifts complexity into optimizing compiler backends.</p>
+
+                    <h3 id="sub-4-2">4.2 Code Size vs. Decoder Simplicity</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>CISC Architecture</th>
+                                <th>RISC Architecture</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Instruction Length</td>
+                                <td>Variable (1 to 15 bytes)</td>
+                                <td>Fixed (32 bits / 4 bytes)</td>
+                            </tr>
+                            <tr>
+                                <td>Memory Access</td>
+                                <td>Combined with arithmetic</td>
+                                <td>Load/Store only</td>
+                            </tr>
+                            <tr>
+                                <td>Registers</td>
+                                <td>Fewer (8–16 registers)</td>
+                                <td>Many (32+ general registers)</td>
+                            </tr>
+                            <tr>
+                                <td>Clock Cycles (CPI)</td>
+                                <td>High &amp; variable (2–10+ cycles)</td>
+                                <td>Low (~1.0 cycle per stage)</td>
+                            </tr>
+                            <tr>
+                                <td>Decoder Hardware</td>
+                                <td>Large, complex microcode ROM</td>
+                                <td>Small, fast hardwired logic</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3 id="sub-4-3">4.3 Memory Access Uniformity</h3>
+                    <p>RISC's uniform memory access prevents unexpected memory stalls mid-operation, simplifying hazard detection in execution pipelines.</p>
+
+                    <h3 id="sub-4-4">4.4 Hardware/Software Trade-off Matrix</h3>
+                    <p>While CISC minimizes memory transfer bytes, RISC maximizes clock frequency (\(f_{\max}\)) and pipeline throughput.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 5 -->
+            <section class="topic-section" id="topic-5">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>Modern Convergence &amp; RISC-V Open ISA</h2>
+                </div>
+                <div class="collapsible-content" id="content-5">
+                    
+                    <h3 id="sub-5-1">5.1 CISC Outside, RISC Inside (Micro-op Decoding)</h3>
+                    <p>Modern desktop/server processors (Intel Core, AMD Ryzen) resolve the CISC vs RISC debate via a hybrid model: the frontend accepts x86 CISC instructions and decodes them into uniform, RISC-like <strong>Micro-operations (&mu;-ops)</strong>. The backend execution engine pipelines and reorders these &mu;-ops identically to a RISC core.</p>
+
+                    <h3 id="sub-5-2">5.2 ARM &amp; Apple Silicon Efficiency Dominance</h3>
+                    <p>Mobile devices and modern supercomputers (Apple M-series, ARM Neoverse, Fujitsu Fugaku) leverage clean 64-bit RISC ISAs (ARMv8/v9) for power efficiency and high execution throughput per watt.</p>
+
+                    <h3 id="sub-5-3">5.3 RISC-V Open ISA &amp; Modular Extensions</h3>
+                    <p><strong>RISC-V</strong> is an open-source, royalty-free instruction set architecture developed at UC Berkeley. It features a minimal integer base (<code>RV32I</code> / <code>RV64I</code>) plus modular extensions:</p>
+                    <ul>
+                        <li><strong>M:</strong> Integer Multiply &amp; Divide</li>
+                        <li><strong>A:</strong> Atomic Memory Instructions</li>
+                        <li><strong>F:</strong> Single-Precision Floating-Point</li>
+                        <li><strong>D:</strong> Double-Precision Floating-Point</li>
+                        <li><strong>C:</strong> Compressed 16-bit Instructions (CISC-like code density!)</li>
+                    </ul>
+
+                    <h3 id="sub-5-4">5.4 Comparison Matrix &amp; Self-Assessment</h3>
+                    <div style="background: var(--bg-mint); padding: 1.25rem; border-radius: 8px; border: 1px solid var(--border-light); margin-top: 1rem;">
+                        <h4 style="color: var(--text-dark); margin-bottom: 0.75rem;">Self-Assessment Check</h4>
+                        <ol style="line-height: 1.8;">
+                            <li><strong>Q1:</strong> What is the defining memory access rule of RISC architectures?<br>
+                            <em>Answer:</em> The Load/Store rule: only explicit `lw` and `sw` instructions touch memory; all ALU ops work on registers.</li>
+                            <li><strong>Q2:</strong> How do modern x86 chips reconcile CISC compatibility with RISC pipelining?<br>
+                            <em>Answer:</em> By decoding variable-length x86 CISC instructions into fixed RISC-like micro-ops (&mu;-ops) in the hardware frontend.</li>
+                            <li><strong>Q3:</strong> What does RV32IMAFD represent in RISC-V terminology?<br>
+                            <em>Answer:</em> 32-bit base integer ISA with Multiply (M), Atomic (A), Single-float (F), and Double-float (D) extensions.</li>
+                        </ol>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <a href="#original-pdf" class="btn"
+                            style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;"
+                            onclick="document.getElementById('original-pdf').scrollIntoView()">Next Section</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number"
+                        style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round"
+                            stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" x2="8" y1="13" y2="13"></line>
+                            <line x1="16" x2="8" y1="17" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for your reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()"
+                        style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/12.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Computer Networks - Lecture 13</title>
+    <meta content="Study notes for Computer Networks (CSAI321), Lecture 13 covering Network Layer Principles, IPv4 Datagram Structure, Classful Addressing, CIDR, and Special Address Ranges." name="description" />
+    <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>13</text></svg>" rel="icon" />
+    <link href="../css/style.css" rel="stylesheet" />
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Computer Networks Foundations</h1>
+            <p>Lecture 13 - Addressing the World: IPv4 & Classless CIDR Routing</p>
+            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/13.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text" />
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 5</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>Short Notes</a></li>
+                <li>
+                    <a href="#topic-1">1. The Network Layer Role & IPv4 Datagram Structure<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 Host-to-Host Delivery Model</a></li><li><a href="#sub-1-2">1.2 20-Byte Base IPv4 Header Structure</a></li><li><a href="#sub-1-3">1.3 Time to Live (TTL) & Fragmentation Fields</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. IPv4 Addressing Fundamentals<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 32-Bit Binary Notation to Dotted Decimal</a></li><li><a href="#sub-2-2">2.2 Network Prefix vs. Host Identifier Split</a></li><li><a href="#sub-2-3">2.3 Interface Addressing Principle</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Historical Classful Addressing<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 Class A, B, C Network Boundaries</a></li><li><a href="#sub-3-2">3.2 Class D (Multicast) & Class E (Experimental)</a></li><li><a href="#sub-3-3">3.3 Inefficiencies & Address Space Exhaustion</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Classless Inter-Domain Routing (CIDR)<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 CIDR Notation (/x)</a></li><li><a href="#sub-4-2">4.2 Subnet Mask Representation</a></li><li><a href="#sub-4-3">4.3 Longest Prefix Match Rule in Routers</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Special IPv4 Address Ranges<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 Private IP Space (RFC 1918)</a></li><li><a href="#sub-5-2">5.2 Loopback & Local Broadcast Addresses</a></li><li><a href="#sub-5-3">5.3 APIPA (169.254.0.0/16) Automatic Addressing</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Short Notes -->
+            <section id="short-notes" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-short-notes')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                    </div>
+                    <h2>Short Notes &amp; Visual Summary</h2>
+                </div>
+                <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
+                    <p style="margin-bottom: 1rem;">Core architectural takeaways for Lecture 13:</p>
+                    <div class="box box-blue">
+                        <div class="box-title">Key Architectural Concepts</div>
+                        <ul>
+                            <li><strong>Primary Topic Objective:</strong> Detailed analysis and formal protocol mechanisms for Addressing the World: IPv4 & Classless CIDR Routing.</li>
+                            <li><strong>Core Layer Position:</strong> Operation within the TCP/IP Network Protocol Stack with rigorous state management and packet processing rules.</li>
+                            <li><strong>Engineering Tradeoffs:</strong> Balancing protocol overhead, latency, reliability, and security across distributed environments.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="topic-section" id="topic-1">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>The Network Layer Role & IPv4 Datagram Structure</h2>
+                </div>
+                <div class="collapsible-content" id="content-1">
+                    
+                    <h3 id="sub-1-1">1.1 Host-to-Host Delivery Model</h3>
+                    <p>The Network Layer transports packets from sending host to receiving host across interconnected routers, executing two core functions: <strong>Forwarding</strong> (local router action) and <strong>Routing</strong> (network-wide path selection).</p>
+                    <h3 id="sub-1-2">1.2 20-Byte Base IPv4 Header Structure</h3>
+                    <p>Standard IPv4 header is 20 bytes (without options). Key fields include Source IP (32 bits), Destination IP (32 bits), Version (4), Header Length (IHL), Total Length, Protocol (e.g., 6 for TCP, 17 for UDP), TTL, and Header Checksum.</p>
+                
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('short-notes').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="topic-section" id="topic-2">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>IPv4 Addressing Fundamentals</h2>
+                </div>
+                <div class="collapsible-content" id="content-2">
+                    
+                    <h3 id="sub-2-1">2.1 32-Bit Binary Notation to Dotted Decimal</h3>
+                    <p>IPv4 addresses are 32-bit integers written in 4 octets separated by dots (e.g., <code>192.168.1.1</code>).</p>
+                    $$\text{IPv4 Address Space} = 2^{32} = 4,294,967,296 \text{ addresses}$$
+                
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="topic-section" id="topic-3">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>Historical Classful Addressing</h2>
+                </div>
+                <div class="collapsible-content" id="content-3">
+                    
+                    <h3 id="sub-3-1">3.1 Class A, B, C Network Boundaries</h3>
+                    <ul>
+                        <li><strong>Class A (0.0.0.0 to 127.255.255.255):</strong> 8-bit netid, 24-bit hostid ($16M$ hosts/net).</li>
+                        <li><strong>Class B (128.0.0.0 to 191.255.255.255):</strong> 16-bit netid, 16-bit hostid ($65K$ hosts/net).</li>
+                        <li><strong>Class C (192.0.0.0 to 223.255.255.255):</strong> 24-bit netid, 8-bit hostid ($254$ hosts/net).</li>
+                    </ul>
+                
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="topic-section" id="topic-4">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>Classless Inter-Domain Routing (CIDR)</h2>
+                </div>
+                <div class="collapsible-content" id="content-4">
+                    
+                    <h3 id="sub-4-1">4.1 CIDR Notation (/x)</h3>
+                    <p><strong>CIDR (RFC 1519)</strong> abandoned rigid classes. Address format <code>a.b.c.d/x</code> indicates that the first $x$ bits specify the network prefix.</p>
+                    <h3 id="sub-4-2">4.2 Subnet Mask Representation</h3>
+                    <p>A subnet mask has $x$ leading 1s followed by $32-x$ trailing 0s (e.g., <code>/24</code> = <code>255.255.255.0</code>).</p>
+                    <h3 id="sub-4-3">4.3 Longest Prefix Match Rule in Routers</h3>
+                    <p>When forwarding a packet, a router searches its routing table and selects the entry whose subnet prefix matches the destination IP address with the <strong>longest bit-length ($x$)</strong>.</p>
+                
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="topic-section" id="topic-5">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>Special IPv4 Address Ranges</h2>
+                </div>
+                <div class="collapsible-content" id="content-5">
+                    
+                    <h3 id="sub-5-1">5.1 Private IP Space (RFC 1918)</h3>
+                    <div class="box box-green">
+                        <div class="box-title">RFC 1918 Private Address Blocks</div>
+                        <ul>
+                            <li><code>10.0.0.0/8</code> (10.0.0.0 to 10.255.255.255)</li>
+                            <li><code>172.16.0.0/12</code> (172.16.0.0 to 172.31.255.255)</li>
+                            <li><code>192.168.0.0/16</code> (192.168.0.0 to 192.168.255.255)</li>
+                        </ul>
+                    </div>
+                
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('original-pdf').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" x2="8" y1="13" y2="13"></line>
+                            <line x1="16" x2="8" y1="17" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/13.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Modern Computer Architecture - Lecture 14</title>
+    <meta
+        content="Study notes for Modern Computer Architecture (CSA222), Lecture 14 covering high-level control flow translation (if/else, while, for loops), branch-away reversal logic, relational comparisons via slt/slti, procedure call mechanics (jal, jr $ra), and stack frame management."
+        name="description" />
+    <link
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>14</text></svg>"
+        rel="icon" />
+    <link href="../css/style.css" rel="stylesheet" />
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}]});"></script>
+</head>
+
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Modern Computer Architecture</h1>
+            <p>Lecture 14 - Control Flow Translation, Relational Idioms &amp; Stack Frame Calling Conventions</p>
+            <a href="../index.html"
+                style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">←
+                Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/14.pdf"
+                style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;"
+                target="_blank">Open PDF in New Tab ↗</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="https://claude.ai/artifact/DVA7A3ckmQLKsLhcpmLBGU"
+                style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;"
+                target="_blank">Visual Reference ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text" />
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 6</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            style="vertical-align: text-bottom; margin-right: 4px;">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>Short Notes</a></li>
+                <li>
+                    <a href="#topic-1">1. Conditionals &amp; Branch-Away Logic<span class="sub-count">4</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 High-Level Structure Reversal</a></li>
+                        <li><a href="#sub-1-2">1.2 Branch-if-Equal (beq) &amp; Not-Equal (bne)</a></li>
+                        <li><a href="#sub-1-3">1.3 Reversing Test Conditions</a></li>
+                        <li><a href="#sub-1-4">1.4 if/else Flowchart Translation</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Relational Ordering &amp; The slt Idiom<span class="sub-count">4</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 Hardware Relational Limitations</a></li>
+                        <li><a href="#sub-2-2">2.2 Set-Less-Than (slt &amp; slti) Instructions</a></li>
+                        <li><a href="#sub-2-3">2.3 Building &lt;, &gt;, &lt;=, &gt;= with $zero</a></li>
+                        <li><a href="#sub-2-4">2.4 Assembly Comparison Code Examples</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Loop Translation Patterns (while &amp; for)<span class="sub-count">4</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 Flattening Structured Loops</a></li>
+                        <li><a href="#sub-3-2">3.2 Top Test &amp; Jump-Back Architecture</a></li>
+                        <li><a href="#sub-3-3">3.3 Pointer Arithmetic &amp; Array Traversal</a></li>
+                        <li><a href="#sub-3-4">3.4 Loop Optimization Basics</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Procedure Call Mechanics<span class="sub-count">4</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 Jump-and-Link (jal) &amp; Return (jr $ra)</a></li>
+                        <li><a href="#sub-4-2">4.2 Parameter ($a0-$a3) &amp; Return ($v0-$v1) Flow</a></li>
+                        <li><a href="#sub-4-3">4.3 Leaf vs Non-Leaf Subroutines</a></li>
+                        <li><a href="#sub-4-4">4.4 Procedure Execution Flow</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Stack Frames &amp; Recursive Functions<span class="sub-count">4</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 The Stack Architecture (High to Low Memory)</a></li>
+                        <li><a href="#sub-5-2">5.2 Pushing &amp; Popping Frame Registers</a></li>
+                        <li><a href="#sub-5-3">5.3 Preserving $ra in Recursive Functions</a></li>
+                        <li><a href="#sub-5-4">5.4 Summary Comparison &amp; Rapid Check</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-6">6. MIPS Programming Guide (SPIM)<span class="sub-count">11</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-6-1">6.1 What MIPS Is &amp; the Load/Store Model</a></li>
+                        <li><a href="#sub-6-2">6.2 Data Types, Literals &amp; Registers</a></li>
+                        <li><a href="#sub-6-3">6.3 Program Structure &amp; Data Declarations</a></li>
+                        <li><a href="#sub-6-4">6.4 Load &amp; Store Instructions</a></li>
+                        <li><a href="#sub-6-5">6.5 Indirect &amp; Based Addressing</a></li>
+                        <li><a href="#sub-6-6">6.6 Arithmetic (add, mult, div, Hi/Lo)</a></li>
+                        <li><a href="#sub-6-7">6.7 Control Flow: Branches &amp; Jumps</a></li>
+                        <li><a href="#sub-6-8">6.8 System Calls &amp; I/O (SPIM)</a></li>
+                        <li><a href="#sub-6-9">6.9 Complete Example: Sum 1×2…10×11</a></li>
+                        <li><a href="#sub-6-10">6.10 Cheat Sheet</a></li>
+                        <li><a href="#sub-6-11">6.11 Practice Questions</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round"
+                            stroke-linejoin="round" stroke-width="2"
+                            style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" x2="8" y1="13" y2="13"></line>
+                            <line x1="16" x2="8" y1="17" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>Original PDF</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Short Notes -->
+            <section id="short-notes" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-short-notes')">
+                    <div class="topic-number"
+                        style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                    </div>
+                    <h2>Short Notes &amp; Visual Summary</h2>
+                </div>
+                <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
+                    <p style="margin-bottom: 1rem;">Core translation rules and assembly calling patterns for Lecture 14:</p>
+
+                    <div class="box box-blue">
+                        <div class="box-title">Assembly Translation Principles</div>
+                        <ul>
+                            <li><strong>Branch AWAY Rule:</strong> In <code>if (cond) { body }</code>, assembly branches <em>AWAY</em> to skip the body when the condition is <code>FALSE</code> (e.g., test <code>a == b</code> &rarr; use <code>bne a, b, ELSE_LABEL</code>).</li>
+                            <li><strong>Relational Ordering (<code>slt</code> Idiom):</strong> MIPS lacks <code>blt</code> / <code>bgt</code> instructions. To test <code>a &lt; b</code>, execute <code>slt &#36;t0, &#36;a, &#36;b</code> (sets <code>&#36;t0=1</code> if true, 0 if false), then branch on <code>&#36;t0</code> using <code>bne &#36;t0, &#36;zero, LABEL</code>.</li>
+                            <li><strong>Function Calls (<code>jal</code> / <code>jr &#36;ra</code>):</strong> <code>jal FUNCTION</code> saves <code>PC+4</code> into <code>&#36;ra</code> and jumps. Function returns via <code>jr &#36;ra</code>.</li>
+                            <li><strong>Stack Frame Management:</strong> The stack grows downward (subtracting from <code>&#36;sp</code>). Non-leaf and recursive functions MUST save <code>&#36;ra</code> and saved registers onto the stack in prologue and restore them before returning.</li>
+                        </ul>
+                    </div>
+
+                    <div style="background: white; padding: 1.25rem; border-radius: 8px; border: 1px solid var(--border-light); margin-top: 1rem;">
+                        <h4 style="color: var(--blue); margin-bottom: 0.75rem;">Stack Memory Growth &amp; Frame Layout</h4>
+                        <div style="display: flex; gap: 1rem; align-items: center; justify-content: space-around; flex-wrap: wrap;">
+                            <div style="flex: 1; min-width: 250px; background: var(--bg-secondary, #f8f9fa); padding: 1rem; border-radius: 6px; border: 1px solid var(--gray-border);">
+                                <div style="font-weight: 700; color: var(--text-dark); margin-bottom: 0.5rem; text-align: center;">Memory Direction</div>
+                                <div style="font-size: 0.82rem; font-family: monospace; line-height: 1.8;">
+                                    High Addr &uarr; [ Caller Frame ]<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-- Pushed $ra (return addr)<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-- Pushed $s0 (saved reg)<br>
+                                    Low Addr &darr; [ $sp &rarr; Top of Stack ]
+                                </div>
+                            </div>
+                            <div style="flex: 1; min-width: 250px; font-size: 0.85rem; line-height: 1.6;">
+                                <strong>Prologue Code:</strong><br>
+                                <code>addi &#36;sp, &#36;sp, -8</code> (allocate 8 bytes)<br>
+                                <code>sw &#36;ra, 4(&#36;sp)</code> (save return addr)<br>
+                                <code>sw &#36;s0, 0(&#36;sp)</code> (save $s0 reg)<br><br>
+                                <strong>Epilogue Code:</strong><br>
+                                <code>lw &#36;s0, 0(&#36;sp)</code><br>
+                                <code>lw &#36;ra, 4(&#36;sp)</code><br>
+                                <code>addi &#36;sp, &#36;sp, 8</code><br>
+                                <code>jr &#36;ra</code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 1 -->
+            <section class="topic-section" id="topic-1">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>Conditionals &amp; Branch-Away Logic</h2>
+                </div>
+                <div class="collapsible-content" id="content-1">
+                    
+                    <h3 id="sub-1-1">1.1 High-Level Structure Reversal</h3>
+                    <p>High-level code is structured with nested control blocks (<code>if/else</code>, <code>while</code>). Assembly is flat. Translating control flow requires flattening blocks into labeled jump targets using conditional branches.</p>
+
+                    <h3 id="sub-1-2">1.2 Branch-if-Equal (beq) &amp; Not-Equal (bne)</h3>
+                    <p>MIPS provides two core conditional branch instructions:</p>
+                    <ul>
+                        <li><code>beq &#36;t0, &#36;t1, TargetLabel</code> &rarr; Jump to TargetLabel if <code>Reg[&#36;t0] == Reg[&#36;t1]</code></li>
+                        <li><code>bne &#36;t0, &#36;t1, TargetLabel</code> &rarr; Jump to TargetLabel if <code>Reg[&#36;t0] != Reg[&#36;t1]</code></li>
+                    </ul>
+
+                    <h3 id="sub-1-3">1.3 Reversing Test Conditions</h3>
+                    <p>To implement high-level <code>if (x == y) { body }</code>, assembly evaluates the <strong>inverse condition</strong> to branch <em>away</em> over the body when false:</p>
+                    <pre><code># C code: if (i == j) f = g + h; else f = g - h;
+
+    bne &#36;s3, &#36;s4, ElseBlock   # Branch away to Else if i != j
+    add &#36;s0, &#36;s1, &#36;s2         # f = g + h
+    j ExitIf                  # Skip Else block
+
+ElseBlock:
+    sub &#36;s0, &#36;s1, &#36;s2         # f = g - h
+
+ExitIf:</code></pre>
+
+                    <h3 id="sub-1-4">1.4 if/else Flowchart Translation</h3>
+                    <p>The conditional test splits execution into two divergent paths that rejoin at a common exit label.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" disabled="">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section class="topic-section" id="topic-2">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>Relational Ordering &amp; The slt Idiom</h2>
+                </div>
+                <div class="collapsible-content" id="content-2">
+                    
+                    <h3 id="sub-2-1">2.1 Hardware Relational Limitations</h3>
+                    <p>Including hardware comparison logic for <code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>, <code>&gt;=</code> directly inside conditional branch hardware makes the branch decoder slow. MIPS separates comparison from branching.</p>
+
+                    <h3 id="sub-2-2">2.2 Set-Less-Than (slt &amp; slti) Instructions</h3>
+                    <p>MIPS uses the <code>slt</code> (Set Less Than) instruction:</p>
+                    $$\text{slt } \$t0, \$s1, \$s2 \implies \$t0 = \begin{cases} 1 & \text{if } \$s1 < \$s2 \\ 0 & \text{if } \$s1 \ge \$s2 \end{cases}$$
+                    <p>For constants: <code>slti &#36;t0, &#36;s1, 100</code>.</p>
+
+                    <h3 id="sub-2-3">2.3 Building &lt;, &gt;, &lt;=, &gt;= with <code>&#36;zero</code></h3>
+                    <p>Combining <code>slt</code> with <code>bne</code> / <code>beq</code> and <code>&#36;zero</code> synthesizes all 4 relational tests:</p>
+                    <ul>
+                        <li><strong>\(a < b\):</strong> <code>slt &#36;t0, &#36;a, &#36;b</code> &rarr; <code>bne &#36;t0, &#36;zero, Target</code></li>
+                        <li><strong>\(a \ge b\):</strong> <code>slt &#36;t0, &#36;a, &#36;b</code> &rarr; <code>beq &#36;t0, &#36;zero, Target</code></li>
+                        <li><strong>\(a > b\):</strong> Swap operands! <code>slt &#36;t0, &#36;b, &#36;a</code> &rarr; <code>bne &#36;t0, &#36;zero, Target</code></li>
+                        <li><strong>\(a \le b\):</strong> Swap operands! <code>slt &#36;t0, &#36;b, &#36;a</code> &rarr; <code>beq &#36;t0, &#36;zero, Target</code></li>
+                    </ul>
+
+                    <h3 id="sub-2-4">2.4 Assembly Comparison Code Examples</h3>
+                    <pre><code># C code: if (a < b) max = b;
+    slt &#36;t0, &#36;s0, &#36;s1         # &#36;t0 = 1 if a < b
+    beq &#36;t0, &#36;zero, Skip      # If false (&#36;t0 == 0), skip
+    move &#36;s2, &#36;s1             # max = b
+Skip:</code></pre>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section class="topic-section" id="topic-3">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>Loop Translation Patterns (while &amp; for)</h2>
+                </div>
+                <div class="collapsible-content" id="content-3">
+                    
+                    <h3 id="sub-3-1">3.1 Flattening Structured Loops</h3>
+                    <p>Loops consist of a <strong>top condition test</strong>, a <strong>loop body</strong>, and an <strong>unconditional jump back</strong> to the top test.</p>
+
+                    <h3 id="sub-3-2">3.2 Top Test &amp; Jump-Back Architecture</h3>
+                    <pre><code># C code: while (save[i] == k) i += 1;
+
+LoopTop:
+    sll  &#36;t1, &#36;s3, 2          # &#36;t1 = i * 4 (byte offset)
+    add  &#36;t1, &#36;t1, &#36;s6        # &#36;t1 = address of save[i]
+    lw   &#36;t0, 0(&#36;t1)          # &#36;t0 = save[i]
+    bne  &#36;t0, &#36;s5, LoopExit   # Exit loop if save[i] != k
+    addi &#36;s3, &#36;s3, 1          # i += 1
+    j    LoopTop              # Jump back to test
+
+LoopExit:</code></pre>
+
+                    <h3 id="sub-3-3">3.3 Pointer Arithmetic &amp; Array Traversal</h3>
+                    <p>Because integer elements occupy 4 bytes in 32-bit systems, array index <code>i</code> must be multiplied by 4 (<code>sll &#36;t1, &#36;s3, 2</code>) to compute byte offsets relative to base array address <code>&#36;s6</code>.</p>
+
+                    <h3 id="sub-3-4">3.4 Loop Optimization Basics</h3>
+                    <p>Compilers optimize loop overhead by moving the test condition to the bottom of the loop, executing 1 branch per iteration instead of 2 (branch + jump).</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section class="topic-section" id="topic-4">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>Procedure Call Mechanics</h2>
+                </div>
+                <div class="collapsible-content" id="content-4">
+                    
+                    <h3 id="sub-4-1">4.1 Jump-and-Link (jal) &amp; Return (jr $ra)</h3>
+                    <p>Procedure execution requires saving the return instruction address before jumping:</p>
+                    <ul>
+                        <li><code>jal FunctionLabel</code> &rarr; Sets <code>&#36;ra = PC + 4</code> and jumps to <code>FunctionLabel</code>.</li>
+                        <li><code>jr &#36;ra</code> &rarr; Jumps back to the saved address in <code>&#36;ra</code>.</li>
+                    </ul>
+
+                    <h3 id="sub-4-2">4.2 Parameter (<code>&#36;a0-&#36;a3</code>) &amp; Return (<code>&#36;v0-&#36;v1</code>) Flow</h3>
+                    <p>Subroutine call steps:</p>
+                    <ol>
+                        <li>Caller places arguments in <code>&#36;a0–&#36;a3</code>.</li>
+                        <li>Caller executes <code>jal Function</code>.</li>
+                        <li>Function computes result, placing it in <code>&#36;v0</code>.</li>
+                        <li>Function executes <code>jr &#36;ra</code> to return.</li>
+                    </ol>
+
+                    <h3 id="sub-4-3">4.3 Leaf vs Non-Leaf Subroutines</h3>
+                    <p>A <strong>Leaf function</strong> makes no nested subroutine calls. It can execute without modifying <code>&#36;ra</code>. A <strong>Non-Leaf function</strong> calls other subroutines; executing <code>jal</code> inside a non-leaf function overwrites <code>&#36;ra</code>, so <code>&#36;ra</code> MUST be saved onto the stack beforehand!</p>
+
+                    <h3 id="sub-4-4">4.4 Procedure Execution Flow</h3>
+                    <p>Visual breakdown of <code>jal</code> and <code>jr &#36;ra</code> register flow.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 5 -->
+            <section class="topic-section" id="topic-5">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>Stack Frames &amp; Recursive Functions</h2>
+                </div>
+                <div class="collapsible-content" id="content-5">
+                    
+                    <h3 id="sub-5-1">5.1 The Stack Architecture</h3>
+                    <p>The stack is a Last-In-First-Out (LIFO) structure located in high memory. As values are pushed, the stack pointer <code>&#36;sp</code> decrements towards lower memory addresses.</p>
+
+                    <h3 id="sub-5-2">5.2 Pushing &amp; Popping Frame Registers</h3>
+                    <p>Allocating 8 bytes for 2 words on the stack:</p>
+                    <pre><code># Push prologue:
+    addi &#36;sp, &#36;sp, -8    # Allocate 8 bytes
+    sw   &#36;ra, 4(&#36;sp)     # Save return address
+    sw   &#36;s0, 0(&#36;sp)     # Save register &#36;s0
+
+# Pop epilogue:
+    lw   &#36;s0, 0(&#36;sp)     # Restore register &#36;s0
+    lw   &#36;ra, 4(&#36;sp)     # Restore return address
+    addi &#36;sp, &#36;sp, 8     # Deallocate stack frame
+    jr   &#36;ra             # Return to caller</code></pre>
+
+                    <h3 id="sub-5-3">5.3 Preserving <code>&#36;ra</code> in Recursive Functions</h3>
+                    <p>Recursive functions (e.g. Factorial) call themselves repeatedly. Each invocation pushes its own stack frame containing its local argument <code>&#36;a0</code> and return address <code>&#36;ra</code>. Unwinding the recursion pops frames in exact reverse order.</p>
+
+                    <h3 id="sub-5-4">5.4 Summary Comparison &amp; Rapid Check</h3>
+                    <div style="background: var(--bg-mint); padding: 1.25rem; border-radius: 8px; border: 1px solid var(--border-light); margin-top: 1rem;">
+                        <h4 style="color: var(--text-dark); margin-bottom: 0.75rem;">Self-Assessment Check</h4>
+                        <ol style="line-height: 1.8;">
+                            <li><strong>Q1:</strong> Why does assembly code branch AWAY when translating an <code>if</code> statement?<br>
+                            <em>Answer:</em> Because if the condition is false, assembly must skip over the <code>if</code> body to the <code>else</code> or exit block.</li>
+                            <li><strong>Q2:</strong> How does MIPS implement <code>if (a &lt; b)</code> without a <code>blt</code> instruction?<br>
+                            <em>Answer:</em> By executing <code>slt &#36;t0, &#36;a, &#36;b</code> followed by <code>bne &#36;t0, &#36;zero, Label</code>.</li>
+                            <li><strong>Q3:</strong> What happens to register <code>&#36;ra</code> if a non-leaf function calls <code>jal</code> without saving <code>&#36;ra</code> on the stack?<br>
+                            <em>Answer:</em> The second <code>jal</code> overwrites <code>&#36;ra</code>, causing an infinite return loop when returning from the nested function.</li>
+                        </ol>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 6 -->
+            <section class="topic-section" id="topic-6">
+                <div class="topic-header" onclick="toggleSection('content-6')">
+                    <div class="topic-number">6</div>
+                    <h2>MIPS Programming Guide (SPIM)</h2>
+                </div>
+                <div class="collapsible-content" id="content-6">
+
+                    <div class="box box-blue" style="margin-bottom:1.5rem;">
+                        <div class="box-title">About this section</div>
+                        <p>A step-by-step guide for writing real MIPS programs: storing data, doing arithmetic, making decisions, looping, calling subroutines and printing results in the SPIM simulator. Adapted and expanded from the <a href="https://www.cs.jhu.edu/~cs333/reference.html" target="_blank" style="color:var(--blue);">MIPS Quick Reference</a> (Johns Hopkins CS333).</p>
+                    </div>
+
+                    <h3 id="sub-6-1">6.1 What MIPS Is &amp; the Load/Store Model</h3>
+                    <p>MIPS is a <strong>RISC</strong> (Reduced Instruction Set Computer) design — few instructions, all the same size, very regular rules. Programs run on <strong>SPIM</strong>, a simulator that emulates a MIPS processor.</p>
+                    <p><strong>The CPU cycle:</strong> fetch → decode → execute → advance PC. Each instruction is tiny: <code>add &#36;t0, &#36;t1, &#36;t2</code> maps to exactly one machine instruction.</p>
+                    <div class="box box-green">
+                        <div class="box-title">The one picture to keep in your head</div>
+                        <p><strong>RAM</strong> (large, slow) ↔ <strong>Registers</strong> (32 fast boxes inside CPU) ↔ <strong>ALU</strong> (calculator)</p>
+                        <ul>
+                            <li>RAM talks to registers <em>only</em> through <code>lw</code>/<code>lb</code> (load) and <code>sw</code>/<code>sb</code> (store).</li>
+                            <li>The ALU <em>only ever</em> sees registers — never RAM directly.</li>
+                        </ul>
+                    </div>
+
+                    <h3 id="sub-6-2">6.2 Data Types, Literals &amp; Registers</h3>
+                    <p>MIPS works with three sizes: <strong>byte</strong> (1 byte, 8 bits), <strong>halfword</strong> (2 bytes, 16 bits), <strong>word</strong> (4 bytes, 32 bits). Every register and every instruction is exactly one word wide.</p>
+                    <table>
+                        <thead><tr><th>Name</th><th>Size</th><th>Bits</th><th>Signed Range</th></tr></thead>
+                        <tbody>
+                            <tr><td>byte</td><td>1 byte</td><td>8</td><td>−128 to 127</td></tr>
+                            <tr><td>halfword</td><td>2 bytes</td><td>16</td><td>−32,768 to 32,767</td></tr>
+                            <tr><td>word</td><td>4 bytes</td><td>32</td><td>≈ −2.1 billion to 2.1 billion</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="box box-beige">
+                        <div class="box-title">Literals: writing values in code</div>
+                        <ul>
+                            <li><strong>Number:</strong> <code>4</code> → the integer 4</li>
+                            <li><strong>Character:</strong> <code>'b'</code> → ASCII 98 (1 byte)</li>
+                            <li><strong>String:</strong> <code>"A string"</code> → one byte per character</li>
+                        </ul>
+                        <p><strong>Common bug:</strong> <code>'4'</code> (ASCII 52) ≠ <code>4</code> (integer four).</p>
+                    </div>
+                    <p><strong>Registers:</strong> MIPS has 32 general-purpose 32-bit registers. Every register starts with <code>&#36;</code>. You can name by number (<code>&#36;8</code>) or by alias (<code>&#36;t0</code>) — they refer to the same box.</p>
+                    <table>
+                        <thead><tr><th>Name</th><th>Number</th><th>Job</th><th>Preserved across call?</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>&#36;zero</code></td><td>0</td><td>Always 0 — writes discarded</td><td>constant</td></tr>
+                            <tr><td><code>&#36;v0–&#36;v1</code></td><td>2–3</td><td>Return values; <code>&#36;v0</code> also picks syscall</td><td>No</td></tr>
+                            <tr><td><code>&#36;a0–&#36;a3</code></td><td>4–7</td><td>Arguments to a subroutine</td><td>No</td></tr>
+                            <tr><td><code>&#36;t0–&#36;t9</code></td><td>8–15, 24–25</td><td>Temporaries — caller must save if needed</td><td>No</td></tr>
+                            <tr><td><code>&#36;s0–&#36;s7</code></td><td>16–23</td><td>Saved values — callee must restore</td><td>Yes</td></tr>
+                            <tr><td><code>&#36;sp</code></td><td>29</td><td>Stack pointer (top of stack)</td><td>Yes</td></tr>
+                            <tr><td><code>&#36;fp</code></td><td>30</td><td>Frame pointer</td><td>Yes</td></tr>
+                            <tr><td><code>&#36;ra</code></td><td>31</td><td>Return address (written by <code>jal</code>)</td><td>Save if calling again</td></tr>
+                        </tbody>
+                    </table>
+                    <p><strong>Special registers Hi &amp; Lo:</strong> Multiply/divide results don't fit in one register. <code>mult</code> puts the upper 32 bits in <strong>Hi</strong> and lower 32 bits in <strong>Lo</strong>. Copy with <code>mfhi</code> / <code>mflo</code>.</p>
+                    <p><strong>Stack:</strong> Grows from <em>high to low</em> memory. Pushing means subtracting from <code>&#36;sp</code>.</p>
+
+                    <h3 id="sub-6-3">6.3 Program Structure &amp; Data Declarations</h3>
+                    <p>A MIPS program is a plain text file ending in <code>.s</code>. Two sections:</p>
+                    <table>
+                        <thead><tr><th>Part</th><th>Marked by</th><th>Contents</th></tr></thead>
+                        <tbody>
+                            <tr><td>Data declarations</td><td><code>.data</code></td><td>Variable names; storage allocated in RAM</td></tr>
+                            <tr><td>Code</td><td><code>.text</code></td><td>The program instructions</td></tr>
+                            <tr><td>Starting point</td><td><code>main:</code></td><td>First instruction to execute</td></tr>
+                            <tr><td>Ending point</td><td>exit syscall</td><td><code>li &#36;v0, 10</code> + <code>syscall</code></td></tr>
+                        </tbody>
+                    </table>
+                    <pre class="code-block"><code># Template.s
+.data
+    var1:   .word  3           # integer, initial value 3
+    array1: .byte  'a','b'     # 2-byte character array
+    array2: .space 40          # 40 uninitialised bytes
+    msg:    .asciiz "Hi\n"    # null-terminated string
+
+.text
+main:
+    # ... instructions ...
+    li   &#36;v0, 10
+    syscall                    # exit</code></pre>
+                    <p><strong>Storage types:</strong> <code>.word</code> (4 bytes), <code>.byte</code> (1 byte), <code>.space N</code> (N uninitialised bytes), <code>.asciiz</code> (null-terminated string). Anything after <code>#</code> is a comment.</p>
+
+                    <h3 id="sub-6-4">6.4 Load &amp; Store Instructions</h3>
+                    <div class="box box-blue">
+                        <div class="box-title">The load/store rule</div>
+                        <p>RAM access is <strong>only</strong> allowed with load and store instructions. All other instructions use register operands exclusively.</p>
+                    </div>
+                    <table>
+                        <thead><tr><th>Instruction</th><th>Form</th><th>What it does</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>lw</code></td><td><code>lw rd, mem</code></td><td>Load word (4 bytes) from RAM into register</td></tr>
+                            <tr><td><code>lb</code></td><td><code>lb rd, mem</code></td><td>Load byte, sign-extended into 32-bit register</td></tr>
+                            <tr><td><code>sw</code></td><td><code>sw rs, mem</code></td><td>Store register word into RAM</td></tr>
+                            <tr><td><code>sb</code></td><td><code>sb rs, mem</code></td><td>Store low byte of register into RAM</td></tr>
+                            <tr><td><code>li</code></td><td><code>li rd, value</code></td><td>Load immediate constant into register (no RAM)</td></tr>
+                            <tr><td><code>la</code></td><td><code>la rd, label</code></td><td>Load <em>address</em> of label into register</td></tr>
+                        </tbody>
+                    </table>
+                    <p><strong>Memory trick:</strong> The register always comes first. For <code>lw</code>, data flows RAM → register. For <code>sw</code>, register → RAM.</p>
+                    <p><strong>la vs lw:</strong> <code>lw &#36;t0, var1</code> copies the <em>value</em> stored at var1. <code>la &#36;t0, var1</code> copies the <em>address</em> of var1 (like a C pointer).</p>
+                    <pre class="code-block"><code>.data
+    var1: .word 23
+.text
+main:
+    lw &#36;t0, var1      # &#36;t0 = 23
+    li &#36;t1, 5         # &#36;t1 = 5
+    sw &#36;t1, var1      # var1 = 5
+    li &#36;v0, 10
+    syscall</code></pre>
+
+                    <h3 id="sub-6-5">6.5 Indirect &amp; Based Addressing</h3>
+                    <p>Put an address in a register and reach memory <em>through</em> it, optionally adding an offset. Only used with load and store.</p>
+                    <table>
+                        <thead><tr><th>Style</th><th>Syntax</th><th>Address used</th></tr></thead>
+                        <tbody>
+                            <tr><td>Indirect</td><td><code>(&#36;t0)</code></td><td>Whatever address is in <code>&#36;t0</code></td></tr>
+                            <tr><td>Based / indexed</td><td><code>4(&#36;t0)</code></td><td><code>&#36;t0 + 4</code></td></tr>
+                            <tr><td>Negative offset</td><td><code>-12(&#36;t0)</code></td><td><code>&#36;t0 − 12</code></td></tr>
+                        </tbody>
+                    </table>
+                    <p><strong>Arrays:</strong> Keep base address in a register; element <em>i</em> is at offset <code>4 × i</code> (integers are 4 bytes each).</p>
+                    <p><strong>Stack:</strong> Access saved values as <code>0(&#36;sp)</code>, <code>4(&#36;sp)</code>, etc.</p>
+                    <pre class="code-block"><code>.data
+    array1: .space 12       # 3 integers
+.text
+main:
+    la  &#36;t0, array1
+    li  &#36;t1, 5
+    sw  &#36;t1,  (&#36;t0)       # array1[0] = 5
+    li  &#36;t1, 13
+    sw  &#36;t1, 4(&#36;t0)       # array1[1] = 13
+    li  &#36;t1, -7
+    sw  &#36;t1, 8(&#36;t0)       # array1[2] = -7
+    li  &#36;v0, 10
+    syscall</code></pre>
+
+                    <h3 id="sub-6-6">6.6 Arithmetic (add, mult, div, Hi/Lo)</h3>
+                    <p>Arithmetic works <strong>only on registers</strong>. Most instructions take 3 operands — destination first.</p>
+                    <table>
+                        <thead><tr><th>Instruction</th><th>Meaning</th><th>Notes</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>add rd, rs, rt</code></td><td><code>rd = rs + rt</code></td><td>Signed; traps on overflow</td></tr>
+                            <tr><td><code>sub rd, rs, rt</code></td><td><code>rd = rs − rt</code></td><td>Signed</td></tr>
+                            <tr><td><code>addi rd, rs, n</code></td><td><code>rd = rs + n</code></td><td>No <code>subi</code>; use negative n</td></tr>
+                            <tr><td><code>addu / subu</code></td><td>unsigned add/sub</td><td>Wraps silently on overflow</td></tr>
+                            <tr><td><code>move rd, rs</code></td><td><code>rd = rs</code></td><td>Copy register</td></tr>
+                            <tr><td><code>mult rs, rt</code></td><td><code>(Hi, Lo) = rs × rt</code></td><td>64-bit result split across Hi &amp; Lo</td></tr>
+                            <tr><td><code>div rs, rt</code></td><td><code>Lo = rs ÷ rt, Hi = rs mod rt</code></td><td>Quotient in Lo, remainder in Hi</td></tr>
+                            <tr><td><code>mfhi rd</code></td><td><code>rd = Hi</code></td><td>Move from Hi (remainder / upper bits)</td></tr>
+                            <tr><td><code>mflo rd</code></td><td><code>rd = Lo</code></td><td>Move from Lo (quotient / lower bits)</td></tr>
+                        </tbody>
+                    </table>
+                    <pre class="code-block"><code># (a + b) * c, then a mod 4
+# &#36;t1=6, &#36;t2=4, &#36;t3=3
+add  &#36;t4, &#36;t1, &#36;t2     # &#36;t4 = 10
+mult &#36;t4, &#36;t3           # Lo = 30
+mflo &#36;t5                # &#36;t5 = 30
+li   &#36;t6, 4
+div  &#36;t1, &#36;t6           # Lo = 1 (6÷4), Hi = 2 (6 mod 4)
+mfhi &#36;t7                # &#36;t7 = 2</code></pre>
+
+                    <h3 id="sub-6-7">6.7 Control Flow: Branches &amp; Jumps</h3>
+                    <p>Branches jump to a label only if a comparison is true. The <strong>program counter (PC)</strong> normally increments by 4 each instruction; branches change it.</p>
+                    <table>
+                        <thead><tr><th>Instruction</th><th>Branch if</th><th>C equivalent</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>b target</code></td><td>always</td><td><code>goto target;</code></td></tr>
+                            <tr><td><code>beq rs, rt, target</code></td><td>equal</td><td><code>if (rs == rt)</code></td></tr>
+                            <tr><td><code>bne rs, rt, target</code></td><td>not equal</td><td><code>if (rs != rt)</code></td></tr>
+                            <tr><td><code>blt rs, rt, target</code></td><td>less than</td><td><code>if (rs &lt; rt)</code></td></tr>
+                            <tr><td><code>ble rs, rt, target</code></td><td>≤</td><td><code>if (rs &lt;= rt)</code></td></tr>
+                            <tr><td><code>bgt rs, rt, target</code></td><td>greater than</td><td><code>if (rs &gt; rt)</code></td></tr>
+                            <tr><td><code>bge rs, rt, target</code></td><td>≥</td><td><code>if (rs &gt;= rt)</code></td></tr>
+                        </tbody>
+                    </table>
+                    <p><code>b</code>, <code>blt</code>, <code>ble</code>, <code>bgt</code>, <code>bge</code> are pseudo-instructions the assembler rewrites automatically.</p>
+                    <p><strong>Subroutine calls — jal &amp; jr:</strong></p>
+                    <ul>
+                        <li><code>jal label</code> — saves return address in <code>&#36;ra</code>, then jumps to label.</li>
+                        <li><code>jr &#36;ra</code> — jumps back to the saved return address.</li>
+                        <li><strong>Warning:</strong> If a subroutine calls another, the second <code>jal</code> overwrites <code>&#36;ra</code>. Save <code>&#36;ra</code> on the stack first.</li>
+                    </ul>
+                    <pre class="code-block"><code># if (a &gt; b) max = a; else max = b;
+# a=&#36;t0, b=&#36;t1, max=&#36;t2
+bgt  &#36;t0, &#36;t1, a_bigger
+move &#36;t2, &#36;t1          # else: max = b
+b    done_if
+a_bigger:
+move &#36;t2, &#36;t0          # then: max = a
+done_if:
+
+# Subroutine that squares a number (argument in &#36;a0, result in &#36;v0)
+main:
+    li   &#36;a0, 7
+    jal  square
+    move &#36;t0, &#36;v0        # &#36;t0 = 49
+    li   &#36;v0, 10 ; syscall
+square:
+    mult &#36;a0, &#36;a0
+    mflo &#36;v0
+    jr   &#36;ra
+
+# Saving &#36;ra for nested calls
+outer:
+    addi &#36;sp, &#36;sp, -4   # make room
+    sw   &#36;ra, 0(&#36;sp)    # save return address
+    jal  square          # &#36;ra overwritten here
+    lw   &#36;ra, 0(&#36;sp)    # restore
+    addi &#36;sp, &#36;sp, 4    # free stack space
+    jr   &#36;ra</code></pre>
+
+                    <h3 id="sub-6-8">6.8 System Calls &amp; I/O (SPIM)</h3>
+                    <p>To print, read input or exit: put service code in <code>&#36;v0</code>, arguments in <code>&#36;a0</code>–<code>&#36;a1</code>, then <code>syscall</code>.</p>
+                    <table>
+                        <thead><tr><th>Service</th><th>&#36;v0 code</th><th>Arguments</th><th>Result</th></tr></thead>
+                        <tbody>
+                            <tr><td>Print integer</td><td>1</td><td><code>&#36;a0</code> = value</td><td>—</td></tr>
+                            <tr><td>Print string</td><td>4</td><td><code>&#36;a0</code> = address of string</td><td>—</td></tr>
+                            <tr><td>Read integer</td><td>5</td><td>—</td><td><code>&#36;v0</code> = value read</td></tr>
+                            <tr><td>Read string</td><td>8</td><td><code>&#36;a0</code> = buffer addr, <code>&#36;a1</code> = max chars+1</td><td>—</td></tr>
+                            <tr><td>Exit</td><td>10</td><td>—</td><td>—</td></tr>
+                        </tbody>
+                    </table>
+                    <pre class="code-block"><code># Print integer in &#36;t2
+li    &#36;v0, 1
+move  &#36;a0, &#36;t2
+syscall
+
+# Print a string
+.data
+    string1: .asciiz "Print this.\n"
+.text
+    li   &#36;v0, 4
+    la   &#36;a0, string1   # NOTE: la not lw
+    syscall
+
+# Read integer and store in RAM
+li   &#36;v0, 5
+syscall
+sw   &#36;v0, int_value
+
+# Exit (always end your program with this)
+li   &#36;v0, 10
+syscall</code></pre>
+                    <p><strong>String storage:</strong> <code>.asciiz</code> null-terminates automatically. <code>"Hi\n"</code> = bytes 72, 105, 10, 0.</p>
+
+                    <h3 id="sub-6-9">6.9 Complete Example: Sum 1×2 + 2×3 + … + 10×11</h3>
+                    <p>Computes <strong>440</strong> and prints it. Uses: data section, <code>li</code>, loop via <code>bgt</code>, <code>addi</code>, <code>mult</code>, <code>mflo</code>, <code>add</code>, and two syscalls.</p>
+                    <table>
+                        <thead><tr><th>Register</th><th>Role</th><th>Starts at</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>&#36;t0</code></td><td>loop counter</td><td>1</td></tr>
+                            <tr><td><code>&#36;t1</code></td><td>running sum</td><td>0</td></tr>
+                            <tr><td><code>&#36;t2</code></td><td>loop limit</td><td>10</td></tr>
+                            <tr><td><code>&#36;t3</code></td><td>scratch (count+1, then product)</td><td>—</td></tr>
+                        </tbody>
+                    </table>
+                    <pre class="code-block"><code>.data
+    out_string: .asciiz "The result is:\n"
+.text
+main:
+    li   &#36;t0, 1           # counter = 1
+    li   &#36;t1, 0           # sum = 0
+    li   &#36;t2, 10          # limit = 10
+loop_top:
+    bgt  &#36;t0, &#36;t2, loop_end   # exit if counter &gt; 10
+    addi &#36;t3, &#36;t0, 1     # &#36;t3 = counter + 1
+    mult &#36;t0, &#36;t3         # Lo = counter * (counter+1)
+    mflo &#36;t3              # &#36;t3 = product
+    add  &#36;t1, &#36;t1, &#36;t3   # sum += product
+    addi &#36;t0, &#36;t0, 1     # counter++
+    b    loop_top
+loop_end:
+    li   &#36;v0, 4
+    la   &#36;a0, out_string
+    syscall               # print label
+    li   &#36;v0, 1
+    move &#36;a0, &#36;t1
+    syscall               # print 440
+    li   &#36;v0, 10
+    syscall               # exit</code></pre>
+                    <p><strong>Verify:</strong> Σ k(k+1) for k=1..10 = (1²+…+10²) + (1+…+10) = 385 + 55 = <strong>440</strong>.</p>
+
+                    <h3 id="sub-6-10">6.10 Instruction Cheat Sheet</h3>
+                    <table>
+                        <thead><tr><th>Group</th><th>Instruction</th><th>Meaning</th></tr></thead>
+                        <tbody>
+                            <tr><td>Load/Store</td><td><code>lw rd, mem</code></td><td>rd = word at mem</td></tr>
+                            <tr><td>Load/Store</td><td><code>lb rd, mem</code></td><td>rd = byte at mem, sign-extended</td></tr>
+                            <tr><td>Load/Store</td><td><code>sw rs, mem</code></td><td>word at mem = rs</td></tr>
+                            <tr><td>Load/Store</td><td><code>li rd, value</code></td><td>rd = constant (no RAM)</td></tr>
+                            <tr><td>Addressing</td><td><code>la rd, label</code></td><td>rd = address of label</td></tr>
+                            <tr><td>Addressing</td><td><code>lw rd, 4(rs)</code></td><td>rd = word at rs+4</td></tr>
+                            <tr><td>Arithmetic</td><td><code>add / sub / addi</code></td><td>signed add/sub/add-immediate</td></tr>
+                            <tr><td>Arithmetic</td><td><code>mult rs, rt</code></td><td>(Hi,Lo) = rs × rt</td></tr>
+                            <tr><td>Arithmetic</td><td><code>div rs, rt</code></td><td>Lo = quotient, Hi = remainder</td></tr>
+                            <tr><td>Arithmetic</td><td><code>mfhi / mflo rd</code></td><td>rd = Hi / rd = Lo</td></tr>
+                            <tr><td>Arithmetic</td><td><code>move rd, rs</code></td><td>rd = rs</td></tr>
+                            <tr><td>Branch</td><td><code>b / beq / bne / blt / ble / bgt / bge</code></td><td>conditional/unconditional jump to label</td></tr>
+                            <tr><td>Jump</td><td><code>j label</code></td><td>unconditional jump</td></tr>
+                            <tr><td>Jump</td><td><code>jr rs</code></td><td>jump to address in rs</td></tr>
+                            <tr><td>Subroutine</td><td><code>jal label</code></td><td>&#36;ra = return addr, then jump</td></tr>
+                            <tr><td>Subroutine</td><td><code>jr &#36;ra</code></td><td>return to caller</td></tr>
+                            <tr><td>System</td><td><code>syscall</code></td><td>service via &#36;v0: 1=print int, 4=print str, 5=read int, 10=exit</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3 id="sub-6-11">6.11 Practice Questions &amp; Answers</h3>
+                    <div style="background: var(--bg-mint); padding: 1.25rem; border-radius: 8px; border: 1px solid var(--border-light);">
+                        <h4 style="color: var(--text-dark); margin-bottom: 0.75rem;">Common Mistakes to Avoid</h4>
+                        <ol style="line-height:1.9;">
+                            <li>Using <code>lw</code> when you meant <code>la</code> (value vs address), especially before printing a string.</li>
+                            <li>Forgetting array offsets jump by 4 for integers, not by 1.</li>
+                            <li>Doing arithmetic directly on a RAM variable — load it into a register first.</li>
+                            <li>Forgetting the exit syscall (<code>li &#36;v0, 10 / syscall</code>).</li>
+                            <li>Calling a subroutine from inside another without saving <code>&#36;ra</code> on the stack.</li>
+                        </ol>
+                    </div>
+                    <div style="background: white; padding: 1.25rem; border-radius: 8px; border: 1px solid var(--border-light); margin-top: 1rem;">
+                        <h4 style="color: var(--blue); margin-bottom: 0.75rem;">Practice Q &amp; A</h4>
+                        <ol style="line-height:1.9;">
+                            <li><strong>What is the difference between <code>&#36;t0</code> and <code>&#36;8</code>?</strong><br><em>Nothing — they name the same register.</em></li>
+                            <li><strong>How many integers can <code>nums: .space 20</code> hold?</strong><br><em>20 ÷ 4 = 5 integers.</em></li>
+                            <li><strong>After <code>li &#36;t0,9 / li &#36;t1,2 / div &#36;t0,&#36;t1 / mfhi &#36;t2 / mflo &#36;t3</code>?</strong><br><em>&#36;t2 = 1 (remainder), &#36;t3 = 4 (quotient).</em></li>
+                            <li><strong>Load element 3 of an integer array whose base is in <code>&#36;s0</code>:</strong><br><em><code>lw &#36;t1, 12(&#36;s0)</code> — offset = 3 × 4 = 12.</em></li>
+                            <li><strong>Print the integer in <code>&#36;s2</code>:</strong><br><em><code>li &#36;v0,1 / move &#36;a0,&#36;s2 / syscall</code>.</em></li>
+                            <li><strong>Why must a recursive subroutine save <code>&#36;ra</code>?</strong><br><em>Every <code>jal</code> overwrites <code>&#36;ra</code>, so the inner call destroys the outer return address.</em></li>
+                            <li><strong>Change Section 10 to sum 1×2 + … + 20×21:</strong><br><em>Change <code>li &#36;t2, 10</code> to <code>li &#36;t2, 20</code>. Answer becomes 3080.</em></li>
+                        </ol>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <a href="#original-pdf" class="btn"
+                            style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;"
+                            onclick="document.getElementById('original-pdf').scrollIntoView()">Next Section</a>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number"
+                        style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round"
+                            stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" x2="8" y1="13" y2="13"></line>
+                            <line x1="16" x2="8" y1="17" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for your reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()"
+                        style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/14.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+
+</html>

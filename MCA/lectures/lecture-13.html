@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Modern Computer Architecture - Lecture 13</title>
+    <meta
+        content="Study notes for Modern Computer Architecture (CSA222), Lecture 13 covering MIPS32 register file conventions, caller-saved vs callee-saved registers, R-type, I-type, and J-type instruction encodings, and RISC-V modular ISA."
+        name="description" />
+    <link
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>13</text></svg>"
+        rel="icon" />
+    <link href="../css/style.css" rel="stylesheet" />
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}], ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code', 'annotation', 'annotation-xml']});"></script>
+</head>
+
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Modern Computer Architecture</h1>
+            <p>Lecture 13 - MIPS32 &amp; RISC-V Instruction Formats: R, I, and J Encodings</p>
+            <a href="../index.html"
+                style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">←
+                Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/13 Part_1.pdf"
+                style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;"
+                target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text" />
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 5</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            style="vertical-align: text-bottom; margin-right: 4px;">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>Short Notes</a></li>
+                <li>
+                    <a href="#topic-1">1. MIPS32 Register Conventions<span class="sub-count">4</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 The 32 Architectural Registers</a></li>
+                        <li><a href="#sub-1-2">1.2 The Hardwired <code>&#36;zero</code> Register</a></li>
+                        <li><a href="#sub-1-3">1.3 Argument (<code>&#36;a0-&#36;a3</code>) &amp; Return (<code>&#36;v0-&#36;v1</code>)</a></li>
+                        <li><a href="#sub-1-4">1.4 Special Pointers: <code>&#36;sp</code>, <code>&#36;fp</code>, <code>&#36;ra</code></a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Caller-Saved vs. Callee-Saved Registers<span class="sub-count">4</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 Temporary (<code>&#36;t0-&#36;t9</code>) Scratchpads</a></li>
+                        <li><a href="#sub-2-2">2.2 Saved Registers (<code>&#36;s0-&#36;s7</code>) Across Calls</a></li>
+                        <li><a href="#sub-2-3">2.3 Register Preservation Contract</a></li>
+                        <li><a href="#sub-2-4">2.4 Function Calling Conventions Matrix</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. R-Type (Register ALU) Format<span class="sub-count">4</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 32-Bit Bit-Field Layout (opcode, rs, rt, rd, shamt, funct)</a></li>
+                        <li><a href="#sub-3-2">3.2 The 6-Bit Opcode &amp; Funct Split</a></li>
+                        <li><a href="#sub-3-3">3.3 Shift Amount (shamt) Operations</a></li>
+                        <li><a href="#sub-3-4">3.4 Worked Bit Encoding Examples</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. I-Type &amp; J-Type Instruction Formats<span class="sub-count">4</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 I-Type Format (Immediate &amp; Memory Offsets)</a></li>
+                        <li><a href="#sub-4-2">4.2 Sign-Extension &amp; Memory Loads/Stores</a></li>
+                        <li><a href="#sub-4-3">4.3 J-Type Format (26-Bit Jump Target)</a></li>
+                        <li><a href="#sub-4-4">4.4 Word Alignment Shift Arithmetic</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. RISC-V Modular ISA Architecture<span class="sub-count">4</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 RV32I Base Integer Instruction Set</a></li>
+                        <li><a href="#sub-5-2">5.2 Standard Modular Extensions (M, A, F, D, C)</a></li>
+                        <li><a href="#sub-5-3">5.3 MIPS vs RISC-V Encoding Comparison</a></li>
+                        <li><a href="#sub-5-4">5.4 Assessment Check &amp; Exercises</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round"
+                            stroke-linejoin="round" stroke-width="2"
+                            style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" x2="8" y1="13" y2="13"></line>
+                            <line x1="16" x2="8" y1="17" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>Original PDF</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Short Notes -->
+            <section id="short-notes" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-short-notes')">
+                    <div class="topic-number"
+                        style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                    </div>
+                    <h2>Short Notes &amp; Visual Summary</h2>
+                </div>
+                <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
+                    <p style="margin-bottom: 1rem;">Quick reference for MIPS32 and RISC-V instruction encodings for Lecture 13:</p>
+
+                    <div class="box box-blue">
+                        <div class="box-title">MIPS32 Instruction Encoding Formats</div>
+                        <ul>
+                            <li><strong>R-Type (Register-Register ALU):</strong> <code>[opcode: 6] [rs: 5] [rt: 5] [rd: 5] [shamt: 5] [funct: 6]</code> — Used for <code>add</code>, <code>sub</code>, <code>and</code>, <code>or</code>, <code>slt</code>. Opcode is always 0; actual op is in <code>funct</code>.</li>
+                            <li><strong>I-Type (Immediate &amp; Memory):</strong> <code>[opcode: 6] [rs: 5] [rt: 5] [immediate/offset: 16]</code> — Used for <code>addi</code>, <code>lw</code>, <code>sw</code>, <code>beq</code>, <code>bne</code>.</li>
+                            <li><strong>J-Type (Unconditional Jump):</strong> <code>[opcode: 6] [target_address: 26]</code> — Used for <code>j</code> and <code>jal</code>. Target address shifted left 2 bits.</li>
+                            <li><strong>Register Convention:</strong> <code>&#36;zero</code> (reg 0) hardwired to 0; <code>&#36;v0–&#36;v1</code> (reg 2–3) return values; <code>&#36;a0–&#36;a3</code> (reg 4–7) arguments; <code>&#36;t0–&#36;t9</code> caller-saved; <code>&#36;s0–&#36;s7</code> callee-saved.</li>
+                        </ul>
+                    </div>
+
+                    <div style="background: white; padding: 1.25rem; border-radius: 8px; border: 1px solid var(--border-light); margin-top: 1rem;">
+                        <h4 style="color: var(--blue); margin-bottom: 0.75rem;">MIPS Bit Field Layout Breakdown (32 Bits Total)</h4>
+                        <div style="font-family: monospace; font-size: 0.85rem; line-height: 1.8;">
+                            <div style="background: rgba(2, 132, 199, 0.08); padding: 0.5rem; border-radius: 4px; margin-bottom: 0.5rem;">
+                                <strong>R-Type:</strong> | 31..26 (6b opcode) | 25..21 (5b rs) | 20..16 (5b rt) | 15..11 (5b rd) | 10..6 (5b shamt) | 5..0 (6b funct) |
+                            </div>
+                            <div style="background: rgba(124, 58, 237, 0.08); padding: 0.5rem; border-radius: 4px; margin-bottom: 0.5rem;">
+                                <strong>I-Type:</strong> | 31..26 (6b opcode) | 25..21 (5b rs) | 20..16 (5b rt) | 15..0 (16b immediate / memory offset) |
+                            </div>
+                            <div style="background: rgba(5, 150, 105, 0.08); padding: 0.5rem; border-radius: 4px;">
+                                <strong>J-Type:</strong> | 31..26 (6b opcode) | 25..0 (26b target address) |
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 1 -->
+            <section class="topic-section" id="topic-1">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>MIPS32 Register Conventions</h2>
+                </div>
+                <div class="collapsible-content" id="content-1">
+                    
+                    <h3 id="sub-1-1">1.1 The 32 Architectural Registers</h3>
+                    <p>MIPS32 provides 32 general-purpose 32-bit registers, numbered <code>0</code> to <code>31</code>. By software convention, each register has a dedicated alias and usage contract:</p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Register Name</th>
+                                <th>Number</th>
+                                <th>Conventional Software Role</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>&#36;zero</code></td>
+                                <td>0</td>
+                                <td>Hardwired Constant Zero (0x00000000)</td>
+                            </tr>
+                            <tr>
+                                <td><code>&#36;v0 – &#36;v1</code></td>
+                                <td>2 – 3</td>
+                                <td>Function Return Values / Expression Results</td>
+                            </tr>
+                            <tr>
+                                <td><code>&#36;a0 – &#36;a3</code></td>
+                                <td>4 – 7</td>
+                                <td>Function Arguments 1 through 4</td>
+                            </tr>
+                            <tr>
+                                <td><code>&#36;t0 – &#36;t9</code></td>
+                                <td>8–15, 24–25</td>
+                                <td>Temporaries (Caller-Saved scratchpad)</td>
+                            </tr>
+                            <tr>
+                                <td><code>&#36;s0 – &#36;s7</code></td>
+                                <td>16 – 23</td>
+                                <td>Saved Values (Callee-Saved across calls)</td>
+                            </tr>
+                            <tr>
+                                <td><code>&#36;gp, &#36;sp, &#36;fp</code></td>
+                                <td>28, 29, 30</td>
+                                <td>Global Pointer, Stack Pointer, Frame Pointer</td>
+                            </tr>
+                            <tr>
+                                <td><code>&#36;ra</code></td>
+                                <td>31</td>
+                                <td>Return Address (written by <code>jal</code>)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3 id="sub-1-2">1.2 The Hardwired <code>&#36;zero</code> (Register 0)</h3>
+                    <p>Register <code>&#36;zero</code> always returns <code>0</code> when read, and writes to <code>&#36;zero</code> are discarded. This enables concise synthesis of instructions without extra hardware opcodes:</p>
+                    <ul>
+                        <li><code>move &#36;t0, &#36;t1</code> &rarr; <code>add &#36;t0, &#36;t1, &#36;zero</code></li>
+                        <li><code>li &#36;t0, 5</code> &rarr; <code>addi &#36;t0, &#36;zero, 5</code></li>
+                        <li><code>nop</code> &rarr; <code>sll &#36;0, &#36;0, 0</code></li>
+                    </ul>
+
+                    <h3 id="sub-1-3">1.3 Argument (<code>&#36;a0-&#36;a3</code>) &amp; Return (<code>&#36;v0-&#36;v1</code>)</h3>
+                    <p>When calling functions, callers place up to 4 parameters into <code>&#36;a0–&#36;a3</code>. Upon completion, the subprogram places result values into <code>&#36;v0</code> (and <code>&#36;v1</code> for 64-bit pair results).</p>
+
+                    <h3 id="sub-1-4">1.4 Special Pointers: <code>&#36;sp</code>, <code>&#36;fp</code>, and <code>&#36;ra</code></h3>
+                    <p>The Stack Pointer <code>&#36;sp</code> points to the top of the stack (which grows downwards in memory). <code>&#36;ra</code> holds the 32-bit return instruction address captured during procedure calls.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" disabled="">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section class="topic-section" id="topic-2">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>Caller-Saved vs. Callee-Saved Registers</h2>
+                </div>
+                <div class="collapsible-content" id="content-2">
+                    
+                    <h3 id="sub-2-1">2.1 Temporary (<code>&#36;t0-&#36;t9</code>) Scratchpads</h3>
+                    <p><strong>Caller-Saved (<code>&#36;t0–&#36;t9</code>):</strong> The caller function assumes <code>&#36;t</code> registers may be overwritten by any called subroutine. If the caller needs a <code>&#36;t</code> value after a function call, the <em>caller</em> must push <code>&#36;t</code> onto the stack before <code>jal</code> and restore it afterwards.</p>
+
+                    <h3 id="sub-2-2">2.2 Saved Registers (<code>&#36;s0-&#36;s7</code>) Across Calls</h3>
+                    <p><strong>Callee-Saved (<code>&#36;s0–&#36;s7</code>):</strong> The called subroutine guarantees that <code>&#36;s</code> registers will retain their original values when the subroutine returns. If the <em>callee</em> needs to use <code>&#36;s</code> registers internally, it must push the old <code>&#36;s</code> values onto the stack in its prologue and restore them in its epilogue.</p>
+
+                    <h3 id="sub-2-3">2.3 Register Preservation Contract</h3>
+                    <div class="box box-blue">
+                        <strong>Preservation Rule:</strong><br>
+                        - <strong>Preserved across function call:</strong> <code>&#36;s0–&#36;s7</code>, <code>&#36;sp</code>, <code>&#36;fp</code>, <code>&#36;ra</code>, <code>&#36;gp</code><br>
+                        - <strong>Not preserved (can be clobbered):</strong> <code>&#36;t0–&#36;t9</code>, <code>&#36;a0–&#36;a3</code>, <code>&#36;v0–&#36;v1</code>
+                    </div>
+
+                    <h3 id="sub-2-4">2.4 Function Calling Conventions Matrix</h3>
+                    <p>Dividing registers into caller-saved vs callee-saved prevents unnecessary stack pushes/pops for short utility functions.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section class="topic-section" id="topic-3">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>R-Type (Register ALU) Format</h2>
+                </div>
+                <div class="collapsible-content" id="content-3">
+                    
+                    <h3 id="sub-3-1">3.1 32-Bit Bit-Field Layout</h3>
+                    <p>R-Type instructions operate strictly between registers. The 32 bits are split into 6 distinct fields:</p>
+                    $$\begin{array}{|c|c|c|c|c|c|}
+                    \hline
+                    \text{opcode (6b)} & \text{rs (5b)} & \text{rt (5b)} & \text{rd (5b)} & \text{shamt (5b)} & \text{funct (6b)} \\
+                    \hline
+                    31 \dots 26 & 25 \dots 21 & 20 \dots 16 & 15 \dots 11 & 10 \dots 6 & 5 \dots 0 \\
+                    \hline
+                    \end{array}$$
+
+                    <h3 id="sub-3-2">3.2 The 6-Bit Opcode &amp; Funct Split</h3>
+                    <ul>
+                        <li><strong>opcode (bits 31-26):</strong> Always <code>000000</code> (0) for all R-type instructions.</li>
+                        <li><strong>rs (bits 25-21):</strong> First source register specifier.</li>
+                        <li><strong>rt (bits 20-16):</strong> Second source register specifier.</li>
+                        <li><strong>rd (bits 15-11):</strong> Destination register specifier.</li>
+                        <li><strong>shamt (bits 10-6):</strong> Shift amount for bit-shift operations (0 for add/sub).</li>
+                        <li><strong>funct (bits 5-0):</strong> Selects the specific ALU operation (e.g. <code>100000</code> for <code>add</code>, <code>100010</code> for <code>sub</code>).</li>
+                    </ul>
+
+                    <h3 id="sub-3-3">3.3 Shift Amount (shamt) Operations</h3>
+                    <p>Shift instructions (<code>sll</code>, <code>srl</code>) shift the contents of register <code>rt</code> by <code>shamt</code> bits, storing the result in <code>rd</code> (<code>rs</code> is set to 0).</p>
+
+                    <h3 id="sub-3-4">3.4 Worked Bit Encoding Examples</h3>
+                    <p>Encoding assembly statement: <code>add &#36;t0, &#36;s1, &#36;s2</code></p>
+                    <ul>
+                        <li><code>&#36;s1</code> = Reg 17 (<code>10001</code>), <code>&#36;s2</code> = Reg 18 (<code>10010</code>), <code>&#36;t0</code> = Reg 8 (<code>01000</code>).</li>
+                        <li>Opcode = 0 (<code>000000</code>), shamt = 0 (<code>00000</code>), funct = 32 (<code>100000</code>).</li>
+                        <li><strong>Binary:</strong> <code>000000 10001 10010 01000 00000 100000</code> &rarr; <code>0x02324020</code>.</li>
+                    </ul>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section class="topic-section" id="topic-4">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>I-Type &amp; J-Type Instruction Formats</h2>
+                </div>
+                <div class="collapsible-content" id="content-4">
+                    
+                    <h3 id="sub-4-1">4.1 I-Type Format (Immediate &amp; Memory Offsets)</h3>
+                    <p>I-Type instructions incorporate a 16-bit constant immediate value:</p>
+                    $$\begin{array}{|c|c|c|c|}
+                    \hline
+                    \text{opcode (6b)} & \text{rs (5b)} & \text{rt (5b)} & \text{immediate / offset (16b)} \\
+                    \hline
+                    31 \dots 26 & 25 \dots 21 & 20 \dots 16 & 15 \dots 0 \\
+                    \hline
+                    \end{array}$$
+
+                    <h3 id="sub-4-2">4.2 Sign-Extension &amp; Memory Loads/Stores</h3>
+                    <p>For arithmetic (<code>addi</code>) and loads (<code>lw</code>), the 16-bit immediate is sign-extended to 32 bits before calculation:</p>
+                    $$\text{Address} = \text{Reg}[rs] + \text{SignExtend}(\text{immediate})$$
+                    <p>For <code>lw &#36;t0, 8(&#36;s0)</code>: <code>rs</code> = <code>&#36;s0</code>, <code>rt</code> = <code>&#36;t0</code>, immediate = <code>8</code>.</p>
+
+                    <h3 id="sub-4-3">4.3 J-Type Format (26-Bit Jump Target)</h3>
+                    <p>Unconditional jumps (<code>j</code>, <code>jal</code>) encode a 26-bit target address field:</p>
+                    $$\begin{array}{|c|c|}
+                    \hline
+                    \text{opcode (6b)} & \text{target address (26b)} \\
+                    \hline
+                    31 \dots 26 & 25 \dots 0 \\
+                    \hline
+                    \end{array}$$
+
+                    <h3 id="sub-4-4">4.4 Word Alignment Shift Arithmetic</h3>
+                    <p>Because all MIPS instructions are 4-byte word aligned, the last 2 bits of any instruction address are always <code>00</code>. The 26-bit target is shifted left by 2 bits to form a 28-bit byte offset, then combined with the top 4 bits of the Program Counter (<code>PC[31:28]</code>).</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 5 -->
+            <section class="topic-section" id="topic-5">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>RISC-V Modular ISA Architecture</h2>
+                </div>
+                <div class="collapsible-content" id="content-5">
+                    
+                    <h3 id="sub-5-1">5.1 RV32I Base Integer Instruction Set</h3>
+                    <p>RISC-V learned from MIPS, keeping registers <code>x0</code> through <code>x31</code> (where <code>x0</code> is hardwired to 0). RV32I provides a clean 40-instruction base integer set.</p>
+
+                    <h3 id="sub-5-2">5.2 Standard Modular Extensions (M, A, F, D, C)</h3>
+                    <p>Unlike MIPS (where all instructions are fixed into one giant spec), RISC-V is modular:</p>
+                    <ul>
+                        <li><strong>RV32I:</strong> Base integer ISA</li>
+                        <li><strong>+M:</strong> Hardware Multiply / Divide</li>
+                        <li><strong>+A:</strong> Atomic Memory Synchronization</li>
+                        <li><strong>+F/+D:</strong> Single &amp; Double Precision IEEE 754 Floating-Point</li>
+                        <li><strong>+C:</strong> Compressed 16-bit Encodings for Microcontrollers</li>
+                    </ul>
+
+                    <h3 id="sub-5-3">5.3 MIPS vs RISC-V Encoding Comparison</h3>
+                    <p>RISC-V fixes source registers <code>rs1</code> and <code>rs2</code> into identical bit positions across all instruction formats (R, I, S, B, U, J), simplifying hardware decode logic even further.</p>
+
+                    <h3 id="sub-5-4">5.4 Assessment Check &amp; Exercises</h3>
+                    <div style="background: var(--bg-mint); padding: 1.25rem; border-radius: 8px; border: 1px solid var(--border-light); margin-top: 1rem;">
+                        <h4 style="color: var(--text-dark); margin-bottom: 0.75rem;">Self-Assessment Check</h4>
+                        <ol style="line-height: 1.8;">
+                            <li><strong>Q1:</strong> Which MIPS register is hardwired to constant 0?<br>
+                            <em>Answer:</em> Register <code>&#36;zero</code> (<code>&#36;0</code>).</li>
+                            <li><strong>Q2:</strong> How many bits are dedicated to the <code>opcode</code> field in MIPS R-type instructions?<br>
+                            <em>Answer:</em> 6 bits (always set to <code>000000</code>; the operation is specified by the 6-bit <code>funct</code> field).</li>
+                            <li><strong>Q3:</strong> Why is the 26-bit jump target in J-type instructions shifted left by 2 bits?<br>
+                            <em>Answer:</em> Because instructions are 4-byte word aligned, so trailing bits are always 00, effectively extending jump reach by 4x.</li>
+                        </ol>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <a href="#original-pdf" class="btn"
+                            style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;"
+                            onclick="document.getElementById('original-pdf').scrollIntoView()">Next Section</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number"
+                        style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round"
+                            stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" x2="8" y1="13" y2="13"></line>
+                            <line x1="16" x2="8" y1="17" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for your reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()"
+                        style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/13 Part_1.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+
+</html>
