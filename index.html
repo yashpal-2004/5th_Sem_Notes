@@ -23,10 +23,38 @@
     font-size: 0.72rem;
     font-weight: 500;
     color: var(--text-muted, #8a9099);
-    margin-top: 6px;
     letter-spacing: 0.01em;
 }
 .subject-updated svg { opacity: 0.6; flex-shrink: 0; }
+.subject-footer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px dashed rgba(0, 0, 0, 0.08);
+}
+.card-handbook-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 20px;
+    border: 1px solid var(--border-light, #d0d7de);
+    background: #ffffff;
+    color: var(--text-dark, #1c1c1c);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+.card-handbook-btn:hover {
+    background: var(--text-dark, #1c1c1c);
+    color: #ffffff;
+    border-color: var(--text-dark, #1c1c1c);
+    transform: translateY(-1px);
+}
 .hero-section {
     display: flex;
     justify-content: space-between;
@@ -205,20 +233,20 @@
                     <span class="hero-timeline-name aml">AML (C1) <small style="font-weight: normal; opacity: 0.75;">(10%)</small></span>
                     <span class="hero-timeline-date aml">25 Sep</span>
                 </div>
-                <div class="hero-timeline-item" data-date="2026-10-12">
-                    <span class="hero-timeline-name cn">CN (Mid Sem) <small style="font-weight: normal; opacity: 0.75;">(20%)</small></span>
+                <div class="hero-timeline-item" data-date="2026-10-12" title="CN Mid Sem Syllabus: Lectures 01 to 13">
+                    <span class="hero-timeline-name cn">CN (Mid Sem) <small style="font-weight: normal; opacity: 0.75;">(20% &bull; L1-13)</small></span>
                     <span class="hero-timeline-date cn">12 Oct</span>
                 </div>
-                <div class="hero-timeline-item" data-date="2026-10-15">
-                    <span class="hero-timeline-name dl">DL (Mid Sem) <small style="font-weight: normal; opacity: 0.75;">(20%)</small></span>
+                <div class="hero-timeline-item" data-date="2026-10-15" title="DL Mid Sem Syllabus: Lectures 01 to 11">
+                    <span class="hero-timeline-name dl">DL (Mid Sem) <small style="font-weight: normal; opacity: 0.75;">(20% &bull; L1-11)</small></span>
                     <span class="hero-timeline-date dl">15 Oct</span>
                 </div>
-                <div class="hero-timeline-item" data-date="2026-10-19">
-                    <span class="hero-timeline-name mca">MCA (Mid Sem) <small style="font-weight: normal; opacity: 0.75;">(20%)</small></span>
+                <div class="hero-timeline-item" data-date="2026-10-19" title="MCA Mid Sem Syllabus: Lectures 01 to 14">
+                    <span class="hero-timeline-name mca">MCA (Mid Sem) <small style="font-weight: normal; opacity: 0.75;">(20% &bull; L1-14)</small></span>
                     <span class="hero-timeline-date mca">19 Oct</span>
                 </div>
-                <div class="hero-timeline-item" data-date="2026-10-22">
-                    <span class="hero-timeline-name aml">AML (Mid Sem) <small style="font-weight: normal; opacity: 0.75;">(25%)</small></span>
+                <div class="hero-timeline-item" data-date="2026-10-22" title="AML Mid Sem Syllabus: Lectures 01 to 12">
+                    <span class="hero-timeline-name aml">AML (Mid Sem) <small style="font-weight: normal; opacity: 0.75;">(25% &bull; L1-12)</small></span>
                     <span class="hero-timeline-date aml">22 Oct</span>
                 </div>
                 <div class="hero-timeline-item" data-date="2026-10-30">
@@ -253,9 +281,17 @@
                         <span class="subject-tag">DL Foundations</span>
                         <span class="subject-stats" data-subject="dl">12 Lectures &bull; 0/12 Done</span>
                     </div>
-                    <div class="subject-updated">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                        Last updated: Sep 30, 2026
+                    <div class="subject-footer-row">
+                        <div class="subject-updated">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            Last updated: Sep 30, 2026
+                        </div>
+                        <span onclick="event.preventDefault(); event.stopPropagation();">
+                            <a href="DL_Sem5/DL_Short_Notes_Handbook.pdf" download="DL_Short_Notes_Handbook.pdf" title="Download Complete Deep Learning Short Notes Handbook (PDF)" class="card-handbook-btn">
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                Handbook PDF
+                            </a>
+                        </span>
                     </div>
                 </a>
 
@@ -269,9 +305,17 @@
                         <span class="subject-tag">Advanced ML (CSA333)</span>
                         <span class="subject-stats" data-subject="aml">12 Lectures &bull; 0/12 Done</span>
                     </div>
-                    <div class="subject-updated">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                        Last updated: Sep 25, 2026
+                    <div class="subject-footer-row">
+                        <div class="subject-updated">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            Last updated: Sep 25, 2026
+                        </div>
+                        <span onclick="event.preventDefault(); event.stopPropagation();">
+                            <a href="AML/AML_Short_Notes_Handbook.pdf" download="AML_Short_Notes_Handbook.pdf" title="Download Complete AML Short Notes Handbook (PDF)" class="card-handbook-btn">
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                Handbook PDF
+                            </a>
+                        </span>
                     </div>
                 </a>
 
@@ -286,9 +330,17 @@
                         <span class="subject-tag">CN Foundations (CSAI321)</span>
                         <span class="subject-stats" data-subject="cn">14 Lectures &bull; 0/14 Done</span>
                     </div>
-                    <div class="subject-updated">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                        Last updated: Sep 26, 2026
+                    <div class="subject-footer-row">
+                        <div class="subject-updated">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            Last updated: Sep 26, 2026
+                        </div>
+                        <span onclick="event.preventDefault(); event.stopPropagation();">
+                            <a href="CN/CN_Short_Notes_Handbook.pdf" download="CN_Short_Notes_Handbook.pdf" title="Download Complete Computer Networks Short Notes Handbook (PDF)" class="card-handbook-btn">
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                Handbook PDF
+                            </a>
+                        </span>
                     </div>
                 </a>
 
@@ -302,9 +354,17 @@
                         <span class="subject-tag">Modern Computer Architecture</span>
                         <span class="subject-stats" data-subject="mca">14 Lectures &bull; 0/14 Done</span>
                     </div>
-                    <div class="subject-updated">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                        Last updated: Sep 26, 2026
+                    <div class="subject-footer-row">
+                        <div class="subject-updated">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            Last updated: Sep 26, 2026
+                        </div>
+                        <span onclick="event.preventDefault(); event.stopPropagation();">
+                            <a href="MCA/MCA_Short_Notes_Handbook.pdf" download="MCA_Short_Notes_Handbook.pdf" title="Download Complete Modern Computer Architecture Short Notes Handbook (PDF)" class="card-handbook-btn">
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                Handbook PDF
+                            </a>
+                        </span>
                     </div>
                 </a>
 

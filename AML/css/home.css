@@ -473,6 +473,7 @@ footer {
     display: flex;
     align-items: center;
     gap: 12px;
+    flex-wrap: wrap;
 }
 
 .bulk-btn {
@@ -498,6 +499,17 @@ footer {
     border-color: var(--text-dark);
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(19, 34, 25, 0.1);
+}
+
+.bulk-btn-primary {
+    background: var(--text-dark);
+    color: #ffffff;
+    border-color: var(--text-dark);
+}
+
+.bulk-btn-primary:hover {
+    background: #2b4369;
+    color: #ffffff;
 }
 
 .lecture-card-top {
