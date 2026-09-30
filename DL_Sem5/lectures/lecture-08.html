@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Deep Learning - Lecture 08</title>
+    <meta content="Study notes for Deep Learning, Lecture 08 covering adaptive learning rates: AdaGrad, RMSProp, Adam, AdamW, and coordinate-wise gradient scaling." name="description"/>
+    <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>08</text></svg>" rel="icon"/>
+    <link href="../css/style.css" rel="stylesheet"/>
+    <!-- KaTeX for LaTeX rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Deep Learning Foundations</h1>
+            <p>Lecture 08 - Adaptive Learning Rates: AdaGrad, RMSProp & Adam</p>
+            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/8.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF Worksheet ↗</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/worksheet08_adaptive_lr.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open Adaptive LR Interactive ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text"/>
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 7</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Short Notes</a></li>
+                <li>
+                    <a href="#topic-1">1. Why One Learning Rate Fails<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 Anisotropic Valleys & Heterogeneous Curvature</a></li>
+                        <li><a href="#sub-1-2">1.2 Limitations of Momentum on Step Distance</a></li>
+                        <li><a href="#sub-1-3">1.3 The Core Principle of Adaptive Step Sizing</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. AdaGrad: History-Based Coordinate Scaling<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 Sum of Squared Gradients Accumulator</a></li>
+                        <li><a href="#sub-2-2">2.2 Parameter Update Equation & Coordinate Damping</a></li>
+                        <li><a href="#sub-2-3">2.3 High-Frequency vs Rare Feature Handling</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. The Fatal Flaw of AdaGrad: Premature Stalling<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 Monotonically Growing Denominator</a></li>
+                        <li><a href="#sub-3-2">3.2 Effective Step Decay to Zero</a></li>
+                        <li><a href="#sub-3-3">3.3 Inability to Navigate Non-Convex Saddles</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. RMSProp: Leaky Averaging of Squared Gradients<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 Fading Memory via Exponential Moving Average</a></li>
+                        <li><a href="#sub-4-2">4.2 RMSProp Parameter Update Equation</a></li>
+                        <li><a href="#sub-4-3">4.3 Scale Invariance Under Steady Gradients</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. The Need for Bias Correction & Adam<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 Zero-Initialization Cold Start Problem</a></li>
+                        <li><a href="#sub-5-2">5.2 Derivation of the Bias Correction Factor</a></li>
+                        <li><a href="#sub-5-3">5.3 Combining Velocity (1st Moment) and Scale (2nd Moment)</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-6">6. Adam & AdamW Update Rules and Trade-offs<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-6-1">6.1 Complete Adam Algorithm & Standard Hyperparameters</a></li>
+                        <li><a href="#sub-6-2">6.2 Decoupled Weight Decay in AdamW</a></li>
+                        <li><a href="#sub-6-3">6.3 Optimizer Selection Matrix</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-7">7. Step-by-Step Worked Numerical Walkthrough<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-7-1">7.1 Coordinate Gradient Setup</a></li>
+                        <li><a href="#sub-7-2">7.2 Step 1 & Step 2 Arithmetic Walk</a></li>
+                        <li><a href="#sub-7-3">7.3 Comprehensive Comparative Trajectory Table</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Short Notes Summary Section -->
+            <section class="topic-section" id="short-notes">
+                <div class="topic-header" onclick="toggleSection('content-short-notes')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                    </div>
+                    <h2>Executive Summary & Formula Sheet</h2>
+                </div>
+                <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
+                    <p><strong>Core Concept:</strong> Standard SGD and Momentum apply a single scalar learning rate \(\alpha\) across all model parameters. In deep neural networks, loss curvature is highly anisotropic: steep coordinates require small step sizes to prevent destructive divergence, while flat coordinates require large step sizes to make measurable progress. Adaptive learning rate optimizers solve this dilemma by measuring each parameter's historical gradient magnitudes and scaling each coordinate step inversely proportional to its root mean square gradient.</p>
+
+                    <div class="box box-blue">
+                        <div class="box-title">Adaptive Optimizer Formula Sheet</div>
+                        <ul style="list-style:none; padding-left:0; margin-bottom:0;">
+                            <li style="margin-bottom: 0.75rem;"><strong>AdaGrad Accumulator:</strong> $$G_t = G_{t-1} + g_t^2, \quad w_{t+1} = w_t - \frac{\alpha}{\sqrt{G_t + \epsilon}} g_t$$</li>
+                            <li style="margin-bottom: 0.75rem;"><strong>RMSProp Fading Memory (EWMA):</strong> $$S_t = \beta S_{t-1} + (1 - \beta) g_t^2, \quad w_{t+1} = w_t - \frac{\alpha}{\sqrt{S_t + \epsilon}} g_t$$</li>
+                            <li style="margin-bottom: 0.75rem;"><strong>Adam 1st & 2nd Moments:</strong> $$m_t = \beta_1 m_{t-1} + (1 - \beta_1) g_t, \quad v_t = \beta_2 v_{t-1} + (1 - \beta_2) g_t^2$$</li>
+                            <li style="margin-bottom: 0.75rem;"><strong>Adam Bias Corrections:</strong> $$\hat{m}_t = \frac{m_t}{1 - \beta_1^t}, \quad \hat{v}_t = \frac{v_t}{1 - \beta_2^t}$$</li>
+                            <li style="margin-bottom: 0.75rem;"><strong>Adam Parameter Update:</strong> $$w_{t+1} = w_t - \frac{\alpha}{\sqrt{\hat{v}_t} + \epsilon} \hat{m}_t$$</li>
+                            <li><strong>AdamW Decoupled Weight Decay:</strong> $$w_{t+1} = w_t (1 - \alpha \lambda) - \frac{\alpha}{\sqrt{\hat{v}_t} + \epsilon} \hat{m}_t$$</li>
+                        </ul>
+                    </div>
+
+                    <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Lecture 08 Visual Cheatsheet</h3>
+                    <div style="text-align: center; background: var(--bg-secondary, #f8f9fa); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-light); margin-bottom: 1.5rem;">
+                        <a href="../images/8.png" target="_blank" title="Click to view full size">
+                            <img src="../images/8.png" alt="Lecture 08 Short Notes Cheatsheet" style="max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
+                        </a>
+                        <p style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-muted);">Click image to open high-resolution version in new tab</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" disabled="">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 1 -->
+            <section class="topic-section" id="topic-1">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>1. Why One Learning Rate Fails: Curvature & Scale</h2>
+                </div>
+                <div class="collapsible-content" id="content-1" style="max-height: none;">
+                    <div class="sub-topic" id="sub-1-1">
+                        <h3>1.1 Anisotropic Valleys & Heterogeneous Curvature</h3>
+                        <p>In real-world deep neural networks, loss surfaces are rarely symmetric bowls. Instead, they form narrow, elongated canyons known as <strong>anisotropic valleys</strong>. Mathematically, this is captured by the Hessian matrix of second derivatives, where eigenvalues differ by orders of magnitude:</p>
+                        <ul>
+                            <li><strong>Steep Direction (\(w_1\)):</strong> High curvature, large second derivative \(\frac{\partial^2 L}{\partial w_1^2}\), yielding large gradient values \(|g_1| \gg 0\).</li>
+                            <li><strong>Flat Direction (\(w_2\)):</strong> Low curvature, tiny second derivative \(\frac{\partial^2 L}{\partial w_2^2}\), yielding minute gradient values \(|g_2| \approx 0\).</li>
+                        </ul>
+                        <p>Under a single global learning rate \(\alpha\), we face an impossible dilemma: if \(\alpha\) is chosen large enough to make progress along the flat coordinate \(w_2\), the update across the steep coordinate \(w_1\) blows up and diverges. Conversely, if \(\alpha\) is tuned small enough to prevent oscillation along \(w_1\), motion along \(w_2\) grinds to a dead halt.</p>
+                    </div>
+
+                    <div class="sub-topic" id="sub-1-2">
+                        <h3>1.2 Limitations of Momentum on Step Distance</h3>
+                        <p>SGD with Momentum accumulates past gradients to smooth oscillations and provide directional inertia. However, momentum primarily modifies the <strong>direction</strong> of updates, not their absolute coordinate-wise step distance.</p>
+                        <p>In empirical experiments on anisotropic quadratic losses (e.g. \(L(w_1, w_2) = 10w_1^2 + w_2^2\)), when \(\alpha = 0.08\), the steep direction finishes in 3 steps while the flat direction takes 574 steps. Adding heavy momentum (\(\beta = 0.9\)) reduces the flat direction to 539 steps: a modest 6% improvement. Momentum alone cannot resolve the coordinate scale disparity.</p>
+                    </div>
+
+                    <div class="sub-topic" id="sub-1-3">
+                        <h3>1.3 The Core Principle of Adaptive Step Sizing</h3>
+                        <div class="box box-green">
+                            <div class="box-title">The Fundamental Adaptive Rule</div>
+                            <p><strong>Stop using raw gradient magnitude to determine step distance.</strong></p>
+                            <p>Instead, measure the historical scale of gradients for every coordinate independently. If a parameter has consistently large gradients, divide its step size by a running measure of its gradient scale. If a parameter has consistently tiny gradients, divide by that small number to scale its step size up.</p>
+                        </div>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('short-notes').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section class="topic-section" id="topic-2">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>2. AdaGrad: History-Based Coordinate Scaling</h2>
+                </div>
+                <div class="collapsible-content" id="content-2" style="max-height: none;">
+                    <div class="sub-topic" id="sub-2-1">
+                        <h3>2.1 Sum of Squared Gradients Accumulator</h3>
+                        <p>Proposed by Duchi, Hazan, and Singer (2011), <strong>AdaGrad</strong> (Adaptive Gradient Algorithm) introduces an accumulator vector \(G_t\) of the exact same dimensionality as parameter vector \(w\). At every iteration \(t\), the element-wise square of the current gradient is added to the historical sum:</p>
+                        <div class="formula-box">$$G_t = G_{t-1} + g_t^2 = \sum_{\tau=1}^t g_\tau^2$$</div>
+                        <p>Where \(G_0 = \mathbf{0}\). Squaring ensures that signs never cancel: every gradient step contributes positively to the coordinate's accumulated variation.</p>
+                    </div>
+
+                    <div class="sub-topic" id="sub-2-2">
+                        <h3>2.2 Parameter Update Equation & Coordinate Damping</h3>
+                        <p>AdaGrad divides the base learning rate \(\alpha\) element-wise by the square root of the accumulated squared gradients:</p>
+                        <div class="formula-box">$$w_{t+1} = w_t - \frac{\alpha}{\sqrt{G_t + \epsilon}} \odot g_t$$</div>
+                        <p>Here \(\epsilon\) is a tiny smoothing term (typically \(10^{-8}\)) that prevents division by zero on step 1 or for inactive parameters.</p>
+                        <p>Notice the self-regulating behavior: if coordinate \(i\) has a massive gradient \(g_{t,i} = 3.0\), then \(G_{t,i}\) becomes large, and the effective step \(\frac{\alpha}{\sqrt{G_{t,i}}} g_{t,i} \approx \alpha \frac{3}{\sqrt{9}} = \alpha \cdot 1.0\). The step size is completely tamed!</p>
+                    </div>
+
+                    <div class="sub-topic" id="sub-2-3">
+                        <h3>2.3 High-Frequency vs Rare Feature Handling</h3>
+                        <p>AdaGrad provides exceptional advantages in settings with sparse features (e.g. text classification, word embeddings, recommendation systems):</p>
+                        <ul>
+                            <li><strong>Frequent Features (e.g., common words):</strong> Experience frequent gradient updates, causing \(G_t\) to grow rapidly and shrinking their effective learning rate to prevent divergence.</li>
+                            <li><strong>Infrequent Features (e.g., rare domain words):</strong> Receive few updates, so their \(G_t\) remains very small, allowing large exploratory steps whenever they do appear in a mini-batch.</li>
+                        </ul>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section class="topic-section" id="topic-3">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>3. The Fatal Flaw of AdaGrad: Premature Stalling</h2>
+                </div>
+                <div class="collapsible-content" id="content-3" style="max-height: none;">
+                    <div class="sub-topic" id="sub-3-1">
+                        <h3>3.1 Monotonically Growing Denominator</h3>
+                        <p>Because \(g_t^2 \ge 0\) at every single iteration, the accumulator sum \(G_t = G_{t-1} + g_t^2\) is strictly monotonically non-decreasing:</p>
+                        <div class="formula-box">$$G_1 \le G_2 \le G_3 \le \dots \le G_t \to \infty$$</div>
+                        <p>Every non-zero gradient, regardless of whether it occurred 10,000 steps ago during initial chaotic exploration or right now, permanently increases the denominator.</p>
+                    </div>
+
+                    <div class="sub-topic" id="sub-3-2">
+                        <h3>3.2 Effective Step Decay to Zero</h3>
+                        <p>As training proceeds, \(\sqrt{G_t}\) grows relentlessly large. Consequently, the effective coordinate learning rate shrinks to negligible fractions:</p>
+                        <div class="formula-box">$$\lim_{t \to \infty} \frac{\alpha}{\sqrt{G_t + \epsilon}} = 0$$</div>
+                        <p>Even if the model reaches a plateau or enters a totally new loss basin where large steps are desperately required, AdaGrad's effective step size remains frozen at zero. The optimizer loses all plasticity and stalls prematurely long before finding an optimal minimizer.</p>
+                    </div>
+
+                    <div class="sub-topic" id="sub-3-3">
+                        <h3>3.3 Inability to Navigate Non-Convex Saddles</h3>
+                        <p>In deep learning, landscapes are filled with saddle points and flat plateaus. When an optimizer exhausts its learning rate early during the steep initial descent, it becomes completely trapped when navigating subtle saddle points later in training. This makes AdaGrad unsuitable for deep neural network architectures.</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section class="topic-section" id="topic-4">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>4. RMSProp: Leaky Averaging of Squared Gradients</h2>
+                </div>
+                <div class="collapsible-content" id="content-4" style="max-height: none;">
+                    <div class="sub-topic" id="sub-4-1">
+                        <h3>4.1 Fading Memory via Exponential Moving Average</h3>
+                        <p>Introduced by Geoffrey Hinton in his Coursera Lecture 6 (2012), <strong>RMSProp</strong> (Root Mean Square Propagation) resolves AdaGrad's stalling flaw by replacing the infinite summation with an <strong>Exponentially Weighted Moving Average (EWMA)</strong> of squared gradients:</p>
+                        <div class="formula-box">$$S_t = \beta S_{t-1} + (1 - \beta) g_t^2$$</div>
+                        <p>Where \(\beta \in (0, 1)\) is the decay parameter (typically \(\beta = 0.9\) or \(0.99\)). Instead of remembering the entire training history, RMSProp maintains an effective memory window of approximately \(\frac{1}{1 - \beta}\) steps (e.g. 10 steps when \(\beta = 0.9\)). Older gradients fade out exponentially!</p>
+                    </div>
+
+                    <div class="sub-topic" id="sub-4-2">
+                        <h3>4.2 RMSProp Parameter Update Equation</h3>
+                        <p>With a fading memory scale \(S_t\), the parameter update is defined as:</p>
+                        <div class="formula-box">$$w_{t+1} = w_t - \frac{\alpha}{\sqrt{S_t + \epsilon}} \odot g_t$$</div>
+                        <p>Because \(S_t\) can both decrease (when recent gradients are small) and increase (when recent gradients are large), the effective step size \(\frac{\alpha}{\sqrt{S_t + \epsilon}}\) dynamically adapts up or down throughout training, completely eliminating premature freezing.</p>
+                    </div>
+
+                    <div class="sub-topic" id="sub-4-3">
+                        <h3>4.3 Scale Invariance Under Steady Gradients</h3>
+                        <p>Consider what occurs when a parameter receives a steady gradient \(g\) over several steps. The EWMA converges to the squared gradient: \(S_t \to g^2\). Substituting this into the update rule:</p>
+                        <div class="formula-box">$$\Delta w = -\frac{\alpha}{\sqrt{g^2}} \cdot g = -\alpha \cdot \frac{g}{|g|} = -\alpha \cdot \text{sign}(g)$$</div>
+                        <div class="box box-amber">
+                            <div class="box-title">Remarkable Property of RMSProp</div>
+                            <p>For any steady gradient, RMSProp takes a step of size <strong>exactly \(\alpha\)</strong> in the direction of the sign of the gradient, regardless of whether the gradient was \(100.0\) or \(0.001\)! Steep and flat directions make equal progress along steady slopes.</p>
+                        </div>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 5 -->
+            <section class="topic-section" id="topic-5">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>5. The Need for Bias Correction & Adam</h2>
+                </div>
+                <div class="collapsible-content" id="content-5" style="max-height: none;">
+                    <div class="sub-topic" id="sub-5-1">
+                        <h3>5.1 Zero-Initialization Cold Start Problem</h3>
+                        <p>In practice, moment vectors are initialized at zero: \(m_0 = \mathbf{0}\) and \(v_0 = \mathbf{0}\). Consider the first step of an EWMA with decay \(\beta = 0.999\) on a constant gradient \(g = 1\):</p>
+                        <div class="formula-box">$$v_1 = 0.999(0) + (1 - 0.999)(1)^2 = 0.001$$</div>
+                        <p>Notice that \(v_1\) is \(0.001\), whereas the true gradient squared is \(1.0\)! It is artificially underestimated by a factor of 1000 simply because it started from zero. In the denominator of an update rule, \(\frac{1}{\sqrt{v_1}} = \frac{1}{\sqrt{0.001}} \approx 31.62\), which would produce an explosive, erratic jump on early mini-batches.</p>
+                    </div>
+
+                    <div class="sub-topic" id="sub-5-2">
+                        <h3>5.2 Derivation of the Bias Correction Factor</h3>
+                        <p>Let's unroll the recursive formula for \(v_t\) assuming gradients \(g_i\) come from a stationary distribution with expectation \(E[g_i^2]\):</p>
+                        <p>$$v_t = (1 - \beta) \sum_{i=1}^t \beta^{t-i} g_i^2$$</p>
+                        <p>Taking expectations on both sides:</p>
+                        <p>$$E[v_t] = E\left[(1 - \beta) \sum_{i=1}^t \beta^{t-i} g_i^2\right] = E[g_t^2] \cdot (1 - \beta) \sum_{i=1}^t \beta^{t-i}$$</p>
+                        <p>The finite geometric series sums to \(\sum_{i=1}^t \beta^{t-i} = \frac{1 - \beta^t}{1 - \beta}\). Substituting this back:</p>
+                        <p>$$E[v_t] = E[g_t^2] \cdot (1 - \beta) \left(\frac{1 - \beta^t}{1 - \beta}\right) = E[g_t^2] \cdot (1 - \beta^t)$$</p>
+                        <div class="box box-blue">
+                            <div class="box-title">Unbiased Moment Estimator</div>
+                            <p>To eliminate this discrepancy so that \(E[\hat{v}_t] = E[g_t^2]\), we must divide by \((1 - \beta^t)\):</p>
+                            <div class="formula-box">$$\hat{v}_t = \frac{v_t}{1 - \beta_2^t}, \quad \hat{m}_t = \frac{m_t}{1 - \beta_1^t}$$</div>
+                            <p>When \(t=1\), \(\frac{1}{1 - 0.999^1} = \frac{1}{0.001} = 1000\), perfectly correcting \(0.001 \times 1000 = 1.0\)! As \(t \to \infty\), \(\beta^t \to 0\), so the correction factor smoothly approaches \(1.0\).</p>
+                        </div>
+                    </div>
+
+                    <div class="sub-topic" id="sub-5-3">
+                        <h3>5.3 Combining Velocity (1st Moment) and Scale (2nd Moment)</h3>
+                        <p>Kingma and Ba (2014) combined the best of both worlds in <strong>Adam</strong> (Adaptive Moment Estimation):</p>
+                        <ul>
+                            <li><strong>First Moment (\(m_t\)):</strong> Tracks directional velocity (Momentum) to dampen oscillations and barrel through small noise.</li>
+                            <li><strong>Second Moment (\(v_t\)):</strong> Tracks coordinate-wise gradient variance (RMSProp) to normalize step size across heterogeneous curvatures.</li>
+                            <li><strong>Analytical Bias Correction:</strong> Protects against wild initialization transients during the first few hundred steps.</li>
+                        </ul>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 6 -->
+            <section class="topic-section" id="topic-6">
+                <div class="topic-header" onclick="toggleSection('content-6')">
+                    <div class="topic-number">6</div>
+                    <h2>6. Adam & AdamW Update Rules and Trade-offs</h2>
+                </div>
+                <div class="collapsible-content" id="content-6" style="max-height: none;">
+                    <div class="sub-topic" id="sub-6-1">
+                        <h3>6.1 Complete Adam Algorithm & Standard Hyperparameters</h3>
+                        <p>At each iteration \(t\) with mini-batch gradient \(g_t\):</p>
+                        <ol>
+                            <li>Update biased 1st moment: \(m_t = \beta_1 m_{t-1} + (1 - \beta_1) g_t\)</li>
+                            <li>Update biased 2nd raw moment: \(v_t = \beta_2 v_{t-1} + (1 - \beta_2) g_t^2\)</li>
+                            <li>Compute bias-corrected 1st moment: \(\hat{m}_t = \frac{m_t}{1 - \beta_1^t}\)</li>
+                            <li>Compute bias-corrected 2nd moment: \(\hat{v}_t = \frac{v_t}{1 - \beta_2^t}\)</li>
+                            <li>Update weights: \(w_{t+1} = w_t - \frac{\alpha}{\sqrt{\hat{v}_t} + \epsilon} \hat{m}_t\)</li>
+                        </ol>
+                        <div class="box box-green">
+                            <div class="box-title">Standard Default Hyperparameters</div>
+                            <p>Learning rate: \(\alpha = 0.001\) (1e-3); First moment decay: \(\beta_1 = 0.9\); Second moment decay: \(\beta_2 = 0.999\); Epsilon: \(\epsilon = 10^{-8}\). These defaults perform remarkably well across almost all neural architectures with zero manual tuning.</p>
+                        </div>
+                    </div>
+
+                    <div class="sub-topic" id="sub-6-2">
+                        <h3>6.2 Decoupled Weight Decay in AdamW</h3>
+                        <p>Loshchilov and Hutter (2017) discovered that standard L2 regularisation is broken when implemented in Adam. In traditional SGD, adding \(\frac{1}{2}\lambda w^2\) to the loss adds \(\lambda w\) to the gradient, which corresponds directly to weight decay.</p>
+                        <p>In Adam, however, \(\lambda w\) enters into the second moment accumulator \(v_t\). If a weight is large, its \(\lambda w\) term inflates \(v_t\), which increases the denominator and paradoxically <em>reduces</em> the penalty force! <strong>AdamW</strong> decouples weight decay by subtracting \(\alpha \lambda w_t\) directly outside the adaptive scaling:</p>
+                        <div class="formula-box">$$w_{t+1} = w_t (1 - \alpha \lambda) - \frac{\alpha}{\sqrt{\hat{v}_t} + \epsilon} \hat{m}_t$$</div>
+                        <p>AdamW is now the universal gold standard for training Transformers, Large Language Models (LLMs), and modern deep networks.</p>
+                    </div>
+
+                    <div class="sub-topic" id="sub-6-3">
+                        <h3>6.3 Optimizer Selection Matrix</h3>
+                        <table style="width:100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.9rem;">
+                            <thead>
+                                <tr style="background: var(--bg-secondary); border-bottom: 2px solid var(--border-light); text-align: left;">
+                                    <th style="padding: 8px;">Optimizer</th>
+                                    <th style="padding: 8px;">Primary Mechanism</th>
+                                    <th style="padding: 8px;">Key Strength</th>
+                                    <th style="padding: 8px;">Main Limitation</th>
+                                    <th style="padding: 8px;">Recommended Application</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid var(--border-light);">
+                                    <td style="padding: 8px;"><strong>SGD</strong></td>
+                                    <td>Pure instantaneous gradient</td>
+                                    <td>Simple, minimal memory</td>
+                                    <td>Oscillates in ravines, sensitive to \(\alpha\)</td>
+                                    <td>Baseline theory</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid var(--border-light);">
+                                    <td style="padding: 8px;"><strong>SGD + Momentum</strong></td>
+                                    <td>Velocity accumulation</td>
+                                    <td>Superior generalization in vision</td>
+                                    <td>Requires extensive \(\alpha, \beta\) schedule tuning</td>
+                                    <td>ResNets, ConvNets</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid var(--border-light);">
+                                    <td style="padding: 8px;"><strong>AdaGrad</strong></td>
+                                    <td>Sum of squared gradients</td>
+                                    <td>Auto-tunes sparse features</td>
+                                    <td>Learning rate monotonically vanishes</td>
+                                    <td>Shallow NLP, sparse tabular models</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid var(--border-light);">
+                                    <td style="padding: 8px;"><strong>RMSProp</strong></td>
+                                    <td>EWMA of squared gradients</td>
+                                    <td>Overcomes AdaGrad stalling</td>
+                                    <td>Still uses noisy raw numerator gradient</td>
+                                    <td>RNNs, Reinforcement Learning</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px;"><strong>AdamW</strong></td>
+                                    <td>Dual moments + bias corr. + decoupled decay</td>
+                                    <td>Fast, robust, optimal generalisation</td>
+                                    <td>Requires 3x memory for optimizer states</td>
+                                    <td>Default for LLMs, Transformers, modern DL</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-7').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 7 -->
+            <section class="topic-section" id="topic-7">
+                <div class="topic-header" onclick="toggleSection('content-7')">
+                    <div class="topic-number">7</div>
+                    <h2>7. Step-by-Step Worked Numerical Walkthrough</h2>
+                </div>
+                <div class="collapsible-content" id="content-7" style="max-height: none;">
+                    <div class="sub-topic" id="sub-7-1">
+                        <h3>7.1 Coordinate Gradient Setup</h3>
+                        <p>Consider two parameters of a neural network starting at \(w_1 = 1.0000\) and \(w_2 = 1.0000\). The loss landscape is an anisotropic valley where \(w_1\) is on a steep slope and \(w_2\) is on a flat slope. Their observed gradients over two consecutive steps are:</p>
+                        <table style="width:100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.95rem;">
+                            <thead>
+                                <tr style="background: var(--bg-secondary); border-bottom: 2px solid var(--border-light);">
+                                    <th style="padding: 8px;">Parameter</th>
+                                    <th style="padding: 8px;">Step 1 Gradient (\(g_1\))</th>
+                                    <th style="padding: 8px;">Step 2 Gradient (\(g_2\))</th>
+                                    <th style="padding: 8px;">Curvature Profile</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid var(--border-light);">
+                                    <td style="padding: 8px;"><strong>\(w_1\)</strong></td>
+                                    <td style="padding: 8px;">\(3.0\)</td>
+                                    <td style="padding: 8px;">\(4.0\)</td>
+                                    <td style="padding: 8px;">Steep direction (large gradient)</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px;"><strong>\(w_2\)</strong></td>
+                                    <td style="padding: 8px;">\(0.3\)</td>
+                                    <td style="padding: 8px;">\(0.4\)</td>
+                                    <td style="padding: 8px;">Flat direction (ten times smaller gradient)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="sub-topic" id="sub-7-2">
+                        <h3>7.2 Step 1 & Step 2 Arithmetic Walk</h3>
+                        <div class="box box-blue">
+                            <div class="box-title">1. Plain SGD (\(\alpha = 0.1\))</div>
+                            <p><strong>Step 1:</strong></p>
+                            <ul>
+                                <li>\(w_1 = 1.0000 - 0.1(3.0) = \mathbf{0.7000}\)</li>
+                                <li>\(w_2 = 1.0000 - 0.1(0.3) = \mathbf{0.9700}\)</li>
+                            </ul>
+                            <p><strong>Step 2:</strong></p>
+                            <ul>
+                                <li>\(w_1 = 0.7000 - 0.1(4.0) = \mathbf{0.3000}\) (Total moved: \(0.7000\))</li>
+                                <li>\(w_2 = 0.9700 - 0.1(0.4) = \mathbf{0.9300}\) (Total moved: \(0.0700\))</li>
+                            </ul>
+                            <p>Notice: \(w_1\) moved 10 times farther than \(w_2\)! Progress along the flat direction is virtually stalled.</p>
+                        </div>
+
+                        <div class="box box-green">
+                            <div class="box-title">2. AdaGrad (\(\alpha = 0.1, G_0 = 0\))</div>
+                            <p><strong>Step 1 (\(g_1 = 3.0, g_2 = 0.3\)):</strong></p>
+                            <ul>
+                                <li>\(G_1(w_1) = 0 + 3^2 = 9.0000 \implies \sqrt{G_1} = 3.0000 \implies \Delta w_1 = -\frac{0.1 \times 3.0}{3.0000} = \mathbf{-0.1000} \implies w_1 = \mathbf{0.9000}\)</li>
+                                <li>\(G_1(w_2) = 0 + 0.3^2 = 0.0900 \implies \sqrt{G_1} = 0.3000 \implies \Delta w_2 = -\frac{0.1 \times 0.3}{0.3000} = \mathbf{-0.1000} \implies w_2 = \mathbf{0.9000}\)</li>
+                            </ul>
+                            <p><strong>Step 2 (\(g_1 = 4.0, g_2 = 0.4\)):</strong></p>
+                            <ul>
+                                <li>\(G_2(w_1) = 9.0 + 4^2 = 25.0000 \implies \sqrt{G_2} = 5.0000 \implies \Delta w_1 = -\frac{0.1 \times 4.0}{5.0000} = \mathbf{-0.0800} \implies w_1 = \mathbf{0.8200}\)</li>
+                                <li>\(G_2(w_2) = 0.09 + 0.4^2 = 0.2500 \implies \sqrt{G_2} = 0.5000 \implies \Delta w_2 = -\frac{0.1 \times 0.4}{0.5000} = \mathbf{-0.0800} \implies w_2 = \mathbf{0.8200}\)</li>
+                            </ul>
+                            <p>Notice: In both steps, \(w_1\) and \(w_2\) moved <strong>exactly equal distances</strong> (\(-0.1000\) and \(-0.0800\)), perfectly overcoming the 10x gradient disparity! However, notice how step size shrank from \(0.1000\) to \(0.0800\) as \(G\) accumulated.</p>
+                        </div>
+
+                        <div class="box box-amber">
+                            <div class="box-title">3. RMSProp (\(\alpha = 0.1, \beta = 0.9, S_0 = 0\))</div>
+                            <p><strong>Step 1:</strong></p>
+                            <ul>
+                                <li>\(S_1(w_1) = 0.9(0) + 0.1(3^2) = 0.9000 \implies \sqrt{S_1} = 0.9487 \implies \Delta w_1 = -\frac{0.1(3.0)}{0.9487} = \mathbf{-0.3162} \implies w_1 = \mathbf{0.6838}\)</li>
+                                <li>\(S_1(w_2) = 0.9(0) + 0.1(0.3^2) = 0.0090 \implies \sqrt{S_1} = 0.0949 \implies \Delta w_2 = -\frac{0.1(0.3)}{0.0949} = \mathbf{-0.3162} \implies w_2 = \mathbf{0.6838}\)</li>
+                            </ul>
+                            <p><strong>Step 2:</strong></p>
+                            <ul>
+                                <li>\(S_2(w_1) = 0.9(0.9000) + 0.1(4^2) = 0.8100 + 1.6000 = 2.4100 \implies \sqrt{S_2} = 1.5524 \implies \Delta w_1 = -\frac{0.1(4.0)}{1.5524} = \mathbf{-0.2577} \implies w_1 = \mathbf{0.4261}\)</li>
+                                <li>\(S_2(w_2) = 0.9(0.0090) + 0.1(0.4^2) = 0.0081 + 0.0160 = 0.0241 \implies \sqrt{S_2} = 0.1552 \implies \Delta w_2 = -\frac{0.1(0.4)}{0.1552} = \mathbf{-0.2577} \implies w_2 = \mathbf{0.4261}\)</li>
+                            </ul>
+                            <p>RMSProp preserves dynamic responsiveness while guaranteeing identical progress along both coordinates.</p>
+                        </div>
+                    </div>
+
+                    <div class="sub-topic" id="sub-7-3">
+                        <h3>7.3 Comprehensive Comparative Trajectory Table</h3>
+                        <table style="width:100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.9rem;">
+                            <thead>
+                                <tr style="background: var(--bg-secondary); border-bottom: 2px solid var(--border-light);">
+                                    <th style="padding: 8px;">Algorithm</th>
+                                    <th style="padding: 8px;">\(w_1\) after Step 1</th>
+                                    <th style="padding: 8px;">\(w_2\) after Step 1</th>
+                                    <th style="padding: 8px;">\(w_1\) after Step 2</th>
+                                    <th style="padding: 8px;">\(w_2\) after Step 2</th>
+                                    <th style="padding: 8px;">Ratio \(\frac{\Delta w_1}{\Delta w_2}\)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid var(--border-light);">
+                                    <td style="padding: 8px;"><strong>Plain SGD</strong></td>
+                                    <td style="padding: 8px;">0.7000</td>
+                                    <td style="padding: 8px;">0.9700</td>
+                                    <td style="padding: 8px;">0.3000</td>
+                                    <td style="padding: 8px;">0.9300</td>
+                                    <td style="padding: 8px; color: var(--red); font-weight: bold;">10.0 (Severe imbalance)</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid var(--border-light);">
+                                    <td style="padding: 8px;"><strong>AdaGrad</strong></td>
+                                    <td style="padding: 8px;">0.9000</td>
+                                    <td style="padding: 8px;">0.9000</td>
+                                    <td style="padding: 8px;">0.8200</td>
+                                    <td style="padding: 8px;">0.8200</td>
+                                    <td style="padding: 8px; color: var(--green); font-weight: bold;">1.0 (Balanced, but decaying)</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px;"><strong>RMSProp</strong></td>
+                                    <td style="padding: 8px;">0.6838</td>
+                                    <td style="padding: 8px;">0.6838</td>
+                                    <td style="padding: 8px;">0.4261</td>
+                                    <td style="padding: 8px;">0.4261</td>
+                                    <td style="padding: 8px; color: var(--blue); font-weight: bold;">1.0 (Balanced & persistent)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('original-pdf').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for Lecture 08 (Adaptive Learning Rates Worksheet):</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-7').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/8.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--border-light, #ddd); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>

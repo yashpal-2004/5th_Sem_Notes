@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Deep Learning - Lecture 10 Part 2</title>
+    <meta content="Study notes for Deep Learning, Lecture 10 Part 2 covering classical CNN architectures: LeNet-5, AlexNet, and VGG-16 with layer-by-layer dimension tracing and parameter counting." name="description"/>
+    <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2245%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>10b</text></svg>" rel="icon"/>
+    <link href="../css/style.css" rel="stylesheet"/>
+    <!-- KaTeX for LaTeX rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Deep Learning Foundations</h1>
+            <p>Lecture 10 Part 2 - Classical CNN Architectures: LeNet, AlexNet & VGG-16</p>
+            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/10 Part_2.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF Worksheet ↗</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/worksheet10_architectures.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open Architectures Interactive ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text"/>
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 7</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Short Notes</a></li>
+                <li>
+                    <a href="#topic-1">1. Evolution of Deep Vision Architectures<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 Historical Arc: From 1998 to 2014</a></li>
+                        <li><a href="#sub-1-2">1.2 The ImageNet Large Scale Visual Recognition Challenge</a></li>
+                        <li><a href="#sub-1-3">1.3 Paradigm Shift: Handcrafted Features to Learned Hierarchies</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. LeNet-5: The Pioneer Network (1998)<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 Architecture Design & Digit Recognition</a></li>
+                        <li><a href="#sub-2-2">2.2 Subsampling (Average Pooling) & Sigmoid/Tanh</a></li>
+                        <li><a href="#sub-2-3">2.3 Exact Layer Breakdown (~60,000 Parameters)</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. AlexNet: The Deep Learning Revolution (2012)<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 Architectural Leap: 8 Layers & Dual-GPU Split</a></li>
+                        <li><a href="#sub-3-2">3.2 Breakthrough Innovations (ReLU, Dropout, Overlapping Pool)</a></li>
+                        <li><a href="#sub-3-3">3.3 Layer-by-Layer Parameter Count (~60 Million Parameters)</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. VGG-16: The Principle of Factorization (2014)<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 The Philosophy of Structural Uniformity</a></li>
+                        <li><a href="#sub-4-2">4.2 Factorizing Large Filters into Stacks of 3x3 Convolutions</a></li>
+                        <li><a href="#sub-4-3">4.3 16-Layer Deep Pipeline (~138 Million Parameters)</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Comprehensive Layer-by-Layer Dimension Tracing<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 LeNet-5 Dimension & Parameter Table</a></li>
+                        <li><a href="#sub-5-2">5.2 AlexNet Dimension & Parameter Table</a></li>
+                        <li><a href="#sub-5-3">5.3 VGG-16 Dimension & Parameter Table</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-6">6. Computational Bottlenecks & Memory Distribution<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-6-1">6.1 The Parameter vs Memory Paradox</a></li>
+                        <li><a href="#sub-6-2">6.2 Why Early Layers Consume 80% of Activation RAM</a></li>
+                        <li><a href="#sub-6-3">6.3 Why Dense FC Layers Account for 80% of Weights</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-7">7. Step-by-Step Worked Architectural Calculations<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-7-1">7.1 AlexNet Conv1 Dimensions and Flops</a></li>
+                        <li><a href="#sub-7-2">7.2 VGG-16 Dense FC6 Transition Shock</a></li>
+                        <li><a href="#sub-7-3">7.3 Architectural Comparison Summary Matrix</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Short Notes Summary Section -->
+            <section class="topic-section" id="short-notes">
+                <div class="topic-header" onclick="toggleSection('content-short-notes')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                    </div>
+                    <h2>Executive Summary & Formula Sheet</h2>
+                </div>
+                <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
+                    <p><strong>Core Concept:</strong> The transition from LeNet-5 (1998) to AlexNet (2012) and VGG-16 (2014) marks the foundational progression of computer vision from shallow handwriting recognition to deep, high-resolution visual understanding. AlexNet demonstrated that deep networks with non-saturating activations (ReLU) and regularisation (Dropout) can be trained on GPUs to surpass hand-crafted algorithms. VGG-16 proved that replacing heterogeneous large filters (\(11\times 11, 5\times 5\)) with deep cascades of uniform \(3\times 3\) convolutions increases non-linear expressiveness while drastically economizing on parameters.</p>
+
+                    <div class="box box-blue">
+                        <div class="box-title">Classical CNN Architectures Metric Sheet</div>
+                        <table style="width:100%; border-collapse: collapse; font-size: 0.9rem;">
+                            <thead>
+                                <tr style="background: rgba(255,255,255,0.7); border-bottom: 2px solid var(--border-light); text-align: left;">
+                                    <th style="padding: 6px;">Network</th>
+                                    <th style="padding: 6px;">Year</th>
+                                    <th style="padding: 6px;">Input Size</th>
+                                    <th style="padding: 6px;">Conv Filters</th>
+                                    <th style="padding: 6px;">Activation</th>
+                                    <th style="padding: 6px;">Total Params</th>
+                                    <th style="padding: 6px;">Key Milestone</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid var(--border-light);">
+                                    <td style="padding: 6px;"><strong>LeNet-5</strong></td>
+                                    <td>1998</td>
+                                    <td>\(32 \times 32 \times 1\)</td>
+                                    <td>\(5 \times 5\)</td>
+                                    <td>Tanh / Sigmoid</td>
+                                    <td>\(\approx 60\text{k}\)</td>
+                                    <td>First commercial digit recognizer</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid var(--border-light);">
+                                    <td style="padding: 6px;"><strong>AlexNet</strong></td>
+                                    <td>2012</td>
+                                    <td>\(224 \times 224 \times 3\)</td>
+                                    <td>\(11\times 11, 5\times 5, 3\times 3\)</td>
+                                    <td>ReLU</td>
+                                    <td>\(\approx 60\text{M}\)</td>
+                                    <td>ImageNet breakthrough (16.4% top-5 error)</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 6px;"><strong>VGG-16</strong></td>
+                                    <td>2014</td>
+                                    <td>\(224 \times 224 \times 3\)</td>
+                                    <td>Uniform \(3 \times 3\) only</td>
+                                    <td>ReLU</td>
+                                    <td>\(\approx 138\text{M}\)</td>
+                                    <td>Proved depth with small filters beats wide shallow filters</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Lecture 10 Part 2 Visual Cheatsheet</h3>
+                    <div style="text-align: center; background: var(--bg-secondary, #f8f9fa); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-light); margin-bottom: 1.5rem;">
+                        <a href="../images/10_part_2.png" target="_blank" title="Click to view full size">
+                            <img src="../images/10_part_2.png" alt="Lecture 10 Part 2 Short Notes Cheatsheet" style="max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
+                        </a>
+                        <p style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-muted);">Click image to open high-resolution version in new tab</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" disabled="">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 1 -->
+            <section class="topic-section" id="topic-1">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>1. Evolution of Deep Vision Architectures</h2>
+                </div>
+                <div class="collapsible-content" id="content-1" style="max-height: none;">
+                    <div class="sub-topic" id="sub-1-1">
+                        <h3>1.1 Historical Arc: From 1998 to 2014</h3>
+                        <p>For over a decade following the creation of LeNet-5, computer vision remained dominated by hand-engineered feature pipelines: SIFT (Scale-Invariant Feature Transform), HOG (Histogram of Oriented Gradients), and Gabor filter banks paired with Support Vector Machines (SVMs). These systems were brittle, required years of domain-specific feature engineering, and could not scale to diverse open-world imagery.</p>
+                    </div>
+
+                    <div class="sub-topic" id="sub-1-2">
+                        <h3>1.2 The ImageNet Large Scale Visual Recognition Challenge</h3>
+                        <p>The turning point arrived with the <strong>ImageNet challenge (ILSVRC)</strong>: 1.2 million high-resolution color training images distributed across 1,000 distinct object classes. In 2012, Alex Krizhevsky, Ilya Sutskever, and Geoffrey Hinton entered <strong>AlexNet</strong>, achieving a top-5 error rate of 16.4%, demolishing the runner-up (26.2%) by an unprecedented 10 percentage points. This single event ignited the modern deep learning boom.</p>
+                    </div>
+
+                    <div class="sub-topic" id="sub-1-3">
+                        <h3>1.3 Paradigm Shift: Handcrafted Features to Learned Hierarchies</h3>
+                        <p>The core breakthrough of AlexNet and VGG was demonstrating that deep convolutional networks could learn optimal spatial representations end-to-end directly from raw pixels, obsoleting decades of manual feature design.</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('short-notes').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section class="topic-section" id="topic-2">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>2. LeNet-5: The Pioneer Network (1998)</h2>
+                </div>
+                <div class="collapsible-content" id="content-2" style="max-height: none;">
+                    <div class="sub-topic" id="sub-2-1">
+                        <h3>2.1 Architecture Design & Digit Recognition</h3>
+                        <p>Designed by Yann LeCun et al. at Bell Labs for handwritten check and zip-code recognition (MNIST), <strong>LeNet-5</strong> introduced the iconic foundational sequence: <strong>Conv \(\to\) Pool \(\to\) Conv \(\to\) Pool \(\to\) FC \(\to\) Output</strong>.</p>
+                        <p>Input images were \(32 \times 32\) grayscale digits. Convolutions utilized \(5 \times 5\) filters with valid padding, causing spatial sizes to shrink systematically.</p>
+                    </div>
+
+                    <div class="sub-topic" id="sub-2-2">
+                        <h3>2.2 Subsampling (Average Pooling) & Sigmoid/Tanh</h3>
+                        <p>In 1998, max pooling and ReLU had not yet been popularized. LeNet-5 utilized <strong>Average Pooling (Subsampling)</strong> with trainable coefficients and sigmoidal/tanh activations. Because tanh saturates when activations grow large (\(|z| > 2\)), training deeper networks was prevented by severe vanishing gradients.</p>
+                    </div>
+
+                    <div class="sub-topic" id="sub-2-3">
+                        <h3>2.3 Exact Layer Breakdown (~60,000 Parameters)</h3>
+                        <ul>
+                            <li><strong>Input:</strong> \(32 \times 32 \times 1\)</li>
+                            <li><strong>C1 (Conv):</strong> 6 filters of size \(5 \times 5\), stride 1, valid padding \(\implies 28 \times 28 \times 6\). Parameters: \((5 \times 5 \times 1 + 1) \times 6 = \mathbf{156}\).</li>
+                            <li><strong>S2 (AvgPool):</strong> \(2 \times 2\) pool, stride 2 \(\implies 14 \times 14 \times 6\). (LeNet learned 2 params per channel \(= 12\)).</li>
+                            <li><strong>C3 (Conv):</strong> 16 filters of size \(5 \times 5\), custom channel map \(\implies 10 \times 10 \times 16\). Parameters: \(\mathbf{1,516}\).</li>
+                            <li><strong>S4 (AvgPool):</strong> \(2 \times 2\) pool, stride 2 \(\implies 5 \times 5 \times 16\).</li>
+                            <li><strong>C5 (Conv / FC):</strong> 120 filters of size \(5 \times 5 \implies 1 \times 1 \times 120\). Parameters: \((5 \times 5 \times 16 + 1) \times 120 = \mathbf{48,120}\).</li>
+                            <li><strong>F6 (FC):</strong> 84 units fully connected \(\implies \mathbf{10,164}\) parameters.</li>
+                            <li><strong>Output:</strong> 10 Euclidean RBF units \(\implies 840\) parameters.</li>
+                            <li><strong>Total Parameters:</strong> \(\approx \mathbf{60,000}\) weights.</li>
+                        </ul>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section class="topic-section" id="topic-3">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>3. AlexNet: The Deep Learning Revolution (2012)</h2>
+                </div>
+                <div class="collapsible-content" id="content-3" style="max-height: none;">
+                    <div class="sub-topic" id="sub-3-1">
+                        <h3>3.1 Architectural Leap: 8 Layers & Dual-GPU Split</h3>
+                        <p>AlexNet scaled deep vision by an order of magnitude: 8 learned layers (5 Convolutional + 3 Fully Connected) trained on \(224 \times 224 \times 3\) RGB images. Because GPUs in 2012 (NVIDIA GTX 580) had only 3 GB of VRAM, the network was split across two GPUs running in parallel, communicating cross-GPU activations only at specific layer boundaries.</p>
+                    </div>
+
+                    <div class="sub-topic" id="sub-3-2">
+                        <h3>3.2 Breakthrough Innovations</h3>
+                        <div class="box box-green">
+                            <div class="box-title">Key Algorithmic Breakthroughs in AlexNet</div>
+                            <ul>
+                                <li><strong>Rectified Linear Units (ReLU):</strong> Replaced saturating tanh with \(f(x) = \max(0, x)\). Accelerated convergence speed by <strong>6x</strong> and resolved vanishing gradients.</li>
+                                <li><strong>Dropout (p = 0.5):</strong> Applied to FC6 and FC7 to prevent catastrophic memorization among its 60 million weights.</li>
+                                <li><strong>Data Augmentation:</strong> Random \(224 \times 224\) crops from \(256 \times 256\) images, horizontal reflections, and PCA color jittering artificially multiplied dataset size by 2048x.</li>
+                                <li><strong>Overlapping Max Pooling:</strong> Used \(3 \times 3\) pooling windows with stride \(S = 2\), reducing top-1 error by 0.4% and suppressing blurriness.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="sub-topic" id="sub-3-3">
+                        <h3>3.3 Layer-by-Layer Parameter Count (~60 Million Parameters)</h3>
+                        <p>AlexNet contains roughly 60 million parameters. However, <strong>over 58 million (95%)</strong> reside purely in the final three fully-connected layers (specifically, the massive transition from Conv5 \(6 \times 6 \times 256 = 9,216\) to FC6 \(4,096\) accounts for \(37.7\) Million weights alone!).</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section class="topic-section" id="topic-4">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>4. VGG-16: The Principle of Factorization (2014)</h2>
+                </div>
+                <div class="collapsible-content" id="content-4" style="max-height: none;">
+                    <div class="sub-topic" id="sub-4-1">
+                        <h3>4.1 The Philosophy of Structural Uniformity</h3>
+                        <p>Created by Karen Simonyan and Andrew Zisserman at Oxford (Visual Geometry Group), <strong>VGG</strong> asked a foundational question: <em>Can we make CNNs deeper simply by fixing all architectural hyper-parameters to the smallest viable values?</em></p>
+                        <p>VGG discarded all heterogeneous filters (\(11\times 11, 7\times 7, 5\times 5\)). Every single convolutional layer in VGG uses <strong>kernel size \(3 \times 3\), stride 1, and same padding \(P = 1\)</strong>. Downsampling is handled strictly by \(2 \times 2\) Max Pooling layers with stride 2 placed between convolutional blocks.</p>
+                    </div>
+
+                    <div class="sub-topic" id="sub-4-2">
+                        <h3>4.2 Factorizing Large Filters into Stacks of 3x3 Convolutions</h3>
+                        <div class="box box-amber">
+                            <div class="box-title">Filter Factorization Proof</div>
+                            <p>Consider the receptive field and parameter count of replacing a single \(7 \times 7\) convolution with a stack of three \(3 \times 3\) convolutions (all with \(C\) channels):</p>
+                            <ul>
+                                <li><strong>Single \(7 \times 7\) layer:</strong> Receptive field = \(7 \times 7\). Parameters = \(7 \times 7 \times C^2 = \mathbf{49 C^2}\). Non-linear activations = <strong>1</strong>.</li>
+                                <li><strong>Stack of three \(3 \times 3\) layers:</strong>
+                                    <ul>
+                                        <li>Layer 1: RF = \(3 \times 3\)</li>
+                                        <li>Layer 2: RF = \(3 + (3-1) = 5 \times 5\)</li>
+                                        <li>Layer 3: RF = \(5 + (3-1) = 7 \times 7\)</li>
+                                    </ul>
+                                    Parameters = \(3 \times (3 \times 3 \times C^2) = \mathbf{27 C^2}\). Non-linear activations = <strong>3 (three ReLUs)</strong>.
+                                </li>
+                            </ul>
+                            <p>The \(3 \times 3\) cascade achieves the <strong>identical receptive field</strong> while slashing parameter count by <strong>45%</strong> and tripling non-linear representational capacity!</p>
+                        </div>
+                    </div>
+
+                    <div class="sub-topic" id="sub-4-3">
+                        <h3>4.3 16-Layer Deep Pipeline (~138 Million Parameters)</h3>
+                        <p>VGG-16 arranges its 13 convolutional and 3 dense layers into 5 homogeneous stages. Whenever spatial dimensions are halved by max pooling (\(224 \to 112 \to 56 \to 28 \to 14 \to 7\)), channel capacity is systematically doubled (\(64 \to 128 \to 256 \to 512 \to 512\)), keeping computational volume roughly constant across stages.</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 5 -->
+            <section class="topic-section" id="topic-5">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>5. Comprehensive Layer-by-Layer Dimension Tracing</h2>
+                </div>
+                <div class="collapsible-content" id="content-5" style="max-height: none;">
+                    <div class="sub-topic" id="sub-5-1">
+                        <h3>5.1 LeNet-5 Dimension & Parameter Table</h3>
+                        <table style="width:100%; border-collapse: collapse; margin-top: 0.5rem; font-size: 0.85rem;">
+                            <thead>
+                                <tr style="background: var(--bg-secondary); border-bottom: 2px solid var(--border-light); text-align: left;">
+                                    <th style="padding: 6px;">Layer</th>
+                                    <th style="padding: 6px;">Input Shape</th>
+                                    <th style="padding: 6px;">Filter Specs</th>
+                                    <th style="padding: 6px;">Output Shape</th>
+                                    <th style="padding: 6px;">Parameters</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid var(--border-light);"><td>Input</td><td>\(32 \times 32 \times 1\)</td><td>-</td><td>\(32 \times 32 \times 1\)</td><td>0</td></tr>
+                                <tr style="border-bottom: 1px solid var(--border-light);"><td>C1 (Conv)</td><td>\(32 \times 32 \times 1\)</td><td>\(6 \times (5\times 5), S=1, P=0\)</td><td>\(28 \times 28 \times 6\)</td><td>\((25\times 1 + 1)\times 6 = 156\)</td></tr>
+                                <tr style="border-bottom: 1px solid var(--border-light);"><td>S2 (Pool)</td><td>\(28 \times 28 \times 6\)</td><td>\(2 \times 2, S=2\)</td><td>\(14 \times 14 \times 6\)</td><td>0 (deterministic)</td></tr>
+                                <tr style="border-bottom: 1px solid var(--border-light);"><td>C3 (Conv)</td><td>\(14 \times 14 \times 6\)</td><td>\(16 \times (5\times 5), S=1, P=0\)</td><td>\(10 \times 10 \times 16\)</td><td>1,516</td></tr>
+                                <tr style="border-bottom: 1px solid var(--border-light);"><td>S4 (Pool)</td><td>\(10 \times 10 \times 16\)</td><td>\(2 \times 2, S=2\)</td><td>\(5 \times 5 \times 16\)</td><td>0</td></tr>
+                                <tr style="border-bottom: 1px solid var(--border-light);"><td>C5 (Conv)</td><td>\(5 \times 5 \times 16\)</td><td>\(120 \times (5\times 5), S=1, P=0\)</td><td>\(1 \times 1 \times 120\)</td><td>\((400 + 1)\times 120 = 48,120\)</td></tr>
+                                <tr style="border-bottom: 1px solid var(--border-light);"><td>F6 (FC)</td><td>\(120\)</td><td>Dense</td><td>\(84\)</td><td>\((120 + 1)\times 84 = 10,164\)</td></tr>
+                                <tr><td>Output</td><td>\(84\)</td><td>Dense</td><td>\(10\)</td><td>\((84 + 1)\times 10 = 850\)</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="sub-topic" id="sub-5-2">
+                        <h3>5.2 AlexNet Dimension & Parameter Table</h3>
+                        <table style="width:100%; border-collapse: collapse; margin-top: 0.5rem; font-size: 0.85rem;">
+                            <thead>
+                                <tr style="background: var(--bg-secondary); border-bottom: 2px solid var(--border-light); text-align: left;">
+                                    <th style="padding: 6px;">Layer</th>
+                                    <th style="padding: 6px;">Input Shape</th>
+                                    <th style="padding: 6px;">Filter Specs</th>
+                                    <th style="padding: 6px;">Output Shape</th>
+                                    <th style="padding: 6px;">Parameters</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid var(--border-light);"><td>Input</td><td>\(224 \times 224 \times 3\)</td><td>-</td><td>\(224 \times 224 \times 3\)</td><td>0</td></tr>
+                                <tr style="border-bottom: 1px solid var(--border-light);"><td>Conv1 + Pool1</td><td>\(224 \times 224 \times 3\)</td><td>\(96 \times (11\times 11), S=4, P=2\) \(\to\) Pool \(3\times 3, S=2\)</td><td>\(27 \times 27 \times 96\)</td><td>\((363 + 1)\times 96 = 34,944\)</td></tr>
+                                <tr style="border-bottom: 1px solid var(--border-light);"><td>Conv2 + Pool2</td><td>\(27 \times 27 \times 96\)</td><td>\(256 \times (5\times 5), S=1, P=2\) \(\to\) Pool \(3\times 3, S=2\)</td><td>\(13 \times 13 \times 256\)</td><td>\((2400 + 1)\times 256 = 614,656\)</td></tr>
+                                <tr style="border-bottom: 1px solid var(--border-light);"><td>Conv3</td><td>\(13 \times 13 \times 256\)</td><td>\(384 \times (3\times 3), S=1, P=1\)</td><td>\(13 \times 13 \times 384\)</td><td>\((2304 + 1)\times 384 = 885,120\)</td></tr>
+                                <tr style="border-bottom: 1px solid var(--border-light);"><td>Conv4</td><td>\(13 \times 13 \times 384\)</td><td>\(384 \times (3\times 3), S=1, P=1\)</td><td>\(13 \times 13 \times 384\)</td><td>\((3456 + 1)\times 384 = 1,327,488\)</td></tr>
+                                <tr style="border-bottom: 1px solid var(--border-light);"><td>Conv5 + Pool5</td><td>\(13 \times 13 \times 384\)</td><td>\(256 \times (3\times 3), S=1, P=1\) \(\to\) Pool \(3\times 3, S=2\)</td><td>\(6 \times 6 \times 256\)</td><td>\((3456 + 1)\times 256 = 884,992\)</td></tr>
+                                <tr style="border-bottom: 1px solid var(--border-light);"><td>FC6</td><td>\(6 \times 6 \times 256 = 9,216\)</td><td>Dense + Dropout</td><td>\(4,096\)</td><td>\((9216 + 1)\times 4096 = \mathbf{37,752,832}\)</td></tr>
+                                <tr style="border-bottom: 1px solid var(--border-light);"><td>FC7</td><td>\(4,096\)</td><td>Dense + Dropout</td><td>\(4,096\)</td><td>\((4096 + 1)\times 4096 = \mathbf{16,781,312}\)</td></tr>
+                                <tr><td>FC8 (Output)</td><td>\(4,096\)</td><td>Dense \(\to\) Softmax</td><td>\(1,000\)</td><td>\((4096 + 1)\times 1000 = \mathbf{4,097,000}\)</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="sub-topic" id="sub-5-3">
+                        <h3>5.3 VGG-16 Dimension & Parameter Table</h3>
+                        <table style="width:100%; border-collapse: collapse; margin-top: 0.5rem; font-size: 0.85rem;">
+                            <thead>
+                                <tr style="background: var(--bg-secondary); border-bottom: 2px solid var(--border-light); text-align: left;">
+                                    <th style="padding: 6px;">Stage</th>
+                                    <th style="padding: 6px;">Layer Type</th>
+                                    <th style="padding: 6px;">Output Feature Map</th>
+                                    <th style="padding: 6px;">Weights / Filter Form</th>
+                                    <th style="padding: 6px;">Stage Parameters</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid var(--border-light);"><td>Stage 1</td><td>2x Conv \(3\times 3\), Pool</td><td>\(112 \times 112 \times 64\)</td><td>\(3 \to 64 \to 64\)</td><td>\(1,792 + 36,928 = 38,720\)</td></tr>
+                                <tr style="border-bottom: 1px solid var(--border-light);"><td>Stage 2</td><td>2x Conv \(3\times 3\), Pool</td><td>\(56 \times 56 \times 128\)</td><td>\(64 \to 128 \to 128\)</td><td>\(73,856 + 147,584 = 221,440\)</td></tr>
+                                <tr style="border-bottom: 1px solid var(--border-light);"><td>Stage 3</td><td>3x Conv \(3\times 3\), Pool</td><td>\(28 \times 28 \times 256\)</td><td>\(128 \to 256 \to 256 \to 256\)</td><td>\(295,168 + 2\times 590,080 = 1,475,328\)</td></tr>
+                                <tr style="border-bottom: 1px solid var(--border-light);"><td>Stage 4</td><td>3x Conv \(3\times 3\), Pool</td><td>\(14 \times 14 \times 512\)</td><td>\(256 \to 512 \to 512 \to 512\)</td><td>\(1,180,160 + 2\times 2,359,808 = 5,899,776\)</td></tr>
+                                <tr style="border-bottom: 1px solid var(--border-light);"><td>Stage 5</td><td>3x Conv \(3\times 3\), Pool</td><td>\(7 \times 7 \times 512\)</td><td>\(512 \to 512 \to 512 \to 512\)</td><td>\(3 \times 2,359,808 = 7,079,424\)</td></tr>
+                                <tr style="border-bottom: 1px solid var(--border-light);"><td>FC6</td><td>Dense + Dropout</td><td>\(4,096\)</td><td>\((7\times 7\times 512) \to 4096 = 25088 \to 4096\)</td><td>\(\mathbf{102,764,544}\)</td></tr>
+                                <tr style="border-bottom: 1px solid var(--border-light);"><td>FC7</td><td>Dense + Dropout</td><td>\(4,096\)</td><td>\(4096 \to 4096\)</td><td>\(\mathbf{16,781,312}\)</td></tr>
+                                <tr><td>FC8</td><td>Dense \(\to\) Softmax</td><td>\(1,000\)</td><td>\(4096 \to 1000\)</td><td>\(\mathbf{4,097,000}\)</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 6 -->
+            <section class="topic-section" id="topic-6">
+                <div class="topic-header" onclick="toggleSection('content-6')">
+                    <div class="topic-number">6</div>
+                    <h2>6. Computational Bottlenecks & Memory Distribution</h2>
+                </div>
+                <div class="collapsible-content" id="content-6" style="max-height: none;">
+                    <div class="sub-topic" id="sub-6-1">
+                        <h3>6.1 The Parameter vs Memory Paradox</h3>
+                        <p>In deep CNN architectures like AlexNet and VGG-16, there is an extreme, inverted divergence between where <strong>memory (activation RAM / compute FLOPs)</strong> is consumed versus where <strong>weights (parameter count)</strong> live:</p>
+                        <div class="box box-amber">
+                            <div class="box-title">The Fundamental Architectural Imbalance</div>
+                            <ul>
+                                <li><strong>Early Convolutional Layers:</strong> Contain less than <strong>10%</strong> of the total weights, but consume over <strong>80% of total activation memory and FLOPs</strong>! This occurs because the feature maps are massive (\(224 \times 224, 112 \times 112\)).</li>
+                                <li><strong>Final Fully Connected Layers:</strong> Consume almost <strong>no activation memory</strong> (\(4096\) floats is negligible), but contain over <strong>80% to 90% of all trainable parameters</strong>!</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="sub-topic" id="sub-6-2">
+                        <h3>6.2 Why Early Layers Consume 80% of Activation RAM</h3>
+                        <p>During training, the backward pass requires caching all intermediate forward feature map activations to compute gradients. In VGG Stage 1, a single feature map tensor \([B, 64, 224, 224]\) with batch size 32 requires: \(32 \times 64 \times 224 \times 224 \times 4 \text{ bytes} \approx \mathbf{411 \text{ MB}}\) of VRAM for one layer alone!</p>
+                    </div>
+
+                    <div class="sub-topic" id="sub-6-3">
+                        <h3>6.3 Why Dense FC Layers Account for 80% of Weights</h3>
+                        <p>When the final convolutional tensor (\(7 \times 7 \times 512 = 25,088\)) is flattened and connected to FC6 (\(4,096\)), every single spatial element connects to every hidden neuron. This single layer produces \(25,088 \times 4,096 = 102.7\) Million weights! This massive parameter bottleneck motivated later architectures (GoogLeNet, ResNet) to replace FC layers entirely with <strong>Global Average Pooling</strong>.</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-7').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 7 -->
+            <section class="topic-section" id="topic-7">
+                <div class="topic-header" onclick="toggleSection('content-7')">
+                    <div class="topic-number">7</div>
+                    <h2>7. Step-by-Step Worked Architectural Calculations</h2>
+                </div>
+                <div class="collapsible-content" id="content-7" style="max-height: none;">
+                    <div class="sub-topic" id="sub-7-1">
+                        <h3>7.1 AlexNet Conv1 Dimensions and Flops</h3>
+                        <p>Calculate the exact output shape and number of multiply-accumulate operations (MACs) for AlexNet Layer 1:</p>
+                        <ul>
+                            <li>Input: \(224 \times 224 \times 3\), Filters: 96, Kernel: \(11 \times 11\), Stride: 4, Padding: 2.</li>
+                        </ul>
+                        <div class="box box-blue">
+                            <div class="box-title">Calculations</div>
+                            <p>Output spatial dimension:
+                                $$O = \left\lfloor \frac{224 - 11 + 2(2)}{4} \right\rfloor + 1 = \left\lfloor \frac{217}{4} \right\rfloor + 1 = 54 + 1 = \mathbf{55 \times 55}$$
+                            </p>
+                            <p>Output shape: \([96, 55, 55]\) (30,250 output pixels).</p>
+                            <p>Operations per output pixel: \(11 \times 11 \times 3 = 363\) multiplications.</p>
+                            <p>Total MACs: \(55 \times 55 \times 96 \times 363 \approx \mathbf{105.4 \times 10^6}\) (105 Million operations in Conv1 alone!).</p>
+                        </div>
+                    </div>
+
+                    <div class="sub-topic" id="sub-7-2">
+                        <h3>7.2 VGG-16 Dense FC6 Transition Shock</h3>
+                        <p>Calculate the memory footprint of storing only the weights of VGG-16 layer FC6 in FP32 (4 bytes per float):</p>
+                        <div class="box box-green">
+                            <div class="box-title">Calculation</div>
+                            <p>Weights count: \(25,088 \times 4,096 = 102,760,448\) weights.</p>
+                            <p>Biases count: \(4,096\) biases.</p>
+                            <p>Total floats: \(102,764,544\) values.</p>
+                            <p>Memory size on disk / GPU RAM:
+                                $$\text{Size} = \frac{102,764,544 \times 4}{1024 \times 1024} \approx \mathbf{392.0 \text{ MB}}$$
+                            </p>
+                            <p>A single layer requires nearly 400 Megabytes just to store its weight matrix!</p>
+                        </div>
+                    </div>
+
+                    <div class="sub-topic" id="sub-7-3">
+                        <h3>7.3 Architectural Comparison Summary Matrix</h3>
+                        <table style="width:100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.9rem;">
+                            <thead>
+                                <tr style="background: var(--bg-secondary); border-bottom: 2px solid var(--border-light); text-align: left;">
+                                    <th style="padding: 8px;">Metric</th>
+                                    <th style="padding: 8px;">LeNet-5 (1998)</th>
+                                    <th style="padding: 8px;">AlexNet (2012)</th>
+                                    <th style="padding: 8px;">VGG-16 (2014)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid var(--border-light);"><td>Learned Layers</td><td>7 (5 Conv/Pool + 2 FC)</td><td>8 (5 Conv + 3 FC)</td><td>16 (13 Conv + 3 FC)</td></tr>
+                                <tr style="border-bottom: 1px solid var(--border-light);"><td>Total Parameters</td><td>\(\approx 60\) Thousand</td><td>\(\approx 60\) Million</td><td>\(\approx 138\) Million</td></tr>
+                                <tr style="border-bottom: 1px solid var(--border-light);"><td>Weight Memory (FP32)</td><td>\(< 1\) MB</td><td>\(\approx 240\) MB</td><td>\(\approx 528\) MB</td></tr>
+                                <tr style="border-bottom: 1px solid var(--border-light);"><td>Input Resolution</td><td>\(32 \times 32 \times 1\)</td><td>\(224 \times 224 \times 3\)</td><td>\(224 \times 224 \times 3\)</td></tr>
+                                <tr style="border-bottom: 1px solid var(--border-light);"><td>Non-linearity</td><td>Tanh / Sigmoid</td><td>ReLU</td><td>ReLU</td></tr>
+                                <tr><td>Top-5 Error (ImageNet)</td><td>N/A (MNIST)</td><td>16.4%</td><td>7.3%</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('original-pdf').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for Lecture 10 Part 2 (Inside LeNet, AlexNet & VGG-16 Worksheet):</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-7').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/10 Part_2.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--border-light, #ddd); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>

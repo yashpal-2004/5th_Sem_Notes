@@ -36,7 +36,7 @@
             <li><a href="../assignments.html">Assignments</a></li>
             <li><a href="../archive.html">Archive</a></li>
         </ul>
-        <div class="nav-stats">7 Lectures &bull; 42 Topics</div>
+        <div class="nav-stats">12 Lectures &bull; 77 Topics</div>
     </nav>
 
     <!-- Lectures Section -->
@@ -45,15 +45,15 @@
                         <div class="section-header-row">
                 <h3 class="section-label">Compiled Lectures</h3>
                 <div class="bulk-actions">
-                    <button class="bulk-btn" onclick="openAllNotes()" title="Open all 7 HTML Lecture Notes in separate tabs">
+                    <button class="bulk-btn" onclick="openAllNotes()" title="Open all 12 HTML Lecture Notes in separate tabs">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
                         Open All HTML Notes
                     </button>
-                    <button class="bulk-btn" onclick="openAllPDFs()" title="Open all 7 Lecture PDFs in separate tabs">
+                    <button class="bulk-btn" onclick="openAllPDFs()" title="Open all 12 Lecture PDFs in separate tabs">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
                         Open All PDFs
                     </button>
-                    <button class="bulk-btn" onclick="openAllShortNotes()" title="Open all 7 Short Notes Images in separate tabs">
+                    <button class="bulk-btn" onclick="openAllShortNotes()" title="Open all 12 Short Notes Images in separate tabs">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                         Open All Short Notes
                     </button>
@@ -215,6 +215,116 @@
                     </div>
                 </div>
 
+                <!-- Lecture 08 -->
+                <div class="lecture-card" data-lecture-id="dl-l8" onclick="window.location.href='lectures/lecture-08.html'">
+                    <div class="lecture-card-top">
+                        <div class="lecture-number">08</div>
+                        <div class="lecture-card-actions">
+                            <a href="pdfs/8.pdf" target="_blank" class="card-action-btn" title="Open Original PDF" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            </a>
+                            <a href="images/8.png" target="_blank" class="card-action-btn" title="Open Short Notes Image" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                            </a>
+                            <div class="lecture-checkbox" onclick="toggleComplete(event, 'dl-l8')" title="Toggle completion status"></div>
+                        </div>
+                    </div>
+                    <h2>Adaptive Learning Rates: AdaGrad, RMSProp & Adam</h2>
+                    <p>Heterogeneous curvature, AdaGrad squared gradient accumulation and premature stalling, RMSProp fading memory, Adam dual moments with bias correction, and step-by-step arithmetic.</p>
+                    <div class="lecture-card-header">
+                        <span class="lecture-tag">Adaptive Optimizers</span>
+                        <span class="lecture-stats">7 Topics</span>
+                    </div>
+                </div>
+
+                <!-- Lecture 09 -->
+                <div class="lecture-card" data-lecture-id="dl-l9" onclick="window.location.href='lectures/lecture-09.html'">
+                    <div class="lecture-card-top">
+                        <div class="lecture-number">09</div>
+                        <div class="lecture-card-actions">
+                            <a href="pdfs/9.pdf" target="_blank" class="card-action-btn" title="Open Original PDF" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            </a>
+                            <a href="images/9.png" target="_blank" class="card-action-btn" title="Open Short Notes Image" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                            </a>
+                            <div class="lecture-checkbox" onclick="toggleComplete(event, 'dl-l9')" title="Toggle completion status"></div>
+                        </div>
+                    </div>
+                    <h2>Regularisation: L2, L1, Early Stopping & Dropout</h2>
+                    <p>Overfitting mechanisms, runaway weight suppression, L2 weight decay derivation, L1 Lasso exact sparsity, validation patience with checkpoint restoration, and inverted dropout ensembles.</p>
+                    <div class="lecture-card-header">
+                        <span class="lecture-tag">Generalisation & Regularisation</span>
+                        <span class="lecture-stats">7 Topics</span>
+                    </div>
+                </div>
+
+                <!-- Lecture 10 Part 1 -->
+                <div class="lecture-card" data-lecture-id="dl-l10-1" onclick="window.location.href='lectures/lecture-10-part-1.html'">
+                    <div class="lecture-card-top">
+                        <div class="lecture-number">10a</div>
+                        <div class="lecture-card-actions">
+                            <a href="pdfs/10 Part_1.pdf" target="_blank" class="card-action-btn" title="Open Original PDF" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            </a>
+                            <a href="images/10_part_1.png" target="_blank" class="card-action-btn" title="Open Short Notes Image" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                            </a>
+                            <div class="lecture-checkbox" onclick="toggleComplete(event, 'dl-l10-1')" title="Toggle completion status"></div>
+                        </div>
+                    </div>
+                    <h2>CNN Foundations: From Pixels to Patterns</h2>
+                    <p>Image tensors, 2D convolution cross-correlation, multi-channel 3D kernels, valid vs same padding, stride geometry, max vs average pooling, and receptive field expansion.</p>
+                    <div class="lecture-card-header">
+                        <span class="lecture-tag">Convolutional Networks</span>
+                        <span class="lecture-stats">7 Topics</span>
+                    </div>
+                </div>
+
+                <!-- Lecture 10 Part 2 -->
+                <div class="lecture-card" data-lecture-id="dl-l10-2" onclick="window.location.href='lectures/lecture-10-part-2.html'">
+                    <div class="lecture-card-top">
+                        <div class="lecture-number">10b</div>
+                        <div class="lecture-card-actions">
+                            <a href="pdfs/10 Part_2.pdf" target="_blank" class="card-action-btn" title="Open Original PDF" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            </a>
+                            <a href="images/10_part_2.png" target="_blank" class="card-action-btn" title="Open Short Notes Image" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                            </a>
+                            <div class="lecture-checkbox" onclick="toggleComplete(event, 'dl-l10-2')" title="Toggle completion status"></div>
+                        </div>
+                    </div>
+                    <h2>Inside LeNet, AlexNet & VGG-16</h2>
+                    <p>Classical architecture evolution, LeNet digit recognizer, AlexNet GPU breakthrough with ReLU/Dropout, VGG 3x3 filter factorization, layer dimension tracing, and parameter bottlenecks.</p>
+                    <div class="lecture-card-header">
+                        <span class="lecture-tag">Classical Vision Architectures</span>
+                        <span class="lecture-stats">7 Topics</span>
+                    </div>
+                </div>
+
+                <!-- Lecture 11 -->
+                <div class="lecture-card" data-lecture-id="dl-l11" onclick="window.location.href='lectures/lecture-11.html'">
+                    <div class="lecture-card-top">
+                        <div class="lecture-number">11</div>
+                        <div class="lecture-card-actions">
+                            <a href="pdfs/11.pdf" target="_blank" class="card-action-btn" title="Open Original PDF" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            </a>
+                            <a href="images/11.png" target="_blank" class="card-action-btn" title="Open Short Notes Image" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                            </a>
+                            <div class="lecture-checkbox" onclick="toggleComplete(event, 'dl-l11')" title="Toggle completion status"></div>
+                        </div>
+                    </div>
+                    <h2>Modern Architectures: Inception & ResNet</h2>
+                    <p>The degradation problem, 1x1 convolution channel pooling, GoogLeNet multi-scale inception modules, residual skip connections as gradient highways, and bottleneck blocks.</p>
+                    <div class="lecture-card-header">
+                        <span class="lecture-tag">Modern Vision Architectures</span>
+                        <span class="lecture-stats">7 Topics</span>
+                    </div>
+                </div>
+
             </div>
         </div>
     </section>
@@ -224,15 +334,15 @@
         <h3 class="stats-title">DL Notes Metrics</h3>
         <div class="stats-grid">
             <div class="stat-item">
-                <div class="stat-val">7</div>
+                <div class="stat-val">12</div>
                 <div class="stat-label">Lectures Compiled</div>
             </div>
             <div class="stat-item">
-                <div class="stat-val">42</div>
+                <div class="stat-val">77</div>
                 <div class="stat-label">Topics</div>
             </div>
             <div class="stat-item">
-                <div class="stat-val">18</div>
+                <div class="stat-val">28</div>
                 <div class="stat-label">Diagrams & Worksheets</div>
             </div>
             <div class="stat-item">
@@ -356,23 +466,31 @@
             }
         }
 
+        const dlLecturesList = [
+            { note: 'lecture-01.html', pdf: '1.pdf', img: '1.png' },
+            { note: 'lecture-02.html', pdf: '2.pdf', img: '2.png' },
+            { note: 'lecture-03.html', pdf: '3.pdf', img: '3.png' },
+            { note: 'lecture-04.html', pdf: '4.pdf', img: '4.png' },
+            { note: 'lecture-05.html', pdf: '5.pdf', img: '5.png' },
+            { note: 'lecture-06.html', pdf: '6.pdf', img: '6.png' },
+            { note: 'lecture-07.html', pdf: '7.pdf', img: '7.png' },
+            { note: 'lecture-08.html', pdf: '8.pdf', img: '8.png' },
+            { note: 'lecture-09.html', pdf: '9.pdf', img: '9.png' },
+            { note: 'lecture-10-part-1.html', pdf: '10 Part_1.pdf', img: '10_part_1.png' },
+            { note: 'lecture-10-part-2.html', pdf: '10 Part_2.pdf', img: '10_part_2.png' },
+            { note: 'lecture-11.html', pdf: '11.pdf', img: '11.png' }
+        ];
+
         function openAllNotes() {
-            for (let i = 1; i <= 7; i++) {
-                const num = String(i).padStart(2, '0');
-                window.open(`lectures/lecture-${num}.html`, '_blank');
-            }
+            dlLecturesList.forEach(l => window.open(`lectures/${l.note}`, '_blank'));
         }
 
         function openAllPDFs() {
-            for (let i = 1; i <= 7; i++) {
-                window.open(`pdfs/${i}.pdf`, '_blank');
-            }
+            dlLecturesList.forEach(l => window.open(`pdfs/${l.pdf}`, '_blank'));
         }
 
         function openAllShortNotes() {
-            for (let i = 1; i <= 7; i++) {
-                window.open(`images/${i}.png`, '_blank');
-            }
+            dlLecturesList.forEach(l => window.open(`images/${l.img}`, '_blank'));
         }
     </script>
 </body>

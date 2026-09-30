@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Deep Learning - Lecture 09</title>
+    <meta content="Study notes for Deep Learning, Lecture 09 covering regularisation: L2 weight decay, L1 Lasso sparsity, early stopping, and dropout." name="description"/>
+    <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>09</text></svg>" rel="icon"/>
+    <link href="../css/style.css" rel="stylesheet"/>
+    <!-- KaTeX for LaTeX rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Deep Learning Foundations</h1>
+            <p>Lecture 09 - Regularisation: Learning the Pattern, Not the Noise</p>
+            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/9.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF Worksheet ↗</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/worksheet09_regularisation.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open Regularisation Interactive ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text"/>
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 7</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Short Notes</a></li>
+                <li>
+                    <a href="#topic-1">1. The Nature of Overfitting<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 Generalisation vs Memorisation</a></li>
+                        <li><a href="#sub-1-2">1.2 Signal vs Noise & Three Ingredients</a></li>
+                        <li><a href="#sub-1-3">1.3 Root Cause: Runaway Large Weights</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. L2 Regularisation & Weight Decay<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 The L2 Penalty & Loss Formulation</a></li>
+                        <li><a href="#sub-2-2">2.2 Derivation of the Weight Decay Multiplier</a></li>
+                        <li><a href="#sub-2-3">2.3 Smooth Boundaries & Never Penalizing Bias</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. L1 Regularisation & Exact Sparsity<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 The Absolute Value Penalty Formulation</a></li>
+                        <li><a href="#sub-3-2">3.2 Sub-gradient Update & Constant Push to Zero</a></li>
+                        <li><a href="#sub-3-3">3.3 Geometry of Sparsity & Feature Selection</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Early Stopping: Implicit Regularisation<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 Validation Loss Monitoring & Patience</a></li>
+                        <li><a href="#sub-4-2">4.2 Restoring Best Checkpoint Weights</a></li>
+                        <li><a href="#sub-4-3">4.3 Mathematical Equivalence to Small Weights</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Dropout: Ensembles of Subnetworks<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 Neuronal Co-adaptation & Bernoulli Masking</a></li>
+                        <li><a href="#sub-5-2">5.2 Inverted Dropout & Activation Scaling</a></li>
+                        <li><a href="#sub-5-3">5.3 Training Mode vs Test Mode (model.eval())</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-6">6. Strategy & Decision Matrix<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-6-1">6.1 Diagnostic Loss Curve Interpretation</a></li>
+                        <li><a href="#sub-6-2">6.2 Stacking Regularisers: Diminishing Returns</a></li>
+                        <li><a href="#sub-6-3">6.3 Comprehensive Comparison Matrix</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-7">7. Step-by-Step Worked Numerical Walkthrough<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-7-1">7.1 L2 vs L1 Parameter Shrinkage Calculation</a></li>
+                        <li><a href="#sub-7-2">7.2 Inverted Dropout Activation Arithmetic</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Short Notes Summary Section -->
+            <section class="topic-section" id="short-notes">
+                <div class="topic-header" onclick="toggleSection('content-short-notes')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                    </div>
+                    <h2>Executive Summary & Formula Sheet</h2>
+                </div>
+                <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
+                    <p><strong>Core Concept:</strong> Neural networks are universal approximators with immense parameter capacity. When trained unconstrained, they do not just learn the underlying data-generating distribution (signal); they also memorize idiosyncratic sampling noise and spurious correlations. Overfitting manifests geometrically as runaway weight magnitudes, yielding high-frequency oscillations and jagged decision boundaries. <strong>Regularisation</strong> encompasses techniques designed to reduce generalization error on unseen test data, often by keeping weights small, enforcing sparsity, halting training at optimal validation loss, or breaking neuronal co-adaptation.</p>
+
+                    <div class="box box-blue">
+                        <div class="box-title">Key Regularisation Formulas & Decision Rules</div>
+                        <ul style="list-style:none; padding-left:0; margin-bottom:0;">
+                            <li style="margin-bottom: 0.75rem;"><strong>L2 Regularised Objective:</strong> $$J(w) = L(w) + \frac{\lambda}{2} \|w\|_2^2 = L(w) + \frac{\lambda}{2} \sum_{i} w_i^2$$</li>
+                            <li style="margin-bottom: 0.75rem;"><strong>L2 Weight Decay Update:</strong> $$w_{t+1} = w_t (1 - \alpha \lambda) - \alpha \nabla L(w_t)$$</li>
+                            <li style="margin-bottom: 0.75rem;"><strong>L1 Regularised Objective:</strong> $$J(w) = L(w) + \lambda \|w\|_1 = L(w) + \lambda \sum_{i} |w_i|$$</li>
+                            <li style="margin-bottom: 0.75rem;"><strong>L1 Subgradient Update:</strong> $$w_{t+1} = w_t - \alpha \lambda \cdot \text{sign}(w_t) - \alpha \nabla L(w_t)$$</li>
+                            <li style="margin-bottom: 0.75rem;"><strong>Inverted Dropout (Training Forward Pass):</strong> $$\tilde{a} = \frac{m \odot a}{1 - p}, \quad m_i \sim \text{Bernoulli}(1 - p)$$</li>
+                            <li><strong>Evaluation Rule:</strong> Disable Dropout during inference (\(p = 0\)). Never apply weight decay to bias parameters \(b\).</li>
+                        </ul>
+                    </div>
+
+                    <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Lecture 09 Visual Cheatsheet</h3>
+                    <div style="text-align: center; background: var(--bg-secondary, #f8f9fa); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-light); margin-bottom: 1.5rem;">
+                        <a href="../images/9.png" target="_blank" title="Click to view full size">
+                            <img src="../images/9.png" alt="Lecture 09 Short Notes Cheatsheet" style="max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
+                        </a>
+                        <p style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-muted);">Click image to open high-resolution version in new tab</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" disabled="">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 1 -->
+            <section class="topic-section" id="topic-1">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>1. The Nature of Overfitting & Generalisation</h2>
+                </div>
+                <div class="collapsible-content" id="content-1" style="max-height: none;">
+                    <div class="sub-topic" id="sub-1-1">
+                        <h3>1.1 Generalisation vs Memorisation</h3>
+                        <p>A machine learning model is not constructed to perform well on data it has already seen; it is built to produce accurate inferences on <strong>unseen data</strong> drawn from the same underlying distribution. Consider two students preparing for an examination:</p>
+                        <ul>
+                            <li><strong>Student A (Memoriser):</strong> Memorises the exact answers to past papers. On past papers, Student A scores 100%. On the actual exam with newly phrased questions, Student A fails.</li>
+                            <li><strong>Student B (Learner):</strong> Learns the underlying concepts, principles, and problem-solving methods. On past papers, Student B scores 98%. On the real exam, Student B excels.</li>
+                        </ul>
+                        <p>In deep learning, <strong>Training error is NOT the goal</strong>. Achieving near-zero training loss is trivial with high-capacity models. The true objective is minimizing <strong>Generalisation error</strong> (Test error).</p>
+                    </div>
+
+                    <div class="sub-topic" id="sub-1-2">
+                        <h3>1.2 Signal vs Noise & Three Ingredients</h3>
+                        <p>Real-world datasets always consist of two superimposed components: <strong>Data = Signal + Noise</strong>.</p>
+                        <ul>
+                            <li><strong>Signal:</strong> The true invariant physical or structural relationship between features \(x\) and targets \(y\). Signal repeats predictably across training, validation, and test sets.</li>
+                            <li><strong>Noise:</strong> Irrelevant measurement errors, missing latent variables, and stochastic sample flukes. Noise never repeats identically on new samples.</li>
+                        </ul>
+                        <div class="box box-amber">
+                            <div class="box-title">The Three Ingredients of Overfitting</div>
+                            <ol>
+                                <li><strong>Excessive Model Capacity:</strong> The network has far more parameters, layers, and non-linear expressive power than needed to capture the signal.</li>
+                                <li><strong>Noisy or Small Dataset:</strong> The training dataset has limited sample variety or contains high measurement error, confusing the optimizer.</li>
+                                <li><strong>Prolonged Training:</strong> Optimizing for excessive epochs allows the optimizer to fine-tune weights around individual training outliers.</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="sub-topic" id="sub-1-3">
+                        <h3>1.3 Root Cause: Runaway Large Weights</h3>
+                        <p>Where does overfitting physically come from inside a neural network? <strong>Excessively large weight magnitudes</strong>.</p>
+                        <p>For a sigmoid or softmax layer, the pre-activation is \(z = \sum w_i x_i + b\). When weights \(|w_i|\) grow into large numbers (e.g. 20, 50, 100), tiny changes in an input feature \(\Delta x\) cause massive swings in \(z\). The network develops massive partial derivatives \(\left|\frac{\partial \hat{y}}{\partial x}\right|\), creating violent, jagged ripples in the decision boundary that wrap around individual noisy training points.</p>
+                        <p>Conversely, when weights are kept small, the model behaves smoothly and almost linearly over small intervals, establishing gentle, well-behaved boundaries that generalize reliably.</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('short-notes').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section class="topic-section" id="topic-2">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>2. L2 Regularisation & Weight Decay (Ridge)</h2>
+                </div>
+                <div class="collapsible-content" id="content-2" style="max-height: none;">
+                    <div class="sub-topic" id="sub-2-1">
+                        <h3>2.1 The L2 Penalty & Loss Formulation</h3>
+                        <p>The most widely utilized regularisation technique is <strong>L2 Regularisation</strong> (historically known as Ridge Regression or Tikhonov Regularisation). We penalize large weights by augmenting the empirical data loss \(L(w)\) with the squared Euclidean norm of the weight vectors:</p>
+                        <div class="formula-box">$$J(w) = L(w) + \frac{\lambda}{2} \|w\|_2^2 = L(w) + \frac{\lambda}{2} \sum_{i=1}^D w_i^2$$</div>
+                        <p>Where \(\lambda > 0\) is the regularisation hyperparameter. If \(\lambda = 0\), we recover unconstrained training. As \(\lambda \to \infty\), the model is forced to set all weights to zero.</p>
+                    </div>
+
+                    <div class="sub-topic" id="sub-2-2">
+                        <h3>2.2 Derivation of the Weight Decay Multiplier</h3>
+                        <p>Computing the gradient of the regularised objective \(J(w)\) with respect to parameter \(w\):</p>
+                        <p>$$\nabla_w J(w) = \nabla_w L(w) + \lambda w$$</p>
+                        <p>Substituting this gradient into the standard gradient descent update rule:</p>
+                        <p>$$w_{t+1} = w_t - \alpha \nabla_w J(w_t) = w_t - \alpha \left(\nabla_w L(w_t) + \lambda w_t\right)$$</p>
+                        <p>Factoring out \(w_t\):</p>
+                        <div class="formula-box">$$w_{t+1} = w_t (1 - \alpha \lambda) - \alpha \nabla_w L(w_t)$$</div>
+                        <div class="box box-green">
+                            <div class="box-title">Why It Is Called "Weight Decay"</div>
+                            <p>Notice the multiplicative factor \((1 - \alpha \lambda)\). Because \(\alpha > 0\) and \(\lambda > 0\), this factor is strictly less than 1 (e.g., \(1 - 0.001 \times 0.1 = 0.9999\)). Before taking the gradient step, the optimizer shrinks the weight toward zero by a tiny percentage at <strong>every single iteration</strong>!</p>
+                        </div>
+                    </div>
+
+                    <div class="sub-topic" id="sub-2-3">
+                        <h3>2.3 Smooth Boundaries & Never Penalizing Bias</h3>
+                        <p><strong>Why L2 produces smooth boundaries:</strong> By preventing weights from growing large, the slope of the activation functions remains bounded. The Lipschitz constant of the network is small, ensuring that similar input vectors always produce similar predictions.</p>
+                        <div class="box box-red">
+                            <div class="box-title">Critical Practical Rule: Never Regularise Biases</div>
+                            <p><strong>Do NOT include bias parameters \(b\) in the L2 penalty!</strong> Biases control the absolute position/threshold of the decision boundary, not its curvature, complexity, or sensitivity. Penalizing biases restricts the network from shifting its activations to fit shifted data distributions without providing any regularisation benefit.</p>
+                        </div>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section class="topic-section" id="topic-3">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>3. L1 Regularisation & Exact Sparsity (Lasso)</h2>
+                </div>
+                <div class="collapsible-content" id="content-3" style="max-height: none;">
+                    <div class="sub-topic" id="sub-3-1">
+                        <h3>3.1 The Absolute Value Penalty Formulation</h3>
+                        <p><strong>L1 Regularisation</strong> (Lasso - Least Absolute Shrinkage and Selection Operator) penalizes the sum of the absolute values of the weights rather than their squares:</p>
+                        <div class="formula-box">$$J(w) = L(w) + \lambda \|w\|_1 = L(w) + \lambda \sum_{i=1}^D |w_i|$$</div>
+                        <p>The derivative of \(|w|\) with respect to \(w\) is the sign function \(\text{sign}(w)\), defined as \(+1\) for \(w > 0\), \(-1\) for \(w < 0\), and undefined at \(w = 0\) (where we use the sub-gradient zero).</p>
+                    </div>
+
+                    <div class="sub-topic" id="sub-3-2">
+                        <h3>3.2 Sub-gradient Update & Constant Push to Zero</h3>
+                        <p>The gradient descent update rule under L1 regularisation is:</p>
+                        <div class="formula-box">$$w_{t+1} = w_t - \alpha \lambda \cdot \text{sign}(w_t) - \alpha \nabla_w L(w_t)$$</div>
+                        <p>Consider the fundamental difference in the push towards zero between L2 and L1:</p>
+                        <ul>
+                            <li><strong>L2 Push (\(\lambda w\)):</strong> The penalty force is proportional to \(w\). When \(w = 10\), the push is strong (\(10\lambda\)). But when \(w = 0.01\), the push shrinks to \(0.01\lambda\). As \(w\) nears zero, the restoring force vanishes. L2 weights approach zero asymptotically, but <strong>never become exactly zero</strong>.</li>
+                            <li><strong>L1 Push (\(\lambda \cdot \text{sign}(w)\)):</strong> The penalty force is <strong>constant</strong> regardless of whether \(w = 10\) or \(w = 0.0001\). It exerts a relentless constant pressure of magnitude \(\alpha \lambda\) towards origin. This drives non-essential weights to <strong>exact zero (\(w = 0.0000\))</strong>!</li>
+                        </ul>
+                    </div>
+
+                    <div class="sub-topic" id="sub-3-3">
+                        <h3>3.3 Geometry of Sparsity & Feature Selection</h3>
+                        <p>In high-dimensional feature spaces, driving weights to exact zero produces <strong>sparse models</strong>. When weight \(w_j = 0\), feature \(x_j\) has zero influence on the network output. L1 regularisation performs automatic embedded <strong>feature selection</strong>, discarding uninformative inputs and drastically reducing inference compute memory.</p>
+                        <div class="box box-blue">
+                            <div class="box-title">Geometric Constraint Intuition</div>
+                            <p>In constrained optimization, L2 corresponds to a circular/spherical constraint ball \(\sum w_i^2 \le C\), whose smooth tangency points with elliptical loss contours occur in open space. L1 corresponds to a diamond/hyper-rhombus constraint \(\sum |w_i| \le C\), whose sharp corners sit precisely on the coordinate axes (\(w_i = 0\)), making corner intersections overwhelmingly likely.</p>
+                        </div>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section class="topic-section" id="topic-4">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>4. Early Stopping: Implicit Regularisation</h2>
+                </div>
+                <div class="collapsible-content" id="content-4" style="max-height: none;">
+                    <div class="sub-topic" id="sub-4-1">
+                        <h3>4.1 Validation Loss Monitoring & Patience</h3>
+                        <p>During neural network training, training loss decreases monotonically with each passing epoch. However, validation loss follows a U-shaped curve: it decreases initially as the model learns general signal, hits a global minimum at epoch \(E^*\), and then begins climbing upward as the network starts memorizing training noise.</p>
+                        <p><strong>Early Stopping</strong> halts training when validation loss stops improving. Because mini-batch gradient descent is stochastic and validation curves are noisy, we introduce a <strong>patience parameter</strong> (e.g. \(patience = 5\) or \(10\)):</p>
+                        <div class="formula-box">$$\text{Stop if: } L_{\text{val}}(t) > \min_{k \le t} L_{\text{val}}(k) \quad \text{for } P \text{ consecutive epochs}$$</div>
+                    </div>
+
+                    <div class="sub-topic" id="sub-4-2">
+                        <h3>4.2 Restoring Best Checkpoint Weights</h3>
+                        <div class="box box-amber">
+                            <div class="box-title">Crucial Implementation Rule</div>
+                            <p>Never keep the weights from the final epoch when early stopping triggers! If patience is 10, the model has already been overfitting for 10 epochs. <strong>Always cache model checkpoints and restore the weights from epoch \(E^*\)</strong> where validation loss was lowest.</p>
+                        </div>
+                    </div>
+
+                    <div class="sub-topic" id="sub-4-3">
+                        <h3>4.3 Mathematical Equivalence to Small Weights</h3>
+                        <p>Why does early stopping regularise the model so effectively? At initialization, weights start near zero (\(w_0 \approx 0\)). Under gradient descent updates \(\Delta w = -\alpha \nabla L\), parameter vectors only travel a finite distance from the origin:</p>
+                        <div class="formula-box">$$\|w_T - w_0\| \le T \cdot \alpha \cdot G_{\max}$$</div>
+                        <p>Stopping after \(T\) iterations limits the parameter space that can be reached. Sjöberg and Ljung (1995) proved that early stopping is mathematically equivalent to L2 regularisation with an effective penalty \(\lambda \propto \frac{1}{T}\). It is a "free lunch" regulariser: zero computational cost at inference and actually saves GPU training time!</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 5 -->
+            <section class="topic-section" id="topic-5">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>5. Dropout: Ensembles of Subnetworks</h2>
+                </div>
+                <div class="collapsible-content" id="content-5" style="max-height: none;">
+                    <div class="sub-topic" id="sub-5-1">
+                        <h3>5.1 Neuronal Co-adaptation & Bernoulli Masking</h3>
+                        <p>Introduced by Srivastava, Hinton, Krizhevsky, Sutskever, and Salakhutdinov (2014), <strong>Dropout</strong> addresses the root cause of overfitting in dense deep networks: <strong>complex co-adaptation</strong>. In an unconstrained network, individual neurons learn to rely on specific partner neurons to correct their mistakes, creating brittle interdependent structures.</p>
+                        <p>During training, dropout randomly turns off (drops) each hidden neuron independently with probability \(p\) (typically \(p = 0.5\) for hidden layers, \(p = 0.2\) for input features) by multiplying activation vector \(a\) element-wise with a binary Bernoulli mask \(m \sim \text{Bernoulli}(1 - p)\).</p>
+                    </div>
+
+                    <div class="sub-topic" id="sub-5-2">
+                        <h3>5.2 Inverted Dropout & Activation Scaling</h3>
+                        <p>If half the neurons are turned off during training, the expected sum of inputs to the next layer is cut in half: \(E[\sum \tilde{a}_i] = (1 - p) \sum a_i\). At test time, all neurons must be active to maximize inference accuracy.</p>
+                        <p>In standard dropout, activations had to be multiplied by \((1 - p)\) at test time. Modern frameworks instead use <strong>Inverted Dropout</strong>: during training, active activations are scaled up by \(\frac{1}{1 - p}\) immediately:</p>
+                        <div class="formula-box">$$\tilde{a}_i = \begin{cases} \frac{a_i}{1 - p} & \text{with probability } 1 - p \\ 0 & \text{with probability } p \end{cases}$$</div>
+                        <p>Now \(E[\tilde{a}_i] = (1 - p) \cdot \frac{a_i}{1 - p} + p \cdot 0 = a_i\)! The expectation is identical across train and test time, requiring <strong>zero modifications</strong> during test inference.</p>
+                    </div>
+
+                    <div class="sub-topic" id="sub-5-3">
+                        <h3>5.3 Training Mode vs Test Mode (model.eval())</h3>
+                        <p>Dropout represents an implicit <strong>ensemble of \(2^N\) distinct subnetworks</strong> sharing weights. Each mini-batch trains a randomly thinned subnetwork, preventing any neuron from relying on an idiosyncratic peer.</p>
+                        <div class="box box-green">
+                            <div class="box-title">Critical PyTorch Engineering Rule</div>
+                            <p>Always switch modes explicitly:</p>
+                            <ul>
+                                <li><code>model.train()</code>: Enables dropout masks and random thinning. Notice that training loss will appear artificially higher due to missing neurons!</li>
+                                <li><code>model.eval()</code> with <code>torch.no_grad()</code>: Completely disables dropout, using the full deterministic ensemble. Validation loss often drops noticeably upon entering eval mode.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 6 -->
+            <section class="topic-section" id="topic-6">
+                <div class="topic-header" onclick="toggleSection('content-6')">
+                    <div class="topic-number">6</div>
+                    <h2>6. Strategic Regularisation Framework & Decision Matrix</h2>
+                </div>
+                <div class="collapsible-content" id="content-6" style="max-height: none;">
+                    <div class="sub-topic" id="sub-6-1">
+                        <h3>6.1 Diagnostic Loss Curve Interpretation</h3>
+                        <p>Always diagnose model behavior by plotting Training Loss and Validation Loss simultaneously across epochs:</p>
+                        <table style="width:100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem;">
+                            <thead>
+                                <tr style="background: var(--bg-secondary); border-bottom: 2px solid var(--border-light); text-align: left;">
+                                    <th style="padding: 8px;">Curve Signature</th>
+                                    <th style="padding: 8px;">Diagnosis</th>
+                                    <th style="padding: 8px;">Prescription</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid var(--border-light);">
+                                    <td style="padding: 8px;">High Training Loss, High Validation Loss</td>
+                                    <td><strong>Underfitting</strong> (High Bias)</td>
+                                    <td>Increase network capacity, add layers, remove excessive regularisation, train longer.</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid var(--border-light);">
+                                    <td style="padding: 8px;">Low Training Loss, Low Validation Loss</td>
+                                    <td><strong>Good Fit</strong> (Optimal Generalisation)</td>
+                                    <td>Maintain hyperparameters; model has learned underlying signal.</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px;">Training Loss continues falling, Validation Loss curves upward</td>
+                                    <td><strong>Overfitting</strong> (High Variance)</td>
+                                    <td>Add Early Stopping, increase L2 weight decay, add Dropout (p=0.2-0.5), collect more data.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="sub-topic" id="sub-6-2">
+                        <h3>6.2 Stacking Regularisers: Diminishing Returns</h3>
+                        <p>It is tempting to stack L2 weight decay + L1 + Dropout + Early Stopping simultaneously. However, excessive regularisation chokes the representation capacity of the network, converting an overfitted model directly into an underfitted model.</p>
+                        <p><strong>Standard Recommended Recipe:</strong></p>
+                        <ol>
+                            <li>Start with a high-capacity model that can easily overfit the training data.</li>
+                            <li>Always activate <strong>Early Stopping</strong> with patience (free safety net).</li>
+                            <li>Add moderate <strong>L2 Weight Decay</strong> (\(\lambda = 10^{-4}\) to \(10^{-2}\) via AdamW).</li>
+                            <li>If validation loss still diverges, insert <strong>Dropout</strong> (\(p = 0.2\) to \(0.5\)) into deep fully-connected layers.</li>
+                        </ol>
+                    </div>
+
+                    <div class="sub-topic" id="sub-6-3">
+                        <h3>6.3 Comprehensive Comparison Matrix</h3>
+                        <table style="width:100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.9rem;">
+                            <thead>
+                                <tr style="background: var(--bg-secondary); border-bottom: 2px solid var(--border-light); text-align: left;">
+                                    <th style="padding: 8px;">Method</th>
+                                    <th style="padding: 8px;">Mechanism</th>
+                                    <th style="padding: 8px;">Effect on Weights</th>
+                                    <th style="padding: 8px;">Inference Overhead</th>
+                                    <th style="padding: 8px;">Primary Use Case</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid var(--border-light);">
+                                    <td style="padding: 8px;"><strong>L2 Regularisation</strong></td>
+                                    <td>Penalizes \(\sum w^2\)</td>
+                                    <td>Smooth shrinkage towards zero</td>
+                                    <td>None (weights baked in)</td>
+                                    <td>Standard default for all deep models</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid var(--border-light);">
+                                    <td style="padding: 8px;"><strong>L1 Regularisation</strong></td>
+                                    <td>Penalizes \(\sum |w|\)</td>
+                                    <td>Drives non-essential weights to exact zero</td>
+                                    <td>None (sparse model)</td>
+                                    <td>Feature selection, compact compressed models</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid var(--border-light);">
+                                    <td style="padding: 8px;"><strong>Early Stopping</strong></td>
+                                    <td>Halt on val loss minimum</td>
+                                    <td>Restricts distance from initialization</td>
+                                    <td>None (saves training time)</td>
+                                    <td>Universal safety net on every training run</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px;"><strong>Dropout</strong></td>
+                                    <td>Random neuron deactivation</td>
+                                    <td>Prevents co-adaptation; ensemble effect</td>
+                                    <td>None (disabled at test time)</td>
+                                    <td>Fully connected layers, large MLPs, Transformers</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-7').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 7 -->
+            <section class="topic-section" id="topic-7">
+                <div class="topic-header" onclick="toggleSection('content-7')">
+                    <div class="topic-number">7</div>
+                    <h2>7. Step-by-Step Worked Numerical Walkthrough</h2>
+                </div>
+                <div class="collapsible-content" id="content-7" style="max-height: none;">
+                    <div class="sub-topic" id="sub-7-1">
+                        <h3>7.1 L2 vs L1 Parameter Shrinkage Calculation</h3>
+                        <p>Let current parameter value be \(w = 0.5000\), base learning rate \(\alpha = 0.1\), regularisation strength \(\lambda = 0.2\), and data gradient \(\nabla L = 0.0500\).</p>
+                        <div class="box box-green">
+                            <div class="box-title">L2 Weight Decay Calculation</div>
+                            <p>Update equation: \(w_{t+1} = w_t (1 - \alpha \lambda) - \alpha \nabla L\)</p>
+                            <ul>
+                                <li>Decay factor: \(1 - (0.1 \times 0.2) = 1 - 0.02 = \mathbf{0.98}\)</li>
+                                <li>Weight after decay: \(0.5000 \times 0.98 = \mathbf{0.4900}\)</li>
+                                <li>Data gradient step: \(0.1 \times 0.0500 = \mathbf{0.0050}\)</li>
+                                <li>Final updated weight: \(0.4900 - 0.0050 = \mathbf{0.4850}\)</li>
+                            </ul>
+                        </div>
+                        <div class="box box-blue">
+                            <div class="box-title">L1 Lasso Calculation</div>
+                            <p>Update equation: \(w_{t+1} = w_t - \alpha \lambda \cdot \text{sign}(w_t) - \alpha \nabla L\)</p>
+                            <ul>
+                                <li>Because \(w = 0.5000 > 0\), \(\text{sign}(w) = +1\)</li>
+                                <li>L1 penalty step: \(\alpha \lambda = 0.1 \times 0.2 = \mathbf{0.0200}\)</li>
+                                <li>Data gradient step: \(0.1 \times 0.0500 = \mathbf{0.0050}\)</li>
+                                <li>Final updated weight: \(0.5000 - 0.0200 - 0.0050 = \mathbf{0.4750}\)</li>
+                            </ul>
+                            <p>Notice that L1 removed a full \(0.0200\), while L2 removed only \(0.0100\) (since \(2\lambda w = 0.02 \times 0.5 = 0.01\)). L1 pulls significantly harder on small weights towards exact zero!</p>
+                        </div>
+                    </div>
+
+                    <div class="sub-topic" id="sub-7-2">
+                        <h3>7.2 Inverted Dropout Activation Arithmetic</h3>
+                        <p>Consider a hidden layer vector with 4 activations before dropout: \(a = [2.0, 4.0, 6.0, 8.0]\). We apply inverted dropout with dropout probability \(p = 0.5\) (keep probability \(1 - p = 0.5\)).</p>
+                        <div class="box box-amber">
+                            <div class="box-title">Dropout Forward Pass Arithmetic</div>
+                            <ul>
+                                <li>Scaling factor: \(\frac{1}{1 - p} = \frac{1}{0.5} = \mathbf{2.0}\)</li>
+                                <li>Suppose random Bernoulli mask generated is \(m = [1, 0, 1, 0]\) (neurons 1 and 3 active; neurons 2 and 4 dropped).</li>
+                                <li>Masked activations: \(a \odot m = [2.0, 0.0, 6.0, 0.0]\)</li>
+                                <li>Scaled inverted activations: \(\tilde{a} = 2.0 \times [2.0, 0.0, 6.0, 0.0] = \mathbf{[4.0, 0.0, 12.0, 0.0]}\)</li>
+                                <li>Notice the sum of activations:
+                                    <ul>
+                                        <li>Original unmasked sum: \(2.0 + 4.0 + 6.0 + 8.0 = 20.0\)</li>
+                                        <li>Inverted dropout sum: \(4.0 + 0.0 + 12.0 + 0.0 = 16.0\) (expected value across masks is exactly \(20.0\))</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                            <p>During backpropagation, gradients only flow backwards through neurons 1 and 3, scaled by \(2.0\). Neurons 2 and 4 receive exactly zero gradient.</p>
+                        </div>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('original-pdf').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for Lecture 09 (Regularisation Worksheet):</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-7').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/9.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--border-light, #ddd); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>

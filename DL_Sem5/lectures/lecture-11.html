@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Deep Learning - Lecture 11</title>
+    <meta content="Study notes for Deep Learning, Lecture 11 covering modern CNN architectures: Inception (GoogLeNet), 1x1 convolutions, the degradation problem, and Deep Residual Learning (ResNet)." name="description"/>
+    <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>11</text></svg>" rel="icon"/>
+    <link href="../css/style.css" rel="stylesheet"/>
+    <!-- KaTeX for LaTeX rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Deep Learning Foundations</h1>
+            <p>Lecture 11 - Modern CNN Architectures: Inception & ResNet</p>
+            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/11.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF Worksheet ↗</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/worksheet11_inception_resnet.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open Inception/ResNet Interactive ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text"/>
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 7</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Short Notes</a></li>
+                <li>
+                    <a href="#topic-1">1. Limits of Plain ConvNets & The Depth Barrier<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 Vanishing Gradients in Deep Pipelines</a></li>
+                        <li><a href="#sub-1-2">1.2 The Degradation Problem (Optimization Failure)</a></li>
+                        <li><a href="#sub-1-3">1.3 The Trade-off: Wider vs Deeper</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. The 1x1 Convolution as a Dimensionality Reducer<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 Cross-Channel Linear Projection</a></li>
+                        <li><a href="#sub-2-2">2.2 Channel Pooling Without Spatial Distortion</a></li>
+                        <li><a href="#sub-2-3">2.3 Dramatic Computational FLOPs Reduction</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. GoogLeNet / Inception Architecture<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 Multi-Scale Processing in Parallel</a></li>
+                        <li><a href="#sub-3-2">3.2 The Inception Module with Bottlenecks</a></li>
+                        <li><a href="#sub-3-3">3.3 Global Average Pooling & Auxiliary Classifiers</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Deep Residual Learning (ResNet)<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 Reformulation: Learning Residuals F(x) = H(x) - x</a></li>
+                        <li><a href="#sub-4-2">4.2 The Residual Skip Connection: H(x) = F(x) + x</a></li>
+                        <li><a href="#sub-4-3">4.3 Gradient Highway: Resolving Vanishing Gradients</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. ResNet Block Variants & Architectural Scaling<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 Basic Residual Block (ResNet-18/34)</a></li>
+                        <li><a href="#sub-5-2">5.2 Bottleneck Residual Block (ResNet-50/101/152)</a></li>
+                        <li><a href="#sub-5-3">5.3 Identity Shortcuts vs 1x1 Projection Shortcuts</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-6">6. Dimension Tracing & Comparative Matrix<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-6-1">6.1 GoogLeNet (Inception-v1) Stage Configuration</a></li>
+                        <li><a href="#sub-6-2">6.2 ResNet-50 Layer-by-Layer Dimension Tracing</a></li>
+                        <li><a href="#sub-6-3">6.3 Classical vs Modern Architecture Matrix</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-7">7. Step-by-Step Worked Architectural Calculations<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-7-1">7.1 Inception Module FLOP Reduction Calculation</a></li>
+                        <li><a href="#sub-7-2">7.2 ResNet-50 Bottleneck Block Parameter Derivation</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Short Notes Summary Section -->
+            <section class="topic-section" id="short-notes">
+                <div class="topic-header" onclick="toggleSection('content-short-notes')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                    </div>
+                    <h2>Executive Summary & Formula Sheet</h2>
+                </div>
+                <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
+                    <p><strong>Core Concept:</strong> As neural networks grow deeper, plain sequential stacking hits a fundamental optimization barrier known as the <strong>degradation problem</strong>: deeper plain networks paradoxically exhibit higher training and validation errors than shallower counterparts. Two revolutionary architectures resolved this dilemma at ILSVRC 2014 and 2015. <strong>GoogLeNet (Inception)</strong> introduced multi-scale parallel receptive fields and used \(1 \times 1\) bottleneck convolutions to dramatically cut FLOPs while replacing dense FC layers with Global Average Pooling (~6.8M parameters). <strong>ResNet</strong> introduced identity shortcut connections (\(\mathcal{H}(x) = \mathcal{F}(x) + x\)), converting layers into residual estimators and creating unobstructed gradient highways that enabled training networks of unprecedented depth (50, 101, and 152 layers).</p>
+
+                    <div class="box box-blue">
+                        <div class="box-title">Modern Architecture Formula & Identity Sheet</div>
+                        <ul style="list-style:none; padding-left:0; margin-bottom:0;">
+                            <li style="margin-bottom: 0.75rem;"><strong>1x1 Convolution Operation:</strong> $$\mathbf{Y}_{h,w,k} = \sum_{c=1}^{C_{\text{in}}} \mathbf{X}_{h,w,c} \cdot \mathbf{W}_{k,c} + b_k \quad (\text{preserves spatial } H \times W, \text{ changes } C_{\text{in}} \to C_{\text{out}})$$</li>
+                            <li style="margin-bottom: 0.75rem;"><strong>Residual Block Formulation:</strong> $$\mathcal{H}(x) = \mathcal{F}(x, \{W_i\}) + x$$</li>
+                            <li style="margin-bottom: 0.75rem;"><strong>Residual Mapping (What is learned):</strong> $$\mathcal{F}(x) = \mathcal{H}(x) - x$$</li>
+                            <li style="margin-bottom: 0.75rem;"><strong>Gradient Highway (Backpropagation):</strong> $$\frac{\partial \mathcal{E}}{\partial x} = \frac{\partial \mathcal{E}}{\partial \mathcal{H}} \left( \frac{\partial \mathcal{F}}{\partial x} + \mathbf{I} \right) = \frac{\partial \mathcal{E}}{\partial \mathcal{H}} \frac{\partial \mathcal{F}}{\partial x} + \frac{\partial \mathcal{E}}{\partial \mathcal{H}}$$</li>
+                            <li style="margin-bottom: 0.75rem;"><strong>Projection Shortcut (when shapes differ):</strong> $$\mathcal{H}(x) = \mathcal{F}(x) + W_s x \quad (\text{where } W_s \text{ is a } 1\times 1 \text{ conv with stride } S=2)$$</li>
+                            <li><strong>ResNet Bottleneck Structure:</strong> $$1\times 1 \text{ conv (reduce } C\text{)} \to 3\times 3 \text{ conv} \to 1\times 1 \text{ conv (restore } 4C\text{)}$$</li>
+                        </ul>
+                    </div>
+
+                    <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Lecture 11 Visual Cheatsheet</h3>
+                    <div style="text-align: center; background: var(--bg-secondary, #f8f9fa); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-light); margin-bottom: 1.5rem;">
+                        <a href="../images/11.png" target="_blank" title="Click to view full size">
+                            <img src="../images/11.png" alt="Lecture 11 Short Notes Cheatsheet" style="max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
+                        </a>
+                        <p style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-muted);">Click image to open high-resolution version in new tab</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" disabled="">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 1 -->
+            <section class="topic-section" id="topic-1">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>1. Limits of Plain ConvNets & The Depth Barrier</h2>
+                </div>
+                <div class="collapsible-content" id="content-1" style="max-height: none;">
+                    <div class="sub-topic" id="sub-1-1">
+                        <h3>1.1 Vanishing Gradients in Deep Pipelines</h3>
+                        <p>Following VGG's success, researchers attempted to stack more layers (e.g. 20, 30, 56 layers). However, repeated multiplication of weight Jacobians during backpropagation caused gradients to either decay exponentially toward zero (vanishing gradient) or explode to infinity.</p>
+                    </div>
+
+                    <div class="sub-topic" id="sub-1-2">
+                        <h3>1.2 The Degradation Problem (Optimization Failure)</h3>
+                        <p>Even with Batch Normalization ensuring well-scaled activations, extremely deep plain networks hit a strange and devastating roadblock: <strong>the degradation problem</strong>.</p>
+                        <div class="box box-amber">
+                            <div class="box-title">Critical Empirical Discovery (He et al., 2015)</div>
+                            <p>When comparing a 56-layer plain network against a 20-layer plain network on CIFAR-10, the 56-layer network had <strong>higher training error</strong> throughout all epochs! This was <strong>NOT overfitting</strong> (in overfitting, training error is near zero while validation error spikes). It was an optimization failure: stochastic gradient descent cannot optimize deep non-linear stacks to learn even a simple identity mapping!</p>
+                        </div>
+                    </div>
+
+                    <div class="sub-topic" id="sub-1-3">
+                        <h3>1.3 The Trade-off: Wider vs Deeper</h3>
+                        <p>Making networks wider (more channels) linearly increases parameter count and quadrately increases computational cost. To improve representation power efficiently, the vision community needed architectures that could safely scale deeper without gradient collapse.</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('short-notes').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section class="topic-section" id="topic-2">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>2. The 1x1 Convolution as a Dimensionality Reducer</h2>
+                </div>
+                <div class="collapsible-content" id="content-2" style="max-height: none;">
+                    <div class="sub-topic" id="sub-2-1">
+                        <h3>2.1 Cross-Channel Linear Projection</h3>
+                        <p>Introduced by Lin et al. in "Network In Network" (2013), a <strong>\(1 \times 1\) Convolution</strong> operates on a single spatial pixel \((h, w)\) across all input channels \(C_{\text{in}}\). It acts as a localized Multi-Layer Perceptron across the channel depth, computing a linear combination of all channels followed by a non-linear activation (ReLU):</p>
+                        <div class="formula-box">$$\mathbf{Y}_{h,w,k} = \text{ReLU}\left( \sum_{c=1}^{C_{\text{in}}} \mathbf{X}_{h,w,c} \cdot \mathbf{W}_{k,c} + b_k \right)$$</div>
+                    </div>
+
+                    <div class="sub-topic" id="sub-2-2">
+                        <h3>2.2 Channel Pooling Without Spatial Distortion</h3>
+                        <p>While spatial pooling (MaxPool) shrinks spatial height and width while preserving channel depth, a \(1 \times 1\) convolution does the exact opposite: <strong>it shrinks channel depth (\(C_{\text{in}} \to C_{\text{out}}\)) while preserving exact spatial height and width</strong>!</p>
+                    </div>
+
+                    <div class="sub-topic" id="sub-2-3">
+                        <h3>2.3 Dramatic Computational FLOPs Reduction</h3>
+                        <p>By placing a \(1 \times 1\) convolution before an expensive \(3 \times 3\) or \(5 \times 5\) convolution (a <strong>bottleneck projection</strong>), we compress the channel count (e.g. from 256 down to 64), perform the spatial convolution cheaply, and then project channels back up. This reduces FLOPs by up to <strong>70% to 80%</strong> with zero loss in representational capacity.</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section class="topic-section" id="topic-3">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>3. GoogLeNet / Inception Architecture</h2>
+                </div>
+                <div class="collapsible-content" id="content-3" style="max-height: none;">
+                    <div class="sub-topic" id="sub-3-1">
+                        <h3>3.1 Multi-Scale Processing in Parallel</h3>
+                        <p>In standard CNNs (AlexNet, VGG), the designer must choose a fixed kernel size for each layer: should it be \(1 \times 1\), \(3 \times 3\), or \(5 \times 5\)? Different images require different receptive fields to capture small vs large objects.</p>
+                        <p>The <strong>Inception module</strong> avoids this guesswork: it applies \(1 \times 1\), \(3 \times 3\), \(5 \times 5\) convolutions and \(3 \times 3\) Max Pooling <strong>simultaneously in parallel</strong> at the exact same level, concatenating their output feature maps along the channel dimension!</p>
+                    </div>
+
+                    <div class="sub-topic" id="sub-3-2">
+                        <h3>3.2 The Inception Module with Bottlenecks</h3>
+                        <p>A naive multi-scale module is computationally prohibitive because channel depths blow up after concatenation. GoogLeNet introduces <strong>bottleneck \(1 \times 1\) convolutions</strong> before the \(3 \times 3\) and \(5 \times 5\) branches and after the MaxPool branch. This makes deep multi-scale processing computationally feasible.</p>
+                    </div>
+
+                    <div class="sub-topic" id="sub-3-3">
+                        <h3>3.3 Global Average Pooling & Auxiliary Classifiers</h3>
+                        <div class="box box-green">
+                            <div class="box-title">Two Radical Innovations in GoogLeNet (Szegedy et al., 2014)</div>
+                            <ul>
+                                <li><strong>Global Average Pooling (GAP):</strong> Replaced the massive FC layers of AlexNet/VGG with a single GAP layer that averages each feature map into a single scalar value. This slashed total network parameters from 138M (VGG) to just <strong>6.8 Million</strong> (20x parameter reduction!).</li>
+                                <li><strong>Auxiliary Classification Heads:</strong> Attached two intermediate softmax loss branches to middle layers during training. These auxiliary heads injected fresh gradients directly into early layers, combating vanishing gradients in a 22-layer pipeline (discarded at inference).</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section class="topic-section" id="topic-4">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>4. Deep Residual Learning (ResNet)</h2>
+                </div>
+                <div class="collapsible-content" id="content-4" style="max-height: none;">
+                    <div class="sub-topic" id="sub-4-1">
+                        <h3>4.1 Reformulation: Learning Residuals F(x) = H(x) - x</h3>
+                        <p>In a plain network, stacked layers are tasked with learning the full target mapping \(\mathcal{H}(x)\). If an identity mapping is optimal (i.e. adding more layers should at least perform no worse than a shallower network), plain layers struggle to fit weights to approximate \(\mathcal{H}(x) = x\).</p>
+                        <p>Kaiming He et al. (2015) reformulated the objective: instead of fitting \(\mathcal{H}(x)\), let the stacked non-linear layers fit a <strong>residual mapping</strong>:</p>
+                        <div class="formula-box">$$\mathcal{F}(x) = \mathcal{H}(x) - x \implies \mathcal{H}(x) = \mathcal{F}(x) + x$$</div>
+                        <p>If identity mapping is required, the optimizer simply pushes the weights of \(\mathcal{F}(x)\) toward zero, which is trivial with standard L2 regularisation!</p>
+                    </div>
+
+                    <div class="sub-topic" id="sub-4-2">
+                        <h3>4.2 The Residual Skip Connection: H(x) = F(x) + x</h3>
+                        <p>A residual block connects the input \(x\) directly to the output via an <strong>identity shortcut connection</strong>, performing an element-wise addition before applying the final ReLU activation:</p>
+                        <div class="formula-box">$$y = \text{ReLU}\left( \mathcal{F}(x, \{W_i\}) + x \right)$$</div>
+                        <p>Identity shortcuts introduce <strong>zero extra parameters</strong> and <strong>zero computational overhead</strong> beyond simple element-wise addition.</p>
+                    </div>
+
+                    <div class="sub-topic" id="sub-4-3">
+                        <h3>4.3 Gradient Highway: Resolving Vanishing Gradients</h3>
+                        <div class="box box-blue">
+                            <div class="box-title">Mathematical Proof of the Gradient Highway</div>
+                            <p>Let's inspect the gradient of loss \(\mathcal{E}\) with respect to input \(x\) through a residual block:</p>
+                            <div class="formula-box">$$\frac{\partial \mathcal{E}}{\partial x} = \frac{\partial \mathcal{E}}{\partial y} \cdot \frac{\partial y}{\partial x} = \frac{\partial \mathcal{E}}{\partial y} \left( \frac{\partial \mathcal{F}}{\partial x} + \mathbf{I} \right) = \frac{\partial \mathcal{E}}{\partial y} \frac{\partial \mathcal{F}}{\partial x} + \frac{\partial \mathcal{E}}{\partial y}$$</div>
+                            <p>Notice the term \(+\frac{\partial \mathcal{E}}{\partial y}\)! Even if the weight pathway \(\frac{\partial \mathcal{F}}{\partial x}\) decays to zero, <strong>the clean gradient \(\frac{\partial \mathcal{E}}{\partial y}\) flows backwards directly through the identity shortcut unchanged</strong>! The shortcut acts as an uninterrupted gradient highway, enabling stable training of networks with 100 to 1,000+ layers.</p>
+                        </div>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 5 -->
+            <section class="topic-section" id="topic-5">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>5. ResNet Block Variants & Architectural Scaling</h2>
+                </div>
+                <div class="collapsible-content" id="content-5" style="max-height: none;">
+                    <div class="sub-topic" id="sub-5-1">
+                        <h3>5.1 Basic Residual Block (ResNet-18/34)</h3>
+                        <p>For shallow ResNet variants (ResNet-18 and ResNet-34), the residual block consists of two stacked \(3 \times 3\) convolutional layers with Batch Normalization and ReLU:</p>
+                        <p style="text-align:center; font-family:var(--mono);">Input \(x \to [3\times 3 \text{ Conv, BN, ReLU}] \to [3\times 3 \text{ Conv, BN}] \oplus x \to \text{ReLU} \to Output\)</p>
+                    </div>
+
+                    <div class="sub-topic" id="sub-5-2">
+                        <h3>5.2 Bottleneck Residual Block (ResNet-50/101/152)</h3>
+                        <p>For deeper networks, stacking \(3 \times 3\) filters becomes too computationally expensive. ResNet adopts a 3-layer <strong>Bottleneck Block</strong>:</p>
+                        <ol>
+                            <li>\(1 \times 1\) Conv: Compresses channel dimensions (e.g. \(256 \to 64\)).</li>
+                            <li>\(3 \times 3\) Conv: Performs spatial feature learning on the cheap compressed representation (\(64 \to 64\)).</li>
+                            <li>\(1 \times 1\) Conv: Expands channel dimension by \(4\times\) (\(64 \to 256\)) before residual addition.</li>
+                        </ol>
+                    </div>
+
+                    <div class="sub-topic" id="sub-5-3">
+                        <h3>5.3 Identity Shortcuts vs 1x1 Projection Shortcuts</h3>
+                        <p>When the spatial dimensions shrink (via stride \(S = 2\)) or channel capacity expands across stages, the shortcut cannot simply perform raw addition because shapes mismatch (\(\text{Shape}(\mathcal{F}(x)) \ne \text{Shape}(x)\)). In these cases, we use a <strong>Projection Shortcut</strong>:</p>
+                        <div class="formula-box">$$y = \mathcal{F}(x) + \mathbf{W}_s x$$</div>
+                        <p>Where \(\mathbf{W}_s\) is a \(1 \times 1\) convolution with stride \(S = 2\) that matches both spatial resolution and channel depth.</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 6 -->
+            <section class="topic-section" id="topic-6">
+                <div class="topic-header" onclick="toggleSection('content-6')">
+                    <div class="topic-number">6</div>
+                    <h2>6. Dimension Tracing & Comparative Matrix</h2>
+                </div>
+                <div class="collapsible-content" id="content-6" style="max-height: none;">
+                    <div class="sub-topic" id="sub-6-1">
+                        <h3>6.1 GoogLeNet (Inception-v1) Stage Configuration</h3>
+                        <p>GoogLeNet contains 9 Inception modules arranged across 3 main spatial stages (\(28 \times 28 \to 14 \times 14 \to 7 \times 7\)), terminating in Global Average Pooling. Total parameter count is approximately <strong>6.8 Million</strong>.</p>
+                    </div>
+
+                    <div class="sub-topic" id="sub-6-2">
+                        <h3>6.2 ResNet-50 Layer-by-Layer Dimension Tracing</h3>
+                        <table style="width:100%; border-collapse: collapse; margin-top: 0.5rem; font-size: 0.85rem;">
+                            <thead>
+                                <tr style="background: var(--bg-secondary); border-bottom: 2px solid var(--border-light); text-align: left;">
+                                    <th style="padding: 6px;">Stage</th>
+                                    <th style="padding: 6px;">Output Spatial Shape</th>
+                                    <th style="padding: 6px;">Bottleneck Block Structure</th>
+                                    <th style="padding: 6px;">Repeats</th>
+                                    <th style="padding: 6px;">Output Channels</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid var(--border-light);"><td>Conv1</td><td>\(112 \times 112\)</td><td>\(7 \times 7, S=2, P=3\) \(\to\) MaxPool \(3\times 3, S=2\)</td><td>1</td><td>64</td></tr>
+                                <tr style="border-bottom: 1px solid var(--border-light);"><td>Stage 2 (res2)</td><td>\(56 \times 56\)</td><td>\([1\times 1, 64] \to [3\times 3, 64] \to [1\times 1, 256]\)</td><td>3 blocks</td><td>256</td></tr>
+                                <tr style="border-bottom: 1px solid var(--border-light);"><td>Stage 3 (res3)</td><td>\(28 \times 28\)</td><td>\([1\times 1, 128] \to [3\times 3, 128] \to [1\times 1, 512]\)</td><td>4 blocks</td><td>512</td></tr>
+                                <tr style="border-bottom: 1px solid var(--border-light);"><td>Stage 4 (res4)</td><td>\(14 \times 14\)</td><td>\([1\times 1, 256] \to [3\times 3, 256] \to [1\times 1, 1024]\)</td><td>6 blocks</td><td>1024</td></tr>
+                                <tr style="border-bottom: 1px solid var(--border-light);"><td>Stage 5 (res5)</td><td>\(7 \times 7\)</td><td>\([1\times 1, 512] \to [3\times 3, 512] \to [1\times 1, 2048]\)</td><td>3 blocks</td><td>2048</td></tr>
+                                <tr><td>Classifier</td><td>\(1 \times 1\)</td><td>Global Average Pooling \(\to\) Linear(\(2048 \to 1000\))</td><td>1</td><td>1000</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="sub-topic" id="sub-6-3">
+                        <h3>6.3 Classical vs Modern Architecture Matrix</h3>
+                        <table style="width:100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.9rem;">
+                            <thead>
+                                <tr style="background: var(--bg-secondary); border-bottom: 2px solid var(--border-light); text-align: left;">
+                                    <th style="padding: 8px;">Architecture</th>
+                                    <th style="padding: 8px;">Year</th>
+                                    <th style="padding: 8px;">Depth (Layers)</th>
+                                    <th style="padding: 8px;">Parameters</th>
+                                    <th style="padding: 8px;">FLOPs (Compute)</th>
+                                    <th style="padding: 8px;">Top-5 Error</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid var(--border-light);"><td><strong>AlexNet</strong></td><td>2012</td><td>8</td><td>60 M</td><td>0.72 G</td><td>16.4%</td></tr>
+                                <tr style="border-bottom: 1px solid var(--border-light);"><td><strong>VGG-16</strong></td><td>2014</td><td>16</td><td>138 M</td><td>15.3 G</td><td>7.3%</td></tr>
+                                <tr style="border-bottom: 1px solid var(--border-light);"><td><strong>GoogLeNet</strong></td><td>2014</td><td>22</td><td>6.8 M</td><td>1.5 G</td><td>6.7%</td></tr>
+                                <tr><td><strong>ResNet-50</strong></td><td>2015</td><td>50</td><td>25.6 M</td><td>3.8 G</td><td>5.25%</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-7').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 7 -->
+            <section class="topic-section" id="topic-7">
+                <div class="topic-header" onclick="toggleSection('content-7')">
+                    <div class="topic-number">7</div>
+                    <h2>7. Step-by-Step Worked Architectural Calculations</h2>
+                </div>
+                <div class="collapsible-content" id="content-7" style="max-height: none;">
+                    <div class="sub-topic" id="sub-7-1">
+                        <h3>7.1 Inception Module FLOP Reduction Calculation</h3>
+                        <p>Consider an input feature map of shape \(28 \times 28 \times 192\). We wish to apply a \(5 \times 5\) convolution with same padding to produce 32 output channels.</p>
+                        <div class="box box-amber">
+                            <div class="box-title">Without 1x1 Bottleneck</div>
+                            <p>Multiplications per output pixel: \(5 \times 5 \times 192 = 4,800\).</p>
+                            <p>Total MACs: \(28 \times 28 \times 32 \times 4,800 \approx \mathbf{120,422,400}\) (120.4 Million operations).</p>
+                        </div>
+                        <div class="box box-green">
+                            <div class="box-title">With 1x1 Bottleneck (Reduce 192 to 16 channels first)</div>
+                            <ol>
+                                <li>Step 1 (\(1 \times 1\) conv, \(192 \to 16\)):
+                                    $$28 \times 28 \times 16 \times (1 \times 1 \times 192) = 2,408,448 \text{ MACs}$$
+                                </li>
+                                <li>Step 2 (\(5 \times 5\) conv, \(16 \to 32\)):
+                                    $$28 \times 28 \times 32 \times (5 \times 5 \times 16) = 10,035,200 \text{ MACs}$$
+                                </li>
+                                <li>Total Combined Operations: \(2.4\text{M} + 10.0\text{M} = \mathbf{12,443,648}\) MACs!</li>
+                            </ol>
+                            <p>The \(1 \times 1\) bottleneck achieved a <strong>10x reduction in FLOPs</strong> (\(12.4\text{M}\) vs \(120.4\text{M}\))!</p>
+                        </div>
+                    </div>
+
+                    <div class="sub-topic" id="sub-7-2">
+                        <h3>7.2 ResNet-50 Bottleneck Block Parameter Derivation</h3>
+                        <p>Calculate total parameters in a Stage 2 ResNet-50 Bottleneck Block (input channels \(256\), intermediate bottleneck \(64\), output channels \(256\)):</p>
+                        <div class="box box-blue">
+                            <div class="box-title">Calculation</div>
+                            <ul>
+                                <li>Layer 1 (\(1 \times 1\) Conv, \(256 \to 64\)): \((1 \times 1 \times 256 + 1) \times 64 = \mathbf{16,448}\)</li>
+                                <li>Layer 2 (\(3 \times 3\) Conv, \(64 \to 64\)): \((3 \times 3 \times 64 + 1) \times 64 = \mathbf{36,928}\)</li>
+                                <li>Layer 3 (\(1 \times 1\) Conv, \(64 \to 256\)): \((1 \times 1 \times 64 + 1) \times 256 = \mathbf{16,640}\)</li>
+                                <li>Total Block Parameters: \(16,448 + 36,928 + 16,640 = \mathbf{70,016}\) parameters.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('original-pdf').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for Lecture 11 (Inception & ResNet Discovery Worksheet):</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-7').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/11.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--border-light, #ddd); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>

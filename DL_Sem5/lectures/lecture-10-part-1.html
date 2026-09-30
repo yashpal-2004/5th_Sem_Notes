@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Deep Learning - Lecture 10 Part 1</title>
+    <meta content="Study notes for Deep Learning, Lecture 10 Part 1 covering CNN foundations: pixel representation, 2D convolution, channels, padding, stride, pooling, and receptive fields." name="description"/>
+    <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2245%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>10a</text></svg>" rel="icon"/>
+    <link href="../css/style.css" rel="stylesheet"/>
+    <!-- KaTeX for LaTeX rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Deep Learning Foundations</h1>
+            <p>Lecture 10 Part 1 - CNN Foundations: From Pixels to Patterns</p>
+            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/10 Part_1.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF Worksheet ↗</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/worksheet09_cnn.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open CNN Visual Interactive ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text"/>
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 7</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Short Notes</a></li>
+                <li>
+                    <a href="#topic-1">1. Digital Images as Numeric Tensors<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 Grayscale vs Multi-Channel RGB</a></li>
+                        <li><a href="#sub-1-2">1.2 Spatial Matrix Representation & Tensor Shapes</a></li>
+                        <li><a href="#sub-1-3">1.3 Why Fully Connected Layers Fail on Images</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. The 2D Convolution Operation<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 The Sliding Kernel & Dot Product</a></li>
+                        <li><a href="#sub-2-2">2.2 Mathematical Formulation of Cross-Correlation</a></li>
+                        <li><a href="#sub-2-3">2.3 Weight Sharing & Translation Equivariance</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Spatial Geometry: Padding & Stride<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 Spatial Shrinkage & Valid Padding</a></li>
+                        <li><a href="#sub-3-2">3.2 Same Padding & Zero Border Extension</a></li>
+                        <li><a href="#sub-3-3">3.3 Stride & The Universal Spatial Output Formula</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Multi-Channel Convolutions & Feature Maps<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 3D Filter Volumes Matching Input Channels</a></li>
+                        <li><a href="#sub-4-2">4.2 Creating Output Channels via Multiple Filters</a></li>
+                        <li><a href="#sub-4-3">4.3 Exact Parameter Count Formula</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Pooling Layers & Downsampling<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 Max Pooling vs Average Pooling</a></li>
+                        <li><a href="#sub-5-2">5.2 Translation Invariance & Noise Reduction</a></li>
+                        <li><a href="#sub-5-3">5.3 Zero Learnable Parameters Property</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-6">6. Receptive Fields & Hierarchical Features<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-6-1">6.1 Concept of the Effective Receptive Field</a></li>
+                        <li><a href="#sub-6-2">6.2 Receptive Field Expansion Through Depth</a></li>
+                        <li><a href="#sub-6-3">6.3 Hierarchical Visual Abstraction</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-7">7. Step-by-Step Worked Numerical Walkthrough<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-7-1">7.1 Manual 3x3 Convolution Calculation</a></li>
+                        <li><a href="#sub-7-2">7.2 Padding & Stride Dimension Tracing</a></li>
+                        <li><a href="#sub-7-3">7.3 Multi-Channel Parameter Counting Exercise</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Short Notes Summary Section -->
+            <section class="topic-section" id="short-notes">
+                <div class="topic-header" onclick="toggleSection('content-short-notes')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                    </div>
+                    <h2>Executive Summary & Formula Sheet</h2>
+                </div>
+                <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
+                    <p><strong>Core Concept:</strong> Convolutional Neural Networks (CNNs) replace massive, fully-connected matrix multiplications with localized, translation-invariant kernel filters. By enforcing two core inductive biases—<strong>local connectivity</strong> (pixels close together are correlated) and <strong>weight sharing</strong> (a feature detector useful in the top-left is equally useful anywhere in the image)—CNNs drastically reduce parameter counts while hierarchically extracting spatial patterns from edges to textures to semantic object parts.</p>
+
+                    <div class="box box-blue">
+                        <div class="box-title">CNN Core Formulas & Geometry Sheet</div>
+                        <ul style="list-style:none; padding-left:0; margin-bottom:0;">
+                            <li style="margin-bottom: 0.75rem;"><strong>Spatial Output Size (Height / Width):</strong> $$O = \left\lfloor \frac{W - K + 2P}{S} \right\rfloor + 1$$</li>
+                            <li style="margin-bottom: 0.75rem;"><strong>Same Padding Formula (to preserve spatial size \(O = W\) when \(S=1\)):</strong> $$P = \frac{K - 1}{2} \quad (\text{requires odd kernel size } K)$$</li>
+                            <li style="margin-bottom: 0.75rem;"><strong>Convolutional Layer Learnable Parameters:</strong> $$\text{Params} = \left( K_h \times K_w \times C_{\text{in}} + 1 \right) \times C_{\text{out}}$$</li>
+                            <li style="margin-bottom: 0.75rem;"><strong>Output Tensor Shape:</strong> $$\text{Shape} = \left[ N, \, C_{\text{out}}, \, H_{\text{out}}, \, W_{\text{out}} \right]$$</li>
+                            <li style="margin-bottom: 0.75rem;"><strong>Pooling Layer Parameters:</strong> $$\text{Params} = 0 \quad (\text{fixed deterministic aggregation})$$</li>
+                            <li><strong>Two Stacks of \(3 \times 3\) Convolutions Receptive Field:</strong> $$\text{Effective RF} = 3 + (3 - 1) = 5 \times 5 \quad (\text{with } 18 \text{ weights vs } 25 \text{ weights})$$</li>
+                        </ul>
+                    </div>
+
+                    <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Lecture 10 Part 1 Visual Cheatsheet</h3>
+                    <div style="text-align: center; background: var(--bg-secondary, #f8f9fa); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-light); margin-bottom: 1.5rem;">
+                        <a href="../images/10_part_1.png" target="_blank" title="Click to view full size">
+                            <img src="../images/10_part_1.png" alt="Lecture 10 Part 1 Short Notes Cheatsheet" style="max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
+                        </a>
+                        <p style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-muted);">Click image to open high-resolution version in new tab</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" disabled="">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 1 -->
+            <section class="topic-section" id="topic-1">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>1. Digital Images as Numeric Tensors</h2>
+                </div>
+                <div class="collapsible-content" id="content-1" style="max-height: none;">
+                    <div class="sub-topic" id="sub-1-1">
+                        <h3>1.1 Grayscale vs Multi-Channel RGB</h3>
+                        <p>To a computer, an image is fundamentally a grid of discrete numbers representing light intensities:</p>
+                        <ul>
+                            <li><strong>Grayscale Images:</strong> Represented as a 2D spatial matrix of shape \([H, W]\) (or single channel \([H, W, 1]\)). Each pixel is an integer scalar between \(0\) (absolute black) and \(255\) (pure white).</li>
+                            <li><strong>Color RGB Images:</strong> Represented as a 3D tensor of shape \([H, W, 3]\) (or \([3, H, W]\)). The three color channels—Red, Green, and Blue—share the exact same spatial pixel coordinates. A pixel at coordinate \((r, c)\) contains a 3-element vector \([R_{r,c}, G_{r,c}, B_{r,c}]\).</li>
+                        </ul>
+                    </div>
+
+                    <div class="sub-topic" id="sub-1-2">
+                        <h3>1.2 Spatial Matrix Representation & Tensor Shapes</h3>
+                        <p>In deep learning frameworks (PyTorch), image batches are formatted as 4-dimensional tensors:</p>
+                        <div class="formula-box">$$\mathbf{X} \in \mathbb{R}^{B \times C \times H \times W}$$</div>
+                        <p>Where \(B\) is the batch size, \(C\) is channel depth, \(H\) is image height, and \(W\) is image width. Pixels are routinely normalized from integer range \([0, 255]\) into floating-point numbers in range \([0.0, 1.0]\) or standardized via \(\frac{x - \mu}{\sigma}\) to stabilize gradient descent.</p>
+                    </div>
+
+                    <div class="sub-topic" id="sub-1-3">
+                        <h3>1.3 Why Fully Connected Layers Fail on Images</h3>
+                        <p>Suppose we feed a modest \(224 \times 224\) RGB photograph into a standard Multi-Layer Perceptron (MLP) whose first hidden layer has 1,024 neurons:</p>
+                        <ul>
+                            <li>Input dimension: \(224 \times 224 \times 3 = 150,528\) input values.</li>
+                            <li>Weights for first hidden layer alone: \(150,528 \times 1,024 \approx \mathbf{154,140,672}\) parameters (~154 Million weights)!</li>
+                        </ul>
+                        <p>This explosive parameter count leads to catastrophic overfitting, prohibitive GPU memory consumption, and complete loss of 2D spatial geometry when flattening the image into a 1D vector.</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('short-notes').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section class="topic-section" id="topic-2">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>2. The 2D Convolution Operation</h2>
+                </div>
+                <div class="collapsible-content" id="content-2" style="max-height: none;">
+                    <div class="sub-topic" id="sub-2-1">
+                        <h3>2.1 The Sliding Kernel & Dot Product</h3>
+                        <p>The core building block of a CNN is the <strong>convolutional filter (kernel)</strong>: a small matrix of learnable weights (e.g. \(3 \times 3\) or \(5 \times 5\)). The kernel slides across the spatial dimensions of the input image step-by-step. At each position, it computes the element-wise product with the overlapping image patch, sums all values together, and adds a scalar bias:</p>
+                        <div class="formula-box">$$y_{i,j} = \sum_{m=-k}^k \sum_{n=-k}^k x_{i+m, j+n} \cdot w_{m, n} + b$$</div>
+                    </div>
+
+                    <div class="sub-topic" id="sub-2-2">
+                        <h3>2.2 Mathematical Formulation of Cross-Correlation</h3>
+                        <p>In signal processing, mathematical convolution flips the kernel horizontally and vertically before sliding. Deep learning implementations omit the flip and perform <strong>cross-correlation</strong>. Because kernel weights \(w\) are learned end-to-end via backpropagation, learning an unflipped kernel is mathematically equivalent and computationally faster.</p>
+                    </div>
+
+                    <div class="sub-topic" id="sub-2-3">
+                        <h3>2.3 Weight Sharing & Translation Equivariance</h3>
+                        <div class="box box-green">
+                            <div class="box-title">Two Fundamental Inductive Biases</div>
+                            <ol>
+                                <li><strong>Weight Sharing (Parameter Reuse):</strong> The same small kernel slides across every spatial location. A \(3 \times 3\) filter has only 9 weights plus 1 bias, regardless of whether the image is \(32 \times 32\) or \(4000 \times 4000\)!</li>
+                                <li><strong>Translation Equivariance:</strong> If an object shifts by \((\Delta x, \Delta y)\) in the input image, its activated feature representation shifts by the exact same amount in the output feature map: \(f(T(x)) = T(f(x))\).</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section class="topic-section" id="topic-3">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>3. Spatial Geometry: Padding & Stride</h2>
+                </div>
+                <div class="collapsible-content" id="content-3" style="max-height: none;">
+                    <div class="sub-topic" id="sub-3-1">
+                        <h3>3.1 Spatial Shrinkage & Valid Padding</h3>
+                        <p>When sliding a \(K \times K\) kernel across an unpadded \(W \times W\) input, the kernel cannot hang off the edges. The output spatial dimension naturally contracts to \(W - K + 1\). This unpadded mode is called <strong>Valid Padding (\(P = 0\))</strong>. For example, a \(32 \times 32\) image convolved with a \(5 \times 5\) filter shrinks to \(28 \times 28\). In deep networks with tens of layers, spatial dimensions would prematurely shrink to zero!</p>
+                    </div>
+
+                    <div class="sub-topic" id="sub-3-2">
+                        <h3>3.2 Same Padding & Zero Border Extension</h3>
+                        <p>To preserve spatial dimensions and prevent pixel information at the image boundaries from being under-sampled, we add a frame of zeros around the perimeter, known as <strong>Zero Padding (\(P\))</strong>.</p>
+                        <p><strong>Same Padding:</strong> Padding chosen specifically such that the output spatial resolution exactly matches the input resolution (\(O = W\)) when stride \(S = 1\):</p>
+                        <div class="formula-box">$$P = \frac{K - 1}{2}$$</div>
+                        <p>For a \(3 \times 3\) kernel, \(P = \frac{3 - 1}{2} = 1\). For a \(5 \times 5\) kernel, \(P = \frac{5 - 1}{2} = 2\). This is why convolutional kernels almost universally have <strong>odd dimensions</strong> (\(1\times 1, 3\times 3, 5\times 5, 7\times 7\)).</p>
+                    </div>
+
+                    <div class="sub-topic" id="sub-3-3">
+                        <h3>3.3 Stride & The Universal Spatial Output Formula</h3>
+                        <p><strong>Stride (\(S\))</strong> is the step size the kernel hops across the image after each dot product. When \(S = 1\), the kernel moves 1 pixel at a time. When \(S = 2\), the kernel hops 2 pixels, downsampling the spatial resolution by approximately half.</p>
+                        <div class="box box-blue">
+                            <div class="box-title">Universal Spatial Dimension Equation</div>
+                            <p>For input spatial dimension \(W\), kernel size \(K\), padding \(P\), and stride \(S\):</p>
+                            <div class="formula-box">$$O = \left\lfloor \frac{W - K + 2P}{S} \right\rfloor + 1$$</div>
+                            <p>This exact equation applies identically to height (\(H\)) and width (\(W\)).</p>
+                        </div>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section class="topic-section" id="topic-4">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>4. Multi-Channel Convolutions & Feature Maps</h2>
+                </div>
+                <div class="collapsible-content" id="content-4" style="max-height: none;">
+                    <div class="sub-topic" id="sub-4-1">
+                        <h3>4.1 3D Filter Volumes Matching Input Channels</h3>
+                        <p>When the input has multiple channels \(C_{\text{in}}\) (e.g. 3 for RGB or 64 for hidden feature maps), <strong>the depth of a single kernel filter must strictly match \(C_{\text{in}}\)</strong>!</p>
+                        <p>A single filter is actually a 3D block of weights with shape \([K_h, K_w, C_{\text{in}}]\). To compute a single output pixel, the filter performs element-wise products across all \(C_{\text{in}}\) channels simultaneously and sums all products into a <strong>single scalar value</strong>.</p>
+                    </div>
+
+                    <div class="sub-topic" id="sub-4-2">
+                        <h3>4.2 Creating Output Channels via Multiple Filters</h3>
+                        <p>How do we obtain an output with multiple channels \(C_{\text{out}}\)? We apply \(C_{\text{out}}\) separate 3D filters in parallel! Each individual filter learns to detect a distinct feature (e.g. Filter 1 detects vertical edges, Filter 2 detects green patches, Filter 3 detects diagonal textures). The outputs are stacked along the channel axis to create an output tensor of shape \([C_{\text{out}}, H_{\text{out}}, W_{\text{out}}]\).</p>
+                    </div>
+
+                    <div class="sub-topic" id="sub-4-3">
+                        <h3>4.3 Exact Parameter Count Formula</h3>
+                        <div class="box box-green">
+                            <div class="box-title">Convolutional Layer Learnable Parameter Formula</div>
+                            <p>Every filter contains \(K_h \times K_w \times C_{\text{in}}\) weights plus 1 shared bias term. For \(C_{\text{out}}\) filters:</p>
+                            <div class="formula-box">$$\text{Total Parameters} = \left( K_h \times K_w \times C_{\text{in}} + 1 \right) \times C_{\text{out}}$$</div>
+                            <p>Crucially, <strong>the parameter count is completely independent of input image spatial size \(H\) and \(W\)</strong>!</p>
+                        </div>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 5 -->
+            <section class="topic-section" id="topic-5">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>5. Pooling Layers & Downsampling</h2>
+                </div>
+                <div class="collapsible-content" id="content-5" style="max-height: none;">
+                    <div class="sub-topic" id="sub-5-1">
+                        <h3>5.1 Max Pooling vs Average Pooling</h3>
+                        <p>Pooling layers reduce spatial dimensionality while preserving dominant features:</p>
+                        <ul>
+                            <li><strong>Max Pooling:</strong> Slides a small window (typically \(2 \times 2\) with stride \(S = 2\)) and outputs the <strong>maximum value</strong> in each patch. It captures the strongest signal or feature activation regardless of minute sub-pixel position.</li>
+                            <li><strong>Average Pooling:</strong> Computes the arithmetic mean of all values in the patch. It provides smoother spatial aggregation but can dilute sharp edge features.</li>
+                        </ul>
+                    </div>
+
+                    <div class="sub-topic" id="sub-5-2">
+                        <h3>5.2 Translation Invariance & Noise Reduction</h3>
+                        <p>By discarding precise spatial coordinates within each \(2 \times 2\) window, max pooling provides <strong>local translation invariance</strong>: small shifts or rotations of the input do not alter the pooled output. Furthermore, downsampling by \(2\times\) cuts the spatial tensor size by \(75\%\) (\(4\times\)), dramatically speeding up computation in downstream layers.</p>
+                    </div>
+
+                    <div class="sub-topic" id="sub-5-3">
+                        <h3>5.3 Zero Learnable Parameters Property</h3>
+                        <div class="box box-amber">
+                            <div class="box-title">Important Architecture Property</div>
+                            <p>Pooling operations are purely deterministic mathematical functions. <strong>Pooling layers have zero learnable parameters (Weights = 0, Biases = 0).</strong> Pooling operates on each channel independently, leaving channel depth \(C\) completely unchanged.</p>
+                        </div>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 6 -->
+            <section class="topic-section" id="topic-6">
+                <div class="topic-header" onclick="toggleSection('content-6')">
+                    <div class="topic-number">6</div>
+                    <h2>6. Receptive Fields & Hierarchical Features</h2>
+                </div>
+                <div class="collapsible-content" id="content-6" style="max-height: none;">
+                    <div class="sub-topic" id="sub-6-1">
+                        <h3>6.1 Concept of the Effective Receptive Field</h3>
+                        <p>The <strong>Receptive Field (RF)</strong> of a neuron in layer \(L\) is the spatial area in the original input image that directly influences that neuron's activation. In the first convolutional layer with \(3 \times 3\) filters, each neuron has an RF of exactly \(3 \times 3\) pixels.</p>
+                    </div>
+
+                    <div class="sub-topic" id="sub-6-2">
+                        <h3>6.2 Receptive Field Expansion Through Depth</h3>
+                        <p>When stacking multiple convolutional layers, the receptive field expands linearly with depth:</p>
+                        <ul>
+                            <li>Layer 1 (\(3 \times 3\) conv): RF = \(3 \times 3\)</li>
+                            <li>Layer 2 (\(3 \times 3\) conv): RF = \(5 \times 5\)</li>
+                            <li>Layer 3 (\(3 \times 3\) conv): RF = \(7 \times 7\)</li>
+                        </ul>
+                        <div class="box box-green">
+                            <div class="box-title">The Power of Stacking Small Kernels (VGG Principle)</div>
+                            <p>A stack of two \(3 \times 3\) conv layers covers the exact same \(5 \times 5\) receptive field as a single \(5 \times 5\) layer. However:</p>
+                            <ul>
+                                <li>Two \(3 \times 3\) layers: \(2 \times (3 \times 3 \times C^2) = 18C^2\) parameters.</li>
+                                <li>One \(5 \times 5\) layer: \(1 \times (5 \times 5 \times C^2) = 25C^2\) parameters.</li>
+                            </ul>
+                            <p>The stacked \(3 \times 3\) design uses <strong>28% fewer parameters</strong> and incorporates two non-linear activation functions instead of one, granting far higher discriminative power!</p>
+                        </div>
+                    </div>
+
+                    <div class="sub-topic" id="sub-6-3">
+                        <h3>6.3 Hierarchical Visual Abstraction</h3>
+                        <p>As the receptive field expands across deeper layers, the network learns a natural hierarchy of visual abstractions:</p>
+                        <ul>
+                            <li><strong>Early Layers (Small RF):</strong> Low-level features (oriented edges, color blobs, simple corners).</li>
+                            <li><strong>Middle Layers (Medium RF):</strong> Mid-level features (textures, geometric shapes, circles, stripes).</li>
+                            <li><strong>Deep Layers (Large RF):</strong> Semantic parts (eyes, wheels, dog snouts, handles).</li>
+                            <li><strong>Final Fully Connected Layer (Global RF):</strong> High-level category classification (car, cat, airplane).</li>
+                        </ul>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-7').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 7 -->
+            <section class="topic-section" id="topic-7">
+                <div class="topic-header" onclick="toggleSection('content-7')">
+                    <div class="topic-number">7</div>
+                    <h2>7. Step-by-Step Worked Numerical Walkthrough</h2>
+                </div>
+                <div class="collapsible-content" id="content-7" style="max-height: none;">
+                    <div class="sub-topic" id="sub-7-1">
+                        <h3>7.1 Manual 3x3 Convolution Calculation</h3>
+                        <p>Consider a \(3 \times 3\) image patch \(X\) and a vertical edge detector kernel \(W\) with bias \(b = -1.0\):</p>
+                        <div class="formula-box">
+                            $$X = \begin{bmatrix} 10 & 10 & 0 \\ 10 & 10 & 0 \\ 10 & 10 & 0 \end{bmatrix}, \quad W = \begin{bmatrix} 1 & 0 & -1 \\ 1 & 0 & -1 \\ 1 & 0 & -1 \end{bmatrix}, \quad b = -1.0$$
+                        </div>
+                        <p>Compute the pre-activation output value \(y\):</p>
+                        <div class="box box-blue">
+                            <div class="box-title">Dot Product Arithmetic</div>
+                            <ul>
+                                <li>Row 1 dot product: \((10 \times 1) + (10 \times 0) + (0 \times -1) = 10 + 0 + 0 = 10\)</li>
+                                <li>Row 2 dot product: \((10 \times 1) + (10 \times 0) + (0 \times -1) = 10 + 0 + 0 = 10\)</li>
+                                <li>Row 3 dot product: \((10 \times 1) + (10 \times 0) + (0 \times -1) = 10 + 0 + 0 = 10\)</li>
+                                <li>Sum of dot products: \(10 + 10 + 10 = \mathbf{30}\)</li>
+                                <li>Adding bias: \(y = 30 + (-1.0) = \mathbf{29.0}\)</li>
+                                <li>Passing through ReLU: \(\text{ReLU}(29.0) = \mathbf{29.0}\) (strong edge detected!)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="sub-topic" id="sub-7-2">
+                        <h3>7.2 Padding & Stride Dimension Tracing</h3>
+                        <p>Trace the spatial dimensions for an input of shape \(28 \times 28\) passing through two successive operations:</p>
+                        <div class="box box-amber">
+                            <div class="box-title">Dimension Calculations</div>
+                            <ol>
+                                <li><strong>Conv Layer 1:</strong> Input \(28 \times 28\), Kernel \(K = 5\), Padding \(P = 2\), Stride \(S = 1\):
+                                    $$O_1 = \left\lfloor \frac{28 - 5 + 2(2)}{1} \right\rfloor + 1 = \left\lfloor \frac{27}{1} \right\rfloor + 1 = \mathbf{28 \times 28}$$
+                                </li>
+                                <li><strong>Max Pooling Layer:</strong> Input \(28 \times 28\), Kernel \(K = 2\), Padding \(P = 0\), Stride \(S = 2\):
+                                    $$O_2 = \left\lfloor \frac{28 - 2 + 0}{2} \right\rfloor + 1 = \frac{26}{2} + 1 = 13 + 1 = \mathbf{14 \times 14}$$
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="sub-topic" id="sub-7-3">
+                        <h3>7.3 Multi-Channel Parameter Counting Exercise</h3>
+                        <p>Calculate the exact number of learnable parameters in a convolutional layer with:</p>
+                        <ul>
+                            <li>Input: \(C_{\text{in}} = 3\) (RGB), Output: \(C_{\text{out}} = 64\) feature maps, Kernel: \(K = 3 \times 3\).</li>
+                        </ul>
+                        <div class="box box-green">
+                            <div class="box-title">Calculation</div>
+                            <ul>
+                                <li>Weights per filter: \(K_h \times K_w \times C_{\text{in}} = 3 \times 3 \times 3 = \mathbf{27}\) weights.</li>
+                                <li>Biases per filter: \(\mathbf{1}\) bias.</li>
+                                <li>Parameters per filter: \(27 + 1 = \mathbf{28}\) parameters.</li>
+                                <li>Total layer parameters: \(28 \times C_{\text{out}} = 28 \times 64 = \mathbf{1,792}\) parameters.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('original-pdf').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for Lecture 10 Part 1 (First CNN Worksheet):</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-7').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/10 Part_1.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--border-light, #ddd); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>
