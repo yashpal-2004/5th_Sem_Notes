@@ -1,0 +1,285 @@
+/* Mid-Semester Examination Blueprint Styling */
+
+.midsem-blueprint-section {
+    padding: 3.5rem 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.midsem-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.midsem-card {
+    background: #ffffff;
+    border: 1px solid var(--border-light, #e2e8f0);
+    border-radius: 14px;
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.midsem-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+.midsem-card-stripe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+}
+
+.midsem-card.dl .midsem-card-stripe { background: #2e593f; }
+.midsem-card.cn .midsem-card-stripe { background: #1e606d; }
+.midsem-card.aml .midsem-card-stripe { background: #365584; }
+.midsem-card.mca .midsem-card-stripe { background: #6d4c3d; }
+
+.midsem-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+.midsem-subject-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.45rem;
+    font-weight: 600;
+    color: var(--text-dark, #132219);
+    margin: 0 0 0.25rem;
+}
+
+.midsem-subject-meta {
+    font-size: 0.82rem;
+    color: var(--text-muted, #667069);
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.midsem-badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.midsem-card.dl .midsem-badge { background: #eaf2ed; color: #1e4530; border: 1px solid #c2dbcd; }
+.midsem-card.cn .midsem-badge { background: #e9f5f7; color: #154e58; border: 1px solid #bfdfe4; }
+.midsem-card.aml .midsem-badge { background: #ecf2fa; color: #203e68; border: 1px solid #c8d8ec; }
+.midsem-card.mca .midsem-badge { background: #f7f0ec; color: #4e3224; border: 1px solid #e0cebe; }
+
+.midsem-stat-chips {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.25rem;
+}
+
+.midsem-chip {
+    background: #f8faf9;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 8px;
+    padding: 0.4rem 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 100px;
+}
+
+.midsem-chip-label {
+    font-size: 0.7rem;
+    color: var(--text-muted, #667069);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    font-weight: 600;
+}
+
+.midsem-chip-val {
+    font-size: 0.86rem;
+    font-weight: 700;
+    color: var(--text-dark, #132219);
+}
+
+.midsem-breakdown-box {
+    background: #fafaf8;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.midsem-breakdown-title {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-dark, #132219);
+    margin: 0 0 0.65rem;
+}
+
+.midsem-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+
+.midsem-list li {
+    font-size: 0.85rem;
+    color: var(--text-dark, #132219);
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    line-height: 1.4;
+}
+
+.midsem-list-bullet {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin-top: 6px;
+    flex-shrink: 0;
+}
+
+.midsem-card.dl .midsem-list-bullet { background: #2e593f; }
+.midsem-card.cn .midsem-list-bullet { background: #1e606d; }
+.midsem-card.aml .midsem-list-bullet { background: #365584; }
+.midsem-card.mca .midsem-list-bullet { background: #6d4c3d; }
+
+.midsem-topics-box {
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px dashed rgba(0, 0, 0, 0.1);
+    font-size: 0.82rem;
+    color: var(--text-muted, #667069);
+    line-height: 1.5;
+}
+
+.midsem-topics-title {
+    font-size: 0.76rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--text-dark, #132219);
+    margin-bottom: 0.35rem;
+}
+
+/* In-subject Dashboard Banner Styles */
+.subject-midsem-banner {
+    background: #ffffff;
+    border: 1px solid var(--border-light, #e2e8f0);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+    position: relative;
+    overflow: hidden;
+}
+
+.subject-midsem-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--text-dark, #132219);
+}
+
+.subject-midsem-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.subject-midsem-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.subject-midsem-title-wrap h4 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 600;
+    color: var(--text-dark, #132219);
+}
+
+.subject-midsem-tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.subject-midsem-tag {
+    font-size: 0.72rem;
+    font-weight: 600;
+    background: rgba(0, 0, 0, 0.05);
+    padding: 2px 8px;
+    border-radius: 6px;
+    color: var(--text-dark, #132219);
+}
+
+.subject-midsem-body {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1rem;
+    font-size: 0.84rem;
+    line-height: 1.5;
+}
+
+.subject-midsem-col h5 {
+    margin: 0 0 0.35rem;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted, #667069);
+}
+
+.subject-midsem-col p {
+    margin: 0;
+    color: var(--text-dark, #132219);
+}
+
+.subject-midsem-col ul {
+    margin: 0;
+    padding-left: 1.1rem;
+    color: var(--text-dark, #132219);
+}
+
+@media (max-width: 768px) {
+    .midsem-blueprint-section {
+        padding: 2rem 1rem;
+    }
+    .midsem-grid {
+        grid-template-columns: 1fr;
+    }
+    .subject-midsem-body {
+        grid-template-columns: 1fr;
+    }
+}

@@ -13,6 +13,7 @@
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="css/home.css?v=1.1">
+    <link rel="stylesheet" href="css/midsem-blueprint.css">
     <link rel="icon"
         href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23000000%22/><circle cx=%2250%22 cy=%2228%22 r=%2214%22 fill=%22white%22/><circle cx=%2226%22 cy=%2270%22 r=%2214%22 fill=%22white%22/><circle cx=%2274%22 cy=%2270%22 r=%2214%22 fill=%22white%22/></svg>">
 </head>
@@ -221,8 +222,288 @@
 
         </div>
 
+    </section>
 
+    <!-- Mid-Semester Examination Blueprint Section (Official In-Class Briefing) -->
+    <section class="midsem-blueprint-section" id="midsem-blueprints">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem; border-bottom: 2px solid var(--border-light); padding-bottom: 1.25rem;">
+            <div>
+                <div style="display: inline-flex; align-items: center; gap: 8px; font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #b91c1c; background: rgba(239, 68, 68, 0.08); padding: 4px 12px; border-radius: 20px; border: 1px solid rgba(239, 68, 68, 0.2); margin-bottom: 0.5rem;">
+                    Official Faculty Briefing
+                </div>
+                <h2 style="font-family: 'Playfair Display', Georgia, serif; font-size: 2.2rem; margin: 0 0 0.5rem; color: var(--text-dark);">Mid-Semester Examination Blueprints</h2>
+                <p style="color: var(--text-muted); font-size: 0.95rem; margin: 0; max-width: 800px; line-height: 1.5;">Section-wise question distributions, time allocations, tested coding problems, hardware schematics, and critical tips briefed directly by professors for the 12–22 October mid-sem exams.</p>
+            </div>
+            <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">
+                Exam Dates: 12 Oct &ndash; 22 Oct 2026
+            </div>
+        </div>
 
+        <div class="midsem-grid">
+
+            <!-- Deep Learning Blueprint -->
+            <div class="midsem-card dl" id="blueprint-dl">
+                <div class="midsem-card-stripe"></div>
+                <div class="midsem-header">
+                    <div>
+                        <h3 class="midsem-subject-title">Deep Learning</h3>
+                        <div class="midsem-subject-meta">
+                            <span>Exam Date: 15 Oct 2026</span>
+                            <span>&bull;</span>
+                            <span>Weightage: 20%</span>
+                        </div>
+                    </div>
+                    <span class="midsem-badge">L01 &ndash; L11 (Current Week)</span>
+                </div>
+
+                <div class="midsem-stat-chips">
+                    <div class="midsem-chip">
+                        <span class="midsem-chip-label">MCQs (70%)</span>
+                        <span class="midsem-chip-val">30 Questions</span>
+                    </div>
+                    <div class="midsem-chip">
+                        <span class="midsem-chip-label">Coding (30%)</span>
+                        <span class="midsem-chip-val">3 Questions</span>
+                    </div>
+                    <div class="midsem-chip">
+                        <span class="midsem-chip-label">Duration</span>
+                        <span class="midsem-chip-val">2 Hours Strict</span>
+                    </div>
+                </div>
+
+                <div class="midsem-breakdown-box">
+                    <h4 class="midsem-breakdown-title">Exam Structure &amp; Difficulty</h4>
+                    <ul class="midsem-list">
+                        <li>
+                            <span class="midsem-list-bullet"></span>
+                            <span><strong>Question Split:</strong> 30 MCQs (70% weightage) + 3 Coding questions (30% weightage).</span>
+                        </li>
+                        <li>
+                            <span class="midsem-list-bullet"></span>
+                            <span><strong>Coding Tiers:</strong> 1 Easy, 1 Medium, and 1 Hard programming problem.</span>
+                        </li>
+                        <li>
+                            <span class="midsem-list-bullet"></span>
+                            <span><strong>Difficulty Curve:</strong> 50&ndash;55% Medium, 10&ndash;15% Easy, and ~35% Hard difficulty.</span>
+                        </li>
+                        <li>
+                            <span class="midsem-list-bullet"></span>
+                            <span><strong>Pacing Advisory:</strong> Paper is designed to be completed within 2 hours only if preparation is comprehensive.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="midsem-topics-box">
+                    <div class="midsem-topics-title">Tested Topic Scope</div>
+                    Neuron foundations, activations (Sigmoid, Tanh, ReLU, Softmax), forward &amp; backpropagation calculus, loss landscapes, optimizers (SGD, Momentum, NAG, AdaGrad, RMSProp, Adam), regularization (L1/L2, Dropout), and CNNs (LeNet, AlexNet, VGG, Inception, ResNet).
+                </div>
+            </div>
+
+            <!-- Computer Networks Blueprint -->
+            <div class="midsem-card cn" id="blueprint-cn">
+                <div class="midsem-card-stripe"></div>
+                <div class="midsem-header">
+                    <div>
+                        <h3 class="midsem-subject-title">Computer Networks</h3>
+                        <div class="midsem-subject-meta">
+                            <span>Exam Date: 12 Oct 2026</span>
+                            <span>&bull;</span>
+                            <span>Weightage: 20%</span>
+                        </div>
+                    </div>
+                    <span class="midsem-badge">L01 &ndash; L13</span>
+                </div>
+
+                <div class="midsem-stat-chips">
+                    <div class="midsem-chip">
+                        <span class="midsem-chip-label">Objective MCQs</span>
+                        <span class="midsem-chip-val">10 MCQs (20 Marks)</span>
+                    </div>
+                    <div class="midsem-chip">
+                        <span class="midsem-chip-label">Comprehension</span>
+                        <span class="midsem-chip-val">5 Case MCQs</span>
+                    </div>
+                    <div class="midsem-chip">
+                        <span class="midsem-chip-label">Integer &amp; Match</span>
+                        <span class="midsem-chip-val">5 Int + 5 Match</span>
+                    </div>
+                </div>
+
+                <div class="midsem-breakdown-box">
+                    <h4 class="midsem-breakdown-title">Exam Structure &amp; Question Formats</h4>
+                    <ul class="midsem-list">
+                        <li>
+                            <span class="midsem-list-bullet"></span>
+                            <span><strong>Standard MCQs:</strong> 10 questions (2 marks each = 20 marks total).</span>
+                        </li>
+                        <li>
+                            <span class="midsem-list-bullet"></span>
+                            <span><strong>Comprehension MCQs:</strong> 5 questions formatted like contest re-tests.</span>
+                        </li>
+                        <li>
+                            <span class="midsem-list-bullet"></span>
+                            <span><strong>Integer Type:</strong> 5 questions focused on subnet masks, IPv4 addressing, and usable hosts.</span>
+                        </li>
+                        <li>
+                            <span class="midsem-list-bullet"></span>
+                            <span><strong>Match the Following:</strong> 5 protocol and layer mapping questions.</span>
+                        </li>
+                        <li>
+                            <span class="midsem-list-bullet"></span>
+                            <span><strong>Subjective Paper:</strong> 5 questions total, including 2 physical diagram questions (5 marks diagram + 5 marks written theory).</span>
+                        </li>
+                        <li>
+                            <span class="midsem-list-bullet"></span>
+                            <span><strong>Bonus &amp; Exclusions:</strong> 1 Packet Tracer bonus question. Strictly <strong>NO coding</strong> and <strong>NO AWS</strong> questions.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="midsem-topics-box">
+                    <div class="midsem-topics-title">Tested Topic Scope</div>
+                    Network core, packet switching, OSI &amp; TCP/IP models, physical devices, application protocols (HTTP, DNS, SMTP, POP3, IMAP), HTTPS/TLS handshake, socket API, transport protocols (UDP, TCP flow &amp; congestion control), IPv4 CIDR subnetting, and NAT.
+                </div>
+            </div>
+
+            <!-- Advanced Machine Learning Blueprint -->
+            <div class="midsem-card aml" id="blueprint-aml">
+                <div class="midsem-card-stripe"></div>
+                <div class="midsem-header">
+                    <div>
+                        <h3 class="midsem-subject-title">Advanced Machine Learning</h3>
+                        <div class="midsem-subject-meta">
+                            <span>Exam Date: 22 Oct 2026</span>
+                            <span>&bull;</span>
+                            <span>Weightage: 25%</span>
+                        </div>
+                    </div>
+                    <span class="midsem-badge">L01 &ndash; L12 (Till Logistic Lab)</span>
+                </div>
+
+                <div class="midsem-stat-chips">
+                    <div class="midsem-chip">
+                        <span class="midsem-chip-label">MCQs &amp; Numericals</span>
+                        <span class="midsem-chip-val">60% (25&ndash;30 Ques)</span>
+                    </div>
+                    <div class="midsem-chip">
+                        <span class="midsem-chip-label">Hands-on Coding</span>
+                        <span class="midsem-chip-val">40% (4&ndash;5 Ques)</span>
+                    </div>
+                    <div class="midsem-chip">
+                        <span class="midsem-chip-label">Lab Focus</span>
+                        <span class="midsem-chip-val">Logistic Regression</span>
+                    </div>
+                </div>
+
+                <div class="midsem-breakdown-box">
+                    <h4 class="midsem-breakdown-title">Exam Structure &amp; Distribution</h4>
+                    <ul class="midsem-list">
+                        <li>
+                            <span class="midsem-list-bullet"></span>
+                            <span><strong>60% Objective:</strong> 25&ndash;30 MCQs and integer numerical calculations.</span>
+                        </li>
+                        <li>
+                            <span class="midsem-list-bullet"></span>
+                            <span><strong>40% Coding:</strong> 4&ndash;5 Python implementation questions based on lab exercises.</span>
+                        </li>
+                        <li>
+                            <span class="midsem-list-bullet"></span>
+                            <span><strong>Syllabus Horizon:</strong> Complete coverage from ML foundations up to the Logistic Regression lab session.</span>
+                        </li>
+                        <li>
+                            <span class="midsem-list-bullet"></span>
+                            <span><strong>Mathematical Rigor:</strong> Expect closed-form OLS derivations, gradient update computations, and evaluation metrics calculations.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="midsem-topics-box">
+                    <div class="midsem-topics-title">Tested Topic Scope</div>
+                    From code to learning foundations, ML lifecycle, simple &amp; multiple linear regression via OLS, batch / stochastic / mini-batch GD, evaluation metrics (MSE, RMSE, R-squared, Confusion Matrix, F1), polynomial regression &amp; assumptions, bias-variance tradeoff, feature selection, PCA, regularization (L1 Lasso &amp; L2 Ridge), and logistic regression.
+                </div>
+            </div>
+
+            <!-- Modern Computer Architecture Blueprint -->
+            <div class="midsem-card mca" id="blueprint-mca">
+                <div class="midsem-card-stripe"></div>
+                <div class="midsem-header">
+                    <div>
+                        <h3 class="midsem-subject-title">Modern Computer Architecture</h3>
+                        <div class="midsem-subject-meta">
+                            <span>Exam Date: 19 Oct 2026</span>
+                            <span>&bull;</span>
+                            <span>Weightage: 20%</span>
+                        </div>
+                    </div>
+                    <span class="midsem-badge">L01 &ndash; L14 (Complete Scope)</span>
+                </div>
+
+                <div class="midsem-stat-chips">
+                    <div class="midsem-chip">
+                        <span class="midsem-chip-label">Section A (Obj)</span>
+                        <span class="midsem-chip-val">35 Marks (40 Min)</span>
+                    </div>
+                    <div class="midsem-chip">
+                        <span class="midsem-chip-label">Section B (Coding)</span>
+                        <span class="midsem-chip-val">65 Marks (4 Ques)</span>
+                    </div>
+                    <div class="midsem-chip">
+                        <span class="midsem-chip-label">Sec C &amp; D</span>
+                        <span class="midsem-chip-val">Subjective + Circuits</span>
+                    </div>
+                </div>
+
+                <div class="midsem-breakdown-box">
+                    <h4 class="midsem-breakdown-title">Four-Section Exam Architecture</h4>
+                    <ul class="midsem-list">
+                        <li>
+                            <span class="midsem-list-bullet"></span>
+                            <span><strong>Section A (35 Marks, 40 Min limit):</strong> 20 MCQs, 3 Integer type, 3 Match-the-Following (3 marks each).</span>
+                        </li>
+                        <li>
+                            <span class="midsem-list-bullet"></span>
+                            <span><strong>Section B (65 Marks):</strong> 4 Coding questions (2 Verilog HDL + 2 MIPS Assembly programming).</span>
+                        </li>
+                        <li>
+                            <span class="midsem-list-bullet"></span>
+                            <span><strong>Section C:</strong> 3 Subjective architectural analysis questions.</span>
+                        </li>
+                        <li>
+                            <span class="midsem-list-bullet"></span>
+                            <span><strong>Section D (Written Paper):</strong> 2 Circuit drawings + Boolean equations (e.g. Half Adder), logic gates, and machine code instruction encoding/decoding (identifying R, I, J types).</span>
+                        </li>
+                        <li>
+                            <span class="midsem-list-bullet"></span>
+                            <span><strong>Logistics &amp; Bonus:</strong> Official reference sheet provided. Bonus question from upcoming logic gate circuit architecture &amp; debugging (GATE questions link).</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="midsem-breakdown-box" style="margin-top: -0.5rem; background: #fffcf9; border-color: rgba(109, 76, 61, 0.15);">
+                    <h4 class="midsem-breakdown-title" style="color: #6d4c3d;">Must-Practice Assembly Programs &amp; Logic Circuits</h4>
+                    <ul class="midsem-list">
+                        <li>
+                            <span class="midsem-list-bullet" style="background: #6d4c3d;"></span>
+                            <span><strong>MIPS Programs:</strong> Even/Odd check, sum of N natural numbers, sum of odd/even within limits, sum of array elements, Factorial, and Fibonacci series.</span>
+                        </li>
+                        <li>
+                            <span class="midsem-list-bullet" style="background: #6d4c3d;"></span>
+                            <span><strong>Core Hardware Blocks:</strong> MUX, DEMUX, Half/Full Adder, Digital Counters, Registers, and 3-to-8 Decoder (8 outputs).</span>
+                        </li>
+                        <li>
+                            <span class="midsem-list-bullet" style="background: #6d4c3d;"></span>
+                            <span><strong>Lab Mastery:</strong> Review current and previous lab code thoroughly.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="midsem-topics-box">
+                    <div class="midsem-topics-title">Tested Topic Scope</div>
+                    Boolean algebra, logic minimization, two's complement arithmetic, sequential feedback, latches, flip-flops, metastability, register files, FSMs, SRAM vs DRAM memory architecture, von Neumann bottleneck, RISC vs CISC principles, MIPS32 instruction formats (R, I, J), and stack calling conventions.
+                </div>
+            </div>
+
+        </div>
     </section>
 
     <!-- Calendar Schedule and Holidays Grid -->

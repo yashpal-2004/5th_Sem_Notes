@@ -26,12 +26,17 @@
     letter-spacing: 0.01em;
 }
 .subject-updated svg { opacity: 0.6; flex-shrink: 0; }
+.subject-card {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+}
 .subject-footer-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 10px;
-    padding-top: 8px;
+    margin-top: auto;
+    padding-top: 1rem;
     border-top: 1px dashed rgba(0, 0, 0, 0.08);
 }
 .card-handbook-btn {
@@ -233,19 +238,19 @@
                     <span class="hero-timeline-name aml">AML (C1) <small style="font-weight: normal; opacity: 0.75;">(10%)</small></span>
                     <span class="hero-timeline-date aml">25 Sep</span>
                 </div>
-                <div class="hero-timeline-item" data-date="2026-10-12" title="CN Mid Sem Syllabus: Lectures 01 to 13">
+                <div class="hero-timeline-item" data-date="2026-10-12" title="CN Mid Sem: Click to view official exam blueprint" onclick="window.location.href='evaluation-criteria.html#blueprint-cn'" style="cursor: pointer;">
                     <span class="hero-timeline-name cn">CN (Mid Sem) <small style="font-weight: normal; opacity: 0.75;">(20% &bull; L1-13)</small></span>
                     <span class="hero-timeline-date cn">12 Oct</span>
                 </div>
-                <div class="hero-timeline-item" data-date="2026-10-15" title="DL Mid Sem Syllabus: Lectures 01 to 11">
+                <div class="hero-timeline-item" data-date="2026-10-15" title="DL Mid Sem: Click to view official exam blueprint" onclick="window.location.href='evaluation-criteria.html#blueprint-dl'" style="cursor: pointer;">
                     <span class="hero-timeline-name dl">DL (Mid Sem) <small style="font-weight: normal; opacity: 0.75;">(20% &bull; L1-11)</small></span>
                     <span class="hero-timeline-date dl">15 Oct</span>
                 </div>
-                <div class="hero-timeline-item" data-date="2026-10-19" title="MCA Mid Sem Syllabus: Lectures 01 to 14">
+                <div class="hero-timeline-item" data-date="2026-10-19" title="MCA Mid Sem: Click to view official exam blueprint" onclick="window.location.href='evaluation-criteria.html#blueprint-mca'" style="cursor: pointer;">
                     <span class="hero-timeline-name mca">MCA (Mid Sem) <small style="font-weight: normal; opacity: 0.75;">(20% &bull; L1-14)</small></span>
                     <span class="hero-timeline-date mca">19 Oct</span>
                 </div>
-                <div class="hero-timeline-item" data-date="2026-10-22" title="AML Mid Sem Syllabus: Lectures 01 to 12">
+                <div class="hero-timeline-item" data-date="2026-10-22" title="AML Mid Sem: Click to view official exam blueprint" onclick="window.location.href='evaluation-criteria.html#blueprint-aml'" style="cursor: pointer;">
                     <span class="hero-timeline-name aml">AML (Mid Sem) <small style="font-weight: normal; opacity: 0.75;">(25% &bull; L1-12)</small></span>
                     <span class="hero-timeline-date aml">22 Oct</span>
                 </div>
@@ -272,7 +277,7 @@
             <div class="subject-grid">
 
                 <!-- Deep Learning Sem 5 -->
-                <a href="DL_Sem5/index.html" class="subject-card dl">
+                <div class="subject-card dl" onclick="window.location.href='DL_Sem5/index.html'">
                     <div class="subject-number">01</div>
                     <h2 class="subject-title">Deep Learning</h2>
                     <p class="subject-desc">Master neural networks from first principles: biological neurons,
@@ -286,17 +291,15 @@
                             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                             Last updated: Sep 30, 2026
                         </div>
-                        <span onclick="event.preventDefault(); event.stopPropagation();">
-                            <a href="DL_Sem5/DL_Short_Notes_Handbook.pdf" download="DL_Short_Notes_Handbook.pdf" title="Download Complete Deep Learning Short Notes Handbook (PDF)" class="card-handbook-btn">
-                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                                Handbook PDF
-                            </a>
-                        </span>
+                        <a href="DL_Sem5/DL_Short_Notes_Handbook.pdf" download="DL_Short_Notes_Handbook.pdf" onclick="event.stopPropagation();" title="Download Complete Deep Learning Short Notes Handbook (PDF)" class="card-handbook-btn">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            Handbook PDF
+                        </a>
                     </div>
-                </a>
+                </div>
 
                 <!-- Advanced Machine Learning -->
-                <a href="AML/index.html" class="subject-card aml">
+                <div class="subject-card aml" onclick="window.location.href='AML/index.html'">
                     <div class="subject-number">02</div>
                     <h2 class="subject-title">Advanced Machine Learning</h2>
                     <p class="subject-desc">Build strong ML fundamentals conceptually, mathematically, and practically:
@@ -310,17 +313,15 @@
                             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                             Last updated: Sep 25, 2026
                         </div>
-                        <span onclick="event.preventDefault(); event.stopPropagation();">
-                            <a href="AML/AML_Short_Notes_Handbook.pdf" download="AML_Short_Notes_Handbook.pdf" title="Download Complete AML Short Notes Handbook (PDF)" class="card-handbook-btn">
-                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                                Handbook PDF
-                            </a>
-                        </span>
+                        <a href="AML/AML_Short_Notes_Handbook.pdf" download="AML_Short_Notes_Handbook.pdf" onclick="event.stopPropagation();" title="Download Complete AML Short Notes Handbook (PDF)" class="card-handbook-btn">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            Handbook PDF
+                        </a>
                     </div>
-                </a>
+                </div>
 
                 <!-- Computer Networks -->
-                <a href="CN/index.html" class="subject-card cn">
+                <div class="subject-card cn" onclick="window.location.href='CN/index.html'">
                     <div class="subject-number">03</div>
                     <h2 class="subject-title">Computer Networks</h2>
                     <p class="subject-desc">Deconstruct the physical and logical architectures of the Internet: global
@@ -335,17 +336,15 @@
                             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                             Last updated: Sep 26, 2026
                         </div>
-                        <span onclick="event.preventDefault(); event.stopPropagation();">
-                            <a href="CN/CN_Short_Notes_Handbook.pdf" download="CN_Short_Notes_Handbook.pdf" title="Download Complete Computer Networks Short Notes Handbook (PDF)" class="card-handbook-btn">
-                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                                Handbook PDF
-                            </a>
-                        </span>
+                        <a href="CN/CN_Short_Notes_Handbook.pdf" download="CN_Short_Notes_Handbook.pdf" onclick="event.stopPropagation();" title="Download Complete Computer Networks Short Notes Handbook (PDF)" class="card-handbook-btn">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            Handbook PDF
+                        </a>
                     </div>
-                </a>
+                </div>
 
                 <!-- Modern Computer Architecture -->
-                <a href="MCA/index.html" class="subject-card mca">
+                <div class="subject-card mca" onclick="window.location.href='MCA/index.html'">
                     <div class="subject-number">04</div>
                     <h2 class="subject-title">Modern Computer Architecture</h2>
                     <p class="subject-desc">Master CPU design and digital logic: trace execution down the abstraction
@@ -359,14 +358,12 @@
                             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                             Last updated: Sep 26, 2026
                         </div>
-                        <span onclick="event.preventDefault(); event.stopPropagation();">
-                            <a href="MCA/MCA_Short_Notes_Handbook.pdf" download="MCA_Short_Notes_Handbook.pdf" title="Download Complete Modern Computer Architecture Short Notes Handbook (PDF)" class="card-handbook-btn">
-                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                                Handbook PDF
-                            </a>
-                        </span>
+                        <a href="MCA/MCA_Short_Notes_Handbook.pdf" download="MCA_Short_Notes_Handbook.pdf" onclick="event.stopPropagation();" title="Download Complete Modern Computer Architecture Short Notes Handbook (PDF)" class="card-handbook-btn">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            Handbook PDF
+                        </a>
                     </div>
-                </a>
+                </div>
 
             </div>
         </div>
