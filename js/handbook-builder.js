@@ -1,7 +1,7 @@
 /**
  * Dynamic In-Browser Short Notes Handbook Generator
- * Automatically discovers all lectures from the DOM,
- * lets the user customize the lecture range,
+ * Supports subject pages and homepage hub.
+ * Lets the user customize the lecture range,
  * renders a custom Cover Page & Table of Contents on HTML5 Canvas,
  * and compiles a consolidated PDF directly in the browser via pdf-lib.
  */
@@ -9,15 +9,143 @@
 (function () {
     'use strict';
 
+    // Global subject catalog with fallback manifests
+    const SUBJECT_CATALOG = {
+        dl: {
+            id: 'DL',
+            folder: 'DL_Sem5',
+            title: 'Deep Learning',
+            code: 'NST-CS-DL501',
+            midSemLimitDisplay: '11',
+            midSemLabel: 'Mid-Sem (L1 - L11)',
+            themeColor: '#132219',
+            accentColor: '#2e593f',
+            accentLight: '#eaf2ed',
+            bgColor: '#fbfbf9',
+            textDark: '#132219',
+            textMuted: '#69736e',
+            borderColor: '#dae0dc',
+            lectures: [
+                { index: 1, displayNum: '01', title: 'Where it Begins: The Neuron & Decision Boundaries', imgUrl: 'images/1.png' },
+                { index: 2, displayNum: '02', title: 'The Activation Function and the Update Rule', imgUrl: 'images/2.png' },
+                { index: 3, displayNum: '03', title: 'Modern Activations & Vanishing Gradients', imgUrl: 'images/3.png' },
+                { index: 4, displayNum: '04', title: 'Multilayer Perceptrons & Backpropagation', imgUrl: 'images/4.png' },
+                { index: 5, displayNum: '05', title: 'Optimization & Learning-Rate Control', imgUrl: 'images/5.png' },
+                { index: 6, displayNum: '06', title: 'Gradient Descent Mechanics & Loss Landscapes', imgUrl: 'images/6.png' },
+                { index: 7, displayNum: '07', title: 'Optimizers with Memory: Momentum, NAG, AdaGrad & Adam', imgUrl: 'images/7.png' },
+                { index: 8, displayNum: '08', title: 'Adaptive Learning Rates: AdaGrad, RMSProp & Adam', imgUrl: 'images/8.png' },
+                { index: 9, displayNum: '09', title: 'Regularisation: L2, L1, Early Stopping & Dropout', imgUrl: 'images/9.png' },
+                { index: 10, displayNum: '10a', title: 'CNN Foundations: From Pixels to Patterns', imgUrl: 'images/10_part_1.png' },
+                { index: 11, displayNum: '10b', title: 'Inside LeNet, AlexNet & VGG-16', imgUrl: 'images/10_part_2.png' },
+                { index: 12, displayNum: '11', title: 'Modern Architectures: Inception & ResNet', imgUrl: 'images/11.png' }
+            ]
+        },
+        aml: {
+            id: 'AML',
+            folder: 'AML',
+            title: 'Advanced Machine Learning',
+            code: 'NST-CS-AML502',
+            midSemLimitDisplay: '12',
+            midSemLabel: 'Mid-Sem (L1 - L12)',
+            themeColor: '#162238',
+            accentColor: '#365584',
+            accentLight: '#ecf2fa',
+            bgColor: '#f8fafc',
+            textDark: '#162238',
+            textMuted: '#647080',
+            borderColor: '#dae2ec',
+            lectures: [
+                { index: 1, displayNum: '01', title: 'Setting the Foundation: From Code to Learning', imgUrl: 'images/1.png' },
+                { index: 2, displayNum: '02', title: 'The ML Project Lifecycle (Part 1)', imgUrl: 'images/2.png' },
+                { index: 3, displayNum: '03', title: 'Simple Linear Regression Using the OLS Method', imgUrl: 'images/3.png' },
+                { index: 4, displayNum: '04', title: 'Multiple Linear Regression Using the OLS Method', imgUrl: 'images/4.png' },
+                { index: 5, displayNum: '05', title: 'Batch Gradient Descent for Multiple Linear Regression', imgUrl: 'images/5.png' },
+                { index: 6, displayNum: '06', title: 'Stochastic & Mini-Batch Gradient Descent', imgUrl: 'images/6.png' },
+                { index: 7, displayNum: '07', title: 'Regression and Classification Evaluation Metrics', imgUrl: 'images/7.png' },
+                { index: 8, displayNum: '08', title: 'Polynomial Regression & Assumptions', imgUrl: 'images/8.png' },
+                { index: 9, displayNum: '09', title: 'Bias, Variance and the Bias-Variance Tradeoff', imgUrl: 'images/9.png' },
+                { index: 10, displayNum: '10', title: 'Feature Selection', imgUrl: 'images/10.png' },
+                { index: 11, displayNum: '11', title: 'Dimensionality Reduction & PCA', imgUrl: 'images/11.png' },
+                { index: 12, displayNum: '12', title: 'Regularization: L1 (Lasso) & L2 (Ridge)', imgUrl: 'images/12.png' }
+            ]
+        },
+        cn: {
+            id: 'CN',
+            folder: 'CN',
+            title: 'Computer Networks',
+            code: 'NST-CS-CN503',
+            midSemLimitDisplay: '13',
+            midSemLabel: 'Mid-Sem (L1 - L13)',
+            themeColor: '#0d282d',
+            accentColor: '#1e606d',
+            accentLight: '#e9f5f7',
+            bgColor: '#f8fbfb',
+            textDark: '#0d282d',
+            textMuted: '#5f7378',
+            borderColor: '#d7e6e9',
+            lectures: [
+                { index: 1, displayNum: '01', title: 'Introduction: The Cloud, Infrastructure & Top-Down Layers', imgUrl: 'images/1.png' },
+                { index: 2, displayNum: '02', title: 'Moving Data Through the Core: Switching, Delays & Bottlenecks', imgUrl: 'images/2.png' },
+                { index: 3, displayNum: '03', title: 'The OSI and TCP/IP Reference Models', imgUrl: 'images/3.png' },
+                { index: 4, displayNum: '04', title: 'Networking Devices, Topologies & The Cloud Network', imgUrl: 'images/4.png' },
+                { index: 5, displayNum: '05', title: 'Application Layer: Architecture, Protocols & APIs', imgUrl: 'images/5.png' },
+                { index: 6, displayNum: '06', title: 'HTTPS & TLS Handshake: Securing the Web', imgUrl: 'images/6.png' },
+                { index: 7, displayNum: '07', title: 'Electronic Mail Protocols: SMTP, POP3, IMAP & DNS MX', imgUrl: 'images/7.png' },
+                { index: 8, displayNum: '08', title: 'The Socket API & Network Programming', imgUrl: 'images/8.png' },
+                { index: 9, displayNum: '09', title: 'The Transport Layer & User Datagram Protocol (UDP)', imgUrl: 'images/9.png' },
+                { index: 10, displayNum: '10', title: 'Principles of Reliable Data Transfer (rdt)', imgUrl: 'images/10.png' },
+                { index: 11, displayNum: '11', title: 'TCP Congestion Control & Flow Control', imgUrl: 'images/11.png' },
+                { index: 12, displayNum: '12', title: 'Cloud Load Balancing & Traffic Management', imgUrl: 'images/12.png' },
+                { index: 13, displayNum: '13', title: 'Addressing the World: IPv4 & Classless CIDR Routing', imgUrl: 'images/13.png' },
+                { index: 14, displayNum: '14', title: 'Subnetting in Practice & Network Address Translation (NAT)', imgUrl: 'images/14.png' }
+            ]
+        },
+        mca: {
+            id: 'MCA',
+            folder: 'MCA',
+            title: 'Modern Computer Architecture',
+            code: 'NST-CS-MCA504',
+            midSemLimitDisplay: '14',
+            midSemLabel: 'Mid-Sem (L1 - L14)',
+            themeColor: '#2a1e17',
+            accentColor: '#6d4c3d',
+            accentLight: '#f7f0ec',
+            bgColor: '#fbf9f7',
+            textDark: '#2a1e17',
+            textMuted: '#786962',
+            borderColor: '#e6dcd6',
+            lectures: [
+                { index: 1, displayNum: '01', title: 'Course Intro & Boolean Algebra', imgUrl: 'images/1.png' },
+                { index: 2, displayNum: '02', title: 'Logic Minimisation & Universal Gates', imgUrl: 'images/2.png' },
+                { index: 3, displayNum: '03', title: 'Combinational Building Blocks: CISC vs RISC ISA', imgUrl: 'images/3.png' },
+                { index: 4, displayNum: '04', title: 'Number Systems, Two\'s Complement & Overflow', imgUrl: 'images/4.png' },
+                { index: 5, displayNum: '05', title: 'Sequential Logic: Feedback, Latches & Memory', imgUrl: 'images/5.png' },
+                { index: 6, displayNum: '06', title: 'Latches, Flip-Flops & Timing Foundations', imgUrl: 'images/6.png' },
+                { index: 7, displayNum: '07', title: 'Metastability, Synchronizers & Static Timing Analysis', imgUrl: 'images/7.png' },
+                { index: 8, displayNum: '08', title: 'Flip-Flop Types, Registers & Digital Counters', imgUrl: 'images/8.png' },
+                { index: 9, displayNum: '09', title: 'Register Files & Finite State Machines (FSMs)', imgUrl: 'images/9.png' },
+                { index: 10, displayNum: '10', title: 'Memory Technologies: SRAM vs. DRAM & Architecture', imgUrl: 'images/10.png' },
+                { index: 11, displayNum: '11', title: 'Von Neumann vs. Harvard Architecture & Bottleneck', imgUrl: 'images/11.png' },
+                { index: 12, displayNum: '12', title: 'ISA Design Principles: RISC vs. CISC Architecture', imgUrl: 'images/12.png' },
+                { index: 13, displayNum: '13', title: 'MIPS32 & RISC-V Instruction Formats (R, I, and J)', imgUrl: 'images/13.png' },
+                { index: 14, displayNum: '14', title: 'Control Flow Translation & Stack Calling Conventions', imgUrl: 'images/14.png' }
+            ]
+        }
+    };
+
+    function isRootPage() {
+        if (document.querySelectorAll('.lecture-card').length > 0) return false;
+        return !window.location.pathname.match(/[\/\\](DL_Sem5|AML|CN|MCA)[\/\\]/i);
+    }
+
     // Ensure PDFLib is loaded
     function ensurePdfLib(callback) {
         if (window.PDFLib) {
             callback();
             return;
         }
-        // Try local script first, fallback to unpkg
         const script = document.createElement('script');
-        script.src = '../js/pdf-lib.min.js';
+        script.src = isRootPage() ? 'js/pdf-lib.min.js' : '../js/pdf-lib.min.js';
         script.onload = () => callback();
         script.onerror = () => {
             const fallbackScript = document.createElement('script');
@@ -28,111 +156,60 @@
         document.head.appendChild(script);
     }
 
-    // Detect subject details from DOM
-    function getSubjectDetails() {
+    // Detect subject details
+    function getSubjectDetails(subjectKey) {
+        if (subjectKey && SUBJECT_CATALOG[subjectKey.toLowerCase()]) {
+            return SUBJECT_CATALOG[subjectKey.toLowerCase()];
+        }
+
         const titleText = (document.title || '').toLowerCase();
         const logoText = (document.querySelector('.logo-text')?.textContent || '').toLowerCase();
         const fullText = titleText + ' ' + logoText;
 
         if (fullText.includes('deep learning') || fullText.includes('dl')) {
-            return {
-                id: 'DL',
-                title: 'Deep Learning',
-                code: 'NST-CS-DL501',
-                midSemLimitDisplay: '11',
-                midSemLabel: 'Mid-Sem (L1 - L11)',
-                themeColor: '#132219',
-                accentColor: '#2e593f',
-                accentLight: '#eaf2ed',
-                bgColor: '#fbfbf9',
-                textDark: '#132219',
-                textMuted: '#69736e',
-                borderColor: '#dae0dc'
-            };
+            return SUBJECT_CATALOG.dl;
         } else if (fullText.includes('advanced machine learning') || fullText.includes('aml')) {
-            return {
-                id: 'AML',
-                title: 'Advanced Machine Learning',
-                code: 'NST-CS-AML502',
-                midSemLimitDisplay: '12',
-                midSemLabel: 'Mid-Sem (L1 - L12)',
-                themeColor: '#162238',
-                accentColor: '#365584',
-                accentLight: '#ecf2fa',
-                bgColor: '#f8fafc',
-                textDark: '#162238',
-                textMuted: '#647080',
-                borderColor: '#dae2ec'
-            };
+            return SUBJECT_CATALOG.aml;
         } else if (fullText.includes('network') || fullText.includes('cn')) {
-            return {
-                id: 'CN',
-                title: 'Computer Networks',
-                code: 'NST-CS-CN503',
-                midSemLimitDisplay: '13',
-                midSemLabel: 'Mid-Sem (L1 - L13)',
-                themeColor: '#0d282d',
-                accentColor: '#1e606d',
-                accentLight: '#e9f5f7',
-                bgColor: '#f8fbfb',
-                textDark: '#0d282d',
-                textMuted: '#5f7378',
-                borderColor: '#d7e6e9'
-            };
+            return SUBJECT_CATALOG.cn;
         } else if (fullText.includes('architecture') || fullText.includes('mca')) {
-            return {
-                id: 'MCA',
-                title: 'Modern Computer Architecture',
-                code: 'NST-CS-MCA504',
-                midSemLimitDisplay: '14',
-                midSemLabel: 'Mid-Sem (L1 - L14)',
-                themeColor: '#2a1e17',
-                accentColor: '#6d4c3d',
-                accentLight: '#f7f0ec',
-                bgColor: '#fbf9f7',
-                textDark: '#2a1e17',
-                textMuted: '#786962',
-                borderColor: '#e6dcd6'
-            };
+            return SUBJECT_CATALOG.mca;
         }
 
-        // Generic fallback
-        return {
-            id: 'Course',
-            title: document.querySelector('.logo-text')?.textContent || 'Course Notes',
-            code: 'NST-5TH-SEM',
-            themeColor: '#1c1c1c',
-            accentColor: '#4a5568',
-            accentLight: '#edf2f7',
-            bgColor: '#ffffff',
-            textDark: '#1a202c',
-            textMuted: '#718096',
-            borderColor: '#e2e8f0'
-        };
+        return SUBJECT_CATALOG.dl;
     }
 
-    // Scan all lecture cards dynamically from the current DOM
-    function scanLectures() {
+    // Scan all lecture cards dynamically
+    function getLecturesForSubject(subject) {
         const cards = Array.from(document.querySelectorAll('.lecture-card'));
-        return cards.map((card, idx) => {
-            const numEl = card.querySelector('.lecture-number');
-            const titleEl = card.querySelector('h2');
-            const imgLink = card.querySelector('a[href*="images/"]');
-            
-            const numText = numEl ? numEl.textContent.trim() : String(idx + 1).padStart(2, '0');
-            const titleText = titleEl ? titleEl.textContent.trim() : `Lecture ${numText}`;
-            
-            let imgUrl = imgLink ? imgLink.getAttribute('href') : `images/${idx + 1}.png`;
-            return {
-                index: idx + 1,
-                displayNum: numText,
-                title: titleText,
-                imgUrl: imgUrl
-            };
-        });
+        if (cards.length > 0) {
+            return cards.map((card, idx) => {
+                const numEl = card.querySelector('.lecture-number');
+                const titleEl = card.querySelector('h2');
+                const imgLink = card.querySelector('a[href*="images/"]');
+                
+                const numText = numEl ? numEl.textContent.trim() : String(idx + 1).padStart(2, '0');
+                const titleText = titleEl ? titleEl.textContent.trim() : `Lecture ${numText}`;
+                let imgUrl = imgLink ? imgLink.getAttribute('href') : `images/${idx + 1}.png`;
+                return {
+                    index: idx + 1,
+                    displayNum: numText,
+                    title: titleText,
+                    imgUrl: imgUrl
+                };
+            });
+        }
+
+        if (subject && subject.lectures && subject.lectures.length) {
+            return subject.lectures.map(l => ({ ...l }));
+        }
+
+        return [];
     }
 
-    // Modal Manager
+    // Active State
+    let currentSubject = null;
+    let currentLectures = [];
     let modalOverlay = null;
 
     function buildModalDOM() {
@@ -142,7 +219,7 @@
         if (!document.querySelector('link[href*="handbook-modal.css"]')) {
             const link = document.createElement('link');
             link.rel = 'stylesheet';
-            link.href = '../css/handbook-modal.css';
+            link.href = isRootPage() ? 'css/handbook-modal.css' : '../css/handbook-modal.css';
             document.head.appendChild(link);
         }
 
@@ -168,8 +245,8 @@
                     <div class="handbook-presets-row">
                         <span class="handbook-preset-label">Presets:</span>
                         <button type="button" class="handbook-preset-btn" id="presetAllBtn">All Lectures</button>
-                        <button type="button" class="handbook-preset-btn" id="presetMid1Btn">Mid-Sem (L1 - L7)</button>
-                        <button type="button" class="handbook-preset-btn" id="presetMid2Btn">Latter Half (L8+)</button>
+                        <button type="button" class="handbook-preset-btn" id="presetMid1Btn">Mid-Sem Syllabus</button>
+                        <button type="button" class="handbook-preset-btn" id="presetMid2Btn">Post Mid-Sem</button>
                     </div>
                     <div class="handbook-range-grid">
                         <div class="handbook-field">
@@ -184,15 +261,15 @@
                     <div class="handbook-summary-box">
                         <div class="handbook-summary-item">
                             <span class="handbook-summary-label">Selected Range:</span>
-                            <span class="handbook-summary-val" id="summaryRangeVal">Lecture 01 to Lecture 14</span>
+                            <span class="handbook-summary-val" id="summaryRangeVal">Lecture 01 to Lecture 11</span>
                         </div>
                         <div class="handbook-summary-item">
                             <span class="handbook-summary-label">Short Notes Units:</span>
-                            <span class="handbook-summary-val" id="summaryUnitsVal">14 Cheatsheet Pages</span>
+                            <span class="handbook-summary-val" id="summaryUnitsVal">11 Cheatsheet Pages</span>
                         </div>
                         <div class="handbook-summary-item">
                             <span class="handbook-summary-label">Compiled Document:</span>
-                            <span class="handbook-summary-val" id="summaryPagesVal">15 Pages (Cover & Table of Contents + Notes)</span>
+                            <span class="handbook-summary-val" id="summaryPagesVal">12 Pages (Cover & Table of Contents + Notes)</span>
                         </div>
                     </div>
                     <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.78rem;color:var(--text-muted, #667069);padding:0 2px;">
@@ -249,15 +326,12 @@
         document.getElementById('presetMid1Btn').addEventListener('click', () => {
             const startSel = document.getElementById('handbookStartSelect');
             const endSel = document.getElementById('handbookEndSelect');
-            const subject = getSubjectDetails();
-            const lectures = scanLectures();
-
             startSel.selectedIndex = 0;
             let targetIdx = -1;
-            lectures.forEach((lec, idx) => {
+            currentLectures.forEach((lec, idx) => {
                 const numClean = lec.displayNum.replace(/[^0-9]/g, '');
-                const targetClean = (subject.midSemLimitDisplay || '').replace(/[^0-9]/g, '');
-                if (numClean === targetClean || lec.displayNum.toLowerCase() === (subject.midSemLimitDisplay || '').toLowerCase()) {
+                const targetClean = (currentSubject.midSemLimitDisplay || '').replace(/[^0-9]/g, '');
+                if (numClean === targetClean || lec.displayNum.toLowerCase() === (currentSubject.midSemLimitDisplay || '').toLowerCase()) {
                     targetIdx = idx;
                 }
             });
@@ -269,24 +343,21 @@
         document.getElementById('presetMid2Btn').addEventListener('click', () => {
             const startSel = document.getElementById('handbookStartSelect');
             const endSel = document.getElementById('handbookEndSelect');
-            const subject = getSubjectDetails();
-            const lectures = scanLectures();
-
             let targetIdx = -1;
-            lectures.forEach((lec, idx) => {
+            currentLectures.forEach((lec, idx) => {
                 const numClean = lec.displayNum.replace(/[^0-9]/g, '');
-                const targetClean = (subject.midSemLimitDisplay || '').replace(/[^0-9]/g, '');
-                if (numClean === targetClean || lec.displayNum.toLowerCase() === (subject.midSemLimitDisplay || '').toLowerCase()) {
+                const targetClean = (currentSubject.midSemLimitDisplay || '').replace(/[^0-9]/g, '');
+                if (numClean === targetClean || lec.displayNum.toLowerCase() === (currentSubject.midSemLimitDisplay || '').toLowerCase()) {
                     targetIdx = idx;
                 }
             });
 
-            if (targetIdx !== -1 && targetIdx < lectures.length - 1) {
+            if (targetIdx !== -1 && targetIdx < currentLectures.length - 1) {
                 startSel.selectedIndex = targetIdx + 1;
                 endSel.selectedIndex = endSel.options.length - 1;
             } else {
                 startSel.selectedIndex = 0;
-                endSel.selectedIndex = Math.max(0, Math.floor((lectures.length - 1) / 2));
+                endSel.selectedIndex = Math.max(0, Math.floor((currentLectures.length - 1) / 2));
             }
             onRangeChanged();
         });
@@ -294,21 +365,15 @@
         document.getElementById('handbookCompileBtn').addEventListener('click', compileCustomHandbook);
     }
 
-    function openModal() {
-        buildModalDOM();
-        const lectures = scanLectures();
-        if (!lectures.length) {
-            alert('No lecture cards found on this page.');
-            return;
-        }
-
+    function populateSelectOptions() {
         const startSel = document.getElementById('handbookStartSelect');
         const endSel = document.getElementById('handbookEndSelect');
+        if (!startSel || !endSel) return;
 
         startSel.innerHTML = '';
         endSel.innerHTML = '';
 
-        lectures.forEach((lec, idx) => {
+        currentLectures.forEach((lec, idx) => {
             const optStart = new Option(`Lecture ${lec.displayNum}: ${lec.title}`, String(idx));
             const optEnd = new Option(`Lecture ${lec.displayNum}: ${lec.title}`, String(idx));
             startSel.add(optStart);
@@ -316,52 +381,109 @@
         });
 
         startSel.selectedIndex = 0;
-        endSel.selectedIndex = lectures.length - 1;
+        endSel.selectedIndex = currentLectures.length - 1;
+    }
+
+    function openModal(subjectKey) {
+        buildModalDOM();
+
+        currentSubject = getSubjectDetails(subjectKey);
+        currentLectures = getLecturesForSubject(currentSubject);
+
+        if (!currentLectures.length) {
+            alert('No lecture materials found for this subject.');
+            return;
+        }
+
+        // Header and subtitle
+        const titleEl = document.getElementById('handbookModalTitle');
+        if (titleEl) {
+            titleEl.textContent = `${currentSubject.title} Handbook Builder`;
+        }
+        const subtitleEl = document.querySelector('.handbook-modal-subtitle');
+        if (subtitleEl) {
+            subtitleEl.textContent = `Select lecture range for ${currentSubject.title} to compile into an offline revision PDF handbook with an automated Table of Contents.`;
+        }
+
+        populateSelectOptions();
 
         // Reset progress UI
         const progWrap = document.getElementById('handbookProgressWrap');
         progWrap.classList.remove('active');
         document.getElementById('handbookCompileBtn').disabled = false;
 
-        const subject = getSubjectDetails();
         const midBtn = document.getElementById('presetMid1Btn');
         const postMidBtn = document.getElementById('presetMid2Btn');
 
         if (midBtn) {
-            midBtn.textContent = subject.midSemLabel || 'Mid-Sem Syllabus';
+            midBtn.textContent = currentSubject.midSemLabel || 'Mid-Sem Syllabus';
         }
 
         let targetEndIdx = -1;
-        lectures.forEach((lec, idx) => {
+        currentLectures.forEach((lec, idx) => {
             const numClean = lec.displayNum.replace(/[^0-9]/g, '');
-            const targetClean = (subject.midSemLimitDisplay || '').replace(/[^0-9]/g, '');
-            if (numClean === targetClean || lec.displayNum.toLowerCase() === (subject.midSemLimitDisplay || '').toLowerCase()) {
+            const targetClean = (currentSubject.midSemLimitDisplay || '').replace(/[^0-9]/g, '');
+            if (numClean === targetClean || lec.displayNum.toLowerCase() === (currentSubject.midSemLimitDisplay || '').toLowerCase()) {
                 targetEndIdx = idx;
             }
         });
-        if (targetEndIdx === -1) targetEndIdx = lectures.length - 1;
+        if (targetEndIdx === -1) targetEndIdx = currentLectures.length - 1;
 
         if (postMidBtn) {
-            if (targetEndIdx < lectures.length - 1) {
-                const nextLec = lectures[targetEndIdx + 1];
+            if (targetEndIdx < currentLectures.length - 1) {
+                const nextLec = currentLectures[targetEndIdx + 1];
                 postMidBtn.textContent = `Post Mid-Sem (L${nextLec.displayNum}+)`;
                 postMidBtn.style.display = 'inline-block';
             } else {
-                const halfIdx = Math.max(0, Math.floor((lectures.length - 1) / 2));
-                postMidBtn.textContent = `First Half (L1 - L${lectures[halfIdx].displayNum})`;
+                const halfIdx = Math.max(0, Math.floor((currentLectures.length - 1) / 2));
+                postMidBtn.textContent = `First Half (L1 - L${currentLectures[halfIdx].displayNum})`;
                 postMidBtn.style.display = 'inline-block';
             }
         }
 
         const directLink = document.getElementById('handbookDirectFullLink');
         if (directLink) {
-            const defaultPdf = `${subject.id === 'DL' ? 'DL' : subject.id}_Short_Notes_Handbook.pdf`;
-            directLink.href = defaultPdf;
+            const defaultPdf = `${currentSubject.id === 'DL' ? 'DL' : currentSubject.id}_Short_Notes_Handbook.pdf`;
+            const fullHref = (isRootPage() && currentSubject.folder) ? `${currentSubject.folder}/${defaultPdf}` : defaultPdf;
+            directLink.href = fullHref;
             directLink.download = defaultPdf;
         }
 
         onRangeChanged();
         modalOverlay.classList.add('active');
+
+        // Optional background refresh if on homepage
+        if (isRootPage() && currentSubject.folder) {
+            fetch(`${currentSubject.folder}/index.html`)
+                .then(res => res.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const fetchedCards = Array.from(doc.querySelectorAll('.lecture-card'));
+                    if (fetchedCards.length > 0 && currentSubject && (currentSubject.folder === subjectKey || currentSubject.id.toLowerCase() === (subjectKey || '').toLowerCase())) {
+                        const refreshed = fetchedCards.map((card, idx) => {
+                            const numEl = card.querySelector('.lecture-number');
+                            const titleEl = card.querySelector('h2');
+                            const imgLink = card.querySelector('a[href*="images/"]');
+                            const numText = numEl ? numEl.textContent.trim() : String(idx + 1).padStart(2, '0');
+                            const titleText = titleEl ? titleEl.textContent.trim() : `Lecture ${numText}`;
+                            const imgUrl = imgLink ? imgLink.getAttribute('href') : `images/${idx + 1}.png`;
+                            return {
+                                index: idx + 1,
+                                displayNum: numText,
+                                title: titleText,
+                                imgUrl: imgUrl
+                            };
+                        });
+                        if (refreshed.length !== currentLectures.length) {
+                            currentLectures = refreshed;
+                            populateSelectOptions();
+                            onRangeChanged();
+                        }
+                    }
+                })
+                .catch(() => {});
+        }
     }
 
     function closeModal() {
@@ -373,20 +495,22 @@
     function onRangeChanged() {
         const startSel = document.getElementById('handbookStartSelect');
         const endSel = document.getElementById('handbookEndSelect');
-        const lectures = scanLectures();
+        if (!currentLectures.length || !startSel || !endSel) return;
 
         let startIdx = parseInt(startSel.value, 10);
         let endIdx = parseInt(endSel.value, 10);
 
+        if (isNaN(startIdx)) startIdx = 0;
+        if (isNaN(endIdx)) endIdx = currentLectures.length - 1;
+
         if (startIdx > endIdx) {
-            // Keep them valid
             endIdx = startIdx;
             endSel.value = String(endIdx);
         }
 
         const selectedCount = endIdx - startIdx + 1;
-        const startLec = lectures[startIdx];
-        const endLec = lectures[endIdx];
+        const startLec = currentLectures[startIdx];
+        const endLec = currentLectures[endIdx];
 
         document.getElementById('summaryRangeVal').textContent = `Lecture ${startLec.displayNum} to Lecture ${endLec.displayNum}`;
         document.getElementById('summaryUnitsVal').textContent = `${selectedCount} Unit${selectedCount > 1 ? 's' : ''}`;
@@ -456,7 +580,6 @@
 
         metaItems.forEach((item, idx) => {
             const cx = padX + idx * (cardW + 15);
-            // Pill card background
             ctx.fillStyle = subject.accentLight;
             roundRect(ctx, cx, metaY, cardW, metaH, 6, true, false);
             ctx.strokeStyle = subject.borderColor;
@@ -501,7 +624,6 @@
         const rowStartY = thY + thH + 4;
         const numLectures = selectedLectures.length;
         const availH = (H - margin - 55) - rowStartY;
-        // Dynamically clamp row height so few lectures don't look stretched and many fit comfortably
         const rowH = Math.min(50, Math.max(34, Math.floor(availH / numLectures)));
 
         selectedLectures.forEach((lec, idx) => {
@@ -580,7 +702,6 @@
 
     // Robust image byte loader with canvas fallback
     async function fetchImageBytes(url) {
-        // Attempt direct fetch
         try {
             const resp = await fetch(url);
             if (resp.ok) {
@@ -588,7 +709,7 @@
                 return { bytes: new Uint8Array(buffer), isPng: !url.toLowerCase().endsWith('.jpg') };
             }
         } catch (e) {
-            // Fetch failed (likely file:/// CORS restriction); fall back to Image + Canvas
+            // Fetch failed; fall back to Image + Canvas
         }
 
         return new Promise((resolve, reject) => {
@@ -639,16 +760,15 @@
                 throw new Error('PDFLib library could not be initialized.');
             }
 
-            const lectures = scanLectures();
             const startIdx = parseInt(document.getElementById('handbookStartSelect').value, 10);
             const endIdx = parseInt(document.getElementById('handbookEndSelect').value, 10);
-            const selectedLectures = lectures.slice(startIdx, endIdx + 1);
+            const selectedLectures = currentLectures.slice(startIdx, endIdx + 1);
 
             if (!selectedLectures.length) {
                 throw new Error('No lectures selected.');
             }
 
-            const subject = getSubjectDetails();
+            const subject = currentSubject;
             setProgress(15, 'Rendering custom Cover Page & Table of Contents...');
 
             // Render cover canvas
@@ -672,7 +792,12 @@
                 const pct = 25 + Math.floor(((i + 1) / totalLectures) * 65);
                 setProgress(pct, `Embedding Lecture ${lec.displayNum}: ${lec.title.substring(0, 30)}... (${i + 1}/${totalLectures})`);
 
-                const imgData = await fetchImageBytes(lec.imgUrl);
+                let imgUrl = lec.imgUrl;
+                if (isRootPage() && subject.folder && !imgUrl.startsWith(subject.folder + '/')) {
+                    imgUrl = subject.folder + '/' + imgUrl;
+                }
+
+                const imgData = await fetchImageBytes(imgUrl);
                 let embeddedImg;
                 if (!imgData.isPng) {
                     embeddedImg = await pdfDoc.embedJpg(imgData.bytes);
@@ -715,7 +840,7 @@
         }
     }
 
-    // Expose globally so buttons can trigger openHandbookModal()
+    // Expose globally so buttons can trigger openHandbookModal(subjectKey)
     window.openHandbookModal = openModal;
 
     // Attach automatically to any elements with data-action="custom-handbook" or class "trigger-handbook-modal"
@@ -723,7 +848,8 @@
         document.querySelectorAll('[data-action="custom-handbook"], .trigger-handbook-modal').forEach((el) => {
             el.addEventListener('click', (e) => {
                 e.preventDefault();
-                openModal();
+                const subj = el.getAttribute('data-subject');
+                openModal(subj);
             });
         });
     });
