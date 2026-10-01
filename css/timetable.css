@@ -1,0 +1,730 @@
+/* Interactive Timetable Styles - Editorial & Accessible */
+
+.timetable-section {
+    padding: 4rem 2rem 5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.timetable-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+
+.timetable-title-wrap h2 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 2.2rem;
+    font-weight: 400;
+    color: var(--text-dark, #1c1c1c);
+    margin: 0 0 0.5rem;
+}
+
+.timetable-subtitle {
+    color: var(--text-muted, #647080);
+    font-size: 0.95rem;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.timetable-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.timetable-view-toggle {
+    display: inline-flex;
+    background: #f0f2f5;
+    padding: 3px;
+    border-radius: 10px;
+    border: 1px solid var(--border-light, #d0d7de);
+}
+
+.timetable-toggle-btn {
+    padding: 6px 14px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: none;
+    background: transparent;
+    color: var(--text-muted, #647080);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.timetable-toggle-btn.active {
+    background: #ffffff;
+    color: var(--text-dark, #1c1c1c);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.timetable-track-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-dark, #1c1c1c);
+    background: #ffffff;
+    border: 1px solid var(--border-light, #d0d7de);
+    padding: 6px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.timetable-track-toggle:hover {
+    background: #f8fafc;
+}
+
+/* Live Status Banner */
+.timetable-live-banner {
+    background: #ffffff;
+    border: 1px solid var(--border-light, #d0d7de);
+    border-left: 4px solid #059669;
+    border-radius: 12px;
+    padding: 1rem 1.4rem;
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.timetable-live-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.live-pulse-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #059669;
+    box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.7);
+    animation: livePulse 2s infinite;
+}
+
+@keyframes livePulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 8px rgba(5, 150, 105, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(5, 150, 105, 0);
+    }
+}
+
+.live-status-text {
+    font-size: 0.9rem;
+    color: var(--text-dark, #1c1c1c);
+    font-weight: 500;
+}
+
+.live-status-text strong {
+    font-weight: 700;
+}
+
+.live-status-time {
+    font-family: monospace;
+    font-size: 0.85rem;
+    color: var(--text-muted, #647080);
+    background: #f1f5f9;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+/* Day Selector Navigation */
+.timetable-day-tabs {
+    display: flex;
+    gap: 0.5rem;
+    border-bottom: 1px solid var(--border-light, #d0d7de);
+    margin-bottom: 2rem;
+    overflow-x: auto;
+    padding-bottom: 1px;
+}
+
+.timetable-day-tab {
+    padding: 0.65rem 1.4rem;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text-muted, #647080);
+    border: none;
+    background: transparent;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.timetable-day-tab:hover {
+    color: var(--text-dark, #1c1c1c);
+}
+
+.timetable-day-tab.active {
+    color: var(--text-dark, #1c1c1c);
+    border-bottom-color: var(--text-dark, #1c1c1c);
+}
+
+.today-indicator-pill {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    background: #059669;
+    color: #ffffff;
+    padding: 1px 6px;
+    border-radius: 10px;
+    font-weight: 700;
+}
+
+/* Day Cards Timeline */
+.timetable-cards-view {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+}
+
+.period-card {
+    background: #ffffff;
+    border: 1px solid var(--border-light, #d0d7de);
+    border-radius: 14px;
+    padding: 1.35rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.period-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+}
+
+.period-card.is-active-now {
+    border-color: #059669;
+    box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.2), 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.period-card-stripe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+}
+
+.period-card.dl .period-card-stripe { background: #059669; }
+.period-card.aml .period-card-stripe { background: #7c3aed; }
+.period-card.cn .period-card-stripe { background: #0284c7; }
+.period-card.mca .period-card-stripe { background: #d97706; }
+.period-card.minor .period-card-stripe { background: #e11d48; }
+.period-card.elective .period-card-stripe { background: #64748b; }
+.period-card.break .period-card-stripe { background: #eab308; }
+.period-card.contest .period-card-stripe { background: #ea580c; }
+
+.period-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.period-time {
+    font-family: monospace;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-dark, #1c1c1c);
+    letter-spacing: -0.02em;
+}
+
+.period-badges {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.period-type-badge {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 2px 7px;
+    border-radius: 6px;
+}
+
+.period-card.dl .period-type-badge { background: #eaf2ed; color: #1e4530; }
+.period-card.aml .period-type-badge { background: #ecf2fa; color: #203e68; }
+.period-card.cn .period-type-badge { background: #e9f5f7; color: #154e58; }
+.period-card.mca .period-type-badge { background: #f7f0ec; color: #4e3224; }
+.period-card.minor .period-type-badge { background: #fdf2f8; color: #9d174d; }
+.period-card.elective .period-type-badge { background: #f1f5f9; color: #334155; }
+.period-card.break .period-type-badge { background: #fef9c3; color: #713f12; }
+.period-card.contest .period-type-badge { background: #ffedd5; color: #7c2d12; }
+
+.period-subject-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-dark, #1c1c1c);
+    line-height: 1.35;
+    margin: 0;
+}
+
+.period-location-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.82rem;
+    color: var(--text-muted, #647080);
+}
+
+.period-location-row svg {
+    flex-shrink: 0;
+    opacity: 0.7;
+}
+
+.period-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    padding-top: 0.75rem;
+    border-top: 1px dashed rgba(0, 0, 0, 0.08);
+}
+
+.period-duration {
+    font-size: 0.76rem;
+    color: var(--text-muted, #647080);
+    font-weight: 500;
+}
+
+.period-notes-btn {
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: var(--text-dark, #1c1c1c);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: color 0.2s;
+}
+
+.period-notes-btn:hover {
+    text-decoration: underline;
+}
+
+/* Weekly Matrix Table View */
+.timetable-matrix-view {
+    display: none;
+    overflow-x: auto;
+    background: #ffffff;
+    border: 1px solid var(--border-light, #d0d7de);
+    border-radius: 14px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.timetable-matrix-view.active {
+    display: block;
+}
+
+.timetable-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 980px;
+    font-size: 0.82rem;
+}
+
+.timetable-table th,
+.timetable-table td {
+    border: 1px solid rgba(0, 0, 0, 0.07);
+    padding: 0.75rem 0.85rem;
+    text-align: left;
+    vertical-align: top;
+}
+
+.timetable-table th {
+    background: #f8fafc;
+    color: var(--text-dark, #1c1c1c);
+    font-weight: 700;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
+.timetable-table th.time-col-header {
+    text-align: center;
+    font-family: monospace;
+    font-size: 0.75rem;
+    min-width: 120px;
+}
+
+.timetable-day-header-cell {
+    position: sticky;
+    left: 0;
+    background: #f8fafc;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--text-dark, #1c1c1c);
+    z-index: 1;
+    width: 80px;
+    text-align: center;
+}
+
+.timetable-table tr.today-row .timetable-day-header-cell {
+    background: #ecfdf5;
+    color: #065f46;
+    border-left: 3px solid #059669;
+}
+
+.matrix-cell-block {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border-radius: 6px;
+    padding: 6px 8px;
+    height: 100%;
+    box-sizing: border-box;
+    transition: transform 0.15s ease;
+}
+
+.matrix-cell-block:hover {
+    transform: scale(1.02);
+}
+
+.matrix-cell-block.dl { background: #eaf2ed; color: #1e4530; border-left: 3px solid #059669; }
+.matrix-cell-block.aml { background: #ecf2fa; color: #203e68; border-left: 3px solid #7c3aed; }
+.matrix-cell-block.cn { background: #e9f5f7; color: #154e58; border-left: 3px solid #0284c7; }
+.matrix-cell-block.mca { background: #f7f0ec; color: #4e3224; border-left: 3px solid #d97706; }
+.matrix-cell-block.minor { background: #fdf2f8; color: #9d174d; border-left: 3px solid #e11d48; }
+.matrix-cell-block.elective { background: #f1f5f9; color: #334155; border-left: 3px solid #64748b; }
+.matrix-cell-block.break { background: #fef9c3; color: #713f12; text-align: center; justify-content: center; }
+.matrix-cell-block.contest { background: #ffedd5; color: #7c2d12; border-left: 3px solid #ea580c; }
+
+.matrix-subj-title {
+    font-weight: 700;
+    font-size: 0.8rem;
+    line-height: 1.25;
+}
+
+.matrix-room-code {
+    font-size: 0.72rem;
+    opacity: 0.85;
+    font-weight: 600;
+}
+
+.matrix-type-tag {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+@media (max-width: 768px) {
+    .timetable-section {
+        padding: 3rem 1.25rem 4rem;
+    }
+    .timetable-header-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    .timetable-cards-view {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ==========================================================================
+   Hero Live Class Widget
+   ========================================================================== */
+.hero-card-tabs {
+    display: flex;
+    gap: 6px;
+    background: #f1f5f9;
+    padding: 3px;
+    border-radius: 10px;
+    margin-bottom: 1.25rem;
+    border: 1px solid var(--border-light, #d0d7de);
+}
+
+.hero-card-tab {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 7px 10px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text-muted, #647080);
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.hero-card-tab.active {
+    background: #ffffff;
+    color: var(--text-dark, #1c1c1c);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.live-pulse-dot-sm {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #059669;
+    box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.7);
+    animation: livePulse 2s infinite;
+}
+
+.hero-live-featured {
+    background: #f8fafc;
+    border: 1px solid var(--border-light, #d0d7de);
+    border-radius: 12px;
+    padding: 1rem 1.1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-live-featured::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 4px;
+    background: #059669;
+}
+
+.hero-live-badge-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.hero-live-status-pill {
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.hero-live-status-pill.active {
+    background: #eaf2ed;
+    color: #1e4530;
+    border: 1px solid #c2dbcd;
+}
+
+.hero-live-status-pill.upcoming {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+}
+
+.hero-live-status-pill.done {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+}
+
+.hero-live-subj-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-dark, #1c1c1c);
+    margin: 0;
+    line-height: 1.3;
+}
+
+.hero-live-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.78rem;
+    color: var(--text-muted, #647080);
+    flex-wrap: wrap;
+}
+
+.hero-live-venue-chip {
+    font-weight: 600;
+    color: var(--text-dark, #1c1c1c);
+    background: #ffffff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--border-light, #d0d7de);
+}
+
+.hero-live-progress-bar-bg {
+    height: 4px;
+    background: #e2e8f0;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.hero-live-progress-bar-fill {
+    height: 100%;
+    background: #059669;
+    width: 0%;
+    transition: width 0.4s ease;
+}
+
+.hero-today-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    overflow: visible;
+}
+
+.hero-today-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.45rem 0.6rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    border: 1px solid transparent;
+    transition: background 0.15s ease;
+}
+
+.hero-today-item.is-current {
+    background: #ecfdf5;
+    border-color: #a7f3d0;
+}
+
+.hero-today-item.is-past {
+    opacity: 0.55;
+}
+
+.hero-today-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow: hidden;
+}
+
+.hero-today-time {
+    font-family: monospace;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-muted, #647080);
+    white-space: nowrap;
+}
+
+.hero-today-title {
+    font-weight: 600;
+    color: var(--text-dark, #1c1c1c);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.hero-today-room {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.05);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.hero-live-footer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 0.75rem;
+    margin-top: 0.5rem;
+    border-top: 1px dashed rgba(0, 0, 0, 0.08);
+    font-size: 0.76rem;
+}
+
+.hero-tab-pane {
+    display: none;
+    animation: heroFadeIn 0.2s ease;
+}
+
+.hero-tab-pane.active {
+    display: block;
+}
+
+@keyframes heroFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(3px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.hero-live-notes-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: #059669;
+    text-decoration: none;
+    margin-top: 4px;
+    align-self: flex-start;
+}
+
+.hero-live-notes-btn:hover {
+    text-decoration: underline;
+    color: #047857;
+}
+
+.hero-view-all-link {
+    color: var(--text-muted, #647080);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.15s ease;
+}
+
+.hero-view-all-link:hover {
+    color: var(--text-dark, #1c1c1c);
+    text-decoration: underline;
+}
+
+.hero-live-clock {
+    font-family: monospace;
+    font-weight: 600;
+    color: var(--text-muted, #647080);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
