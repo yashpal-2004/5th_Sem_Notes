@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Advanced Machine Learning - Lecture 14</title>
+    <meta
+        content="Study notes for Advanced Machine Learning (CSA333), Lecture 14 covering Maximum Likelihood Estimation (MLE), Probability vs Likelihood, Sigmoid Function, Bernoulli Probability Model, and Binary Cross-Entropy (BCE) Loss derivation."
+        name="description" />
+    <link
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>14</text></svg>"
+        rel="icon" />
+    <link href="../css/style.css" rel="stylesheet" />
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}]});"></script>
+</head>
+
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Advanced Machine Learning</h1>
+            <p>Lecture 14 - Maximum Likelihood Estimation &amp; Logistic Regression: From Probability to Binary Cross-Entropy</p>
+            <a href="../index.html"
+                style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">←
+                Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/14.PDF"
+                style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;"
+                target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text" />
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 5</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            style="vertical-align: text-bottom; margin-right: 4px;">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>Short Notes</a></li>
+                <li>
+                    <a href="#topic-1">1. Probability to Maximum Likelihood<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 The Probability vs. Likelihood Duality</a></li>
+                        <li><a href="#sub-1-2">1.2 Coin Toss Likelihood Derivation</a></li>
+                        <li><a href="#sub-1-3">1.3 The MLE Criterion (\(\hat{\theta} = \arg\max L\))</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Linear Score &amp; The Sigmoid Mapping<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 Why Accuracy Alone Cannot Break Ties</a></li>
+                        <li><a href="#sub-2-2">2.2 Linear Score \(z\) &amp; Decision Boundary \(z=0\)</a></li>
+                        <li><a href="#sub-2-3">2.3 Step Function Failure &amp; The Sigmoid Function</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Bernoulli Model &amp; Dataset Likelihood<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 Class Probabilities \(\hat{p}_i\) and \(1-\hat{p}_i\)</a></li>
+                        <li><a href="#sub-3-2">3.2 Compact Bernoulli Label Probability Formula</a></li>
+                        <li><a href="#sub-3-3">3.3 Joint Dataset Likelihood Under Conditional Independence</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Derivation &amp; Behavior of BCE Loss<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 Why Log-Likelihood (Preventing Underflow)</a></li>
+                        <li><a href="#sub-4-2">4.2 Converting Maximum Log-Likelihood to BCE Loss</a></li>
+                        <li><a href="#sub-4-3">4.3 Asymptotic Penalty for Confident Errors</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Optimization, Convexity &amp; Pipeline<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 Convexity of BCE &amp; Need for Iterative Solvers</a></li>
+                        <li><a href="#sub-5-2">5.2 Regularized Logistic Objective (\(J(\beta) = \text{BCE} + \lambda R\))</a></li>
+                        <li><a href="#sub-5-3">5.3 Complete 8-Step End-to-End Mathematical Story</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round"
+                            stroke-linejoin="round" stroke-width="2"
+                            style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>Original PDF</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Short Notes -->
+            <section id="short-notes" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-short-notes')">
+                    <div class="topic-number"
+                        style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                    </div>
+                    <h2>Short Notes &amp; Visual Summary</h2>
+                </div>
+                <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
+                    <p style="margin-bottom: 1rem;">Core principles and summary cheat-sheet for Lecture 14:</p>
+
+                    <div class="box box-blue">
+                        <div class="box-title">Key MLE &amp; Logistic Regression Takeaways</div>
+                        <ul style="line-height: 1.6;">
+                            <li><strong>Probability vs. Likelihood:</strong> In probability \(P(\text{Data} \mid \theta)\), the model parameter \(\theta\) is fixed and we ask how likely various outcomes are. In likelihood \(L(\theta; \text{Data})\), the observed data is fixed and we ask which candidate parameter \(\theta\) best explains that data.</li>
+                            <li><strong>MLE Principle:</strong> Maximum Likelihood Estimation selects parameters \(\hat{\theta} = \arg\max_\theta L(\theta; D)\) that make the observed dataset most plausible under the model.</li>
+                            <li><strong>Why Accuracy Alone Fails:</strong> Discrete misclassification count cannot break ties between multiple lines that achieve 100% training accuracy. We require a smooth, continuous confidence score.</li>
+                            <li><strong>Linear Score &amp; Sigmoid:</strong> Linear score \(z = \mathbf{x}^\top \beta\). Decision boundary is \(z = 0\). The <strong>Sigmoid function</strong> \(\sigma(z) = \frac{1}{1 + e^{-z}}\) maps \((-\infty, \infty) \to (0, 1)\), establishing estimated class probability \(\hat{p}_i = P(Y_i = 1 \mid x_i) = \sigma(z_i)\).</li>
+                            <li><strong>Bernoulli Likelihood:</strong> Using the compact selector formula \(P(y_i \mid x_i; \beta) = \hat{p}_i^{y_i} (1 - \hat{p}_i)^{1 - y_i}\), the dataset joint likelihood is \(L(\beta) = \prod_{i=1}^n \hat{p}_i^{y_i} (1 - \hat{p}_i)^{1 - y_i}\).</li>
+                            <li><strong>Binary Cross-Entropy (BCE):</strong> Taking the negative average log-likelihood yields the BCE loss function:
+                                $$\text{BCE}(\beta) = -\frac{1}{n} \sum_{i=1}^n \left[ y_i \log(\hat{p}_i) + (1 - y_i) \log(1 - \hat{p}_i) \right]$$
+                            </li>
+                            <li><strong>Asymptotic Punishment:</strong> When an actual positive example (\(y = 1\)) is predicted with near-zero probability (\(\hat{p} \to 0\)), loss \(-\log(\hat{p}) \to +\infty\). BCE severely penalizes confidently wrong predictions.</li>
+                            <li><strong>Convexity &amp; Solvers:</strong> BCE is strictly convex with no local minima traps. However, because the sigmoid nonlinearly couples parameters to predictions, there is no closed-form normal equation—iterative gradient descent is required.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 1 -->
+            <section id="topic-1" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">01</div>
+                    <h2>From Probability to Maximum Likelihood Estimation (MLE)</h2>
+                </div>
+                <div id="content-1" class="collapsible-content">
+                    <h3 id="sub-1-1">1.1 The Probability vs. Likelihood Duality</h3>
+                    <p>While probability and likelihood share the exact same algebraic formula, their fundamental roles in statistics are completely reversed:</p>
+
+                    <table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem;">
+                        <thead>
+                            <tr style="background: var(--bg-mint, #e3ede4); text-align: left;">
+                                <th style="padding: 0.6rem; border: 1px solid var(--border-light);">Question</th>
+                                <th style="padding: 0.6rem; border: 1px solid var(--border-light);">Probability</th>
+                                <th style="padding: 0.6rem; border: 1px solid var(--border-light);">Likelihood</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 0.6rem; border: 1px solid var(--border-light);"><strong>What is fixed?</strong></td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--border-light);">Model parameter \(\theta\) (known)</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--border-light);">Observed Data \(D\) (recorded facts)</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.6rem; border: 1px solid var(--border-light);"><strong>What varies?</strong></td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--border-light);">Future possible outcomes \(X\)</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--border-light);">Candidate parameters \(\theta\)</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.6rem; border: 1px solid var(--border-light);"><strong>Notation</strong></td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--border-light);">\(P(\text{Data} \mid \text{Parameter})\)</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--border-light);">\(L(\text{Parameter}; \text{Data})\)</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.6rem; border: 1px solid var(--border-light);"><strong>Core Question</strong></td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--border-light);">"Assuming this model is true, how likely is this outcome?"</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--border-light);">"Given this observed outcome, which parameter best explains it?"</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3 id="sub-1-2">1.2 Coin Toss Likelihood Derivation</h3>
+                    <p>Suppose a coin is tossed 10 times and we observe exactly <strong>7 Heads</strong> (\(X = 7\)). For any candidate probability of heads \(p \in [0, 1]\), the likelihood function is:</p>
+                    $$L(p; X = 7) = \binom{10}{7} p^7 (1 - p)^3$$
+                    <p>Evaluating this function at different candidate values:</p>
+                    <ul>
+                        <li>\(L(p = 0.5; X = 7) = \binom{10}{7} (0.5)^7 (0.5)^3 \approx 0.117\)</li>
+                        <li>\(L(p = 0.8; X = 7) = \binom{10}{7} (0.8)^7 (0.2)^3 \approx 0.201\)</li>
+                        <li>\(L(p = 0.7; X = 7) = \binom{10}{7} (0.7)^7 (0.3)^3 \approx 0.267\) (Peak of the likelihood curve)</li>
+                    </ul>
+
+                    <h3 id="sub-1-3">1.3 The MLE Criterion (\(\hat{\theta} = \arg\max L\))</h3>
+                    <div class="box box-green">
+                        <div class="box-title">The Principle of Maximum Likelihood Estimation</div>
+                        $$\hat{\theta}_{\text{MLE}} = \arg\max_{\theta} L(\theta; D) = \arg\max_{\theta} P(D \mid \theta)$$
+                        <p>MLE chooses the parameter vector that makes the data we actually observed as probable as possible. It is a frequentist plausibility score, not a probability distribution over \(\theta\).</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" disabled="">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section id="topic-2" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">02</div>
+                    <h2>Linear Score &amp; The Sigmoid Mapping</h2>
+                </div>
+                <div id="content-2" class="collapsible-content">
+                    <h3 id="sub-2-1">2.1 Why Accuracy Alone Cannot Break Ties</h3>
+                    <p>Consider classifying student placement (Placed = 1, Not Placed = 0) using features IQ (\(x_1\)) and CGPA (\(x_2\)). Multiple different separating lines can separate all training points with 100% classification accuracy (zero misclassifications).</p>
+                    <p>A discrete 0-or-1 accuracy metric produces a flat, piecewise constant loss surface. It provides zero gradient guidance to distinguish between a boundary that barely skims past an observation versus a boundary with large, confident margins. We need a <strong>soft confidence score</strong>.</p>
+
+                    <h3 id="sub-2-2">2.2 Linear Score \(z\) &amp; Decision Boundary \(z=0\)</h3>
+                    <p>We define a linear combination of input features:</p>
+                    $$z = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \dots + \beta_d x_d = \mathbf{x}^\top \beta$$
+                    <ul>
+                        <li>The <strong>decision boundary</strong> is the hyperplane where \(z = 0\).</li>
+                        <li>Points with \(z > 0\) lie on the positive side; points with \(z < 0\) lie on the negative side.</li>
+                        <li>The magnitude \(|z|\) reflects the directional distance from the boundary, representing the model's confidence.</li>
+                    </ul>
+
+                    <h3 id="sub-2-3">2.3 Step Function Failure &amp; The Sigmoid Function</h3>
+                    <p>A hard step function \(\hat{y} = 1\) if \(z \ge 0\) else \(0\) is non-differentiable at \(z = 0\) and has zero derivative everywhere else (\(\frac{d\hat{y}}{dz} = 0\)), preventing gradient-based learning. Furthermore, it treats \(z = 0.01\) and \(z = 10\) identically, completely discarding confidence.</p>
+                    <p>To produce smooth, differentiable probabilities, logistic regression applies the <strong>Sigmoid (Logistic) Function</strong>:</p>
+                    $$\sigma(z) = \frac{1}{1 + e^{-z}}$$
+
+                    <div class="box box-blue">
+                        <div class="box-title">Properties of the Sigmoid Function</div>
+                        <ul style="line-height: 1.6;">
+                            <li><strong>Bounded Range:</strong> Since \(e^{-z} > 0\) for all real \(z\), \(0 < \sigma(z) < 1\).</li>
+                            <li><strong>Center Point:</strong> At \(z = 0\) (on the boundary), \(\sigma(0) = \frac{1}{1 + 1} = 0.5\).</li>
+                            <li><strong>Asymptotic Limits:</strong> As \(z \to +\infty\), \(\sigma(z) \to 1\). As \(z \to -\infty\), \(\sigma(z) \to 0\).</li>
+                            <li><strong>Strict Monotonicity:</strong> Preserves order: if \(z_A > z_B\), then \(\sigma(z_A) > \sigma(z_B)\).</li>
+                        </ul>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section id="topic-3" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">03</div>
+                    <h2>Bernoulli Model &amp; Dataset Likelihood</h2>
+                </div>
+                <div id="content-3" class="collapsible-content">
+                    <h3 id="sub-3-1">3.1 Class Probabilities \(\hat{p}_i\) and \(1-\hat{p}_i\)</h3>
+                    <p>For each observation \(i\), the sigmoid output is defined as the model's estimated probability that \(Y_i = 1\):</p>
+                    $$\hat{p}_i = P(Y_i = 1 \mid \mathbf{x}_i; \beta) = \sigma(z_i) = \frac{1}{1 + e^{-\mathbf{x}_i^\top \beta}}$$
+                    <p>Since binary outcomes are complementary, the probability of class 0 is simply the remaining probability mass:</p>
+                    $$P(Y_i = 0 \mid \mathbf{x}_i; \beta) = 1 - \hat{p}_i$$
+
+                    <h3 id="sub-3-2">3.2 Compact Bernoulli Label Probability Formula</h3>
+                    <p>We unify both cases into a single mathematical expression using binary label \(y_i \in \{0, 1\}\) as an exponent selector:</p>
+                    $$q_i = P(y_i \mid \mathbf{x}_i; \beta) = \hat{p}_i^{y_i} (1 - \hat{p}_i)^{1 - y_i}$$
+                    <ul>
+                        <li>If \(y_i = 1\): \(q_i = \hat{p}_i^1 (1 - \hat{p}_i)^0 = \hat{p}_i\).</li>
+                        <li>If \(y_i = 0\): \(q_i = \hat{p}_i^0 (1 - \hat{p}_i)^1 = 1 - \hat{p}_i\).</li>
+                    </ul>
+
+                    <h3 id="sub-3-3">3.3 Joint Dataset Likelihood Under Conditional Independence</h3>
+                    <p>Assuming the observations \((x_1, y_1), \dots, (x_n, y_n)\) are conditionally independent given parameters \(\beta\), the joint likelihood of observing the entire dataset is the product of individual probabilities:</p>
+                    $$L(\beta) = \prod_{i=1}^n P(y_i \mid \mathbf{x}_i; \beta) = \prod_{i=1}^n \hat{p}_i^{y_i} (1 - \hat{p}_i)^{1 - y_i}$$
+
+                    <div class="box box-green">
+                        <div class="box-title">Why Likelihood Outperforms Accuracy</div>
+                        <p>Consider two models that both correctly classify 4 points with 100% accuracy. Model A assigns probabilities \([0.90, 0.80, 0.85, 0.75]\) to the true classes (product \(L = 0.459\)). Model B assigns \([0.60, 0.55, 0.65, 0.60]\) (product \(L = 0.129\)). Likelihood decisively selects Model A because it assigned higher confidence to the actual truth.</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section id="topic-4" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">04</div>
+                    <h2>Derivation &amp; Behavior of BCE Loss</h2>
+                </div>
+                <div id="content-4" class="collapsible-content">
+                    <h3 id="sub-4-1">4.1 Why Log-Likelihood (Preventing Underflow)</h3>
+                    <p>Multiplying \(n\) probabilities between 0 and 1 causes severe <strong>numerical underflow</strong>. For example, \(0.5^{2000} \approx 10^{-602}\), which underflows to exact zero in standard 64-bit IEEE floating-point arithmetic.</p>
+                    <p>Because the natural logarithm \(\log(x)\) is a strictly monotonically increasing function, \(\arg\max_\beta L(\beta) \equiv \arg\max_\beta \log L(\beta)\). It converts unstable products into numerically stable additions:</p>
+                    $$\ell(\beta) = \log L(\beta) = \sum_{i=1}^n \log\left(\hat{p}_i^{y_i} (1 - \hat{p}_i)^{1 - y_i}\right) = \sum_{i=1}^n \left[ y_i \log(\hat{p}_i) + (1 - y_i) \log(1 - \hat{p}_i) \right]$$
+
+                    <h3 id="sub-4-2">4.2 Converting Maximum Log-Likelihood to BCE Loss</h3>
+                    <p>In machine learning, optimization frameworks are standardly formulated as <strong>loss minimization</strong> rather than reward maximization. Multiplying the log-likelihood by \(-1\) and dividing by sample size \(n\) yields the <strong>Binary Cross-Entropy (BCE) Loss</strong>:</p>
+
+                    <div class="box box-blue">
+                        <div class="box-title">Binary Cross-Entropy Loss Equation</div>
+                        $$\text{BCE}(\beta) = -\frac{1}{n} \ell(\beta) = -\frac{1}{n} \sum_{i=1}^n \left[ y_i \log(\hat{p}_i) + (1 - y_i) \log(1 - \hat{p}_i) \right]$$
+                        <p>For an individual observation \(i\):</p>
+                        $$\mathcal{L}_i = \begin{cases} -\log(\hat{p}_i) & \text{if } y_i = 1 \\ -\log(1 - \hat{p}_i) & \text{if } y_i = 0 \end{cases}$$
+                    </div>
+
+                    <h3 id="sub-4-3">4.3 Asymptotic Penalty for Confident Errors</h3>
+                    <p>The logarithmic loss behaves as follows:</p>
+                    <ul>
+                        <li>If \(y_i = 1\) and \(\hat{p}_i = 0.99\): Loss is \(-\log(0.99) \approx 0.01\) (minimal penalty for confident correct prediction).</li>
+                        <li>If \(y_i = 1\) and \(\hat{p}_i = 0.50\): Loss is \(-\log(0.50) \approx 0.693\) (moderate penalty for uncertainty).</li>
+                        <li>If \(y_i = 1\) and \(\hat{p}_i \to 0\): Loss is \(-\log(\hat{p}_i) \to +\infty\) (infinite penalty for confident error).</li>
+                    </ul>
+
+                    <div class="box box-red">
+                        <div class="box-title">Numerical Clipping in Production Libraries</div>
+                        <p>Because \(\log(0)\) evaluates to \(-\infty\), machine learning libraries (such as PyTorch and Scikit-learn) clip predicted probabilities to \([\epsilon, 1 - \epsilon]\) (where \(\epsilon \approx 10^{-15}\)) to prevent \(\text{NaN}\) division errors.</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 5 -->
+            <section id="topic-5" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">05</div>
+                    <h2>Optimization, Convexity &amp; The Complete Pipeline</h2>
+                </div>
+                <div id="content-5" class="collapsible-content">
+                    <h3 id="sub-5-1">5.1 Convexity of BCE &amp; Need for Iterative Solvers</h3>
+                    <p>For linear logistic regression, the Binary Cross-Entropy loss function is <strong>strictly convex</strong> with respect to the weight vector \(\beta\). This means the loss surface forms a global bowl shape with no sub-optimal local minima—any local minimum found is guaranteed to be the global minimum.</p>
+                    <p>However, unlike Ordinary Least Squares (OLS) where the normal equation \(\beta = (X^\top X)^{-1} X^\top y\) yields an instant closed-form solution, the nonlinear sigmoid function prevents analytical isolation of \(\beta\). We must find the optimal weights using <strong>iterative optimization</strong> (Gradient Descent, Newton-Raphson, or L-BFGS).</p>
+
+                    <h3 id="sub-5-2">5.2 Regularized Logistic Objective (\(J(\beta) = \text{BCE} + \lambda R\))</h3>
+                    <p>When training data is linearly separable, unregularized logistic regression weights will explode to infinity (\(\|\beta\| \to \infty\)) to push \(\sigma(z) \to 0\) or \(1\). To prevent this coefficient explosion, we add L1 or L2 regularization penalties:</p>
+                    $$J(\beta) = \text{BCE}(\beta) + \lambda \|\beta\|_2^2 \quad \text{or} \quad J(\beta) = \text{BCE}(\beta) + \lambda \|\beta\|_1$$
+
+                    <h3 id="sub-5-3">5.3 Complete 8-Step End-to-End Mathematical Story</h3>
+                    <div class="box box-green">
+                        <div class="box-title">The Complete Logistic Regression Derivation Chain</div>
+                        <ol style="margin-left: 1.5rem; line-height: 1.8;">
+                            <li><strong>Input Features:</strong> Given feature vector \(\mathbf{x}_i\) for observation \(i\).</li>
+                            <li><strong>Linear Score:</strong> Compute linear score \(z_i = \mathbf{x}_i^\top \beta\).</li>
+                            <li><strong>Sigmoid Mapping:</strong> Pass \(z_i\) into sigmoid \(\sigma(z_i) = \frac{1}{1 + e^{-z_i}}\).</li>
+                            <li><strong>Class Probability:</strong> Define estimated probability \(\hat{p}_i = P(Y_i = 1 \mid \mathbf{x}_i)\).</li>
+                            <li><strong>Bernoulli Term:</strong> Formulate compact observed label probability \(q_i = \hat{p}_i^{y_i} (1 - \hat{p}_i)^{1 - y_i}\).</li>
+                            <li><strong>Joint Likelihood:</strong> Multiply across all \(n\) observations: \(L(\beta) = \prod_{i=1}^n q_i\).</li>
+                            <li><strong>Log-Likelihood:</strong> Take natural logarithm to convert product to sum: \(\ell(\beta) = \sum_{i=1}^n \log q_i\).</li>
+                            <li><strong>BCE Objective:</strong> Negate and average to obtain \(\text{BCE}(\beta) = -\frac{1}{n} \ell(\beta)\), ready for minimization via Gradient Descent.</li>
+                        </ol>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <a href="#original-pdf" class="btn"
+                            style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;"
+                            onclick="document.getElementById('original-pdf').scrollIntoView()">Next Section</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number"
+                        style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round"
+                            stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for your reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()"
+                        style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous
+                            Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/14.PDF" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+
+</html>

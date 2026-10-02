@@ -45,8 +45,8 @@
             folder: 'AML',
             title: 'Advanced Machine Learning',
             code: 'NST-CS-AML502',
-            midSemLimitDisplay: '12',
-            midSemLabel: 'Mid-Sem (L1 - L12)',
+            midSemLimitDisplay: '14',
+            midSemLabel: 'Mid-Sem (L1 - L14)',
             themeColor: '#162238',
             accentColor: '#365584',
             accentLight: '#ecf2fa',
@@ -66,7 +66,9 @@
                 { index: 9, displayNum: '09', title: 'Bias, Variance and the Bias-Variance Tradeoff', imgUrl: 'images/9.png' },
                 { index: 10, displayNum: '10', title: 'Feature Selection', imgUrl: 'images/10.png' },
                 { index: 11, displayNum: '11', title: 'Dimensionality Reduction & PCA', imgUrl: 'images/11.png' },
-                { index: 12, displayNum: '12', title: 'Regularization: L1 (Lasso) & L2 (Ridge)', imgUrl: 'images/12.png' }
+                { index: 12, displayNum: '12', title: 'Regularization: L1 (Lasso) & L2 (Ridge)', imgUrl: 'images/12.png' },
+                { index: 13, displayNum: '13', title: 'Time Series Analysis: Stationarity, AR & MA', imgUrl: 'images/13.png' },
+                { index: 14, displayNum: '14', title: 'Maximum Likelihood Estimation & Logistic Regression', imgUrl: 'images/14.png' }
             ]
         },
         cn: {

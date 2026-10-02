@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Advanced Machine Learning - Lecture 13</title>
+    <meta
+        content="Study notes for Advanced Machine Learning (CSA333), Lecture 13 covering Time Series Analysis: Stationarity, Differencing, Autoregressive (AR) Models, ACF, PACF, and Moving Average (MA) Models."
+        name="description" />
+    <link
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>13</text></svg>"
+        rel="icon" />
+    <link href="../css/style.css" rel="stylesheet" />
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Advanced Machine Learning</h1>
+            <p>Lecture 13 - Time Series Analysis: Stationarity, Differencing, AR, ACF/PACF &amp; MA Models</p>
+            <a href="../index.html"
+                style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">←
+                Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/13.PDF"
+                style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;"
+                target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text" />
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 5</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            style="vertical-align: text-bottom; margin-right: 4px;">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>Short Notes</a></li>
+                <li>
+                    <a href="#topic-1">1. Why Time Matters &amp; Decomposition<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 Violation of the I.I.D. Assumption</a></li>
+                        <li><a href="#sub-1-2">1.2 Cross-Sectional vs. Time Series (Data Leakage)</a></li>
+                        <li><a href="#sub-1-3">1.3 Decomposition: Trend, Seasonality &amp; Noise</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Stationarity &amp; Differencing<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 The Three Stationarity Criteria</a></li>
+                        <li><a href="#sub-2-2">2.2 Why Machine Learning Fails on Non-Stationary Data</a></li>
+                        <li><a href="#sub-2-3">2.3 Lag Differencing (\(\Delta Y_t = Y_t - Y_{t-1}\))</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Lags &amp; Auto Regression (AR)<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 Defining Lags as Feature Inputs</a></li>
+                        <li><a href="#sub-3-2">3.2 The AR(\(p\)) Model Mathematical Formulation</a></li>
+                        <li><a href="#sub-3-3">3.3 Momentum Principle &amp; The Order Selection Dilemma</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. ACF vs. PACF &amp; Order Selection<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 Autocorrelation Function (ACF) Mechanics</a></li>
+                        <li><a href="#sub-4-2">4.2 The Ripple Effect Problem (Indirect Correlations)</a></li>
+                        <li><a href="#sub-4-3">4.3 Partial Autocorrelation (PACF) &amp; Selecting \(p\)</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Random Shocks &amp; Moving Average (MA)<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 Random Shocks / Innovations (\(\varepsilon_t\))</a></li>
+                        <li><a href="#sub-5-2">5.2 Moving Average MA(\(q\)) Model Structure</a></li>
+                        <li><a href="#sub-5-3">5.3 AR vs. MA Model Comparison Matrix</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round"
+                            stroke-linejoin="round" stroke-width="2"
+                            style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" x2="8" y1="13" y2="13"></line>
+                            <line x1="16" x2="8" y1="17" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>Original PDF</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Short Notes -->
+            <section id="short-notes" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-short-notes')">
+                    <div class="topic-number"
+                        style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                    </div>
+                    <h2>Short Notes &amp; Visual Summary</h2>
+                </div>
+                <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
+                    <p style="margin-bottom: 1rem;">Core principles and summary cheat-sheet for Lecture 13:</p>
+
+                    <div class="box box-blue">
+                        <div class="box-title">Time Series Fundamentals &amp; Core Takeaways</div>
+                        <ul style="line-height: 1.6;">
+                            <li><strong>Violation of I.I.D.:</strong> In cross-sectional data, observations are independent and row order is arbitrary. In time series, temporal ordering carries the essential signal; shuffling rows destroys the data structure. Standard K-fold cross-validation is invalid and causes severe temporal data leakage.</li>
+                            <li><strong>Decomposition:</strong> An observed series \(Y_t\) is decomposed into <strong>Trend</strong> (long-term trajectory), <strong>Seasonality</strong> (fixed, repeating cyclic patterns), and <strong>Noise / Shocks</strong> (\(\varepsilon_t\), unpredictable residuals). A forecasting model is successful when its residuals behave as pure white noise.</li>
+                            <li><strong>Stationarity Requirement:</strong> Classical models require constant mean, constant variance, and autocovariance that depends only on lag displacement \(k\), not absolute time \(t\).</li>
+                            <li><strong>Lag Differencing:</strong> \(\Delta Y_t = Y_t - Y_{t-1}\) eliminates linear trends by modeling step-to-step changes rather than raw absolute values.</li>
+                            <li><strong>Auto Regression AR(\(p\)):</strong> Predicts \(y_t\) as a linear combination of its own \(p\) historical lags: \(y_t = c + \phi_1 y_{t-1} + \dots + \phi_p y_{t-p} + \varepsilon_t\) (models momentum). Order \(p\) is selected via significant spikes on the <strong>PACF plot</strong>.</li>
+                            <li><strong>Moving Average MA(\(q\)):</strong> Predicts \(y_t\) as a linear combination of \(q\) past random shocks (forecast errors): \(y_t = c + \varepsilon_t + \theta_1 \varepsilon_{t-1} + \dots + \theta_q \varepsilon_{t-q}\) (models shock absorption, NOT a rolling mean). Order \(q\) is selected via the <strong>ACF plot</strong>.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 1 -->
+            <section id="topic-1" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">01</div>
+                    <h2>Why Time Matters &amp; Time Series Decomposition</h2>
+                </div>
+                <div id="content-1" class="collapsible-content">
+                    <h3 id="sub-1-1">1.1 Violation of the I.I.D. Assumption</h3>
+                    <p>In classical machine learning (e.g., linear regression, classification on tabular datasets), we assume that observations are <strong>Independent and Identically Distributed (I.I.D.)</strong>. If you shuffle 500 house price listings before training, the learned regression weights remain completely unchanged because row 1 (a house in Delhi) has no dependency on row 2 (a house in Mumbai).</p>
+                    <p>In a <strong>Time Series</strong>, observations are explicitly dependent across time: the observation at timestamp \(t\) is directly conditioned on observations at \(t-1, t-2, \dots\). Shuffling the rows completely destroys the temporal structure, eliminating the predictive signal.</p>
+
+                    <h3 id="sub-1-2">1.2 Cross-Sectional vs. Time Series (Data Leakage)</h3>
+                    <table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem;">
+                        <thead>
+                            <tr style="background: var(--bg-mint, #e3ede4); text-align: left;">
+                                <th style="padding: 0.6rem; border: 1px solid var(--border-light);">Dimension</th>
+                                <th style="padding: 0.6rem; border: 1px solid var(--border-light);">Cross-Sectional Data</th>
+                                <th style="padding: 0.6rem; border: 1px solid var(--border-light);">Time Series Data</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 0.6rem; border: 1px solid var(--border-light);"><strong>Index</strong></td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--border-light);">Arbitrary Row ID</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--border-light);">Strictly ordered timestamp \(t\)</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.6rem; border: 1px solid var(--border-light);"><strong>Independence</strong></td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--border-light);">Independent (I.I.D.)</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--border-light);">Autocorrelated (Current row depends on prior rows)</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.6rem; border: 1px solid var(--border-light);"><strong>Validation Strategy</strong></td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--border-light);">Standard K-Fold Cross Validation</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--border-light);">Rolling-window / Forward-chaining temporal splits</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="box box-red">
+                        <div class="box-title">Why Standard K-Fold Cross Validation Fails on Time Series</div>
+                        <p>If you randomly split a time series into \(K\) folds, the training set will contain data points from 2026 to predict test points from 2024. This violates the <strong>arrow of time</strong> and introduces catastrophic <strong>look-ahead data leakage</strong>. Validation must strictly respect temporal causality (train on past, validate on future).</p>
+                    </div>
+
+                    <h3 id="sub-1-3">1.3 Decomposition: Trend, Seasonality &amp; Noise</h3>
+                    <p>Any real-world time series graph (such as university campus power consumption or daily stock trading volume) can be decomposed into three distinct constituent signals:</p>
+                    <ol style="margin-left: 1.5rem; line-height: 1.6;">
+                        <li><strong>Trend (\(T_t\)):</strong> The long-term underlying direction of the data over extended periods (upward, downward, or stationary).</li>
+                        <li><strong>Seasonality (\(S_t\)):</strong> Short-term, repeating periodic cycles tied to a calendar interval (e.g., afternoon electricity peaks, weekend dips, monsoon umbrella sales).</li>
+                        <li><strong>Noise / Residual Shocks (\(\varepsilon_t\)):</strong> Unpredictable, random variations that cannot be explained by trend or seasonality (e.g., unexpected factory shutdowns, viral social media bursts).</li>
+                    </ol>
+
+                    <div class="box box-green">
+                        <div class="box-title">The Goal of Time Series Modeling</div>
+                        <p>A forecasting model aims to extract all systematic rules governing <strong>Trend</strong> and <strong>Seasonality</strong>. If the model's residuals look like pure, structureless white noise (zero mean, constant variance, no autocorrelation), the model has successfully extracted all available predictive information from the series.</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" disabled="">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section id="topic-2" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">02</div>
+                    <h2>Stationarity &amp; Differencing</h2>
+                </div>
+                <div id="content-2" class="collapsible-content">
+                    <h3 id="sub-2-1">2.1 The Three Stationarity Criteria</h3>
+                    <p>A time series is defined as <strong>Weakly (Wide-Sense) Stationary</strong> if its statistical properties do not change as time advances. Specifically, it must satisfy three mathematical conditions:</p>
+
+                    <div class="box box-blue">
+                        <div class="box-title">Mathematical Conditions for Stationarity</div>
+                        <ol style="margin-left: 1.5rem; line-height: 1.6;">
+                            <li><strong>Constant Mean:</strong> \(\mathbb{E}[Y_t] = \mu\) for all \(t\). The series fluctuates around a horizontal baseline rather than drifting upwards or downwards.</li>
+                            <li><strong>Constant Variance:</strong> \(\text{Var}(Y_t) = \sigma^2\) for all \(t\). The amplitude of swings remains steady rather than fanning outward in a megaphone shape.</li>
+                            <li><strong>Time-Invariant Autocovariance:</strong> \(\text{Cov}(Y_t, Y_{t-k}) = \gamma_k\). The covariance between two points depends solely on their distance / lag \(k\), not on the specific timestamp \(t\).</li>
+                        </ol>
+                    </div>
+
+                    <h3 id="sub-2-2">2.2 Why Machine Learning Fails on Non-Stationary Data</h3>
+                    <p>Machine learning models are pattern-matching engines that assume patterns learned on past data remain valid for future data. If a startup's revenue grows by 20% every year, the mean of the historical 10-year data will significantly underestimate tomorrow's baseline. Non-stationary data forces models to extrapolate into unseen distribution regimes, leading to severe generalization breakdown.</p>
+
+                    <h3 id="sub-2-3">2.3 Lag Differencing (\(\Delta Y_t = Y_t - Y_{t-1}\))</h3>
+                    <p>To eliminate trend from non-stationary data, we apply <strong>Lag Differencing</strong>. Instead of modeling the absolute level, we model the change from one period to the next:</p>
+                    $$\Delta Y_t = Y_t - Y_{t-1}$$
+                    <p>Consider stock prices on 5 consecutive days: \([100, 105, 110, 115, 122]\). While the raw series shows a strong upward trend, the differenced series:</p>
+                    $$\Delta Y = [-, 5, 5, 5, 7]$$
+                    <p>fluctuates closely around a constant mean (\(\approx 5.5\)), converting a non-stationary trending series into a stationary series ready for regression and AR modeling.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section id="topic-3" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">03</div>
+                    <h2>Lags &amp; Auto Regression (AR)</h2>
+                </div>
+                <div id="content-3" class="collapsible-content">
+                    <h3 id="sub-3-1">3.1 Defining Lags as Feature Inputs</h3>
+                    <p>In standard supervised learning, we predict target \(Y\) from independent features \(X_1, X_2\). In univariate time series, we have only one column: historical values of \(Y\). We engineer features by creating <strong>lags</strong>:</p>
+                    <ul>
+                        <li>\(y_t\): Current observation (Today's value to predict).</li>
+                        <li>\(y_{t-1}\): Lag 1 (Yesterday's value).</li>
+                        <li>\(y_{t-2}\): Lag 2 (Value from two days ago).</li>
+                        <li>\(y_{t-k}\): Lag \(k\) (Value from \(k\) time intervals in the past).</li>
+                    </ul>
+
+                    <h3 id="sub-3-2">3.2 The AR(\(p\)) Model Mathematical Formulation</h3>
+                    <p>An <strong>Autoregressive model of order \(p\)</strong>, denoted \(\text{AR}(p)\), models the current value as a linear combination of its past \(p\) lags plus an unpredictable white noise shock:</p>
+                    $$y_t = c + \phi_1 y_{t-1} + \phi_2 y_{t-2} + \dots + \phi_p y_{t-p} + \varepsilon_t$$
+                    <p>Where:</p>
+                    <ul>
+                        <li>\(c\): Baseline constant intercept related to the series mean.</li>
+                        <li>\(\phi_1, \dots, \phi_p\): Autoregressive coefficients (weights learned during training).</li>
+                        <li>\(p\): Order of the model (number of past lags included).</li>
+                        <li>\(\varepsilon_t\): White noise residual (\(\varepsilon_t \sim \mathcal{N}(0, \sigma^2)\)).</li>
+                    </ul>
+
+                    <div class="box box-green">
+                        <div class="box-title">Example: An AR(2) Temperature Model</div>
+                        $$y_t = c + \phi_1 y_{t-1} + \phi_2 y_{t-2} + \varepsilon_t$$
+                        <p>Predicts today's temperature using only yesterday's and the day-before-yesterday's temperatures. If \(\phi_1 = 0.6\) and \(\phi_2 = 0.3\), positive momentum carries forward: warm days are followed by warm days.</p>
+                    </div>
+
+                    <h3 id="sub-3-3">3.3 Momentum Principle &amp; The Order Selection Dilemma</h3>
+                    <p>The AR model operates on <strong>momentum</strong>. However, choosing \(p\) presents a classic bias-variance dilemma: setting \(p\) too small ignores real historical dependencies (underfitting), while setting \(p\) too large (e.g., \(p = 365\)) dramatically inflates parameters and overfits to historical noise. We need an objective metric to identify which lags carry true signal.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section id="topic-4" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">04</div>
+                    <h2>ACF vs. PACF &amp; Order Selection</h2>
+                </div>
+                <div id="content-4" class="collapsible-content">
+                    <h3 id="sub-4-1">4.1 Autocorrelation Function (ACF) Mechanics</h3>
+                    <p>The <strong>Autocorrelation Function (ACF)</strong> at lag \(k\) measures the linear correlation between observations separated by \(k\) time steps:</p>
+                    $$\rho_k = \frac{\sum_{t=k+1}^N (Y_t - \bar{Y})(Y_{t-k} - \bar{Y})}{\sum_{t=1}^N (Y_t - \bar{Y})^2}$$
+                    <ul>
+                        <li>\(\rho_k \approx +1\): Strong positive correlation (trend momentum).</li>
+                        <li>\(\rho_k \approx -1\): Strong negative correlation (mean-reverting oscillation).</li>
+                        <li>\(\rho_k \approx 0\): No linear relationship at lag \(k\).</li>
+                    </ul>
+
+                    <h3 id="sub-4-2">4.2 The Ripple Effect Problem (Indirect Correlations)</h3>
+                    <p>Suppose today's temperature is strongly correlated with yesterday's (\(y_t \sim y_{t-1}\)), and yesterday's was strongly correlated with the day before (\(y_{t-1} \sim y_{t-2}\)). Even if \(y_{t-2}\) has <strong>no direct causal impact</strong> on \(y_t\), the standard ACF will show a high correlation between \(y_t\) and \(y_{t-2}\) due to the indirect "ripple effect" passing through \(y_{t-1}\). Therefore, ACF exhibits a slow exponential decay in AR processes, making it unsuitable for isolating the true order \(p\).</p>
+
+                    <h3 id="sub-4-3">4.3 Partial Autocorrelation (PACF) &amp; Selecting \(p\)</h3>
+                    <p>The <strong>Partial Autocorrelation Function (PACF)</strong> measures the pure, direct correlation between \(y_t\) and \(y_{t-k}\) after completely controlling for and removing the linear effects of all intermediate lags \(y_{t-1}, \dots, y_{t-(k-1)}\).</p>
+
+                    <div class="box box-blue">
+                        <div class="box-title">How to Use PACF to Choose AR Order \(p\)</div>
+                        <ol style="margin-left: 1.5rem; line-height: 1.6;">
+                            <li>Plot the PACF with shaded 95% confidence bands (\(\pm \frac{1.96}{\sqrt{N}}\)).</li>
+                            <li>Observe where the bars cut off abruptly: in an AR(\(p\)) process, the PACF has significant spikes up to lag \(p\) and cuts off sharply to near zero thereafter.</li>
+                            <li>If only Lag 1 and Lag 2 cross the significance band, set \(p = 2\) and estimate an \(\text{AR}(2)\) model.</li>
+                        </ol>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 5 -->
+            <section id="topic-5" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">05</div>
+                    <h2>Random Shocks &amp; Moving Average (MA)</h2>
+                </div>
+                <div id="content-5" class="collapsible-content">
+                    <h3 id="sub-5-1">5.1 Random Shocks / Innovations (\(\varepsilon_t\))</h3>
+                    <p>Real-world systems are regularly buffeted by unpredictable external events (e.g., sudden government regulatory announcements, weather storms, unexpected equipment failures). In time series analysis, these unexpected events are formalized as <strong>Random Shocks (Innovations)</strong>:</p>
+                    $$\varepsilon_t = \text{Actual Value} - \text{Predicted Value}$$
+                    <p>These shocks bump the time series off its expected path.</p>
+
+                    <h3 id="sub-5-2">5.2 Moving Average MA(\(q\)) Model Structure</h3>
+                    <p>Instead of predicting \(y_t\) from past series values (as in AR), the <strong>Moving Average model of order \(q\)</strong>, denoted \(\text{MA}(q)\), predicts \(y_t\) as a weighted sum of past forecast errors (shocks):</p>
+                    $$y_t = c + \varepsilon_t + \theta_1 \varepsilon_{t-1} + \theta_2 \varepsilon_{t-2} + \dots + \theta_q \varepsilon_{t-q}$$
+                    <div class="box box-red">
+                        <div class="box-title">Important Distinction: MA Model vs. Rolling Mean</div>
+                        <p>An \(\text{MA}(q)\) model is <strong>NOT</strong> a rolling average of past prices (like a 50-day moving average). It is a regression on past <em>unobserved error shocks</em> (\(\varepsilon_{t-j}\)), capturing how quickly an unexpected disturbance dissipates.</p>
+                    </div>
+
+                    <h3 id="sub-5-3">5.3 AR vs. MA Model Comparison Matrix</h3>
+                    <table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem;">
+                        <thead>
+                            <tr style="background: var(--bg-mint, #e3ede4); text-align: left;">
+                                <th style="padding: 0.6rem; border: 1px solid var(--border-light);">Feature</th>
+                                <th style="padding: 0.6rem; border: 1px solid var(--border-light);">Auto Regressive: AR(\(p\))</th>
+                                <th style="padding: 0.6rem; border: 1px solid var(--border-light);">Moving Average: MA(\(q\))</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 0.6rem; border: 1px solid var(--border-light);"><strong>Input Predictors</strong></td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--border-light);">Past values of the series (\(y_{t-1}, \dots, y_{t-p}\))</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--border-light);">Past random shocks / errors (\(\varepsilon_{t-1}, \dots, \varepsilon_{t-q}\))</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.6rem; border: 1px solid var(--border-light);"><strong>Core Assumption</strong></td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--border-light);">Driven by historical <strong>SIGNAL</strong> (Momentum)</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--border-light);">Driven by historical <strong>NOISE</strong> (Shock Absorption)</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.6rem; border: 1px solid var(--border-light);"><strong>Intuition</strong></td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--border-light);">If values were high yesterday, they stay high today</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--border-light);">A shock bumps the series, and the effect decays after \(q\) steps</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.6rem; border: 1px solid var(--border-light);"><strong>Diagnostic Tool</strong></td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--border-light);"><strong>PACF</strong> cuts off after lag \(p\); ACF decays slowly</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--border-light);"><strong>ACF</strong> cuts off after lag \(q\); PACF decays slowly</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <a href="#original-pdf" class="btn"
+                            style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;"
+                            onclick="document.getElementById('original-pdf').scrollIntoView()">Next Section</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number"
+                        style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round"
+                            stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for your reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()"
+                        style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous
+                            Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/13.PDF" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+
+</html>
