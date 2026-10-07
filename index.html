@@ -545,7 +545,11 @@
                     const span = document.querySelector(`.subject-stats[data-subject="${subj}"]`);
                     if (span) {
                         const label = ids.length === 1 ? '1 Lecture' : ids.length + ' Lectures';
-                        span.innerHTML = `${label} &bull; ${completed}/${ids.length} Done`;
+                        const remaining = ids.length - completed;
+                        const remainingStr = remaining > 0
+                            ? ` &bull; <span style="color:#f59e0b;font-weight:600;">${remaining} remaining</span>`
+                            : ` &bull; <span style="color:#10b981;font-weight:600;">&#10003; All done!</span>`;
+                        span.innerHTML = `${label} &bull; ${completed}/${ids.length} Done${remainingStr}`;
                     }
                 }
 
