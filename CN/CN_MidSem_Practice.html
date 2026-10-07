@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%231a2035%22/><text x=%2250%22 y=%2254%22 font-family=%22Arial%22 font-size=%2232%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>MCA</text></svg>" rel="icon"/>
-<title>MCA · Mid-Sem Practice Dashboard</title>
+<link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2254%22 font-family=%22Arial%22 font-size=%2232%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>CN</text></svg>" rel="icon"/>
+<title>CN · Mid-Sem Practice Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 /* ── Reset ── */
@@ -14,7 +14,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:#f0f2f7;color:#1a2035;m
 /* ── Sidebar ── */
 .sidebar{width:210px;min-height:100vh;background:#1a2035;color:#fff;flex-shrink:0;display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:200;}
 .sidebar-logo{display:flex;align-items:center;gap:10px;padding:20px 18px 18px;border-bottom:1px solid rgba(255,255,255,.07);}
-.logo-pill{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#e63946,#c1121f);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;letter-spacing:.5px;}
+.logo-pill{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#1e606d,#154e58);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;letter-spacing:.5px;}
 .logo-text{font-size:14px;font-weight:700;line-height:1.2;}
 .logo-text small{display:block;font-size:10px;font-weight:400;color:rgba(255,255,255,.45);}
 .sidebar-nav{padding:14px 10px;flex:1;display:flex;flex-direction:column;gap:2px;}
@@ -194,7 +194,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:#f0f2f7;color:#1a2035;m
 <!-- ── Sidebar ── -->
 <aside class="sidebar">
   <div class="sidebar-logo">
-    <div class="logo-pill">MCA</div>
+    <div class="logo-pill" style="background:linear-gradient(135deg,#1e606d,#154e58);">CN</div>
     <div class="logo-text">MidSem Lab<small>Practice Dashboard</small></div>
   </div>
   <nav class="sidebar-nav">
@@ -211,7 +211,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:#f0f2f7;color:#1a2035;m
       <span>Analytics</span>
     </button>
   </nav>
-  <div class="sidebar-footer">MCA · L01–L14 · 14 Oct 2026</div>
+  <div class="sidebar-footer">CN · L01–L14 · 12 Oct 2026</div>
 </aside>
 
 <!-- ── Main ── -->
@@ -239,10 +239,10 @@ body{font-family:'Inter',system-ui,sans-serif;background:#f0f2f7;color:#1a2035;m
     <div class="view active" id="view-dashboard">
 
       <div class="subject-banner">
-        <div class="banner-icon">MCA</div>
+        <div class="banner-icon">CN</div>
         <div>
-          <div class="banner-title">Modern Computer Architecture</div>
-          <div class="banner-sub">Mid-Semester Exam · L01–L14 · 14 Oct 2026 · Weightage 20%</div>
+          <div class="banner-title">Computer Networks</div>
+          <div class="banner-sub">Mid-Semester Exam · L01–L14 · 12 Oct 2026 · Weightage 20%</div>
         </div>
         <div class="banner-right">
           <strong id="banner-total">0</strong>
@@ -396,7 +396,7 @@ lectures.forEach(lec => {
 /* ────────────────────────── SESSION STATE (LOCAL STORAGE) ────────────────────────── */
 let appState = {};
 try {
-  const saved = localStorage.getItem('mca_midsem_progress');
+  const saved = localStorage.getItem('cn_midsem_progress');
   if (saved) appState = JSON.parse(saved) || {};
 } catch(e) {
   console.warn('Could not load progress from localStorage', e);
@@ -404,7 +404,7 @@ try {
 
 function saveState() {
   try {
-    localStorage.setItem('mca_midsem_progress', JSON.stringify(appState));
+    localStorage.setItem('cn_midsem_progress', JSON.stringify(appState));
   } catch(e) {
     console.warn('Could not save progress to localStorage', e);
   }
