@@ -313,20 +313,9 @@ body{font-family:'Inter',system-ui,sans-serif;background:#f0f2f7;color:#1a2035;m
 <script src="mid-sems.js"></script>
 <script type="module">
 'use strict';
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
-import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
+import { loadQuizProgress, saveQuizProgress } from '../js/firebase-service.js';
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBz7RcccbfXgW0AlBue_2thQxO1xZWM0ok",
-  authDomain: "th-sem-9acab.firebaseapp.com",
-  projectId: "th-sem-9acab",
-  storageBucket: "th-sem-9acab.firebasestorage.app",
-  messagingSenderId: "1091172769980",
-  appId: "1:1091172769980:web:df9aa611acf9a5761e70b9",
-  measurementId: "G-V8PLSE7WT1"
-};
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const SUBJECT = 'dl';
 
 // ── Normalise lecture tag from mid-sems.js data ──────────────────────────────
 // DL has split lectures: Lecture 10 Part 1 → L10a, Lecture 10 Part 2 → L10b
@@ -371,8 +360,7 @@ lectures.forEach(lec => {
 });
 
 let appState = {};
-const userDocRef = doc(db, 'global_progress', 'dl_user');
-function saveState() { setDoc(userDocRef, appState).catch(e => console.error(e)); }
+function saveState() { saveQuizProgress(SUBJECT, appState); }
 
 let sCorrect = 0, sWrong = 0, sAnswered = 0;
 const answeredIds = new Set();
@@ -561,9 +549,8 @@ window.startLecturePractice = startLecturePractice;
 window.setFilter = setFilter;
 
 // Init
-getDoc(userDocRef).then(snap => {
-  if (snap.exists()) appState = snap.data();
-  else appState = {};
+loadQuizProgress(SUBJECT).then(state => {
+  appState = state;
   calcStats();
   refreshDashboard();
   // Deep-link via ?lec= param

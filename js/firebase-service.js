@@ -5,21 +5,22 @@ import {
   collection,
   doc,
   setDoc,
+  getDoc,
   deleteDoc,
   onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+// Single source-of-truth Firebase project
 const firebaseConfig = {
-  apiKey: "AIzaSyBCGLTpL9bn6V6Kc1vhXEFpNpfXcEiiE34",
-  authDomain: "nst-tracker.firebaseapp.com",
-  projectId: "nst-tracker",
-  storageBucket: "nst-tracker.firebasestorage.app",
-  messagingSenderId: "807619975988",
-  appId: "1:807619975988:web:9b71e314ef49a88f2b6361",
-  measurementId: "G-6G9H09QLC8"
+  apiKey: "AIzaSyBz7RcccbfXgW0AlBue_2thQxO1xZWM0ok",
+  authDomain: "th-sem-9acab.firebaseapp.com",
+  projectId: "th-sem-9acab",
+  storageBucket: "th-sem-9acab.firebasestorage.app",
+  messagingSenderId: "1091172769980",
+  appId: "1:1091172769980:web:df9aa611acf9a5761e70b9",
+  measurementId: "G-V8PLSE7WT1"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
@@ -27,126 +28,118 @@ export { db };
 
 const channel = new BroadcastChannel('nst_portal_sync');
 
-// Listen for Realtime Portal Assignments with LocalStorage fallback & BroadcastChannel sync
+// ── Portal Assignments ────────────────────────────────────────────────────────
+
 export function listenPortalAssignments(callback) {
-  // First load from localStorage for immediate visual sync
   const localData = localStorage.getItem('nst_portal_assignments');
   if (localData) {
-    try {
-      callback(JSON.parse(localData));
-    } catch(e) {
-      callback([]);
-    }
+    try { callback(JSON.parse(localData)); } catch(e) { callback([]); }
   } else {
     callback([]);
   }
 
-  // Cross-Tab BroadcastChannel Listener
   channel.onmessage = (event) => {
-    if (event.data && Array.isArray(event.data)) {
-      callback(event.data);
-    }
+    if (event.data && Array.isArray(event.data)) callback(event.data);
   };
 
-  // Cross-Tab Sync via Window Storage Event fallback
   window.addEventListener('storage', (e) => {
     if (e.key === 'nst_portal_assignments' && e.newValue) {
-      try {
-        callback(JSON.parse(e.newValue));
-      } catch(err) {}
+      try { callback(JSON.parse(e.newValue)); } catch(err) {}
     }
   });
 
-  // Realtime Cloud Firestore Listener
   const assignmentsCol = collection(db, 'portal_assignments');
   onSnapshot(assignmentsCol, (snapshot) => {
     const list = [];
-    snapshot.forEach(docSnap => {
-      list.push({ id: docSnap.id, ...docSnap.data() });
-    });
+    snapshot.forEach(docSnap => list.push({ id: docSnap.id, ...docSnap.data() }));
 
     if (list.length > 0) {
       localStorage.setItem('nst_portal_assignments', JSON.stringify(list));
       callback(list);
     } else {
-      // If Firestore cloud collection is empty, check if there are locally stored questions to seed to Firestore
       const local = localStorage.getItem('nst_portal_assignments');
       let localList = [];
-      if (local) {
-        try { localList = JSON.parse(local); } catch(e) {}
-      }
+      if (local) { try { localList = JSON.parse(local); } catch(e) {} }
       if (localList.length > 0) {
-        localList.forEach(q => {
-          setDoc(doc(db, 'portal_assignments', q.id), q);
-        });
+        localList.forEach(q => setDoc(doc(db, 'portal_assignments', q.id), q));
         callback(localList);
       } else {
         localStorage.setItem('nst_portal_assignments', JSON.stringify([]));
         callback([]);
       }
     }
-  }, (err) => {
-    console.warn('Firestore assignments listener error:', err);
-  });
+  }, (err) => console.warn('Firestore assignments listener error:', err));
 }
 
-// Save or Update a single Portal Assignment
 export function savePortalAssignment(questionObj) {
   const localData = localStorage.getItem('nst_portal_assignments');
   let list = localData ? JSON.parse(localData) : [];
-  const existingIdx = list.findIndex(q => q.id === questionObj.id);
-  if (existingIdx >= 0) {
-    list[existingIdx] = questionObj;
-  } else {
-    list.push(questionObj);
-  }
+  const idx = list.findIndex(q => q.id === questionObj.id);
+  if (idx >= 0) list[idx] = questionObj; else list.push(questionObj);
   localStorage.setItem('nst_portal_assignments', JSON.stringify(list));
   channel.postMessage(list);
-
-  const docRef = doc(db, 'portal_assignments', questionObj.id);
-  return setDoc(docRef, questionObj).catch(err => console.warn('Firestore sync error:', err));
+  return setDoc(doc(db, 'portal_assignments', questionObj.id), questionObj)
+    .catch(err => console.warn('Firestore sync error:', err));
 }
 
-// Delete a Portal Assignment
 export function removePortalAssignment(id) {
   const localData = localStorage.getItem('nst_portal_assignments');
   let list = localData ? JSON.parse(localData) : [];
   list = list.filter(q => q.id !== id);
   localStorage.setItem('nst_portal_assignments', JSON.stringify(list));
   channel.postMessage(list);
-
-  const docRef = doc(db, 'portal_assignments', id);
-  return deleteDoc(docRef).catch(err => console.warn('Firestore delete error:', err));
+  return deleteDoc(doc(db, 'portal_assignments', id))
+    .catch(err => console.warn('Firestore delete error:', err));
 }
 
-// Listen for Realtime Lecture Checklists
+// ── Lecture Checklist Progress ────────────────────────────────────────────────
+
 export function listenChecklistProgress(callback) {
   const local = localStorage.getItem('nst_checklist_progress');
-  if (local) {
-    try { callback(JSON.parse(local)); } catch(e) {}
-  }
+  if (local) { try { callback(JSON.parse(local)); } catch(e) {} }
 
-  const checklistCol = collection(db, 'checklist_progress');
-  onSnapshot(checklistCol, (snapshot) => {
+  onSnapshot(collection(db, 'checklist_progress'), (snapshot) => {
     const data = {};
     snapshot.forEach(docSnap => {
-      const d = docSnap.data();
-      data[docSnap.id] = d.completed || false;
+      data[docSnap.id] = docSnap.data().completed || false;
     });
     localStorage.setItem('nst_checklist_progress', JSON.stringify(data));
     callback(data);
-  }, (err) => {
-    console.warn('Firestore checklist listener error:', err);
-  });
+  }, (err) => console.warn('Firestore checklist listener error:', err));
 }
 
-// Toggle or Set a Lecture Completion status
 export function setChecklistProgress(lectureId, isCompleted) {
   const local = localStorage.getItem('nst_checklist_progress');
   let data = local ? JSON.parse(local) : {};
   data[lectureId] = isCompleted;
   localStorage.setItem('nst_checklist_progress', JSON.stringify(data));
+  return setDoc(doc(db, 'checklist_progress', lectureId), { completed: isCompleted })
+    .catch(err => console.warn('Firestore checklist sync error:', err));
+}
 
-  const docRef = doc(db, 'checklist_progress', lectureId);
-  return setDoc(docRef, { completed: isCompleted }).catch(err => console.warn('Firestore checklist sync error:', err));
+// ── Quiz Progress (Practice Labs) ────────────────────────────────────────────
+
+/**
+ * Load quiz progress for a given subject from Firestore.
+ * @param {string} subject  e.g. 'aml', 'dl', 'mca', 'cn'
+ * @returns {Promise<object>} appState object
+ */
+export async function loadQuizProgress(subject) {
+  try {
+    const snap = await getDoc(doc(db, 'quiz_progress', subject));
+    if (snap.exists()) return snap.data();
+  } catch(e) {
+    console.warn('Firestore quiz load error:', e);
+  }
+  return {};
+}
+
+/**
+ * Save quiz progress for a given subject to Firestore.
+ * @param {string} subject  e.g. 'aml', 'dl', 'mca', 'cn'
+ * @param {object} state    appState object
+ */
+export function saveQuizProgress(subject, state) {
+  return setDoc(doc(db, 'quiz_progress', subject), state)
+    .catch(err => console.warn('Firestore quiz save error:', err));
 }
