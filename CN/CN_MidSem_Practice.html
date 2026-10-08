@@ -174,6 +174,13 @@ body{font-family:'Inter',system-ui,sans-serif;background:#f0f2f7;color:#1a2035;m
 .acc-mid{color:#b45309;}
 .acc-low{color:#b91c1c;}
 
+/* ── Important button ── */
+.imp-btn{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;border:1.5px solid #e2e8f0;background:#fff;font:600 11px 'Inter',sans-serif;color:#9ca3af;cursor:pointer;transition:all .15s;line-height:1;margin-left:auto;flex-shrink:0;}
+.imp-btn:hover{border-color:#f59e0b;color:#f59e0b;}
+.imp-btn.active{background:#fef3c7;border-color:#f59e0b;color:#b45309;}
+.q-card.important{border-color:#f59e0b;box-shadow:0 0 0 2px rgba(245,158,11,.12);}
+.fc.imp-active{background:#f59e0b;border-color:#f59e0b;color:#fff;}
+
 /* ── Empty state ── */
 .empty{text-align:center;padding:60px 20px;color:#9ca3af;}
 .empty p{font-size:15px;font-weight:600;margin-top:14px;}
@@ -344,6 +351,11 @@ body{font-family:'Inter',system-ui,sans-serif;background:#f0f2f7;color:#1a2035;m
           <span class="fl">Lecture</span>
           <button class="fc active" data-filter="lec" data-val="All" onclick="setFilter('lec','All',this)">All</button>
         </div>
+        <div class="fsep"></div>
+        <button class="fc" id="imp-filter-btn" onclick="toggleImportantFilter()">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" style="margin-right:3px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          Important
+        </button>
         <span class="fcount" id="fcount"></span>
       </div>
 
@@ -429,7 +441,7 @@ function calcStats() {
 
 /* ────────────────────────── FILTER STATE ────────────────────────── */
 let dashDiff = 'All', dashLec = 'All';
-let activeDiff = 'All', activeLec = 'All';
+let activeDiff = 'All', activeLec = 'All', activeImportant = false;
 
 const CIRC = 2 * Math.PI * 36; // 226.2
 
@@ -588,7 +600,8 @@ function setFilter(type, val, el) {
 function filteredBank() {
   return BANK.filter(q =>
     (activeDiff==='All' || q.level===activeDiff) &&
-    (activeLec ==='All' || q.lecture===activeLec)
+    (activeLec ==='All' || q.lecture===activeLec) &&
+    (!activeImportant || appState[q.id+'__imp']===true)
   );
 }
 
@@ -645,7 +658,8 @@ function buildQuiz() {
     const grid = sec.querySelector('#grid-'+level);
     qs.forEach(q => {
       const card = document.createElement('div');
-      card.className = 'q-card';
+      const imp = appState[q.id+'__imp'] === true;
+      card.className = 'q-card' + (imp ? ' important' : '');
       card.id = 'q-'+q.id;
       
       let shuffled, ci, chosen = -1, answered = false;
@@ -665,6 +679,7 @@ function buildQuiz() {
         <div class="q-meta">
           <div class="q-lec ${level}">${q.lecture}</div>
           <span class="q-topic">${q.topic}</span>
+          <button class="imp-btn${imp?' active':''}" onclick="toggleImportant('${q.id}')" title="Mark as important"><svg width="10" height="10" viewBox="0 0 24 24" fill="${imp?'currentColor':'none'}" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>${imp?'Starred':'Star'}</button>
         </div>
         <div class="q-prompt">${q.prompt}</div>
         <div class="options">${shuffled.map((opt,i) => {
@@ -761,6 +776,29 @@ function resetLecture(lec) {
   buildAnalytics();
 }
 
+function toggleImportant(qId) {
+  appState[qId+'__imp'] = !appState[qId+'__imp'];
+  saveState();
+  const card = document.getElementById('q-'+qId);
+  const btn = card ? card.querySelector('.imp-btn') : null;
+  const imp = appState[qId+'__imp'];
+  if (card) card.classList.toggle('important', imp);
+  if (btn) {
+    btn.classList.toggle('active', imp);
+    btn.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="${imp?'currentColor':'none'}" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>${imp?'Starred':'Star'}`;
+  }
+  if (activeImportant && !imp) {
+    buildQuiz();
+  }
+}
+
+function toggleImportantFilter() {
+  activeImportant = !activeImportant;
+  const btn = document.getElementById('imp-filter-btn');
+  if (btn) btn.classList.toggle('imp-active', activeImportant);
+  buildQuiz();
+}
+
 /* ────────────────────────── UTILS ────────────────────────── */
 function updatePills(bank) {
   document.getElementById('pill-correct').textContent = sCorrect;
@@ -817,6 +855,8 @@ window.answer = answer;
 window.resetLecture = resetLecture;
 window.startLecturePractice = startLecturePractice;
 window.setFilter = setFilter;
+window.toggleImportant = toggleImportant;
+window.toggleImportantFilter = toggleImportantFilter;
 
 /* ────────────────────────── INIT ────────────────────────── */
 loadQuizProgress(SUBJECT).then(state => {
