@@ -3793,5 +3793,815 @@ const mcqs = [
     correctAnswer: "Input features → linear score → sigmoid probability → Bernoulli likelihood → log-likelihood → BCE objective",
     explanation: "This is the conceptual pipeline from the linear predictor to the probabilistic learning objective.",
     difficulty: "medium"
+  },
+  {
+    id: "l15-q1",
+    lecture: "Lecture 15",
+    topic: "Binary Cross-Entropy Loss",
+    question: "What loss function is used for binary logistic regression in Lecture 15?",
+    options: [
+      "Binary cross-entropy",
+      "Mean absolute error",
+      "Squared hinge loss",
+      "K-means loss"
+    ],
+    correctAnswer: "Binary cross-entropy",
+    explanation: "The lecture uses binary cross-entropy as the logistic regression loss.",
+    difficulty: "easy"
+  },
+  {
+    id: "l15-q2",
+    lecture: "Lecture 15",
+    topic: "Binary Cross-Entropy Loss",
+    question: "Which expression represents the binary logistic-regression loss for n observations?",
+    options: [
+      "J(β) = −(1/n) Σ[yi log(p̂i) + (1−yi)log(1−p̂i)]",
+      "J(β) = (1/n) Σ(yi + p̂i)",
+      "J(β) = Σ(yi − p̂i)",
+      "J(β) = βᵀβ"
+    ],
+    correctAnswer: "J(β) = −(1/n) Σ[yi log(p̂i) + (1−yi)log(1−p̂i)]",
+    explanation: "Lecture 15 starts with the average binary cross-entropy objective.",
+    difficulty: "easy"
+  },
+  {
+    id: "l15-q3",
+    lecture: "Lecture 15",
+    topic: "Gradient Descent for Logistic Regression",
+    question: "Why is Gradient Descent used for the logistic-regression objective discussed in the lecture?",
+    options: [
+      "There is no closed-form solution for the objective",
+      "The data cannot be stored in matrices",
+      "The sigmoid cannot produce probabilities",
+      "OLS always gives the exact logistic solution"
+    ],
+    correctAnswer: "There is no closed-form solution for the objective",
+    explanation: "The lecture explicitly states that logistic regression has no closed-form solution here, so iterative optimization is used.",
+    difficulty: "easy"
+  },
+  {
+    id: "l15-q4",
+    lecture: "Lecture 15",
+    topic: "Gradient Descent Update Rule",
+    question: "What is the parameter update rule shown for logistic regression?",
+    options: [
+      "βj^(t+1) = βj^t − α ∂J/∂βj",
+      "βj^(t+1) = βj^t + α ∂J/∂βj",
+      "βj^(t+1) = αβj^t",
+      "βj^(t+1) = βj^t / α"
+    ],
+    correctAnswer: "βj^(t+1) = βj^t − α ∂J/∂βj",
+    explanation: "Gradient descent moves the parameter opposite the gradient direction.",
+    difficulty: "easy"
+  },
+  {
+    id: "l15-q5",
+    lecture: "Lecture 15",
+    topic: "Gradient Direction",
+    question: "What does the derivative tell gradient descent about a parameter update?",
+    options: [
+      "The direction and steepness of local change",
+      "The number of classes",
+      "The dataset size only",
+      "The final prediction directly"
+    ],
+    correctAnswer: "The direction and steepness of local change",
+    explanation: "The derivative provides the direction and magnitude information used to descend the loss surface.",
+    difficulty: "easy"
+  },
+  {
+    id: "l15-q6",
+    lecture: "Lecture 15",
+    topic: "Learning Rate",
+    question: "What does the learning rate α control?",
+    options: [
+      "The size of each parameter update",
+      "The number of classes",
+      "The number of features",
+      "The target labels"
+    ],
+    correctAnswer: "The size of each parameter update",
+    explanation: "A larger or smaller α changes how far parameters move in one gradient step.",
+    difficulty: "easy"
+  },
+  {
+    id: "l15-q7",
+    lecture: "Lecture 15",
+    topic: "Dependency Chain",
+    question: "Which dependency chain is correct for one logistic-regression example?",
+    options: [
+      "βj → zi → p̂i → Li",
+      "βj → Li → zi → p̂i",
+      "Li → βj → p̂i → zi",
+      "zi → Li → βj → p̂i"
+    ],
+    correctAnswer: "βj → zi → p̂i → Li",
+    explanation: "The parameter affects the linear score, which affects the probability, which affects the BCE loss.",
+    difficulty: "easy"
+  },
+  {
+    id: "l15-q8",
+    lecture: "Lecture 15",
+    topic: "Chain Rule",
+    question: "How is the derivative of one example's loss with respect to βj expressed using the chain rule?",
+    options: [
+      "∂Li/∂βj = (∂Li/∂p̂i)(∂p̂i/∂zi)(∂zi/∂βj)",
+      "∂Li/∂βj = ∂Li/∂p̂i + ∂zi/∂βj",
+      "∂Li/∂βj = ∂Li/∂zi",
+      "∂Li/∂βj = βjLi"
+    ],
+    correctAnswer: "∂Li/∂βj = (∂Li/∂p̂i)(∂p̂i/∂zi)(∂zi/∂βj)",
+    explanation: "The lecture explicitly expands the dependency chain through probability and score.",
+    difficulty: "medium"
+  },
+  {
+    id: "l15-q9",
+    lecture: "Lecture 15",
+    topic: "BCE Derivative",
+    question: "What is the derivative of the BCE loss with respect to the predicted probability p̂i?",
+    options: [
+      "(p̂i − yi) / [p̂i(1 − p̂i)]",
+      "p̂i − yi",
+      "yi − p̂i",
+      "p̂i(1 − p̂i)"
+    ],
+    correctAnswer: "(p̂i − yi) / [p̂i(1 − p̂i)]",
+    explanation: "Differentiating the BCE expression with respect to p̂i gives the fraction shown in the lecture.",
+    difficulty: "medium"
+  },
+  {
+    id: "l15-q10",
+    lecture: "Lecture 15",
+    topic: "Sigmoid Derivative",
+    question: "What is the derivative of the sigmoid function p̂i = σ(zi)?",
+    options: [
+      "∂p̂i/∂zi = p̂i(1 − p̂i)",
+      "∂p̂i/∂zi = p̂i − 1",
+      "∂p̂i/∂zi = zi(1 − zi)",
+      "∂p̂i/∂zi = 1/p̂i"
+    ],
+    correctAnswer: "∂p̂i/∂zi = p̂i(1 − p̂i)",
+    explanation: "The sigmoid derivative can be written directly in terms of its output.",
+    difficulty: "easy"
+  },
+  {
+    id: "l15-q11",
+    lecture: "Lecture 15",
+    topic: "Linear Score Derivative",
+    question: "For zi = β0 + β1xi1 + ... + βd xid, what is ∂zi/∂βj?",
+    options: [
+      "xij",
+      "βj",
+      "zi",
+      "1/xij"
+    ],
+    correctAnswer: "xij",
+    explanation: "The coefficient βj multiplies feature xij, so differentiating with respect to βj gives xij.",
+    difficulty: "easy"
+  },
+  {
+    id: "l15-q12",
+    lecture: "Lecture 15",
+    topic: "Prediction Minus Target Gradient",
+    question: "After applying the chain rule, what is the per-example gradient with respect to βj?",
+    options: [
+      "(p̂i − yi)xij",
+      "(yi − p̂i)xij",
+      "p̂i(1 − p̂i)xij",
+      "(p̂i + yi)xij"
+    ],
+    correctAnswer: "(p̂i − yi)xij",
+    explanation: "The sigmoid derivative cancels the denominator from the BCE derivative, leaving prediction minus target times the feature.",
+    difficulty: "easy"
+  },
+  {
+    id: "l15-q13",
+    lecture: "Lecture 15",
+    topic: "Gradient Intuition",
+    question: "What does the term (p̂i − yi) represent intuitively?",
+    options: [
+      "The prediction error and update direction",
+      "The feature magnitude only",
+      "The learning rate",
+      "The number of classes"
+    ],
+    correctAnswer: "The prediction error and update direction",
+    explanation: "The lecture highlights prediction minus target as the direction/error signal in the gradient.",
+    difficulty: "easy"
+  },
+  {
+    id: "l15-q14",
+    lecture: "Lecture 15",
+    topic: "Gradient Intuition",
+    question: "What does xij represent in the per-example gradient (p̂i − yi)xij?",
+    options: [
+      "How strongly that feature influences the parameter update",
+      "The loss value",
+      "The predicted class",
+      "The learning rate"
+    ],
+    correctAnswer: "How strongly that feature influences the parameter update",
+    explanation: "A larger feature value gives that observation a stronger contribution to the coefficient gradient.",
+    difficulty: "easy"
+  },
+  {
+    id: "l15-q15",
+    lecture: "Lecture 15",
+    topic: "Batch Gradient Descent",
+    question: "How does Batch Gradient Descent combine the per-example logistic-regression gradients?",
+    options: [
+      "It averages the gradients over all observations",
+      "It uses only the last observation",
+      "It takes the maximum gradient",
+      "It randomly discards half the observations"
+    ],
+    correctAnswer: "It averages the gradients over all observations",
+    explanation: "Batch GD uses every observation and averages their gradient contributions.",
+    difficulty: "easy"
+  },
+  {
+    id: "l15-q16",
+    lecture: "Lecture 15",
+    topic: "Batch Gradient Update Rule",
+    question: "Which is the batch update rule for βj?",
+    options: [
+      "βj ← βj − α(1/n)Σ(p̂i − yi)xij",
+      "βj ← βj + αΣ(p̂i + yi)xij",
+      "βj ← βj − αΣxij",
+      "βj ← βj/n"
+    ],
+    correctAnswer: "βj ← βj − α(1/n)Σ(p̂i − yi)xij",
+    explanation: "The update uses the average of all per-example gradients.",
+    difficulty: "medium"
+  },
+  {
+    id: "l15-q17",
+    lecture: "Lecture 15",
+    topic: "Vectorized Logistic Gradient",
+    question: "What is the vector-form gradient shown in the lecture?",
+    options: [
+      "∇βJ = (1/n)Xᵀ(p̂ − y)",
+      "∇βJ = X(p̂ + y)",
+      "∇βJ = (1/n)X(y − p̂)",
+      "∇βJ = XᵀXβ"
+    ],
+    correctAnswer: "∇βJ = (1/n)Xᵀ(p̂ − y)",
+    explanation: "Vector notation compresses all parameter-wise gradient calculations into one matrix expression.",
+    difficulty: "medium"
+  },
+  {
+    id: "l15-q18",
+    lecture: "Lecture 15",
+    topic: "Batch Gradient Descent Iteration",
+    question: "Which sequence correctly describes one logistic-regression Batch GD iteration?",
+    options: [
+      "Compute z → compute probabilities → compute average BCE and gradient → update parameters",
+      "Update parameters → compute z → delete labels → compute loss",
+      "Compute loss → randomize labels → update features",
+      "Compute probabilities → remove X → update only intercept"
+    ],
+    correctAnswer: "Compute z → compute probabilities → compute average BCE and gradient → update parameters",
+    explanation: "The lecture presents this as the repeated one-iteration workflow.",
+    difficulty: "easy"
+  },
+  {
+    id: "l15-q19",
+    lecture: "Lecture 15",
+    topic: "Simultaneous Parameter Updates",
+    question: "How should all logistic-regression parameters be updated within one Batch GD step?",
+    options: [
+      "Simultaneously using the gradients computed from the current parameters",
+      "One parameter using the newest value of every other parameter",
+      "Only the largest gradient should be updated",
+      "Only the intercept should be updated"
+    ],
+    correctAnswer: "Simultaneously using the gradients computed from the current parameters",
+    explanation: "All parameters are updated from the same current parameter state.",
+    difficulty: "medium"
+  },
+  {
+    id: "l15-q20",
+    lecture: "Lecture 15",
+    topic: "Loss During Optimization",
+    question: "What should generally happen to the logistic-regression loss during successful gradient-descent training?",
+    options: [
+      "It should decrease over iterations",
+      "It should increase monotonically",
+      "It should remain exactly constant",
+      "It should alternate between zero and infinity"
+    ],
+    correctAnswer: "It should decrease over iterations",
+    explanation: "The lecture's loss curve illustrates decreasing loss as optimization progresses.",
+    difficulty: "easy"
+  },
+  {
+    id: "l15-q21",
+    lecture: "Lecture 15",
+    topic: "Multiclass Problem Setup",
+    question: "What type of problem is considered in the multiclass section?",
+    options: [
+      "K mutually exclusive classes with K ≥ 3",
+      "Only two non-exclusive classes",
+      "Continuous regression targets",
+      "Unsupervised clusters only"
+    ],
+    correctAnswer: "K mutually exclusive classes with K ≥ 3",
+    explanation: "The lecture considers mutually exclusive multiclass classification with at least three classes.",
+    difficulty: "easy"
+  },
+  {
+    id: "l15-q22",
+    lecture: "Lecture 15",
+    topic: "Multiclass Approaches",
+    question: "Which two approaches are presented for multiclass classification?",
+    options: [
+      "One-vs-Rest and Softmax Regression",
+      "K-Means and PCA",
+      "Ridge and Lasso",
+      "AR and MA"
+    ],
+    correctAnswer: "One-vs-Rest and Softmax Regression",
+    explanation: "The lecture compares OVR with Softmax as the two multiclass strategies.",
+    difficulty: "easy"
+  },
+  {
+    id: "l15-q23",
+    lecture: "Lecture 15",
+    topic: "One-vs-Rest Setup",
+    question: "How many binary classifiers are trained in One-vs-Rest for K classes?",
+    options: [
+      "K",
+      "K − 1",
+      "2K",
+      "K²"
+    ],
+    correctAnswer: "K",
+    explanation: "One independent binary classifier is trained for each class against all remaining classes.",
+    difficulty: "easy"
+  },
+  {
+    id: "l15-q24",
+    lecture: "Lecture 15",
+    topic: "One-vs-Rest Labels",
+    question: "For the OVR classifier corresponding to class k, what label assignment is used?",
+    options: [
+      "yi = 1 if the example belongs to class k, otherwise 0",
+      "yi = k for every example",
+      "yi = 0 for class k and 1 for all others",
+      "yi is always the original multiclass label"
+    ],
+    correctAnswer: "yi = 1 if the example belongs to class k, otherwise 0",
+    explanation: "Each OVR model turns one class into the positive class and all others into the negative class.",
+    difficulty: "easy"
+  },
+  {
+    id: "l15-q25",
+    lecture: "Lecture 15",
+    topic: "One-vs-Rest Probabilities",
+    question: "What does each OVR model output?",
+    options: [
+      "A sigmoid probability qk for its class",
+      "A covariance matrix",
+      "A single continuous regression target",
+      "A guaranteed joint probability distribution"
+    ],
+    correctAnswer: "A sigmoid probability qk for its class",
+    explanation: "Each binary classifier produces a sigmoid-based class score/probability.",
+    difficulty: "easy"
+  },
+  {
+    id: "l15-q26",
+    lecture: "Lecture 15",
+    topic: "One-vs-Rest Prediction",
+    question: "How is the final class chosen in the basic OVR prediction rule?",
+    options: [
+      "Choose the class with the highest score",
+      "Choose the class with the lowest score",
+      "Average all classes and round down",
+      "Choose a class randomly"
+    ],
+    correctAnswer: "Choose the class with the highest score",
+    explanation: "The lecture defines the prediction as arg max over the class scores qk.",
+    difficulty: "easy"
+  },
+  {
+    id: "l15-q27",
+    lecture: "Lecture 15",
+    topic: "OVR Probability Limitation",
+    question: "What is a limitation of raw OVR outputs?",
+    options: [
+      "They do not naturally sum to 1 across classes",
+      "They can never produce probabilities",
+      "They always sum exactly to 1",
+      "They cannot be compared"
+    ],
+    correctAnswer: "They do not naturally sum to 1 across classes",
+    explanation: "Each OVR classifier is trained independently, so the resulting class scores need not form one joint probability distribution.",
+    difficulty: "medium"
+  },
+  {
+    id: "l15-q28",
+    lecture: "Lecture 15",
+    topic: "OVR Normalization",
+    question: "How can OVR scores be normalized into a probability-like distribution according to the lecture?",
+    options: [
+      "P(y = k) = qk / Σj qj",
+      "P(y = k) = qk²",
+      "P(y = k) = 1 − qk",
+      "P(y = k) = log(qk)"
+    ],
+    correctAnswer: "P(y = k) = qk / Σj qj",
+    explanation: "The lecture shows normalization by dividing each OVR score by the sum of all class scores.",
+    difficulty: "medium"
+  },
+  {
+    id: "l15-q29",
+    lecture: "Lecture 15",
+    topic: "OVR Use Cases",
+    question: "When does the lecture suggest OVR can be useful?",
+    options: [
+      "When simple reduction or class-specific weighting is desired",
+      "Only when classes are continuous",
+      "Only when all probabilities must naturally sum to 1",
+      "Only for unsupervised learning"
+    ],
+    correctAnswer: "When simple reduction or class-specific weighting is desired",
+    explanation: "OVR is presented as useful when a simple binary reduction or class-specific weighting is valuable.",
+    difficulty: "medium"
+  },
+  {
+    id: "l15-q30",
+    lecture: "Lecture 15",
+    topic: "Softmax Model",
+    question: "What is the class-specific linear score in Softmax regression?",
+    options: [
+      "zik = βkᵀxi",
+      "zik = xi − βk",
+      "zik = βk / xi",
+      "zik = xi² + βk"
+    ],
+    correctAnswer: "zik = βkᵀxi",
+    explanation: "Each class k has its own parameter vector βk producing a linear logit score.",
+    difficulty: "easy"
+  },
+  {
+    id: "l15-q31",
+    lecture: "Lecture 15",
+    topic: "Softmax Function",
+    question: "Which formula gives the Softmax probability for class k?",
+    options: [
+      "p̂ik = e^(zik) / Σj e^(zij)",
+      "p̂ik = zik / Σj zij",
+      "p̂ik = 1 − e^(zik)",
+      "p̂ik = e^(−zik)"
+    ],
+    correctAnswer: "p̂ik = e^(zik) / Σj e^(zij)",
+    explanation: "Softmax exponentiates each class score and divides by the sum over all class scores.",
+    difficulty: "easy"
+  },
+  {
+    id: "l15-q32",
+    lecture: "Lecture 15",
+    topic: "Softmax Probability Properties",
+    question: "What important property do Softmax class probabilities have?",
+    options: [
+      "They form a joint probability distribution that sums to 1",
+      "They are independent and never normalized",
+      "They can be negative",
+      "They always equal 0 or 1"
+    ],
+    correctAnswer: "They form a joint probability distribution that sums to 1",
+    explanation: "Softmax explicitly normalizes all class scores together, so class probabilities sum to one.",
+    difficulty: "easy"
+  },
+  {
+    id: "l15-q33",
+    lecture: "Lecture 15",
+    topic: "Softmax Computation Steps",
+    question: "What is the first mathematical step in the Softmax calculation shown for K = 3?",
+    options: [
+      "Compute the logits z_i1, z_i2, z_i3",
+      "Take the logarithm of the probabilities",
+      "Choose the class immediately",
+      "Compute the cross-entropy before probabilities"
+    ],
+    correctAnswer: "Compute the logits z_i1, z_i2, z_i3",
+    explanation: "The lecture first computes the three linear scores before exponentiation and normalization.",
+    difficulty: "easy"
+  },
+  {
+    id: "l15-q34",
+    lecture: "Lecture 15",
+    topic: "Softmax Computation Steps",
+    question: "After exponentiating the Softmax logits, what is the next step?",
+    options: [
+      "Sum the exponentiated scores",
+      "Take their differences",
+      "Discard the largest score",
+      "Set all values to zero"
+    ],
+    correctAnswer: "Sum the exponentiated scores",
+    explanation: "The denominator S = Σj e^(zij) is computed before dividing each exponentiated score by S.",
+    difficulty: "easy"
+  },
+  {
+    id: "l15-q35",
+    lecture: "Lecture 15",
+    topic: "Multiclass Cross-Entropy",
+    question: "How is the per-example multiclass cross-entropy written using one-hot targets yik?",
+    options: [
+      "Li = −Σk yik log(p̂ik)",
+      "Li = Σk(yik + p̂ik)",
+      "Li = Σk p̂ik²",
+      "Li = −Σk yik p̂ik"
+    ],
+    correctAnswer: "Li = −Σk yik log(p̂ik)",
+    explanation: "The one-hot target selects the log probability of the true class.",
+    difficulty: "easy"
+  },
+  {
+    id: "l15-q36",
+    lecture: "Lecture 15",
+    topic: "One-Hot Target Encoding",
+    question: "In the multiclass cross-entropy setup, what does yik equal for the true class?",
+    options: [
+      "1",
+      "0",
+      "k",
+      "−1"
+    ],
+    correctAnswer: "1",
+    explanation: "The one-hot encoding assigns 1 to the true class and 0 to all other classes.",
+    difficulty: "easy"
+  },
+  {
+    id: "l15-q37",
+    lecture: "Lecture 15",
+    topic: "Dataset Multiclass Objective",
+    question: "What is the dataset objective for Softmax multiclass classification?",
+    options: [
+      "J(β) = −(1/n) Σi Σk yik log(p̂ik)",
+      "J(β) = (1/n) Σi Σk(yik + p̂ik)",
+      "J(β) = Σi βk² only",
+      "J(β) = Σi max(p̂ik)"
+    ],
+    correctAnswer: "J(β) = −(1/n) Σi Σk yik log(p̂ik)",
+    explanation: "The lecture uses the average multiclass cross-entropy over all observations and classes.",
+    difficulty: "medium"
+  },
+  {
+    id: "l15-q38",
+    lecture: "Lecture 15",
+    topic: "OVR vs Softmax",
+    question: "Which statement best distinguishes OVR from Softmax?",
+    options: [
+      "OVR trains independent binary models, while Softmax learns joint class probabilities",
+      "OVR always produces joint probabilities, while Softmax does not",
+      "Both methods train exactly one binary classifier",
+      "Softmax is only for binary classification"
+    ],
+    correctAnswer: "OVR trains independent binary models, while Softmax learns joint class probabilities",
+    explanation: "This is the central comparison made in the lecture.",
+    difficulty: "medium"
+  },
+  {
+    id: "l15-q39",
+    lecture: "Lecture 15",
+    topic: "Multiclass Method Selection",
+    question: "When does the lecture recommend Softmax over OVR?",
+    options: [
+      "When classes are mutually exclusive and joint probabilities are desired",
+      "When class-specific weighting is the main goal",
+      "When there are no labels",
+      "When only regression is required"
+    ],
+    correctAnswer: "When classes are mutually exclusive and joint probabilities are desired",
+    explanation: "Softmax is the preferred formulation when mutually exclusive classes should share a normalized probability distribution.",
+    difficulty: "easy"
+  },
+  {
+    id: "l15-q40",
+    lecture: "Lecture 15",
+    topic: "Logistic Regression Assumptions",
+    question: "Which is listed as an assumption for the logistic-regression setup?",
+    options: [
+      "Observations are independent",
+      "Targets must be continuous",
+      "Classes must overlap perfectly",
+      "Features must all be identical"
+    ],
+    correctAnswer: "Observations are independent",
+    explanation: "The lecture lists independence of observations as one of the logistic-regression assumptions.",
+    difficulty: "easy"
+  },
+  {
+    id: "l15-q41",
+    lecture: "Lecture 15",
+    topic: "Logistic Regression Assumptions",
+    question: "What relationship is assumed between continuous predictors and the log-odds?",
+    options: [
+      "A linear relationship",
+      "A quadratic relationship only",
+      "No relationship",
+      "An exponential relationship only"
+    ],
+    correctAnswer: "A linear relationship",
+    explanation: "The lecture assumes continuous predictors have a linear relationship with the log-odds.",
+    difficulty: "easy"
+  },
+  {
+    id: "l15-q42",
+    lecture: "Lecture 15",
+    topic: "Multicollinearity Assumption",
+    question: "What feature condition is assumed in the logistic-regression model?",
+    options: [
+      "There is no severe multicollinearity among features",
+      "All features are exact duplicates",
+      "All features must have zero variance",
+      "Features must be perfectly correlated"
+    ],
+    correctAnswer: "There is no severe multicollinearity among features",
+    explanation: "Severe multicollinearity can make coefficient estimates unstable, so the lecture lists its absence as an assumption.",
+    difficulty: "easy"
+  },
+  {
+    id: "l15-q43",
+    lecture: "Lecture 15",
+    topic: "Binary and Multiclass Class Targets",
+    question: "Which target structure is appropriate for the binary logistic-regression formulation?",
+    options: [
+      "Two possible classes",
+      "A continuous real-valued target only",
+      "An unlimited number of overlapping classes",
+      "No target variable"
+    ],
+    correctAnswer: "Two possible classes",
+    explanation: "Binary logistic regression models a binary outcome, while the multiclass sections extend the idea to multiple exclusive classes.",
+    difficulty: "easy"
+  },
+  {
+    id: "l15-q44",
+    lecture: "Lecture 15",
+    topic: "Nonlinear Feature Maps",
+    question: "How can logistic regression represent nonlinear decision boundaries while remaining linear in parameters?",
+    options: [
+      "By adding transformed polynomial features while keeping the score linear in coefficients",
+      "By replacing the sigmoid with K-Means",
+      "By removing all features",
+      "By making the coefficients nonlinear functions of themselves"
+    ],
+    correctAnswer: "By adding transformed polynomial features while keeping the score linear in coefficients",
+    explanation: "Feature maps can introduce terms such as x² while the model remains linear in its parameters.",
+    difficulty: "medium"
+  },
+  {
+    id: "l15-q45",
+    lecture: "Lecture 15",
+    topic: "Polynomial Feature Maps",
+    question: "Which score is an example of a logistic model using polynomial features?",
+    options: [
+      "z = β0 + β1x + β2x² + ...",
+      "z = x only",
+      "z = β0/x",
+      "z = sin(βx) only"
+    ],
+    correctAnswer: "z = β0 + β1x + β2x² + ...",
+    explanation: "Polynomial feature transformations create nonlinear boundaries in the original feature space.",
+    difficulty: "easy"
+  },
+  {
+    id: "l15-q46",
+    lecture: "Lecture 15",
+    topic: "Nonlinear Decision Boundaries",
+    question: "Why can polynomial features create nonlinear decision boundaries in the original feature space?",
+    options: [
+      "The transformed score remains linear in parameters but nonlinear in the original inputs",
+      "The parameters become random variables",
+      "The target becomes continuous",
+      "Softmax is automatically applied"
+    ],
+    correctAnswer: "The transformed score remains linear in parameters but nonlinear in the original inputs",
+    explanation: "A polynomial feature such as x² changes the geometry of the boundary in the original feature space.",
+    difficulty: "medium"
+  },
+  {
+    id: "l15-q47",
+    lecture: "Lecture 15",
+    topic: "Regularization with Nonlinear Features",
+    question: "Why does the lecture recommend regularization when using polynomial features?",
+    options: [
+      "To reduce the risk of overfitting from increased feature complexity",
+      "To guarantee a linear boundary",
+      "To remove the sigmoid",
+      "To force every coefficient to increase"
+    ],
+    correctAnswer: "To reduce the risk of overfitting from increased feature complexity",
+    explanation: "Polynomial expansions increase model flexibility, so L1 or L2 regularization can help control complexity.",
+    difficulty: "easy"
+  },
+  {
+    id: "l15-q48",
+    lecture: "Lecture 15",
+    topic: "Complete Logistic Training Pipeline",
+    question: "Which sequence matches the complete training story in Lecture 15?",
+    options: [
+      "Initialize β → compute scores → compute probabilities → compute loss → compute gradient → update β → repeat",
+      "Compute gradient → initialize β → compute loss → stop",
+      "Compute probabilities → remove features → deploy immediately",
+      "Choose classes → compute PCA → stop"
+    ],
+    correctAnswer: "Initialize β → compute scores → compute probabilities → compute loss → compute gradient → update β → repeat",
+    explanation: "The lecture summarizes training as a repeated forward-loss-gradient-update cycle until convergence.",
+    difficulty: "easy"
+  },
+  {
+    id: "l15-q49",
+    lecture: "Lecture 15",
+    topic: "Convergence",
+    question: "When does the logistic-regression training loop stop according to the complete training story?",
+    options: [
+      "When the optimization reaches convergence",
+      "After exactly one update",
+      "When every feature becomes zero",
+      "When the loss becomes negative infinity"
+    ],
+    correctAnswer: "When the optimization reaches convergence",
+    explanation: "The lecture ends the iterative training loop by repeating until convergence.",
+    difficulty: "easy"
+  },
+  {
+    id: "l15-q50",
+    lecture: "Lecture 15",
+    topic: "Gradient and Learning Rate Interaction",
+    question: "Suppose the gradient magnitude becomes larger while α stays fixed. What happens to the gradient-descent step magnitude?",
+    options: [
+      "It becomes larger",
+      "It becomes smaller",
+      "It becomes exactly zero",
+      "It becomes independent of the gradient"
+    ],
+    correctAnswer: "It becomes larger",
+    explanation: "The update magnitude depends on α multiplied by the gradient magnitude.",
+    difficulty: "medium"
+  },
+  {
+    id: "l15-q51",
+    lecture: "Lecture 15",
+    topic: "Gradient Sign Interpretation",
+    question: "For a feature value xij > 0, what does a positive term (p̂i − yi)xij imply about the gradient contribution?",
+    options: [
+      "It contributes a positive gradient for βj",
+      "It contributes a negative gradient for βj",
+      "It contributes zero regardless of prediction",
+      "It reverses the feature sign"
+    ],
+    correctAnswer: "It contributes a positive gradient for βj",
+    explanation: "With xij positive, the sign of the gradient contribution matches the sign of p̂i − yi.",
+    difficulty: "medium"
+  },
+  {
+    id: "l15-q52",
+    lecture: "Lecture 15",
+    topic: "Batch Averaging",
+    question: "Why does Batch GD divide the summed logistic-regression gradient by n?",
+    options: [
+      "To compute the average contribution across all observations",
+      "To remove the target variable",
+      "To convert the model into OVR",
+      "To make the sigmoid linear"
+    ],
+    correctAnswer: "To compute the average contribution across all observations",
+    explanation: "The 1/n factor turns the sum of per-example gradients into the average gradient.",
+    difficulty: "easy"
+  },
+  {
+    id: "l15-q53",
+    lecture: "Lecture 15",
+    topic: "Softmax Joint Probability",
+    question: "Why is Softmax particularly appropriate for mutually exclusive classes?",
+    options: [
+      "It distributes one total probability mass across all classes",
+      "It trains K independent binary models",
+      "It allows every class to be simultaneously true",
+      "It does not normalize scores"
+    ],
+    correctAnswer: "It distributes one total probability mass across all classes",
+    explanation: "Softmax probabilities jointly sum to 1, matching a mutually exclusive multiclass outcome.",
+    difficulty: "medium"
+  },
+  {
+    id: "l15-q54",
+    lecture: "Lecture 15",
+    topic: "OVR Class-Specific Weighting",
+    question: "Which feature of OVR can be useful when classes require different treatment?",
+    options: [
+      "Class-specific weighting",
+      "Guaranteed joint probability calibration",
+      "Automatic dimensionality reduction",
+      "Removal of all feature interactions"
+    ],
+    correctAnswer: "Class-specific weighting",
+    explanation: "The lecture explicitly mentions class-specific weighting as one reason to use OVR.",
+    difficulty: "easy"
   }
 ];

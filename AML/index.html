@@ -38,7 +38,7 @@
             <li><a href="../assignments.html">Assignments</a></li>
             <li><a href="../archive.html">Archive</a></li>
         </ul>
-        <div class="nav-stats">14 Lectures &bull; 81 Topics</div>
+        <div class="nav-stats">15 Lectures &bull; 87 Topics</div>
     </nav>
 
     <!-- Lectures Section -->
@@ -82,7 +82,7 @@
                         <h4>Official Mid-Sem Exam Blueprint &bull; 15 Oct 2026</h4>
                     </div>
                     <div class="subject-midsem-tags">
-                        <span class="subject-midsem-tag" style="background:#ecf2fa;color:#203e68;border:1px solid #c8d8ec;font-weight:700;">Syllabus: L01 &ndash; L14 (Till MLE &amp; Logistic Reg)</span>
+                        <span class="subject-midsem-tag" style="background:#ecf2fa;color:#203e68;border:1px solid #c8d8ec;font-weight:700;">Syllabus: L01 &ndash; L15 (Till Multiclass Classification)</span>
                         <span class="subject-midsem-tag">Weightage: 25%</span>
                         <span class="subject-midsem-tag">40% Coding</span>
                     </div>
@@ -482,6 +482,32 @@
 
                 </div>
 
+                <!-- Lecture 15 -->
+                <div class="lecture-card" data-lecture-id="aml-l15" onclick="window.location.href='lectures/lecture-15.html'">
+                    <div class="lecture-card-top">
+                        <div class="lecture-number">15</div>
+                        <div class="lecture-card-actions">
+                            <a href="pdfs/15.PDF" target="_blank" class="card-action-btn" title="Open Original PDF" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            </a>
+                            <a href="images/15.png" target="_blank" class="card-action-btn" title="Open Short Notes Image" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                            </a>
+                            <a href="AML_MidSem_Practice.html?lec=L15" target="_blank" class="card-action-btn" title="Practice Mid-Sem Questions for this Lecture" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            </a>
+                            <div class="lecture-checkbox" onclick="toggleComplete(event, 'aml-l15')" title="Toggle completion status"></div>
+                        </div>
+                    </div>
+                    <h2>Gradient Descent on Logistic Regression &amp; Multiclass Classification</h2>
+                    <p>Chain rule derivation of BCE gradient, batch gradient descent update, One-vs-Rest strategy, Softmax multiclass model, multiclass cross-entropy loss, and regularization.</p>
+                    <div class="lecture-card-header">
+                        <span class="lecture-tag">Gradient &amp; Multiclass</span>
+                        <span class="lecture-stats">6 Topics</span>
+                    </div>
+
+                </div>
+
             </div>
         </div>
     </section>
@@ -491,11 +517,11 @@
         <h3 class="stats-title">AML Notes Metrics</h3>
         <div class="stats-grid">
             <div class="stat-item">
-                <div class="stat-val">14</div>
+                <div class="stat-val">15</div>
                 <div class="stat-label">Lectures Compiled</div>
             </div>
             <div class="stat-item">
-                <div class="stat-val">81</div>
+                <div class="stat-val">87</div>
                 <div class="stat-label">Topics</div>
             </div>
             <div class="stat-item">
@@ -583,20 +609,20 @@
         }
 
         function openAllNotes() {
-            for (let i = 1; i <= 14; i++) {
+            for (let i = 1; i <= 15; i++) {
                 const num = String(i).padStart(2, '0');
                 window.open(`lectures/lecture-${num}.html`, '_blank');
             }
         }
 
         function openAllPDFs() {
-            for (let i = 1; i <= 14; i++) {
+            for (let i = 1; i <= 15; i++) {
                 window.open(`pdfs/${i}.pdf`, '_blank');
             }
         }
 
         function openAllShortNotes() {
-            for (let i = 1; i <= 14; i++) {
+            for (let i = 1; i <= 15; i++) {
                 window.open(`images/${i}.png`, '_blank');
             }
         }
