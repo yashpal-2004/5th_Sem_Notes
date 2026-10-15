@@ -49,6 +49,57 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
         }
 
+        /* Subject-wise Done/Pending Filter Pills */
+        .status-filter-bar {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(19, 34, 25, 0.05);
+            padding: 3px;
+            border-radius: 20px;
+            border: 1px solid var(--border-light);
+            gap: 2px;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 0.28rem 0.75rem;
+            border-radius: 16px;
+            border: none;
+            background: transparent;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            line-height: 1.2;
+            font-family: inherit;
+        }
+
+        .status-pill:hover {
+            color: var(--text-dark);
+        }
+
+        .status-pill.active {
+            background: white;
+            color: var(--text-dark);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+        }
+
+        .status-pill .pill-count {
+            display: inline-block;
+            font-size: 0.68rem;
+            padding: 1px 5px;
+            border-radius: 10px;
+            background: rgba(19, 34, 25, 0.08);
+            font-weight: 700;
+        }
+
+        .status-pill.active .pill-count {
+            background: rgba(19, 34, 25, 0.12);
+        }
+
         .add-btn {
             display: inline-flex;
             align-items: center;
@@ -219,6 +270,12 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            text-decoration: none;
+        }
+
+        .q-title:hover {
+            text-decoration: underline;
+            text-underline-offset: 3px;
         }
 
         .q-meta {
@@ -271,6 +328,42 @@
         .q-btn-del:hover {
             opacity: 1;
             background: rgba(239, 68, 68, 0.1);
+        }
+
+        .q-btn-edit {
+            background: transparent;
+            color: var(--text-muted);
+            opacity: 0.65;
+            padding: 6px;
+        }
+
+        .q-btn-edit:hover {
+            opacity: 1;
+            background: rgba(19, 34, 25, 0.08);
+            color: var(--text-dark);
+        }
+
+        .open-all-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0.45rem 1rem;
+            border-radius: 20px;
+            border: 1px solid var(--border-light);
+            background: white;
+            color: var(--text-dark);
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+            text-decoration: none;
+        }
+
+        .open-all-btn:hover {
+            background: var(--text-dark);
+            color: white;
+            border-color: var(--text-dark);
         }
 
         .empty-state {
@@ -444,7 +537,7 @@
 <body>
 
     <!-- Navigation Bar -->
-    <nav>
+    <nav style="border-bottom: 1px solid var(--border-light); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(8px); background-color: rgba(250,247,242,0.92);">
         <a href="index.html" class="logo-container">
             <svg class="logo-symbol" viewBox="0 0 24 24">
                 <circle cx="12" cy="6" r="3" />
@@ -464,31 +557,30 @@
         <div class="nav-stats" id="totalQuestionsStat">0 Assignments</div>
     </nav>
 
-    <!-- Header Section -->
-    <header class="hero-section" style="padding-bottom: 3rem;">
-        <div class="hero-left" style="max-width: 800px;">
-            <h4 class="hero-subtitle">Newton School of Technology</h4>
-            <h1 class="hero-title">Portal Assignments Hub</h1>
-            <p class="hero-description">Store, manage, and access all college portal assignment questions subject-wise, neatly partitioned into Class &amp; Lab tasks with global cloud syncing.</p>
+    <!-- Sticky Filter Bar -->
+    <div style="position: sticky; top: 73px; z-index: 90; background-color: rgba(250,247,242,0.95); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border-light);">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0.75rem 4rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+            <div class="filter-tabs" id="filterTabs" style="background:transparent; border:none; padding:0;">
+                <button class="filter-tab active" onclick="setSubjectFilter('all')">All Subjects</button>
+                <button class="filter-tab" onclick="setSubjectFilter('mca')">MCA</button>
+                <button class="filter-tab" onclick="setSubjectFilter('dl')">Deep Learning</button>
+                <button class="filter-tab" onclick="setSubjectFilter('aml')">Advanced ML</button>
+                <button class="filter-tab" onclick="setSubjectFilter('cn')">Networks</button>
+            </div>
+            <button class="add-btn" onclick="openAddModal()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Add Question
+            </button>
         </div>
-    </header>
+    </div>
 
     <!-- Main Content Section -->
-    <section class="coursework-section">
+    <section class="coursework-section" style="padding-top: 2rem; padding-bottom: 4rem;">
         <div class="coursework-container">
-            
-            <div class="assignments-header-row">
-                <div class="filter-tabs" id="filterTabs">
-                    <button class="filter-tab active" onclick="setSubjectFilter('all')">All Subjects</button>
-                    <button class="filter-tab" onclick="setSubjectFilter('mca')">MCA</button>
-                    <button class="filter-tab" onclick="setSubjectFilter('dl')">Deep Learning</button>
-                    <button class="filter-tab" onclick="setSubjectFilter('aml')">Advanced ML</button>
-                    <button class="filter-tab" onclick="setSubjectFilter('cn')">Networks</button>
-                </div>
-                <button class="add-btn" onclick="openAddModal()">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                    Add Question
-                </button>
+
+            <div style="margin-bottom: 2rem;">
+                <h1 style="font-family:'Playfair Display',serif; font-size:1.9rem; font-weight:700; color:var(--text-dark); margin:0 0 0.25rem 0; line-height:1.2;">Portal Assignments</h1>
+                <p style="font-size:0.85rem; color:var(--text-muted); margin:0; font-weight:500;">College portal questions — synced globally across all subjects.</p>
             </div>
 
             <!-- Subject Container Blocks -->
@@ -499,14 +591,15 @@
         </div>
     </section>
 
-    <!-- Add Question Modal -->
+    <!-- Add / Edit Question Modal -->
     <div class="modal-overlay" id="addModal">
         <div class="modal-card">
             <div class="modal-header">
-                <h3 class="modal-title">Add Portal Question</h3>
+                <h3 class="modal-title" id="modalTitle">Add Portal Question</h3>
                 <button class="modal-close" onclick="closeAddModal()">&times;</button>
             </div>
             <form id="addQuestionForm" onsubmit="handleFormSubmit(event)">
+                <input type="hidden" id="editingId" value="">
                 <div class="form-row">
                     <div class="form-group">
                         <label for="subjectSelect">Subject</label>
@@ -537,7 +630,7 @@
                     <label for="questionDeadline">Optional Deadline / Tag</label>
                     <input type="text" id="questionDeadline" class="form-control" placeholder="e.g., Due Sep 25">
                 </div>
-                <button type="submit" class="modal-submit">Save Question Globally</button>
+                <button type="submit" class="modal-submit" id="modalSubmitBtn">Save Question Globally</button>
             </form>
         </div>
     </div>
@@ -582,6 +675,12 @@
 
         function openAddModal() {
             var modal = document.getElementById('addModal');
+            var title = document.getElementById('modalTitle');
+            var btn = document.getElementById('modalSubmitBtn');
+            var editId = document.getElementById('editingId');
+            if (editId) editId.value = '';
+            if (title) title.textContent = 'Add Portal Question';
+            if (btn) btn.textContent = 'Save Question Globally';
             if (modal) modal.classList.add('active');
         }
         window.openAddModal = openAddModal;
@@ -591,6 +690,12 @@
             if (modal) modal.classList.remove('active');
             var form = document.getElementById('addQuestionForm');
             if (form) form.reset();
+            var editId = document.getElementById('editingId');
+            if (editId) editId.value = '';
+            var title = document.getElementById('modalTitle');
+            if (title) title.textContent = 'Add Portal Question';
+            var btn = document.getElementById('modalSubmitBtn');
+            if (btn) btn.textContent = 'Save Question Globally';
         }
         window.closeAddModal = closeAddModal;
 
@@ -602,6 +707,43 @@
             openAddModal();
         }
         window.openAddModalWithDefaults = openAddModalWithDefaults;
+
+        function openEditModal(id) {
+            var q = (window.questionsData || []).find(function(x) { return x.id === id; });
+            if (!q) return;
+            var modal = document.getElementById('addModal');
+            var title = document.getElementById('modalTitle');
+            var btn = document.getElementById('modalSubmitBtn');
+            var editId = document.getElementById('editingId');
+            var subjSelect = document.getElementById('subjectSelect');
+            var catSelect = document.getElementById('categorySelect');
+            var qTitle = document.getElementById('questionTitle');
+            var qUrl = document.getElementById('questionUrl');
+            var qDeadline = document.getElementById('questionDeadline');
+            if (editId) editId.value = q.id;
+            if (title) title.textContent = 'Edit Portal Question';
+            if (btn) btn.textContent = 'Update Question';
+            if (subjSelect) subjSelect.value = q.subject;
+            if (catSelect) catSelect.value = q.category;
+            if (qTitle) qTitle.value = q.title;
+            if (qUrl) qUrl.value = q.url;
+            if (qDeadline) qDeadline.value = q.deadline || '';
+            if (modal) modal.classList.add('active');
+        }
+        window.openEditModal = openEditModal;
+
+        function openAllSubjectQuestions(subjKey) {
+            var status = (window.subjectStatusFilters && window.subjectStatusFilters[subjKey]) || 'all';
+            var questions = (window.questionsData || []).filter(function(q) {
+                if (q.subject !== subjKey) return false;
+                if (status === 'pending') return !q.done;
+                if (status === 'done') return !!q.done;
+                return true;
+            });
+            if (questions.length === 0) return;
+            questions.forEach(function(q) { window.open(q.url, '_blank'); });
+        }
+        window.openAllSubjectQuestions = openAllSubjectQuestions;
 
         function promptDeleteQuestion(id) {
             window.pendingDeleteId = id;
@@ -628,6 +770,15 @@
             }
         }
         window.setSubjectFilter = setSubjectFilter;
+
+        window.subjectStatusFilters = {};
+        function setSubjectStatusFilter(subjKey, status) {
+            window.subjectStatusFilters[subjKey] = status;
+            if (typeof window.renderAssignments === 'function') {
+                window.renderAssignments();
+            }
+        }
+        window.setSubjectStatusFilter = setSubjectStatusFilter;
     </script>
 
     <script type="module">
@@ -665,35 +816,41 @@
             const title = document.getElementById('questionTitle').value.trim();
             const url = document.getElementById('questionUrl').value.trim();
             const deadline = document.getElementById('questionDeadline').value.trim();
+            const editingId = document.getElementById('editingId').value.trim();
 
             if (!title || !url) return;
 
-            const newQ = {
-                id: 'q_' + Date.now(),
-                subject,
-                category,
-                title,
-                url,
-                done: false,
-                deadline
-            };
-
             window.closeAddModal();
 
-            if (window.currentFilter !== 'all' && window.currentFilter !== subject) {
-                window.setSubjectFilter(subject);
-            }
-
-            const existingIdx = window.questionsData.findIndex(q => q.id === newQ.id);
-            if (existingIdx >= 0) {
-                window.questionsData[existingIdx] = newQ;
+            if (editingId) {
+                // Edit existing question
+                const idx = window.questionsData.findIndex(q => q.id === editingId);
+                if (idx >= 0) {
+                    const updated = { ...window.questionsData[idx], subject, category, title, url, deadline };
+                    window.questionsData[idx] = updated;
+                    localStorage.setItem('nst_portal_assignments', JSON.stringify(window.questionsData));
+                    window.renderAssignments();
+                    await savePortalAssignment(updated);
+                }
             } else {
+                // Add new question
+                const newQ = {
+                    id: 'q_' + Date.now(),
+                    subject,
+                    category,
+                    title,
+                    url,
+                    done: false,
+                    deadline
+                };
+                if (window.currentFilter !== 'all' && window.currentFilter !== subject) {
+                    window.setSubjectFilter(subject);
+                }
                 window.questionsData.push(newQ);
+                localStorage.setItem('nst_portal_assignments', JSON.stringify(window.questionsData));
+                window.renderAssignments();
+                await savePortalAssignment(newQ);
             }
-            localStorage.setItem('nst_portal_assignments', JSON.stringify(window.questionsData));
-            window.renderAssignments();
-
-            await savePortalAssignment(newQ);
         };
 
         window.renderAssignments = function renderAssignments() {
@@ -737,14 +894,30 @@
                 if (!subjObj) return;
                 const subjQuestions = window.questionsData.filter(q => q.subject === subjKey);
 
-                const classQs = subjQuestions.filter(q => q.category === 'class');
-                const labQs = subjQuestions.filter(q => q.category === 'lab');
+                const currentStatus = window.subjectStatusFilters[subjKey] || 'all';
+
+                // Status counts for this subject
+                const allCount = subjQuestions.length;
+                const pendingCount = subjQuestions.filter(q => !q.done).length;
+                const doneCount = subjQuestions.filter(q => q.done).length;
+
+                // Filter questions for display by subject status filter
+                const filteredQuestions = subjQuestions.filter(q => {
+                    if (currentStatus === 'pending') return !q.done;
+                    if (currentStatus === 'done') return !!q.done;
+                    return true;
+                });
+
+                const classQs = filteredQuestions.filter(q => q.category === 'class');
+                const labQs = filteredQuestions.filter(q => q.category === 'lab');
+
+                const statusLabel = currentStatus === 'all' ? '' : ` (${currentStatus})`;
 
                 const classEmptyHtml = `
                     <div class="empty-state">
                         <svg class="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-                        <div class="empty-state-text">No Class Assignments</div>
-                        <div class="empty-state-sub">There are no pending class questions logged for this subject yet.</div>
+                        <div class="empty-state-text">No Class Assignments${statusLabel}</div>
+                        <div class="empty-state-sub">${currentStatus === 'all' ? 'There are no class questions logged for this subject yet.' : `No ${currentStatus} class questions for this subject.`}</div>
                         <button class="empty-state-btn" onclick="openAddModalWithDefaults('${subjKey}', 'class')">+ Add Class Task</button>
                     </div>
                 `;
@@ -752,18 +925,45 @@
                 const labEmptyHtml = `
                     <div class="empty-state">
                         <svg class="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.5M14 2v7.5M8.5 2h7M14 9.5a5 5 0 1 1-4 0"/></svg>
-                        <div class="empty-state-text">No Lab Assignments</div>
-                        <div class="empty-state-sub">There are no practical lab questions logged for this subject yet.</div>
+                        <div class="empty-state-text">No Lab Assignments${statusLabel}</div>
+                        <div class="empty-state-sub">${currentStatus === 'all' ? 'There are no practical lab questions logged for this subject yet.' : `No ${currentStatus} lab questions for this subject.`}</div>
                         <button class="empty-state-btn" onclick="openAddModalWithDefaults('${subjKey}', 'lab')">+ Add Lab Task</button>
+                    </div>
+                `;
+
+                const openAllBtn = filteredQuestions.length > 0
+                    ? `<button class="open-all-btn" onclick="openAllSubjectQuestions('${subjKey}')" title="Open all ${filteredQuestions.length} visible questions in new tabs">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                            Open All (${filteredQuestions.length})
+                        </button>`
+                    : '';
+
+                const statusFilterBarHtml = `
+                    <div class="status-filter-bar">
+                        <button class="status-pill ${currentStatus === 'all' ? 'active' : ''}" onclick="setSubjectStatusFilter('${subjKey}', 'all')">
+                            All <span class="pill-count">${allCount}</span>
+                        </button>
+                        <button class="status-pill ${currentStatus === 'pending' ? 'active' : ''}" onclick="setSubjectStatusFilter('${subjKey}', 'pending')">
+                            Pending <span class="pill-count">${pendingCount}</span>
+                        </button>
+                        <button class="status-pill ${currentStatus === 'done' ? 'active' : ''}" onclick="setSubjectStatusFilter('${subjKey}', 'done')">
+                            Done <span class="pill-count">${doneCount}</span>
+                        </button>
                     </div>
                 `;
 
                 const sectionHtml = `
                     <div class="subject-section">
-                        <h3 class="subject-section-title">
-                            ${subjObj.name}
-                            <span class="subject-badge ${subjObj.badge}">${subjQuestions.length} Questions</span>
-                        </h3>
+                        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; margin-bottom:1.5rem;">
+                            <h3 class="subject-section-title" style="margin-bottom:0;">
+                                ${subjObj.name}
+                                <span class="subject-badge ${subjObj.badge}">${allCount} Questions</span>
+                            </h3>
+                            <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
+                                ${statusFilterBarHtml}
+                                ${openAllBtn}
+                            </div>
+                        </div>
                         <div class="type-grid">
                             <!-- Class Column -->
                             <div class="type-column">
@@ -808,16 +1008,16 @@
                     <div class="question-left">
                         <div class="q-check" onclick="toggleQuestionDone('${q.id}')" title="Toggle completion status"></div>
                         <div class="q-info">
-                            <div class="q-title" title="${escapeHtml(q.title)}">${escapeHtml(q.title)}</div>
+                            <a href="${escapeHtml(q.url)}" target="_blank" class="q-title" title="${escapeHtml(q.title)}" onclick="event.stopPropagation()">${escapeHtml(q.title)} <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;opacity:0.45;flex-shrink:0;"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>
                             <div class="q-meta">
                                 ${q.deadline ? `<span style="display: inline-flex; align-items: center; gap: 4px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>${escapeHtml(q.deadline)}</span>` : ''}
                             </div>
                         </div>
                     </div>
                     <div class="q-actions">
-                        <a href="${escapeHtml(q.url)}" target="_blank" class="q-btn q-btn-link" title="Open in Portal">
-                            Open <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 2px;"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
-                        </a>
+                        <button class="q-btn q-btn-edit" onclick="openEditModal('${q.id}')" title="Edit Question">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        </button>
                         <button class="q-btn q-btn-del" onclick="promptDeleteQuestion('${q.id}')" title="Delete Question">
                             &times;
                         </button>
@@ -834,6 +1034,16 @@
             var form = document.getElementById('addQuestionForm');
             if (form) {
                 form.onsubmit = window.handleFormSubmit;
+            }
+
+            var urlParams = new URLSearchParams(window.location.search);
+            var subjParam = urlParams.get('subj') || urlParams.get('subject');
+            if (subjParam && ['mca', 'dl', 'aml', 'cn'].includes(subjParam.toLowerCase())) {
+                window.currentFilter = subjParam.toLowerCase();
+                document.querySelectorAll('.filter-tab').forEach(function(tab) {
+                    var onclickAttr = tab.getAttribute('onclick') || '';
+                    tab.classList.toggle('active', onclickAttr.includes("'" + window.currentFilter + "'"));
+                });
             }
 
             window.renderAssignments();
