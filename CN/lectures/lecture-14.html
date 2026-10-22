@@ -5,8 +5,8 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Computer Networks - Lecture 14</title>
-    <meta content="Study notes for Computer Networks (CSAI321), Lecture 14 covering Subnetting Mathematics, VLSM, DHCP DORA Process, NAT Traversal, and IPv6 Transition." name="description" />
-    <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>14</text></svg>" rel="icon" />
+    <meta content="Study notes for Computer Networks (CSAI321), Lecture 14 covering Subnetting Mathematics, host bit borrowing, VLSM, and NAT/NAPT port translation." name="description" />
+    <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%230d282d%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>14</text></svg>" rel="icon" />
     <link href="../css/style.css" rel="stylesheet" />
     <!-- KaTeX for math rendering -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
@@ -18,7 +18,7 @@
     <header>
         <div class="header-titles">
             <h1>Computer Networks Foundations</h1>
-            <p>Lecture 14 - Subnetting in Practice & Network Address Translation (NAT)</p>
+            <p>Lecture 14 - Subnetting in Practice &amp; Network Address Translation (NAT)</p>
             <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
             <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
             <a href="../pdfs/14.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
@@ -32,38 +32,29 @@
         <aside>
             <div class="aside-header">
                 <h3>Table of Contents</h3>
-                <div class="topic-count">Total Topics: 5</div>
+                <div class="topic-count">Total Topics: 3</div>
             </div>
             <ul class="index-list" id="indexList">
                 <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>Short Notes</a></li>
                 <li>
-                    <a href="#topic-1">1. Subnetting Mathematics & Variable Length Subnet Masking (VLSM)<span class="sub-count">3</span></a>
+                    <a href="#topic-1">1. Subnetting Mathematics &amp; Host Bit Borrowing<span class="sub-count">2</span></a>
                     <ul class="sub-index">
-                        <li><a href="#sub-1-1">1.1 Host Bit Borrowing Formula</a></li><li><a href="#sub-1-2">1.2 Calculation of Usable Host Range</a></li><li><a href="#sub-1-3">1.3 VLSM Strategy</a></li>
+                        <li><a href="#sub-1-1">1.1 Host Bit Borrowing Formula</a></li>
+                        <li><a href="#sub-1-2">1.2 Calculation of Usable Host Range</a></li>
                     </ul>
                 </li>
                 <li>
-                    <a href="#topic-2">2. Step-by-Step Subnet Design & Aggregation<span class="sub-count">3</span></a>
+                    <a href="#topic-2">2. Step-by-Step Subnet Design<span class="sub-count">1</span></a>
                     <ul class="sub-index">
-                        <li><a href="#sub-2-1">2.1 Practical Subnetting Example</a></li><li><a href="#sub-2-2">2.2 Route Summarization / Supernetting</a></li><li><a href="#sub-2-3">2.3 CIDR Aggregation Benefits</a></li>
+                        <li><a href="#sub-2-1">2.1 Practical Subnetting Example</a></li>
                     </ul>
                 </li>
                 <li>
-                    <a href="#topic-3">3. Dynamic Host Configuration Protocol (DHCP)<span class="sub-count">3</span></a>
+                    <a href="#topic-3">3. Network Address Translation (NAT) &amp; NAPT<span class="sub-count">3</span></a>
                     <ul class="sub-index">
-                        <li><a href="#sub-3-1">3.1 Plug-and-Play Configuration Model</a></li><li><a href="#sub-3-2">3.2 The DORA Process (Discover, Offer, Request, ACK)</a></li><li><a href="#sub-3-3">3.3 Lease Renewals & DHCP Relay Agents</a></li>
-                    </ul>
-                </li>
-                <li>
-                    <a href="#topic-4">4. Network Address Translation (NAT) & Port Translation<span class="sub-count">3</span></a>
-                    <ul class="sub-index">
-                        <li><a href="#sub-4-1">4.1 Motivation & Private IP Protection</a></li><li><a href="#sub-4-2">4.2 NAPT (Network Address Port Translation) Table</a></li><li><a href="#sub-4-3">4.3 NAT Traversal Techniques</a></li>
-                    </ul>
-                </li>
-                <li>
-                    <a href="#topic-5">5. IPv6 Transition Strategies & Future Addressing<span class="sub-count">3</span></a>
-                    <ul class="sub-index">
-                        <li><a href="#sub-5-1">5.1 128-Bit IPv6 Address Architecture</a></li><li><a href="#sub-5-2">5.2 Dual Stack Deployment Strategy</a></li><li><a href="#sub-5-3">5.3 IPv6 Tunneling over IPv4 Networks</a></li>
+                        <li><a href="#sub-3-1">3.1 Motivation &amp; Private IP Protection</a></li>
+                        <li><a href="#sub-3-2">3.2 NAPT (Network Address Port Translation) Table</a></li>
+                        <li><a href="#sub-3-3">3.3 AWS VPC Subnetting Rules &amp; Constraints</a></li>
                     </ul>
                 </li>
                 <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
@@ -96,19 +87,55 @@
                 </div>
             </section>
 
+            <!-- Topic 1 -->
             <section class="topic-section" id="topic-1">
                 <div class="topic-header" onclick="toggleSection('content-1')">
                     <div class="topic-number">1</div>
-                    <h2>Subnetting Mathematics & Variable Length Subnet Masking (VLSM)</h2>
+                    <h2>Subnetting Mathematics &amp; Host Bit Borrowing</h2>
                 </div>
                 <div class="collapsible-content" id="content-1">
-                    
+
                     <h3 id="sub-1-1">1.1 Host Bit Borrowing Formula</h3>
-                    <p>To divide a network block into $2^b$ smaller subnets, borrow $b$ host bits for the network prefix:</p>
+                    <p>To split a network block into smaller subnets, you borrow $b$ bits from the host portion of the address and add them to the network prefix. If the original prefix is <code>/x</code>, the new prefix becomes <code>/(x+b)</code>.</p>
                     $$\text{Number of Subnets} = 2^b$$
-                    $$\text{Usable Hosts per Subnet} = 2^{32 - (x + b)} - 2$$
-                    <p>(Subtracting 2 for Network ID and Broadcast Address).</p>
-                
+                    $$\text{Usable Hosts per Subnet} = 2^{32-(x+b)} - 2$$
+                    <p>The <strong>&minus;2</strong> removes the <strong>Network Address</strong> (all host bits = 0) and the <strong>Broadcast Address</strong> (all host bits = 1), which are reserved and cannot be assigned to hosts.</p>
+                    <div class="box box-blue">
+                        <div class="box-title">Quick Reference — Borrowing from a /24 block</div>
+                        <table style="width:100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid var(--gray-border); text-align: left;">
+                                    <th style="padding: 0.4rem 0.8rem;">Bits Borrowed (b)</th>
+                                    <th style="padding: 0.4rem 0.8rem;">New Prefix</th>
+                                    <th style="padding: 0.4rem 0.8rem;">Subnets</th>
+                                    <th style="padding: 0.4rem 0.8rem;">Usable Hosts/Subnet</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid var(--gray-border);"><td style="padding: 0.4rem 0.8rem;">1</td><td style="padding: 0.4rem 0.8rem;">/25</td><td style="padding: 0.4rem 0.8rem;">2</td><td style="padding: 0.4rem 0.8rem;">126</td></tr>
+                                <tr style="border-bottom: 1px solid var(--gray-border);"><td style="padding: 0.4rem 0.8rem;">2</td><td style="padding: 0.4rem 0.8rem;">/26</td><td style="padding: 0.4rem 0.8rem;">4</td><td style="padding: 0.4rem 0.8rem;">62</td></tr>
+                                <tr style="border-bottom: 1px solid var(--gray-border);"><td style="padding: 0.4rem 0.8rem;">3</td><td style="padding: 0.4rem 0.8rem;">/27</td><td style="padding: 0.4rem 0.8rem;">8</td><td style="padding: 0.4rem 0.8rem;">30</td></tr>
+                                <tr><td style="padding: 0.4rem 0.8rem;">4</td><td style="padding: 0.4rem 0.8rem;">/28</td><td style="padding: 0.4rem 0.8rem;">16</td><td style="padding: 0.4rem 0.8rem;">14</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3 id="sub-1-2">1.2 Calculation of Usable Host Range</h3>
+                    <p>For any subnet, the address range follows a predictable pattern based on the <strong>block size</strong> (= $2^{\text{host bits}}$):</p>
+                    <ul>
+                        <li><strong>Network Address:</strong> First address in block — host bits all 0. Not assignable.</li>
+                        <li><strong>First Usable Host:</strong> Network Address + 1.</li>
+                        <li><strong>Last Usable Host:</strong> Broadcast Address &minus; 1.</li>
+                        <li><strong>Broadcast Address:</strong> Last address in block — host bits all 1. Not assignable.</li>
+                    </ul>
+                    <p><strong>Example:</strong> Subnet <code>192.168.1.64/26</code> (block size = $2^6 = 64$):</p>
+                    <ul>
+                        <li>Network: <code>192.168.1.64</code></li>
+                        <li>First Host: <code>192.168.1.65</code></li>
+                        <li>Last Host: <code>192.168.1.126</code></li>
+                        <li>Broadcast: <code>192.168.1.127</code></li>
+                    </ul>
+
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('short-notes').scrollIntoView()">Previous Topic</button>
                         <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
@@ -116,22 +143,53 @@
                 </div>
             </section>
 
+            <!-- Topic 2 -->
             <section class="topic-section" id="topic-2">
                 <div class="topic-header" onclick="toggleSection('content-2')">
                     <div class="topic-number">2</div>
-                    <h2>Step-by-Step Subnet Design & Aggregation</h2>
+                    <h2>Step-by-Step Subnet Design</h2>
                 </div>
                 <div class="collapsible-content" id="content-2">
-                    
+
                     <h3 id="sub-2-1">2.1 Practical Subnetting Example</h3>
-                    <p>Dividing <code>192.168.1.0/24</code> into 4 subnets ($b=2$ borrowed bits, new mask <code>/26</code> = <code>255.255.255.192</code>):</p>
-                    <ul>
-                        <li>Subnet 0: <code>192.168.1.0/26</code> (Hosts: .1 to .62, Broadcast: .63)</li>
-                        <li>Subnet 1: <code>192.168.1.64/26</code> (Hosts: .65 to .126, Broadcast: .127)</li>
-                        <li>Subnet 2: <code>192.168.1.128/26</code> (Hosts: .129 to .190, Broadcast: .191)</li>
-                        <li>Subnet 3: <code>192.168.1.192/26</code> (Hosts: .193 to .254, Broadcast: .255)</li>
-                    </ul>
-                
+                    <p>Dividing <code>192.168.1.0/24</code> into 4 equal subnets ($b = 2$ borrowed bits, new mask <code>/26</code> = <code>255.255.255.192</code>, block size = 64):</p>
+                    <table style="width:100%; border-collapse: collapse; margin: 1rem 0;">
+                        <thead>
+                            <tr style="background: var(--bg-secondary); border-bottom: 2px solid var(--gray-border); text-align: left;">
+                                <th style="padding: 0.5rem 1rem;">Subnet</th>
+                                <th style="padding: 0.5rem 1rem;">Network Address</th>
+                                <th style="padding: 0.5rem 1rem;">Usable Range</th>
+                                <th style="padding: 0.5rem 1rem;">Broadcast</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid var(--gray-border);">
+                                <td style="padding: 0.5rem 1rem;">Subnet 0</td>
+                                <td style="padding: 0.5rem 1rem;"><code>192.168.1.0/26</code></td>
+                                <td style="padding: 0.5rem 1rem;">.1 &ndash; .62</td>
+                                <td style="padding: 0.5rem 1rem;"><code>.63</code></td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--gray-border);">
+                                <td style="padding: 0.5rem 1rem;">Subnet 1</td>
+                                <td style="padding: 0.5rem 1rem;"><code>192.168.1.64/26</code></td>
+                                <td style="padding: 0.5rem 1rem;">.65 &ndash; .126</td>
+                                <td style="padding: 0.5rem 1rem;"><code>.127</code></td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--gray-border);">
+                                <td style="padding: 0.5rem 1rem;">Subnet 2</td>
+                                <td style="padding: 0.5rem 1rem;"><code>192.168.1.128/26</code></td>
+                                <td style="padding: 0.5rem 1rem;">.129 &ndash; .190</td>
+                                <td style="padding: 0.5rem 1rem;"><code>.191</code></td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.5rem 1rem;">Subnet 3</td>
+                                <td style="padding: 0.5rem 1rem;"><code>192.168.1.192/26</code></td>
+                                <td style="padding: 0.5rem 1rem;">.193 &ndash; .254</td>
+                                <td style="padding: 0.5rem 1rem;"><code>.255</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
                         <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
@@ -139,63 +197,84 @@
                 </div>
             </section>
 
+            <!-- Topic 3 -->
             <section class="topic-section" id="topic-3">
                 <div class="topic-header" onclick="toggleSection('content-3')">
                     <div class="topic-number">3</div>
-                    <h2>Dynamic Host Configuration Protocol (DHCP)</h2>
+                    <h2>Network Address Translation (NAT) &amp; NAPT</h2>
                 </div>
                 <div class="collapsible-content" id="content-3">
-                    
-                    <h3 id="sub-3-1">3.1 Plug-and-Play Configuration Model</h3>
-                    <p><strong>DHCP (RFC 2131)</strong> automatically assigns IP addresses, default gateways, subnet masks, and DNS server IPs to joining hosts.</p>
+
+                    <h3 id="sub-3-1">3.1 Motivation &amp; Private IP Protection</h3>
+                    <p><strong>NAT (RFC 3022)</strong> allows an entire private LAN using RFC 1918 addresses (<code>10.0.0.0/8</code>, <code>172.16.0.0/12</code>, <code>192.168.0.0/16</code>) to share a single public IP address on the WAN, conserving the scarce IPv4 address space. Private addresses are <em>non-routable</em> on the public Internet — routers drop them — so NAT performs address rewriting at the border router:</p>
+                    <ul>
+                        <li><strong>Outbound:</strong> The source private IP is replaced with the router's single public WAN IP before the packet enters the Internet.</li>
+                        <li><strong>Inbound:</strong> When a reply arrives, the router consults its state table and replaces the destination public IP back with the correct private host IP.</li>
+                    </ul>
+
+                    <h3 id="sub-3-2">3.2 NAPT (Network Address Port Translation) Table</h3>
+                    <p>When multiple private hosts simultaneously use the same public IP, simple address-level NAT is insufficient. <strong>NAPT</strong> (also called <em>PAT — Port Address Translation</em>) extends NAT by also translating the <strong>Layer 4 port number</strong>, uniquely identifying each connection behind a single public IP:</p>
+                    <table style="width:100%; border-collapse: collapse; margin: 1rem 0;">
+                        <thead>
+                            <tr style="background: var(--bg-secondary); border-bottom: 2px solid var(--gray-border); text-align: left;">
+                                <th style="padding: 0.5rem 1rem;">Inside (Private Socket)</th>
+                                <th style="padding: 0.5rem 1rem;">Outside (Public Socket)</th>
+                                <th style="padding: 0.5rem 1rem;">Destination</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid var(--gray-border);">
+                                <td style="padding: 0.5rem 1rem;"><code>192.168.1.10:3345</code></td>
+                                <td style="padding: 0.5rem 1rem;"><code>203.0.113.7:5001</code></td>
+                                <td style="padding: 0.5rem 1rem;"><code>128.119.40.186:80</code></td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--gray-border);">
+                                <td style="padding: 0.5rem 1rem;"><code>192.168.1.11:3345</code></td>
+                                <td style="padding: 0.5rem 1rem;"><code>203.0.113.7:5002</code></td>
+                                <td style="padding: 0.5rem 1rem;"><code>128.119.40.186:80</code></td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.5rem 1rem;"><code>192.168.1.12:4422</code></td>
+                                <td style="padding: 0.5rem 1rem;"><code>203.0.113.7:5003</code></td>
+                                <td style="padding: 0.5rem 1rem;"><code>142.250.72.14:443</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p>Even when two internal hosts pick the identical ephemeral port (e.g. both use <code>3345</code>), the router maps them to distinct public ports (<code>5001</code> vs <code>5002</code>). When return traffic arrives at port <code>5002</code>, the router unambiguously delivers it to <code>192.168.1.11:3345</code>.</p>
+
+                    <h3 id="sub-3-3">3.3 AWS VPC Subnetting Rules &amp; Constraints</h3>
+                    <p>When creating subnets inside an <strong>AWS Virtual Private Cloud (VPC)</strong>, the standard IP reservation rules differ from classical networking. AWS reserves <strong>5 addresses per subnet</strong> instead of the usual 2:</p>
+                    <table style="width:100%; border-collapse: collapse; margin: 1rem 0;">
+                        <thead>
+                            <tr style="background: var(--bg-secondary); border-bottom: 2px solid var(--gray-border); text-align: left;">
+                                <th style="padding: 0.5rem 1rem;">Address</th>
+                                <th style="padding: 0.5rem 1rem;">Reserved For</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid var(--gray-border);"><td style="padding: 0.5rem 1rem;"><code>.0</code></td><td style="padding: 0.5rem 1rem;">Network Address</td></tr>
+                            <tr style="border-bottom: 1px solid var(--gray-border);"><td style="padding: 0.5rem 1rem;"><code>.1</code></td><td style="padding: 0.5rem 1rem;">VPC Router</td></tr>
+                            <tr style="border-bottom: 1px solid var(--gray-border);"><td style="padding: 0.5rem 1rem;"><code>.2</code></td><td style="padding: 0.5rem 1rem;">AWS Reserved / DNS Server</td></tr>
+                            <tr style="border-bottom: 1px solid var(--gray-border);"><td style="padding: 0.5rem 1rem;"><code>.3</code></td><td style="padding: 0.5rem 1rem;">Future Use (Reserved by AWS)</td></tr>
+                            <tr><td style="padding: 0.5rem 1rem;"><code>.255</code></td><td style="padding: 0.5rem 1rem;">Network Broadcast Address</td></tr>
+                        </tbody>
+                    </table>
+                    <p>Therefore the usable host formula changes in AWS context:</p>
+                    $$\text{Usable IPs in AWS Subnet} = 2^{32-\text{prefix}} - 5$$
+                    <p>For example, a <code>/24</code> subnet in AWS yields $256 - 5 = 251$ usable host addresses (not the standard 254).</p>
+
                     <div class="box box-blue">
-                        <div class="box-title">The DHCP DORA Exchange (UDP Ports 67/68)</div>
+                        <div class="box-title">AWS CIDR Size Limits &amp; Operational Constraints</div>
                         <ul>
-                            <li><strong>Discover:</strong> Client broadcasts <code>DHCPDISCOVER</code> to 255.255.255.255.</li>
-                            <li><strong>Offer:</strong> Server responds with <code>DHCPOFFER</code> proposing an IP lease.</li>
-                            <li><strong>Request:</strong> Client broadcasts <code>DHCPREQUEST</code> accepting the lease.</li>
-                            <li><strong>ACK:</strong> Server confirms with <code>DHCPACK</code>.</li>
+                            <li><strong>CIDR Size Range:</strong> AWS enforces subnet masks between <code>/16</code> (65,536 IPs) and <code>/28</code> (16 IPs, 11 usable). Tiny subnets such as <code>/29</code> or <code>/30</code> are blocked by the AWS console.</li>
+                            <li><strong>No Overlapping Subnets:</strong> Subnets within the same VPC must not have overlapping CIDR ranges. AWS validates this at creation time and rejects conflicting ranges.</li>
+                            <li><strong>Containment Rule:</strong> Every subnet CIDR block must be fully contained within the parent VPC CIDR block. A subnet cannot extend beyond its VPC's address space.</li>
+                            <li><strong>Immutable CIDRs:</strong> Once a subnet is created, its CIDR block is immutable — it cannot be resized. To change a subnet's size, you must create a new subnet with the desired CIDR, migrate all resources (EC2 instances, RDS databases, load balancers, etc.) to the new subnet, and delete the old one.</li>
                         </ul>
                     </div>
-                
+
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
-                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
-                    </div>
-                </div>
-            </section>
-
-            <section class="topic-section" id="topic-4">
-                <div class="topic-header" onclick="toggleSection('content-4')">
-                    <div class="topic-number">4</div>
-                    <h2>Network Address Translation (NAT) & Port Translation</h2>
-                </div>
-                <div class="collapsible-content" id="content-4">
-                    
-                    <h3 id="sub-4-1">4.1 Motivation & Private IP Protection</h3>
-                    <p><strong>NAT (RFC 3022)</strong> allows an entire private local area network (e.g. <code>192.168.x.x</code>) to share a single public IP address on the WAN, conserving IPv4 space.</p>
-                    <h3 id="sub-4-2">4.2 NAPT Table Mechanics</h3>
-                    <p>The NAT router modifies outgoing IP packets by replacing private source IP/port with its public IP and a unique dynamic NAT port, storing the mapping in a translation table.</p>
-                
-                    <div class="topic-nav">
-                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
-                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
-                    </div>
-                </div>
-            </section>
-
-            <section class="topic-section" id="topic-5">
-                <div class="topic-header" onclick="toggleSection('content-5')">
-                    <div class="topic-number">5</div>
-                    <h2>IPv6 Transition Strategies & Future Addressing</h2>
-                </div>
-                <div class="collapsible-content" id="content-5">
-                    
-                    <h3 id="sub-5-1">5.1 128-Bit IPv6 Address Architecture</h3>
-                    <p>IPv6 provides $2^{128} \approx 3.4 \times 10^{38}$ addresses, formatted as 8 groups of 4 hexadecimal digits (e.g., <code>2001:0db8:85a3::8a2e:0370:7334</code>). Simplifies router processing by eliminating checksums and fragmentation fields from the fixed 40-byte base header.</p>
-                
-                    <div class="topic-nav">
-                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
                         <button class="btn" onclick="document.getElementById('original-pdf').scrollIntoView()">Next Topic</button>
                     </div>
                 </div>
@@ -220,7 +299,7 @@
                     <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
                     <div id="pdfContainer" style="margin-top: 1rem;"></div>
                     <div class="topic-nav">
-                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
                         <button class="btn" disabled="">Next Topic</button>
                     </div>
                 </div>
@@ -243,4 +322,5 @@
     </script>
     <script src="../js/script.js"></script>
 </body>
+
 </html>

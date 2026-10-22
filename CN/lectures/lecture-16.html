@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Computer Networks - Lecture 16</title>
+    <meta content="Study notes for Computer Networks (CSAI321), Lecture 16 covering Diagnostics with ICMP, Ping RTT latency analysis, Traceroute TTL decrement trick, IPv4 address exhaustion, and 128-bit IPv6 architecture." name="description" />
+    <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%230d282d%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>16</text></svg>" rel="icon" />
+    <link href="../css/style.css" rel="stylesheet" />
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Computer Networks Foundations</h1>
+            <p>Lecture 16 - Diagnostics with ICMP, and the Move to IPv6</p>
+            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/16.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text" />
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 5</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>Short Notes</a></li>
+                <li>
+                    <a href="#topic-1">1. ICMP Fundamentals &amp; Error Reporting<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 Control and Error Channel Paradigm</a></li>
+                        <li><a href="#sub-1-2">1.2 Datagram Encapsulation Structure</a></li>
+                        <li><a href="#sub-1-3">1.3 Primary ICMP Message Types</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Network Diagnostics: Ping &amp; Round-Trip Time (RTT)<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 Echo Request &amp; Echo Reply Mechanics</a></li>
+                        <li><a href="#sub-2-2">2.2 Propagation Delay &amp; RTT Interpretation</a></li>
+                        <li><a href="#sub-2-3">2.3 Diagnosing Outages: Fast Reply vs. Silence</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Path Discovery: Traceroute &amp; The TTL Trick<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 TTL Expiration &amp; ICMP Time Exceeded</a></li>
+                        <li><a href="#sub-3-2">3.2 Incremental TTL Stepping Algorithm</a></li>
+                        <li><a href="#sub-3-3">3.3 Reading Traceroute Output &amp; Isolating Faults</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. IPv4 Address Exhaustion &amp; 128-Bit IPv6 Architecture<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 Limits of the 32-Bit Address Space</a></li>
+                        <li><a href="#sub-4-2">4.2 128-Bit Address Representation &amp; Scope</a></li>
+                        <li><a href="#sub-4-3">4.3 Address Compression Rules &amp; The :: Shortcut</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Architectural Evolution: IPv6 vs IPv4 &amp; Dual Stack<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 Simplified Fixed Header &amp; Efficiency</a></li>
+                        <li><a href="#sub-5-2">5.2 SLAAC Autoconfiguration &amp; No-Broadcast Design</a></li>
+                        <li><a href="#sub-5-3">5.3 Dual-Stack Coexistence &amp; Cloud VPC Integration</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Short Notes Placeholder -->
+            <section id="short-notes" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-short-notes')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                    </div>
+                    <h2>Short Notes &amp; Visual Summary</h2>
+                </div>
+                <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
+                    <p style="margin-bottom: 1rem;">Handwritten / quick summary notes for Lecture 16:</p>
+                    <div style="text-align: center; background: var(--bg-secondary, #f8f9fa); padding: 1rem; border-radius: 8px; border: 1px solid var(--gray-border);">
+                        <a href="../images/16.png" target="_blank" title="Click to view full size">
+                            <img src="../images/16.png" alt="Lecture 16 Short Notes" style="max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
+                        </a>
+                        <p style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-muted);">Click image to open high-resolution version in new tab</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 1 -->
+            <section class="topic-section" id="topic-1">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>ICMP Fundamentals &amp; Error Reporting</h2>
+                </div>
+                <div class="collapsible-content" id="content-1">
+                    <h3 id="sub-1-1">1.1 Control and Error Channel Paradigm</h3>
+                    <p>IP is an unreliable, connectionless protocol designed purely for best-effort delivery. If a datagram is dropped along the path due to network congestion, expired TTL, or an unreachable destination, IP alone has no feedback mechanism. <strong>Internet Control Message Protocol (ICMP)</strong> serves as IP's dedicated control and error signaling channel.</p>
+                    <div class="box box-blue">
+                        <div class="box-title">Network Messenger Principle</div>
+                        <p><em>"If a packet dies silently, you're blind. ICMP is how the network speaks up."</em> ICMP carries diagnostics and error conditions back to the original source host; it never carries application user payload.</p>
+                    </div>
+
+                    <h3 id="sub-1-2">1.2 Datagram Encapsulation Structure</h3>
+                    <p>Architecturally, ICMP is encapsulated directly inside standard IP datagrams (IP Protocol field = <code>1</code>). Although it operates as a network-layer helper protocol, it relies on IP for delivery. Each ICMP message contains an 8-bit <strong>Type</strong> field, an 8-bit <strong>Code</strong> field (providing fine-grained diagnosis), a Checksum, and the first 8 bytes of the offending original IP datagram so the sender can match the error to a specific application socket.</p>
+
+                    <h3 id="sub-1-3">1.3 Primary ICMP Message Types</h3>
+                    <ul>
+                        <li><strong>Echo Request / Echo Reply (Type 8 / Type 0):</strong> Query-response pair verifying bidirectional reachability and measuring latency. Powers <code>ping</code>.</li>
+                        <li><strong>Time Exceeded (Type 11, Code 0):</strong> Dispatched by intermediate routers when an IP packet's Time-to-Live (TTL) field decrements to zero. Powers <code>traceroute</code>.</li>
+                        <li><strong>Destination Unreachable (Type 3):</strong> Informs sender that a network is unreachable (Code 0), host is down (Code 1), protocol is unsupported (Code 2), or UDP/TCP destination port is closed (Code 3).</li>
+                        <li><strong>Redirect (Type 5):</strong> Sent by a default gateway notifying a local host that another router on the local subnet offers a more direct path.</li>
+                    </ul>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('short-notes').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section class="topic-section" id="topic-2">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>Network Diagnostics: Ping &amp; Round-Trip Time (RTT)</h2>
+                </div>
+                <div class="collapsible-content" id="content-2">
+                    <h3 id="sub-2-1">2.1 Echo Request &amp; Echo Reply Mechanics</h3>
+                    <p>The <code>ping</code> utility transmits ICMP Echo Request (Type 8) datagrams stamped with a sequence number and local transmission timestamp. The target host's network stack automatically returns an identical ICMP Echo Reply (Type 0).</p>
+
+                    <h3 id="sub-2-2">2.2 Propagation Delay &amp; RTT Interpretation</h3>
+                    <p>By computing the time elapsed between sending the request and receiving the response, ping calculates the <strong>Round-Trip Time (RTT)</strong>:</p>
+                    $$\text{RTT} \approx 2 \times d_{\text{prop}} + d_{\text{trans}} + d_{\text{queue}} + d_{\text{proc}}$$
+                    <p>RTT serves as <em>real distance-in-time</em>: geographically distant hosts or congested transit hops naturally yield larger millisecond readings.</p>
+
+                    <h3 id="sub-2-3">2.3 Diagnosing Outages: Fast Reply vs. Silence</h3>
+                    <div class="box box-blue">
+                        <div class="box-title">Two Pings, Two Diagnostic Stories</div>
+                        <ul>
+                            <li><strong>Scenario A (Fast Reply):</strong>
+                                <pre style="background: #111; color: #a6e22e; padding: 0.5rem; border-radius: 4px;"><code>$ ping -c 3 8.8.8.8
+64 bytes from 8.8.8.8: icmp_seq=1 time=12.4 ms
+64 bytes from 8.8.8.8: icmp_seq=2 time=11.8 ms
+3 packets sent, 3 received, 0% loss</code></pre>
+                                <em>Proves:</em> Physical layer up, ARP resolved, local gateway routing, WAN backbone operational, target host stack responsive.
+                            </li>
+                            <li><strong>Scenario B (Total Silence / Timeout):</strong>
+                                <pre style="background: #111; color: #f92672; padding: 0.5rem; border-radius: 4px;"><code>$ ping 10.55.99.200
+Request timed out.
+Request timed out.
+3 packets sent, 0 received, 100% loss</code></pre>
+                                <em>Proves:</em> Packet left interface, but either a downstream router lacked a route, the host is offline, or an intervening firewall blocked ICMP traffic.
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section class="topic-section" id="topic-3">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>Path Discovery: Traceroute &amp; The TTL Trick</h2>
+                </div>
+                <div class="collapsible-content" id="content-3">
+                    <h3 id="sub-3-1">3.1 TTL Expiration &amp; ICMP Time Exceeded</h3>
+                    <p>Routers decrement an IP datagram's <strong>Time-to-Live (TTL)</strong> field by 1 at every forward hop to prevent forwarding loops. If a router receives a packet with $\text{TTL} = 1$, decrementing it yields 0. The router discards the packet and sends an <strong>ICMP Time Exceeded (Type 11)</strong> message back to the sender, embedding the router's own IP address as the source.</p>
+
+                    <h3 id="sub-3-2">3.2 Incremental TTL Stepping Algorithm</h3>
+                    <p>Traceroute exploits this behavior intentionally: <em>Send packets designed to die, and listen to who reports the death.</em></p>
+                    <ul>
+                        <li><strong>Round 1 ($\text{TTL} = 1$):</strong> Dies at Router 1 ($R_1$). $R_1$ responds with ICMP Time Exceeded. Traceroute identifies hop 1 and measures RTT to $R_1$.</li>
+                        <li><strong>Round 2 ($\text{TTL} = 2$):</strong> Passes $R_1$, decrements to 0 at Router 2 ($R_2$). $R_2$ sends Time Exceeded. Hop 2 revealed.</li>
+                        <li><strong>Round 3 ($\text{TTL} = 3$):</strong> Passes $R_1, R_2$, dies at Router 3 ($R_3$). Hop 3 revealed.</li>
+                        <li><strong>Final Round:</strong> Packet reaches destination server on an unassigned UDP port or echo port; destination responds with ICMP Port Unreachable or Echo Reply, terminating the trace.</li>
+                    </ul>
+
+                    <h3 id="sub-3-3">3.3 Reading Traceroute Output &amp; Isolating Faults</h3>
+                    <pre style="background: #111; color: #f8f8f2; padding: 0.75rem; border-radius: 6px; font-family: monospace;">
+$ traceroute example.edu
+1  router.lan (192.168.1.1)    1.2 ms
+2  isp-edge.net                8.7 ms
+3  core1.isp.net               14.3 ms
+4  core2.isp.net               22.9 ms
+5  peer.transit.net            41.6 ms
+6  border.example.edu          58.1 ms  <-- LAST RESPONDING HOP
+7  * * *
+8  * * *
+9  * * * (path stops here)</pre>
+                    <p><strong>Troubleshooting Rule:</strong> When diagnosing a broken connection where output transitions into asterisks (<code>* * *</code>), the prime suspect is <strong>at or immediately after the last responding hop</strong> (hop 6 above). Asterisks indicate either a link failure or an administrator filtering ICMP on that interface.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section class="topic-section" id="topic-4">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>IPv4 Address Exhaustion &amp; 128-Bit IPv6 Architecture</h2>
+                </div>
+                <div class="collapsible-content" id="content-4">
+                    <h3 id="sub-4-1">4.1 Limits of the 32-Bit Address Space</h3>
+                    <p>IPv4 uses a 32-bit address field, yielding exactly:</p>
+                    $$2^{32} = 4,294,967,296 \approx 4.3 \times 10^9 \text{ addresses}$$
+                    <p>With global population exceeding 8 billion and billions of mobile phones, IoT sensors, cloud virtual machines, and smart devices online, IPv4 addresses were completely depleted from IANA's free pool in 2011. While NAT/PAT provided a temporary patch, it did not create more addresses.</p>
+
+                    <h3 id="sub-4-2">4.2 128-Bit Address Representation &amp; Scope</h3>
+                    <p><strong>IPv6</strong> expands the address field from 32 bits to <strong>128 bits</strong>:</p>
+                    $$2^{128} \approx 3.4028 \times 10^{38} \text{ unique addresses}$$
+                    <p>This provides millions of addresses per square millimeter of Earth's surface, effectively eliminating scarcity forever.</p>
+                    <p>Format: Written as 8 groups of 4 hexadecimal digits separated by colons:</p>
+                    $$\underbrace{2001}_{\text{16 bits}} : \underbrace{0\text{db}8}_{\text{16 bits}} : \underbrace{85\text{a}3}_{\text{16 bits}} : \underbrace{0000}_{\text{16 bits}} : \underbrace{0000}_{\text{16 bits}} : \underbrace{8\text{a}2\text{e}}_{\text{16 bits}} : \underbrace{0370}_{\text{16 bits}} : \underbrace{7334}_{\text{16 bits}}$$
+
+                    <h3 id="sub-4-3">4.3 Address Compression Rules &amp; The :: Shortcut</h3>
+                    <div class="box box-blue">
+                        <div class="box-title">Compression Standard (RFC 5952)</div>
+                        <ul>
+                            <li><strong>Rule 1 &mdash; Drop Leading Zeros:</strong> Within any 16-bit group, leading zeros can be omitted. <code>0db8 &rarr; db8</code>; <code>0001 &rarr; 1</code>; <code>0000 &rarr; 0</code>.</li>
+                            <li><strong>Rule 2 &mdash; Double Colon (::) Substitution:</strong> A single contiguous run of consecutive groups consisting entirely of zeros can be compressed to <code>::</code>.</li>
+                            <li><strong>Strict Invariant:</strong> <code>::</code> can appear <strong>only once per address</strong>. Multiple double-colons create mathematical ambiguity in the number of reconstructed zero fields.</li>
+                        </ul>
+                    </div>
+                    <p><strong>Step-by-Step Example:</strong></p>
+                    <ol>
+                        <li>Full Form: <code>2001:0db8:0000:0000:0000:0000:0000:0001</code></li>
+                        <li>Omit Leading Zeros: <code>2001:db8:0:0:0:0:0:1</code></li>
+                        <li>Collapse Consecutive Zeros: <code>2001:db8::1</code></li>
+                    </ol>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 5 -->
+            <section class="topic-section" id="topic-5">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>Architectural Evolution: IPv6 vs IPv4 &amp; Dual Stack</h2>
+                </div>
+                <div class="collapsible-content" id="content-5">
+                    <h3 id="sub-5-1">5.1 Simplified Fixed Header &amp; Efficiency</h3>
+                    <p>IPv6 did not merely enlarge addresses; it completely overhauled the Layer 3 protocol header:</p>
+                    <ul>
+                        <li><strong>Fixed 40-byte Base Header:</strong> Facilitates ultra-fast hardware routing and pipelining compared to IPv4's variable header length.</li>
+                        <li><strong>No Header Checksum:</strong> Checksum processing is offloaded to Layer 2 and Layer 4, eliminating CPU-heavy recalculation at every single hop.</li>
+                        <li><strong>No In-Path Fragmentation:</strong> Intermediate routers do not fragment packets; path MTU discovery requires end hosts to handle sizing.</li>
+                    </ul>
+
+                    <h3 id="sub-5-2">5.2 SLAAC Autoconfiguration &amp; No-Broadcast Design</h3>
+                    <ul>
+                        <li><strong>No NAT Required:</strong> True end-to-end global reachability is restored. Every device can have its own public IP.</li>
+                        <li><strong>Stateless Address Autoconfiguration (SLAAC):</strong> Hosts automatically self-assign an IP using local link prefixes broadcast by routers, without requiring a centralized DHCP server.</li>
+                        <li><strong>No Broadcast Addresses:</strong> Broadcasting (which disturbs all hosts on a subnet) is completely eliminated in favor of <strong>multicast</strong> groups and anycast.</li>
+                    </ul>
+
+                    <h3 id="sub-5-3">5.3 Dual-Stack Coexistence &amp; Cloud VPC Integration</h3>
+                    <p>Because the global Internet cannot switch overnight, the primary transition mechanism is <strong>Dual Stack</strong>:</p>
+                    <div class="box box-blue">
+                        <div class="box-title">Dual-Stack Host Operation</div>
+                        <p>Modern hosts and cloud VPC instances maintain both an IPv4 and IPv6 network stack simultaneously. The application queries DNS: if both an <code>AAAA</code> (IPv6) and <code>A</code> (IPv4) record return, the operating system attempts communication via IPv6 first, falling back seamlessly to IPv4 if unreachable.</p>
+                        <p>In AWS VPCs, subnets receive dual IPv4 and IPv6 CIDR blocks, enabling native IPv6 ingress/egress while maintaining full compatibility with legacy IPv4 infrastructure.</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('original-pdf').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" x2="8" y1="13" y2="13"></line>
+                            <line x1="16" x2="8" y1="17" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/16.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+
+</html>

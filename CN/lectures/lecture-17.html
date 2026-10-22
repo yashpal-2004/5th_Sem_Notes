@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Computer Networks - Lecture 17</title>
+    <meta content="Study notes for Computer Networks (CSAI321), Lecture 17 covering Routing Algorithms: Link-State Routing with Dijkstra's algorithm, Distance-Vector Routing with Bellman-Ford, Count-to-Infinity problem, Split Horizon, and Poisoned Reverse." name="description" />
+    <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%230d282d%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>17</text></svg>" rel="icon" />
+    <link href="../css/style.css" rel="stylesheet" />
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Computer Networks Foundations</h1>
+            <p>Lecture 17 - Finding the Path: Link-State &amp; Distance-Vector Routing</p>
+            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/17.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text" />
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 5</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>Short Notes</a></li>
+                <li>
+                    <a href="#topic-1">1. Routing as a Shortest-Path Graph Problem<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 Network to Graph Abstraction</a></li>
+                        <li><a href="#sub-1-2">1.2 Forwarding vs. Routing</a></li>
+                        <li><a href="#sub-1-3">1.3 Global (Link-State) vs. Decentralized (Distance-Vector)</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Link-State Routing &amp; Dijkstra's Algorithm<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 Link-State Flooding &amp; Global Topology Database</a></li>
+                        <li><a href="#sub-2-2">2.2 Step-by-Step Dijkstra Shortest-Path Computation</a></li>
+                        <li><a href="#sub-2-3">2.3 Convergence Characteristics &amp; OSPF Architecture</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Distance-Vector Routing &amp; The Bellman-Ford Equation<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 Neighbor-Only Information Sharing</a></li>
+                        <li><a href="#sub-3-2">3.2 Bellman-Ford Iterative Update Formulation</a></li>
+                        <li><a href="#sub-3-3">3.3 Routing Information Protocol (RIP) Mechanics</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Count-to-Infinity &amp; Loop Prevention<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 The Count-to-Infinity Failure Mode</a></li>
+                        <li><a href="#sub-4-2">4.2 Split Horizon Technique</a></li>
+                        <li><a href="#sub-4-3">4.3 Poisoned Reverse Invariant</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Comprehensive Comparison: Link-State vs. Distance-Vector<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 Architectural Feature Comparison Matrix</a></li>
+                        <li><a href="#sub-5-2">5.2 Computational Overhead &amp; Scalability Limits</a></li>
+                        <li><a href="#sub-5-3">5.3 Preview: Path-Vector &amp; BGP for Inter-Domain Routing</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Short Notes Placeholder -->
+            <section id="short-notes" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-short-notes')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                    </div>
+                    <h2>Short Notes &amp; Visual Summary</h2>
+                </div>
+                <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
+                    <p style="margin-bottom: 1rem;">Handwritten / quick summary notes for Lecture 17:</p>
+                    <div style="text-align: center; background: var(--bg-secondary, #f8f9fa); padding: 1rem; border-radius: 8px; border: 1px solid var(--gray-border);">
+                        <a href="../images/17.png" target="_blank" title="Click to view full size">
+                            <img src="../images/17.png" alt="Lecture 17 Short Notes" style="max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
+                        </a>
+                        <p style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-muted);">Click image to open high-resolution version in new tab</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 1 -->
+            <section class="topic-section" id="topic-1">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>Routing as a Shortest-Path Graph Problem</h2>
+                </div>
+                <div class="collapsible-content" id="content-1">
+                    <h3 id="sub-1-1">1.1 Network to Graph Abstraction</h3>
+                    <p>In network layer architecture, the entire interconnected mesh of packet switches is represented as a weighted directed graph $G = (V, E)$:</p>
+                    <ul>
+                        <li><strong>Nodes ($V$):</strong> Routers in the autonomous system.</li>
+                        <li><strong>Edges ($E$):</strong> Physical links connecting adjacent routers.</li>
+                        <li><strong>Edge Weights ($c(u, v)$):</strong> Cost metric associated with link $(u, v)$, representing latency, hop count, monetary cost, or inverse bandwidth ($c = \frac{10^8}{\text{bandwidth}}$).</li>
+                    </ul>
+                    <div class="box box-blue">
+                        <div class="box-title">Real-World Analogy: Google Maps Navigation</div>
+                        <p>Google Maps treats intersections as nodes and road segments as edges. Live traffic delay represents the edge weight. If link metrics shift from "least delay" to "fewest hops," a slower highway route might be favored over faster multi-lane arterials.</p>
+                    </div>
+
+                    <h3 id="sub-1-2">1.2 Forwarding vs. Routing</h3>
+                    <p>While <strong>forwarding</strong> is the local data-plane action of transferring an incoming packet from an input link to the appropriate output link (nanoseconds via hardware lookup tables), <strong>routing</strong> is the network-wide control-plane process that determines the end-to-end path packets take from source to destination.</p>
+                    <p>The goal of every routing algorithm is to compute the least-cost path to every subnet, outputting entries in the format: <strong>Destination Subnet &rarr; Next-Hop Interface</strong> (not the complete end-to-end path).</p>
+
+                    <h3 id="sub-1-3">1.3 Global (Link-State) vs. Decentralized (Distance-Vector)</h3>
+                    <ul>
+                        <li><strong>Global / Link-State (LS):</strong> Every router acquires complete topology and link costs across the entire network before running a centralized graph algorithm locally.</li>
+                        <li><strong>Decentralized / Distance-Vector (DV):</strong> No router possesses complete topological awareness. Routers only know the cost of links to their direct neighbors and iteratively exchange estimated distances with them.</li>
+                    </ul>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('short-notes').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section class="topic-section" id="topic-2">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>Link-State Routing &amp; Dijkstra's Algorithm</h2>
+                </div>
+                <div class="collapsible-content" id="content-2">
+                    <h3 id="sub-2-1">2.1 Link-State Flooding &amp; Global Topology Database</h3>
+                    <p>In link-state algorithms, each router tests the state and cost of its attached links and broadcasts this information to <em>all</em> routers in the network via <strong>Link-State Advertisements (LSAs)</strong> using reliable flooding. Every router constructs an identical <strong>Link-State Database (LSDB)</strong> representing the complete network map.</p>
+
+                    <h3 id="sub-2-2">2.2 Step-by-Step Dijkstra Shortest-Path Computation</h3>
+                    <p>With an identical map in memory, each router runs Dijkstra's algorithm independently, treating itself as root ($s$):</p>
+                    <ol>
+                        <li><strong>Initialization:</strong> Set $D(s) = 0$, visited set $N' = \{s\}$. For all $v \neq s$, set $D(v) = c(s, v)$ if directly adjacent, else $\infty$.</li>
+                        <li><strong>Select Minimum:</strong> Find unvisited node $w \notin N'$ such that $D(w)$ is minimal. Add $w$ to $N'$.</li>
+                        <li><strong>Relaxation:</strong> For all neighbors $v \notin N'$ of $w$:
+                            $$D(v) = \min(D(v), D(w) + c(w, v))$$
+                        </li>
+                        <li>Repeat until all destination nodes are in $N'$.</li>
+                    </ol>
+
+                    <div class="box box-blue">
+                        <div class="box-title">Dijkstra Trace from Node A (5-Node Graph)</div>
+                        <p>Given nodes $A, B, C, D, E$ with edge costs: $(A,B)=1, (A,C)=4, (B,C)=2, (B,D)=5, (B,E)=8, (C,D)=5, (D,E)=3$:</p>
+                        <pre style="background: #111; color: #a6e22e; padding: 0.5rem; border-radius: 4px;"><code>visit A -> d[A] = 0
+visit B -> d[B] = 1 (A-B)
+visit C -> d[C] = 3 (A-B-C) via edge weight 2
+visit D -> d[D] = 6 (A-B-D)
+visit E -> d[E] = 9 (A-B-D-E)</code></pre>
+                        <p>Forwarding table output at $A$: Destination $E \implies$ Next hop is $B$.</p>
+                    </div>
+
+                    <h3 id="sub-2-3">2.3 Convergence Characteristics &amp; OSPF Architecture</h3>
+                    <p>Because all routers compute shortest paths on identical topological data, Link-State algorithms converge rapidly and are inherently immune to routing loops in steady state. <strong>Open Shortest Path First (OSPF)</strong> is the dominant real-world protocol executing this algorithm in enterprise networks.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section class="topic-section" id="topic-3">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>Distance-Vector Routing &amp; The Bellman-Ford Equation</h2>
+                </div>
+                <div class="collapsible-content" id="content-3">
+                    <h3 id="sub-3-1">3.1 Neighbor-Only Information Sharing</h3>
+                    <p>In distance-vector routing, routers do not broadcast the entire topology. Instead, each router $x$ maintains an estimate vector $D_x = [D_x(y) : y \in V]$ representing its estimated distance to every destination in the network. Periodically, each router sends its distance vector <strong>only to its immediate physical neighbors</strong>.</p>
+
+                    <h3 id="sub-3-2">3.2 Bellman-Ford Iterative Update Formulation</h3>
+                    <p>When router $x$ receives distance vector $D_v$ from neighbor $v$, it updates its own vector using the <strong>Bellman-Ford equation</strong>:</p>
+                    $$D_x(y) = \min_{v \in \text{neighbors}(x)} \left\{ c(x, v) + D_v(y) \right\}$$
+                    <div class="box box-blue">
+                        <div class="box-title">Concrete Bellman-Ford Calculation</div>
+                        <p>Suppose router $X$ wants to reach $Z$:</p>
+                        <ul>
+                            <li>Current direct cost: $c(X, Z) = 7 \implies D_X(Z) = 7$.</li>
+                            <li>Neighbor $Y$ advertises: $D_Y(Z) = 1$. The link cost between $X$ and $Y$ is $c(X, Y) = 2$.</li>
+                            <li>Calculation: $D_X(Z) = \min(7, c(X, Y) + D_Y(Z)) = \min(7, 2 + 1) = 3$.</li>
+                            <li>$X$ updates its distance to $Z$ as $3$, with next hop set to $Y$.</li>
+                        </ul>
+                    </div>
+
+                    <h3 id="sub-3-3">3.3 Routing Information Protocol (RIP) Mechanics</h3>
+                    <p>The standard distance-vector implementation in internet history is <strong>RIP (RFC 1058 / 2453)</strong>. In RIP:</p>
+                    <ul>
+                        <li>Metric is pure <strong>hop count</strong> (each link has cost $1$).</li>
+                        <li>Maximum allowable metric is <strong>15 hops</strong>; a metric of $16$ represents $\infty$ (unreachable).</li>
+                        <li>Updates are broadcast periodically every 30 seconds via UDP port 520.</li>
+                    </ul>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section class="topic-section" id="topic-4">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>Count-to-Infinity &amp; Loop Prevention</h2>
+                </div>
+                <div class="collapsible-content" id="content-4">
+                    <h3 id="sub-4-1">4.1 The Count-to-Infinity Failure Mode</h3>
+                    <p>In Distance-Vector routing: <em>"Good news travels fast, bad news crawls."</em> Consider a linear topology: $A - B - C$, where each link has cost $1$.</p>
+                    <table style="width:100%; border-collapse: collapse; margin: 1rem 0;">
+                        <thead>
+                            <tr style="background: var(--bg-secondary); border-bottom: 2px solid var(--gray-border); text-align: left;">
+                                <th style="padding: 0.5rem 1rem;">Iteration</th>
+                                <th style="padding: 0.5rem 1rem;">$B \to A$ Cost</th>
+                                <th style="padding: 0.5rem 1rem;">$C \to A$ Cost</th>
+                                <th style="padding: 0.5rem 1rem;">Observation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid var(--gray-border);">
+                                <td style="padding: 0.5rem 1rem;">Round 0 (Link $A-B$ breaks)</td>
+                                <td style="padding: 0.5rem 1rem;">3 (hears $C$'s stale cost 2)</td>
+                                <td style="padding: 0.5rem 1rem;">2 (routes via $B$)</td>
+                                <td style="padding: 0.5rem 1rem;">$B$ mistakenly believes $C$ has a path to $A$</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--gray-border);">
+                                <td style="padding: 0.5rem 1rem;">Round 1</td>
+                                <td style="padding: 0.5rem 1rem;">3</td>
+                                <td style="padding: 0.5rem 1rem;">4 ($1 + D_B(A) = 1 + 3$)</td>
+                                <td style="padding: 0.5rem 1rem;">Climbing loop forms</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--gray-border);">
+                                <td style="padding: 0.5rem 1rem;">Round 2</td>
+                                <td style="padding: 0.5rem 1rem;">5 ($1 + D_C(A) = 1 + 4$)</td>
+                                <td style="padding: 0.5rem 1rem;">4</td>
+                                <td style="padding: 0.5rem 1rem;">Bouncing back and forth</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.5rem 1rem;">Convergence</td>
+                                <td style="padding: 0.5rem 1rem;">$\to \infty$</td>
+                                <td style="padding: 0.5rem 1rem;">$\to \infty$</td>
+                                <td style="padding: 0.5rem 1rem;">Eventually reaches 16 ($\infty$) in RIP</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p>Because $B$ and $C$ act on second-hand hearsay without global map visibility, they circulate packets endlessly in a 2-node routing loop.</p>
+
+                    <h3 id="sub-4-2">4.2 Split Horizon Technique</h3>
+                    <p><strong>Split Horizon</strong> states: <em>If router $C$ routes to destination $A$ through router $B$, $C$ must NEVER advertise its route to $A$ back to $B$.</em> By withholding this route from $B$, $B$ cannot mistakenly assume $C$ has an independent alternative path to $A$.</p>
+
+                    <h3 id="sub-4-3">4.3 Poisoned Reverse Invariant</h3>
+                    <p><strong>Poisoned Reverse</strong> extends Split Horizon explicitly: instead of maintaining silence, $C$ actively advertises the route back to $B$ with an infinite cost:</p>
+                    $$D_C(A) = \infty \quad (\text{when advertising specifically to } B)$$
+                    <p>This explicitly poisons any reverse route, preventing 2-node counting loops instantly. (Note: Poisoned reverse does not solve loops involving 3 or more nodes across mesh topologies).</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 5 -->
+            <section class="topic-section" id="topic-5">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>Comprehensive Comparison: Link-State vs. Distance-Vector</h2>
+                </div>
+                <div class="collapsible-content" id="content-5">
+                    <h3 id="sub-5-1">5.1 Architectural Feature Comparison Matrix</h3>
+                    <table style="width:100%; border-collapse: collapse; margin: 1rem 0;">
+                        <thead>
+                            <tr style="background: var(--bg-secondary); border-bottom: 2px solid var(--gray-border); text-align: left;">
+                                <th style="padding: 0.5rem 1rem;">Dimension</th>
+                                <th style="padding: 0.5rem 1rem;">Link-State (Dijkstra)</th>
+                                <th style="padding: 0.5rem 1rem;">Distance-Vector (Bellman-Ford)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid var(--gray-border);">
+                                <td style="padding: 0.5rem 1rem;"><strong>Topology Knowledge</strong></td>
+                                <td style="padding: 0.5rem 1rem;">Complete global network topology map</td>
+                                <td style="padding: 0.5rem 1rem;">Direct neighbors only</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--gray-border);">
+                                <td style="padding: 0.5rem 1rem;"><strong>Message Exchange</strong></td>
+                                <td style="padding: 0.5rem 1rem;">Floods link states to all routers ($O(NE)$)</td>
+                                <td style="padding: 0.5rem 1rem;">Exchanges vectors with immediate neighbors</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--gray-border);">
+                                <td style="padding: 0.5rem 1rem;"><strong>Convergence Speed</strong></td>
+                                <td style="padding: 0.5rem 1rem;">Fast convergence ($O(N^2)$ local computation)</td>
+                                <td style="padding: 0.5rem 1rem;">Slower convergence, subject to count-to-infinity</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--gray-border);">
+                                <td style="padding: 0.5rem 1rem;"><strong>Loop Vulnerability</strong></td>
+                                <td style="padding: 0.5rem 1rem;">Transient loops only during LSA propagation</td>
+                                <td style="padding: 0.5rem 1rem;">Severe persistent loops without Split Horizon</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--gray-border);">
+                                <td style="padding: 0.5rem 1rem;"><strong>Resource Footprint</strong></td>
+                                <td style="padding: 0.5rem 1rem;">High CPU and RAM memory overhead per router</td>
+                                <td style="padding: 0.5rem 1rem;">Extremely lightweight memory footprint</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.5rem 1rem;"><strong>Standard Protocol</strong></td>
+                                <td style="padding: 0.5rem 1rem;">OSPF, IS-IS</td>
+                                <td style="padding: 0.5rem 1rem;">RIP, RIPng</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3 id="sub-5-2">5.2 Computational Overhead &amp; Scalability Limits</h3>
+                    <p>Link-state routing scales within enterprise autonomous systems (AS) by partitioning networks into OSPF Areas. However, neither Link-State nor pure Distance-Vector can scale to the billions of subnets comprising the global Internet.</p>
+
+                    <h3 id="sub-5-3">5.3 Preview: Path-Vector &amp; BGP for Inter-Domain Routing</h3>
+                    <p>To interconnect independent Autonomous Systems (ISPs, universities, cloud providers) across the global Internet, the <strong>Border Gateway Protocol (BGP)</strong> implements <strong>Path-Vector Routing</strong>. Rather than broadcasting mere distances, BGP advertises the exact sequence of Autonomous System Numbers (AS-PATH) packets must traverse. If a router sees its own AS number in the path list, it rejects the advertisement immediately, completely eliminating loops by design.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('original-pdf').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" x2="8" y1="13" y2="13"></line>
+                            <line x1="16" x2="8" y1="17" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/17.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+
+</html>

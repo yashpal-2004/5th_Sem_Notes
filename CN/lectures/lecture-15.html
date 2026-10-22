@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Computer Networks - Lecture 15</title>
+    <meta content="Study notes for Computer Networks (CSAI321), Lecture 15 covering NAT, PAT (Port Address Translation), DHCP 4-Step Handshake (DORA), Route Tables, and AWS VPC Internet Gateway (IGW) vs NAT Gateway." name="description" />
+    <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%230d282d%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>15</text></svg>" rel="icon" />
+    <link href="../css/style.css" rel="stylesheet" />
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Computer Networks Foundations</h1>
+            <p>Lecture 15 - NAT, PAT &amp; DHCP — and How VPC Route Tables Wire It Together</p>
+            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/15.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text" />
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 5</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>Short Notes</a></li>
+                <li>
+                    <a href="#topic-1">1. Private IP Addressing &amp; The Need for NAT<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 Private IP Isolation Paradox</a></li>
+                        <li><a href="#sub-1-2">1.2 Basic NAT Architecture</a></li>
+                        <li><a href="#sub-1-3">1.3 Border Address Rewriting Mechanics</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Port Address Translation (PAT / NAPT)<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 The Many-to-One Sharing Problem</a></li>
+                        <li><a href="#sub-2-2">2.2 NAT Translation Table Architecture</a></li>
+                        <li><a href="#sub-2-3">2.3 Advantages &amp; Architectural Trade-offs</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Dynamic Host Configuration Protocol (DHCP &amp; DORA)<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 The 4 Core Host Parameters</a></li>
+                        <li><a href="#sub-3-2">3.2 The DORA 4-Step Handshake</a></li>
+                        <li><a href="#sub-3-3">3.3 Packet-Level Wire Analysis</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Routing Tables &amp; Longest Prefix Match (LPM)<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 Structure of a Route Table</a></li>
+                        <li><a href="#sub-4-2">4.2 Default Route (0.0.0.0/0) &amp; Specificity</a></li>
+                        <li><a href="#sub-4-3">4.3 Resolving Overlapping Route Prefixes</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Cloud VPC Networking: IGW vs. NAT Gateway<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 Public Subnet Architecture &amp; IGW</a></li>
+                        <li><a href="#sub-5-2">5.2 Outbound-Only Isolation with NAT Gateway</a></li>
+                        <li><a href="#sub-5-3">5.3 Route Table Comparison: Public vs Private</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Short Notes Placeholder -->
+            <section id="short-notes" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-short-notes')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                    </div>
+                    <h2>Short Notes &amp; Visual Summary</h2>
+                </div>
+                <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
+                    <p style="margin-bottom: 1rem;">Handwritten / quick summary notes for Lecture 15:</p>
+                    <div style="text-align: center; background: var(--bg-secondary, #f8f9fa); padding: 1rem; border-radius: 8px; border: 1px solid var(--gray-border);">
+                        <a href="../images/15.png" target="_blank" title="Click to view full size">
+                            <img src="../images/15.png" alt="Lecture 15 Short Notes" style="max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
+                        </a>
+                        <p style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-muted);">Click image to open high-resolution version in new tab</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 1 -->
+            <section class="topic-section" id="topic-1">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>Private IP Addressing &amp; The Need for NAT</h2>
+                </div>
+                <div class="collapsible-content" id="content-1">
+                    <h3 id="sub-1-1">1.1 Private IP Isolation Paradox</h3>
+                    <p>Subnets defined by RFC 1918 (<code>10.0.0.0/8</code>, <code>172.16.0.0/12</code>, <code>192.168.0.0/16</code>) are non-routable over the public Internet. When a device such as your phone connects to home Wi-Fi, it receives a private address like <code>192.168.0.14</code>. Because public Internet routers drop private source and destination addresses, devices on private subnets cannot communicate directly across public networks without border mediation.</p>
+
+                    <h3 id="sub-1-2">1.2 Basic NAT Architecture</h3>
+                    <p><strong>Network Address Translation (NAT)</strong> operates directly at the perimeter border router (such as a home gateway or enterprise perimeter device). NAT bridges private local hosts and public internet endpoints by rewriting IP addresses in transit.</p>
+                    <div class="box box-blue">
+                        <div class="box-title">Address Rewriting at the Perimeter</div>
+                        <ul>
+                            <li><strong>Outbound Transit (Host &rarr; Internet):</strong> Router intercepts packet leaving host (Source: <code>192.168.1.20</code>, Dest: <code>93.184.216.34</code>) and replaces the private source IP with its own single public WAN IP (e.g., <code>203.0.113.7</code>).</li>
+                            <li><strong>Inbound Transit (Internet &rarr; Host):</strong> Router receives server response (Source: <code>93.184.216.34</code>, Dest: <code>203.0.113.7</code>), consults its state memory, and replaces the public destination with <code>192.168.1.20</code> before passing it inward.</li>
+                        </ul>
+                    </div>
+
+                    <h3 id="sub-1-3">1.3 Border Address Rewriting Mechanics</h3>
+                    <p>The core invariant of NAT is state tracking: <em>The reply only finds its way home because the router remembers the swap</em>. If state tracking is corrupted, incomplete, or dropped due to idle timeout, returned packets cannot be forwarded and are discarded.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('short-notes').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section class="topic-section" id="topic-2">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>Port Address Translation (PAT / NAPT)</h2>
+                </div>
+                <div class="collapsible-content" id="content-2">
+                    <h3 id="sub-2-1">2.1 The Many-to-One Sharing Problem</h3>
+                    <p>If an ISP assigns only <strong>one public IP</strong> (e.g., <code>203.0.113.7</code>) to a household with 10+ devices (phones, laptops, consoles, smart TVs) streaming and gaming concurrently, simple IP-level NAT fails because replacing all private IPs with the same public IP creates ambiguity when packets return. The solution is <strong>Port Address Translation (PAT)</strong>, also called <em>Network Address Port Translation (NAPT)</em>.</p>
+
+                    <h3 id="sub-2-2">2.2 NAT Translation Table Architecture</h3>
+                    <p>PAT translates both the <strong>IP address and the Layer 4 Port number</strong>. The router translates each outbound connection into a unique external port on its single public IP.</p>
+                    <table style="width:100%; border-collapse: collapse; margin: 1rem 0;">
+                        <thead>
+                            <tr style="background: var(--bg-secondary); border-bottom: 2px solid var(--gray-border); text-align: left;">
+                                <th style="padding: 0.5rem 1rem;">Inside (Private Socket)</th>
+                                <th style="padding: 0.5rem 1rem;">Outside (Public Socket)</th>
+                                <th style="padding: 0.5rem 1rem;">Destination Socket</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid var(--gray-border);">
+                                <td style="padding: 0.5rem 1rem;"><code>192.168.1.20:51000</code></td>
+                                <td style="padding: 0.5rem 1rem;"><code>203.0.113.7:40001</code></td>
+                                <td style="padding: 0.5rem 1rem;"><code>93.184.216.34:443</code></td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--gray-border);">
+                                <td style="padding: 0.5rem 1rem;"><code>192.168.1.21:51000</code></td>
+                                <td style="padding: 0.5rem 1rem;"><code>203.0.113.7:40002</code></td>
+                                <td style="padding: 0.5rem 1rem;"><code>93.184.216.34:443</code></td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.5rem 1rem;"><code>192.168.1.35:49876</code></td>
+                                <td style="padding: 0.5rem 1rem;"><code>203.0.113.7:40003</code></td>
+                                <td style="padding: 0.5rem 1rem;"><code>142.250.72.14:443</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p>Even when two separate internal hosts pick the identical ephemeral port (e.g. <code>51000</code>), the router maps them to distinct public ports (<code>40001</code> vs <code>40002</code>). When return packets arrive at port <code>40002</code>, the router unambiguously delivers them to <code>192.168.1.21:51000</code>.</p>
+
+                    <h3 id="sub-2-3">2.3 Advantages &amp; Architectural Trade-offs</h3>
+                    <div class="box box-blue">
+                        <div class="box-title">Gains vs. Broken Principles</div>
+                        <ul>
+                            <li><strong>What We Gain:</strong> Extreme conservation of scarce IPv4 addresses (thousands of hosts behind one IP); implicit security side-effect because private hosts are invisible and unaddressable from outside.</li>
+                            <li><strong>What We Break:</strong> Destroys the end-to-end principle of the original Internet architecture. Unsolicited inbound connections (e.g., hosting a peer-to-peer node or public web server) fail unless explicit port forwarding or STUN/TURN traversal is configured.</li>
+                        </ul>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section class="topic-section" id="topic-3">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>Dynamic Host Configuration Protocol (DHCP &amp; DORA)</h2>
+                </div>
+                <div class="collapsible-content" id="content-3">
+                    <h3 id="sub-3-1">3.1 The 4 Core Host Parameters</h3>
+                    <p>When a new device associates with a LAN, it cannot communicate without four basic Layer 3 parameters delivered automatically by a DHCP lease:</p>
+                    <ol>
+                        <li><strong>IP Address:</strong> Unique host identity carved from the local subnet.</li>
+                        <li><strong>Subnet Mask:</strong> Delineates network prefix from host bits (e.g., <code>255.255.255.0</code>).</li>
+                        <li><strong>Default Gateway:</strong> The local router interface IP to reach all non-local destinations.</li>
+                        <li><strong>DNS Server IP:</strong> Resolves human-readable domain names into IP addresses.</li>
+                    </ol>
+
+                    <h3 id="sub-3-2">3.2 The DORA 4-Step Handshake</h3>
+                    <div class="box box-blue">
+                        <div class="box-title">DORA Sequence (UDP 67/68)</div>
+                        <ul>
+                            <li><strong>[D] Discover:</strong> Client has no IP yet ($0.0.0.0$). Broadcasts to $255.255.255.255$ asking: <em>"Is there a DHCP server available?"</em></li>
+                            <li><strong>[O] Offer:</strong> DHCP server reserves an unassigned address from its pool and broadcasts or unicasts a proposed lease.</li>
+                            <li><strong>[R] Request:</strong> Client broadcasts accepting the offered address (confirming selection and notifying other possible servers).</li>
+                            <li><strong>[A] Acknowledge (ACK):</strong> Server finalizes the lease duration, confirms allocation, and sends network mask, gateway, and DNS info.</li>
+                        </ul>
+                    </div>
+
+                    <h3 id="sub-3-3">3.3 Packet-Level Wire Analysis</h3>
+                    <table style="width:100%; border-collapse: collapse; margin: 1rem 0;">
+                        <thead>
+                            <tr style="background: var(--bg-secondary); border-bottom: 2px solid var(--gray-border); text-align: left;">
+                                <th style="padding: 0.5rem 1rem;">Frame</th>
+                                <th style="padding: 0.5rem 1rem;">Source IP</th>
+                                <th style="padding: 0.5rem 1rem;">Destination IP</th>
+                                <th style="padding: 0.5rem 1rem;">Protocol Info</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid var(--gray-border);">
+                                <td style="padding: 0.5rem 1rem;">1</td>
+                                <td style="padding: 0.5rem 1rem;"><code>0.0.0.0</code></td>
+                                <td style="padding: 0.5rem 1rem;"><code>255.255.255.255</code></td>
+                                <td style="padding: 0.5rem 1rem;">DHCP Discover</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--gray-border);">
+                                <td style="padding: 0.5rem 1rem;">2</td>
+                                <td style="padding: 0.5rem 1rem;"><code>192.168.1.1</code></td>
+                                <td style="padding: 0.5rem 1rem;"><code>255.255.255.255</code></td>
+                                <td style="padding: 0.5rem 1rem;">DHCP Offer</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--gray-border);">
+                                <td style="padding: 0.5rem 1rem;">3</td>
+                                <td style="padding: 0.5rem 1rem;"><code>0.0.0.0</code></td>
+                                <td style="padding: 0.5rem 1rem;"><code>255.255.255.255</code></td>
+                                <td style="padding: 0.5rem 1rem;">DHCP Request</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.5rem 1rem;">4</td>
+                                <td style="padding: 0.5rem 1rem;"><code>192.168.1.1</code></td>
+                                <td style="padding: 0.5rem 1rem;"><code>255.255.255.255</code></td>
+                                <td style="padding: 0.5rem 1rem;">DHCP ACK</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p>Addresses expire over time; clients automatically initiate renewal handshakes at half the lease time ($T_1$) and $87.5\%$ ($T_2$), recycling unused addresses when devices disconnect.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section class="topic-section" id="topic-4">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>Routing Tables &amp; Longest Prefix Match (LPM)</h2>
+                </div>
+                <div class="collapsible-content" id="content-4">
+                    <h3 id="sub-4-1">4.1 Structure of a Route Table</h3>
+                    <p>A route table is essentially a deterministic lookup table: <strong>Destination Prefix &rarr; Next Hop</strong>. Every single IP packet evaluated by a router is checked against this table to determine which interface or neighbor to forward to.</p>
+
+                    <h3 id="sub-4-2">4.2 Default Route (0.0.0.0/0) &amp; Specificity</h3>
+                    <p><code>0.0.0.0/0</code> is the <strong>default route</strong> (the catch-all route). With a mask length of 0 bits, it matches every destination IP on the planet. If no specialized subnet matches, traffic exits via this gateway.</p>
+
+                    <h3 id="sub-4-3">4.3 Resolving Overlapping Route Prefixes</h3>
+                    <p>When multiple route entries match a destination address, <strong>Longest Prefix Match (LPM)</strong> determines the winner: <em>Specificity beats generality</em>.</p>
+                    <div class="box box-blue">
+                        <div class="box-title">Example: Packet to Destination 10.0.1.55</div>
+                        <ul>
+                            <li>Candidate 1: <code>0.0.0.0/0 &rarr; gateway</code> (Prefix length: $/0$ bits &mdash; too broad)</li>
+                            <li>Candidate 2: <code>10.0.0.0/16 &rarr; local</code> (Prefix length: $/16$ bits &mdash; matches)</li>
+                            <li>Candidate 3: <code>10.0.1.0/24 &rarr; router-B</code> (Prefix length: $/24$ bits &mdash; <strong>Winner</strong>)</li>
+                        </ul>
+                        <p>Because $/24 > /16 > /0$, the router forwards the packet to <code>router-B</code>.</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 5 -->
+            <section class="topic-section" id="topic-5">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>Cloud VPC Networking: IGW vs. NAT Gateway</h2>
+                </div>
+                <div class="collapsible-content" id="content-5">
+                    <h3 id="sub-5-1">5.1 Public Subnet Architecture &amp; IGW</h3>
+                    <p>In Amazon Web Services (AWS) Virtual Private Cloud (VPC), subnets are not physically partitioned; their accessibility is controlled by route table associations. An <strong>Internet Gateway (IGW)</strong> attaches the VPC directly to the Internet. By definition:</p>
+                    <p><em>"Public subnet" simply means: the associated route table contains a route <code>0.0.0.0/0 &rarr; igw-xxxx</code>.</em> Instances with public IPs in this subnet can be reached bidirectionally (inbound and outbound).</p>
+
+                    <h3 id="sub-5-2">5.2 Outbound-Only Isolation with NAT Gateway</h3>
+                    <p>Backend database servers and application workers must download software patches from the Internet but must never accept unsolicited inbound connections from potential attackers. A <strong>NAT Gateway</strong> solves this:</p>
+                    <ul>
+                        <li>The AWS NAT Gateway is provisioned inside a <strong>Public Subnet</strong> (with an Elastic IP).</li>
+                        <li>The private subnet's route table points its default route to that NAT Gateway: <code>0.0.0.0/0 &rarr; nat-xxxx</code>.</li>
+                        <li>Result: <em>Updates flow out; attackers cannot initiate traffic in.</em></li>
+                    </ul>
+
+                    <h3 id="sub-5-3">5.3 Route Table Comparison: Public vs Private</h3>
+                    <table style="width:100%; border-collapse: collapse; margin: 1rem 0;">
+                        <thead>
+                            <tr style="background: var(--bg-secondary); border-bottom: 2px solid var(--gray-border); text-align: left;">
+                                <th style="padding: 0.5rem 1rem;">Route Table Type</th>
+                                <th style="padding: 0.5rem 1rem;">Local VPC Route</th>
+                                <th style="padding: 0.5rem 1rem;">Internet Route (0.0.0.0/0)</th>
+                                <th style="padding: 0.5rem 1rem;">Traffic Direction</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid var(--gray-border);">
+                                <td style="padding: 0.5rem 1rem;"><strong>Public Subnet RT</strong></td>
+                                <td style="padding: 0.5rem 1rem;"><code>10.0.0.0/16 &rarr; local</code></td>
+                                <td style="padding: 0.5rem 1rem;"><code>0.0.0.0/0 &rarr; igw-0a1b</code></td>
+                                <td style="padding: 0.5rem 1rem;">Bidirectional (Inbound + Outbound)</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.5rem 1rem;"><strong>Private Subnet RT</strong></td>
+                                <td style="padding: 0.5rem 1rem;"><code>10.0.0.0/16 &rarr; local</code></td>
+                                <td style="padding: 0.5rem 1rem;"><code>0.0.0.0/0 &rarr; nat-9f7c</code></td>
+                                <td style="padding: 0.5rem 1rem;">Outbound-Only (Secure Egress)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('original-pdf').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" x2="8" y1="13" y2="13"></line>
+                            <line x1="16" x2="8" y1="17" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/15.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+
+</html>

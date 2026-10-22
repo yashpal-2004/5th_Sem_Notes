@@ -102,7 +102,10 @@
                 { index: 11, displayNum: '11', title: 'TCP Congestion Control & Flow Control', imgUrl: 'images/11.png' },
                 { index: 12, displayNum: '12', title: 'Cloud Load Balancing & Traffic Management', imgUrl: 'images/12.png' },
                 { index: 13, displayNum: '13', title: 'Addressing the World: IPv4 & Classless CIDR Routing', imgUrl: 'images/13.png' },
-                { index: 14, displayNum: '14', title: 'Subnetting in Practice & Network Address Translation (NAT)', imgUrl: 'images/14.png' }
+                { index: 14, displayNum: '14', title: 'Subnetting in Practice & Network Address Translation (NAT)', imgUrl: 'images/14.png' },
+                { index: 15, displayNum: '15', title: 'NAT, PAT & DHCP — and How VPC Route Tables Wire It Together', imgUrl: 'images/15.png' },
+                { index: 16, displayNum: '16', title: 'Diagnostics with ICMP, and the Move to IPv6', imgUrl: 'images/16.png' },
+                { index: 17, displayNum: '17', title: 'Finding the Path: Link-State & Distance-Vector Routing', imgUrl: 'images/17.png' }
             ]
         },
         mca: {
