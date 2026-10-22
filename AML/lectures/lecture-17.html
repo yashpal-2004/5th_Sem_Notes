@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Advanced Machine Learning - Lecture 17</title>
+    <meta
+        content="Study notes for Advanced Machine Learning (CSA333), Lecture 17 covering Decision Trees Part II: ID3 Algorithm, Entropy, Information Gain, Multiway Splits, Overfitting/Underfitting, Pre-Pruning, and Post-Pruning (Cost-Complexity & Reduced-Error)."
+        name="description" />
+    <link
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>17</text></svg>"
+        rel="icon" />
+    <link href="../css/style.css" rel="stylesheet" />
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}]});"></script>
+</head>
+
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Advanced Machine Learning</h1>
+            <p>Lecture 17 - Decision Trees Part II: ID3 Algorithm &amp; Controlling Tree Size (Pruning)</p>
+            <a href="../index.html"
+                style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">←
+                Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/17.PDF"
+                style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;"
+                target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text" />
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 6</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            style="vertical-align: text-bottom; margin-right: 4px;">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>Short Notes</a></li>
+                <li>
+                    <a href="#topic-1">1. Transition from CART to ID3<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 Core Differences Between CART and ID3</a></li>
+                        <li><a href="#sub-1-2">1.2 Multi-Way vs. Binary Branching for Categories</a></li>
+                        <li><a href="#sub-1-3">1.3 Limitations of Basic ID3 (Numerical Inputs &amp; C4.5)</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Information Theory, Entropy &amp; Information Gain<span class="sub-count">4</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 Shannon Entropy Mathematical Formulation</a></li>
+                        <li><a href="#sub-2-2">2.2 Worked Dry Run on a 3-Row Subset</a></li>
+                        <li><a href="#sub-2-3">2.3 Information Gain Formulation</a></li>
+                        <li><a href="#sub-2-4">2.4 Why Weighting Must Reflect Parent Dataset Fractions</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Complete ID3 Tree Construction Walkthrough<span class="sub-count">4</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 Evaluating Degree Split on the 10-Row Dataset</a></li>
+                        <li><a href="#sub-3-2">3.2 Evaluating Field Split &amp; Root Selection</a></li>
+                        <li><a href="#sub-3-3">3.3 Recursive Splitting on Mixed Subsets (UG and PG)</a></li>
+                        <li><a href="#sub-3-4">3.4 Identical Feature Conflict &amp; The Deterministic Ceiling</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Overfitting, Underfitting &amp; Pre-Pruning Controls<span class="sub-count">4</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 Diagnosing Model Fit with Training vs. Validation Error</a></li>
+                        <li><a href="#sub-4-2">4.2 Pre-Pruning Stopping Criteria (max_depth, min_samples_split, min_samples_leaf)</a></li>
+                        <li><a href="#sub-4-3">4.3 Global Constraints (max_leaf_nodes &amp; min_impurity_decrease)</a></li>
+                        <li><a href="#sub-4-4">4.4 Feature Subsampling (max_features) vs. Structural Pruning</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Post-Pruning Paradigms<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 Cost-Complexity Pruning (Weakest-Link &amp; Effective Alpha)</a></li>
+                        <li><a href="#sub-5-2">5.2 Step-by-Step Cost Evaluation Across Alpha Values</a></li>
+                        <li><a href="#sub-5-3">5.3 Reduced-Error Pruning on Validation Sets</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-6">6. Comprehensive Problem Set &amp; Exam Practice Solutions<span class="sub-count">4</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-6-1">6.1 Solved Practice P1: Entropy Gain &amp; Weighting Traps</a></li>
+                        <li><a href="#sub-6-2">6.2 Solved Practice P2: Complete 6-Row ID3 Dry Run</a></li>
+                        <li><a href="#sub-6-3">6.3 Solved Practice P4 &amp; P5: Pruning Bounds &amp; Alpha Calculations</a></li>
+                        <li><a href="#sub-6-4">6.4 Solved Practice P6 &amp; P7: Reduced-Error Workflow &amp; Protocol Verification</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round"
+                            stroke-linejoin="round" stroke-width="2"
+                            style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>Original PDF</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Short Notes -->
+            <section id="short-notes" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-short-notes')">
+                    <div class="topic-number"
+                        style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                    </div>
+                    <h2>Short Notes &amp; Visual Summary</h2>
+                </div>
+                <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
+                    <p style="margin-bottom: 1rem;">Core principles, formulas, and cheat-sheet summary for Lecture 17:</p>
+
+                    <div style="margin-bottom: 1.5rem; text-align: center;">
+                        <img src="../images/17.png" alt="Lecture 17 Short Notes"
+                            style="max-width: 100%; border-radius: 10px; border: 1px solid var(--border-light); box-shadow: 0 4px 16px rgba(0,0,0,0.08); cursor: pointer;"
+                            onclick="window.open('../images/17.png', '_blank')" title="Click to open full size" />
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">Click image to open full size in a new tab</p>
+                    </div>
+
+                    <div class="box box-blue">
+                        <div class="box-title">Key ID3 &amp; Tree Regularization Takeaways</div>
+                        <ul style="line-height: 1.6;">
+                            <li><strong>ID3 Core Definition:</strong> <em>Iterative Dichotomiser 3</em> (Quinlan, 1986). It is strictly a <strong>classification</strong> algorithm that creates <strong>one branch per distinct categorical value</strong> (multi-way branching). Basic ID3 cannot directly split numerical attributes (addressed later by C4.5).</li>
+                            <li><strong>Entropy Formula (Shannon Entropy in bits):</strong>
+                                $$H(D) = - \sum_{k=1}^K p_k \log_2 p_k$$
+                                Pure node: \(H = 0\) bits. Balanced binary node: \(H = 1\) bit. By convention, \(0 \log_2 0 = 0\).</li>
+                            <li><strong>Information Gain:</strong>
+                                $$IG(D, A) = H(D) - H_{\text{after}}(A) = H(D) - \sum_{v \in \text{values}(A)} \frac{|D_v|}{|D|} H(D_v)$$
+                                The feature yielding the maximum Information Gain (equivalent to minimum weighted child entropy) is chosen as the split.</li>
+                            <li><strong>Pre-Pruning (Early Stopping):</strong> Halts growth <em>during</em> construction via constraints: <code>max_depth</code>, <code>min_samples_split</code>, <code>min_samples_leaf</code>, <code>max_leaf_nodes</code>, and <code>min_impurity_decrease</code>. Prevents over-complex models but risks underfitting.</li>
+                            <li><strong>Cost-Complexity Post-Pruning:</strong> Grows a full unconstrained tree \(T_{\max}\), then balances training error with tree size via penalty parameter \(\alpha \ge 0\):
+                                $$\text{Cost}_\alpha(T) = R(T) + \alpha L(T)$$
+                                Branches are collapsed in order of ascending <strong>effective alpha</strong>:
+                                $$\alpha_{\text{eff}} = \frac{R(\text{as one leaf}) - R(\text{current branch})}{L(\text{current branch}) - 1}$$
+                            </li>
+                            <li><strong>Reduced-Error Pruning:</strong> Directly evaluates validation accuracy. A subtree is replaced with a single leaf (predicting the majority class of its <em>training</em> subset). The pruning is retained if and only if validation accuracy is maintained or improved.</li>
+                            <li><strong>Golden Evaluation Workflow:</strong> Training set builds the tree; Validation set tunes hyper-parameters (such as \(\alpha\) or depth limits); Test set evaluates the final chosen tree exactly once.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 1 -->
+            <section id="topic-1" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">01</div>
+                    <h2>Transition from CART to ID3</h2>
+                </div>
+                <div id="content-1" class="collapsible-content">
+                    <h3 id="sub-1-1">1.1 Core Differences Between CART and ID3</h3>
+                    <p>While both CART and ID3 construct decision trees top-down by greedily evaluating feature splits, their structural philosophies, mathematical metrics, and supported problem domains differ fundamentally:</p>
+
+                    <table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem;">
+                        <thead>
+                            <tr style="background: var(--bg-mint, #e3ede4); text-align: left;">
+                                <th style="padding: 0.6rem; border: 1px solid var(--border-light);">Dimension</th>
+                                <th style="padding: 0.6rem; border: 1px solid var(--border-light);">CART (Breiman et al.)</th>
+                                <th style="padding: 0.6rem; border: 1px solid var(--border-light);">Basic ID3 (Quinlan)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td style="padding: 0.5rem; border: 1px solid var(--border-light);"><strong>Supported Tasks</strong></td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">Classification &amp; Regression</td><td style="padding: 0.5rem; border: 1px solid var(--border-light);"><strong>Classification only</strong></td></tr>
+                            <tr style="background: rgba(19, 34, 25, 0.03);"><td style="padding: 0.5rem; border: 1px solid var(--border-light);"><strong>Impurity Metric</strong></td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">Gini Impurity (or Variance/MSE for regression)</td><td style="padding: 0.5rem; border: 1px solid var(--border-light);"><strong>Shannon Entropy &amp; Information Gain</strong></td></tr>
+                            <tr><td style="padding: 0.5rem; border: 1px solid var(--border-light);"><strong>Branching Factor</strong></td><td style="padding: 0.5rem; border: 1px solid var(--border-light);"><strong>Strictly Binary</strong> (always 2 children: Yes / No)</td><td style="padding: 0.5rem; border: 1px solid var(--border-light);"><strong>Multi-way</strong> (one branch per distinct categorical value)</td></tr>
+                            <tr style="background: rgba(19, 34, 25, 0.03);"><td style="padding: 0.5rem; border: 1px solid var(--border-light);"><strong>Numerical Features</strong></td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">Directly handled via dynamic sorted midpoints</td><td style="padding: 0.5rem; border: 1px solid var(--border-light);"><strong>Not directly supported</strong> in basic ID3</td></tr>
+                            <tr><td style="padding: 0.5rem; border: 1px solid var(--border-light);"><strong>Pruning Framework</strong></td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">Cost-Complexity (Weakest-Link) pruning built-in</td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">No pruning in original algorithm (added later)</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3 id="sub-1-2">1.2 Multi-Way vs. Binary Branching for Categories</h3>
+                    <p>Consider the categorical feature <code>Degree \in \{\text{UG}, \text{PG}, \text{PhD}\}</code>:</p>
+                    <ul>
+                        <li><strong>In CART:</strong> Evaluates binary subset questions such as <em>"Is Degree = UG?"</em>. This creates exactly two children: \(\{\text{UG}\}\) and \(\{\text{PG}, \text{PhD}\}\).</li>
+                        <li><strong>In ID3:</strong> If <code>Degree</code> is selected, it immediately splits the data into <strong>three distinct children</strong> simultaneously: one branch for UG, one for PG, and one for PhD. Once a categorical feature has been split in an ID3 branch, it has zero remaining variance and cannot be tested again along that branch.</li>
+                    </ul>
+
+                    <h3 id="sub-1-3">1.3 Limitations of Basic ID3 (Numerical Inputs &amp; C4.5)</h3>
+                    <p>Because basic ID3 creates one branch per distinct value, applying it naively to continuous numerical variables (or unique IDs) would create branches with single observations, yielding trivial zero entropy and massive overfitting. Ross Quinlan subsequently developed <strong>C4.5</strong> to overcome these hurdles by introducing:</p>
+                    <ol>
+                        <li>Dynamic thresholding for continuous attributes (binary splits on numerical features).</li>
+                        <li><strong>Gain Ratio</strong> (\(GR = IG / \text{SplitInfo}\)) to penalize features with many fine-grained categories.</li>
+                        <li>Handling of missing attribute values and rule post-pruning.</li>
+                    </ol>
+
+                    <div class="topic-nav">
+                        <button class="btn" disabled="">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section id="topic-2" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">02</div>
+                    <h2>Information Theory, Entropy &amp; Information Gain</h2>
+                </div>
+                <div id="content-2" class="collapsible-content">
+                    <h3 id="sub-2-1">2.1 Shannon Entropy Mathematical Formulation</h3>
+                    <p>In information theory (Claude Shannon, 1948), <strong>Entropy</strong> measures the average level of information, surprise, or uncertainty inherent in a random variable's possible outcomes. For a dataset \(D\) partitioned into \(K\) classes with empirical proportions \(p_k = n_k / n\):</p>
+                    $$H(D) = - \sum_{k=1}^K p_k \log_2(p_k)$$
+                    <p>Base-2 logarithm is standard in computer science; entropy is thus quantified in <strong>bits</strong>:</p>
+                    <ul>
+                        <li><strong>Completely Pure Node (\(p_1 = 1, p_{k > 1} = 0\)):</strong>
+                            $$H(D) = - 1 \log_2(1) - 0 = 0 \text{ bits} \quad (\text{zero uncertainty})$$
+                        </li>
+                        <li><strong>Maximum Uncertainty (Binary Uniform: \(p_1 = 0.5, p_2 = 0.5\)):</strong>
+                            $$H(D) = - 0.5 \log_2(0.5) - 0.5 \log_2(0.5) = -0.5(-1) - 0.5(-1) = 1.0000 \text{ bit}$$
+                        </li>
+                        <li><strong>Continuity Convention:</strong> \(\lim_{p \to 0^+} p \log_2 p = 0\). If a class is absent (\(p_k = 0\)), its contribution is 0.</li>
+                    </ul>
+
+                    <h3 id="sub-2-2">2.2 Worked Dry Run on a 3-Row Subset</h3>
+                    <p>To demonstrate step-by-step arithmetic without rounding artifacts, consider rows {0, 1, 8} from the employment dataset with labels [E, U, U]:</p>
+                    <ol>
+                        <li><strong>Count:</strong> \(n_E = 1, n_U = 2, n = 3\).</li>
+                        <li><strong>Proportions:</strong> \(p_E = 1/3, p_U = 2/3\).</li>
+                        <li><strong>Evaluate Entropy:</strong>
+                            $$\log_2(1/3) = -\log_2(3) \approx -1.5850, \quad \log_2(2/3) = \log_2(2) - \log_2(3) \approx 1 - 1.5850 = -0.5850$$
+                            $$H(D) = - \left[\frac{1}{3}(-1.5850) + \frac{2}{3}(-0.5850)\right] = 0.5283 + 0.3900 = \mathbf{0.9183} \text{ bits}$$
+                        </li>
+                    </ol>
+
+                    <h3 id="sub-2-3">2.3 Information Gain Formulation</h3>
+                    <p><strong>Information Gain (IG)</strong> measures the expected reduction in entropy achieved by partitioning dataset \(D\) using feature \(A\):</p>
+                    $$IG(D, A) = H(D) - H_{\text{after}}(A) = H(D) - \sum_{v \in \text{values}(A)} \frac{|D_v|}{|D|} H(D_v)$$
+                    <p>Continuing the 3-row example by testing feature <strong>Field</strong>:</p>
+                    <ul>
+                        <li><code>Field = Science</code> contains Row 0 (E): 1 E, 0 U &rarr; \(H(\text{Science}) = 0\) bits (pure).</li>
+                        <li><code>Field = Arts</code> contains Rows 1, 8 (U, U): 0 E, 2 U &rarr; \(H(\text{Arts}) = 0\) bits (pure).</li>
+                        <li><strong>Weighted Child Entropy:</strong>
+                            $$H_{\text{after}}(\text{Field}) = \frac{1}{3} H(\text{Science}) + \frac{2}{3} H(\text{Arts}) = \frac{1}{3}(0) + \frac{2}{3}(0) = 0 \text{ bits}$$
+                        </li>
+                        <li><strong>Information Gain:</strong>
+                            $$IG(D, \text{Field}) = 0.9183 - 0 = \mathbf{0.9183} \text{ bits}$$
+                            Splitting on Field eliminates 100% of the class uncertainty in this subset.
+                        </li>
+                    </ul>
+
+                    <h3 id="sub-2-4">2.4 Why Weighting Must Reflect Parent Dataset Fractions</h3>
+                    <div class="box box-yellow">
+                        <div class="box-title">Critical Weighting Rule</div>
+                        <p>When computing \(H_{\text{after}}\), each child's entropy <strong>must</strong> be multiplied by its relative size in the immediate parent node: \(w_v = |D_v| / |D|\). Taking an unweighted arithmetic average \(\frac{1}{|V|} \sum H(D_v)\) assigns equal importance to a tiny 1-row branch and a massive 99-row branch, completely corrupting the information objective.</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section id="topic-3" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">03</div>
+                    <h2>Complete ID3 Tree Construction Walkthrough</h2>
+                </div>
+                <div id="content-3" class="collapsible-content">
+                    <p>We execute the full ID3 algorithm on the complete 10-row Employment dataset (6 Employed, 4 Unemployed) using the two categorical features: <strong>Degree</strong> and <strong>Field</strong>.</p>
+
+                    <p><strong>Parent Dataset Entropy:</strong></p>
+                    $$p_E = 6/10 = 0.6, \quad p_U = 4/10 = 0.4$$
+                    $$H(D) = - 0.6 \log_2(0.6) - 0.4 \log_2(0.4) \approx - 0.6(-0.73697) - 0.4(-1.32193) \approx \mathbf{0.9710} \text{ bits}$$
+
+                    <h3 id="sub-3-1">3.1 Evaluating Degree Split on the 10-Row Dataset</h3>
+                    <p>Degree has three categorical values: UG, PG, PhD. ID3 creates 3 branches simultaneously:</p>
+                    <table style="width: 100%; border-collapse: collapse; margin: 0.8rem 0; font-size: 0.88rem;">
+                        <thead>
+                            <tr style="background: var(--bg-mint, #e3ede4);">
+                                <th style="padding: 0.5rem; border: 1px solid var(--border-light);">Branch</th>
+                                <th style="padding: 0.5rem; border: 1px solid var(--border-light);">Rows</th>
+                                <th style="padding: 0.5rem; border: 1px solid var(--border-light);">E / U Counts</th>
+                                <th style="padding: 0.5rem; border: 1px solid var(--border-light);">Node Entropy \(H(D_v)\)</th>
+                                <th style="padding: 0.5rem; border: 1px solid var(--border-light);">Weight \(\frac{n_v}{n}\)</th>
+                                <th style="padding: 0.5rem; border: 1px solid var(--border-light);">Weighted Entropy</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td style="padding: 0.4rem; border: 1px solid var(--border-light);"><strong>UG</strong></td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">{0, 1, 6, 8}</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">1 E / 3 U</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);"><span class="math inline">\(-\frac{1}{4}\log_2\frac{1}{4} - \frac{3}{4}\log_2\frac{3}{4} \approx 0.8113\)</span></td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">4/10 = 0.4</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);"><span class="math inline">\(0.4 \times 0.8113 \approx 0.3245\)</span></td></tr>
+                            <tr style="background: rgba(19, 34, 25, 0.03);"><td style="padding: 0.4rem; border: 1px solid var(--border-light);"><strong>PG</strong></td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">{2, 4, 7}</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">2 E / 1 U</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);"><span class="math inline">\(-\frac{2}{3}\log_2\frac{2}{3} - \frac{1}{3}\log_2\frac{1}{3} \approx 0.9183\)</span></td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">3/10 = 0.3</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);"><span class="math inline">\(0.3 \times 0.9183 \approx 0.2755\)</span></td></tr>
+                            <tr><td style="padding: 0.4rem; border: 1px solid var(--border-light);"><strong>PhD</strong></td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">{3, 5, 9}</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">3 E / 0 U</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">\(0.0000\) (Completely Pure)</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">3/10 = 0.3</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">\(0.3 \times 0 = 0.0000\)</td></tr>
+                        </tbody>
+                    </table>
+                    $$H_{\text{after}}(\text{Degree}) = 0.3245 + 0.2755 + 0 = \mathbf{0.6000} \text{ bits}$$
+                    $$IG(D, \text{Degree}) = 0.9710 - 0.6000 = \mathbf{0.3710} \text{ bits}$$
+
+                    <h3 id="sub-3-2">3.2 Evaluating Field Split &amp; Root Selection</h3>
+                    <p>Field has two categories: Science and Arts:</p>
+                    <ul>
+                        <li><strong>Science ({0, 2, 3, 6, 9}):</strong> 4 E, 1 U &rarr; \(H(\text{Science}) = -\frac{4}{5}\log_2\frac{4}{5} - \frac{1}{5}\log_2\frac{1}{5} \approx 0.7219\) bits.</li>
+                        <li><strong>Arts ({1, 4, 5, 7, 8}):</strong> 2 E, 3 U &rarr; \(H(\text{Arts}) = -\frac{2}{5}\log_2\frac{2}{5} - \frac{3}{5}\log_2\frac{3}{5} \approx 0.9710\) bits.</li>
+                        <li><strong>Weighted Child Entropy:</strong>
+                            $$H_{\text{after}}(\text{Field}) = \frac{5}{10}(0.7219) + \frac{5}{10}(0.9710) = 0.3610 + 0.4855 = \mathbf{0.8464} \text{ bits}$$
+                        </li>
+                        <li><strong>Information Gain:</strong>
+                            $$IG(D, \text{Field}) = 0.9710 - 0.8464 = \mathbf{0.1245} \text{ bits}$$
+                        </li>
+                    </ul>
+
+                    <div class="box box-mint">
+                        <div class="box-title">Root Decision</div>
+                        <p>\(IG(D, \text{Degree}) = 0.3710 \text{ bits} > IG(D, \text{Field}) = 0.1245 \text{ bits}\).<br>
+                        <strong>Degree is unambiguously selected as the Root Node!</strong></p>
+                    </div>
+
+                    <h3 id="sub-3-3">3.3 Recursive Splitting on Mixed Subsets (UG and PG)</h3>
+                    <p>The root creates three branches:</p>
+                    <ol>
+                        <li><strong>PhD branch:</strong> Already pure (3 E, 0 U). Becomes a terminal leaf predicting <strong>Employed (E)</strong>.</li>
+                        <li><strong>UG branch ({0, 1, 6, 8}):</strong> Split using <code>Field</code>:
+                            <ul>
+                                <li>Science ({0, 6}): 1 E, 1 U &rarr; Both Degree (UG) and Field (Science) are exhausted. Class counts tie (1:1). Applying the tie-break rule (predict U), the leaf predicts <strong>U</strong>.</li>
+                                <li>Arts ({1, 8}): 0 E, 2 U &rarr; Pure leaf predicting <strong>U</strong>.</li>
+                            </ul>
+                        </li>
+                        <li><strong>PG branch ({2, 4, 7}):</strong> Split using <code>Field</code>:
+                            <ul>
+                                <li>Science ({2}): 1 E, 0 U &rarr; Pure leaf predicting <strong>E</strong>.</li>
+                                <li>Arts ({4, 7}): 1 E (Row 7), 1 U (Row 4) &rarr; Tied (1:1). Tie-break predicts <strong>U</strong>.</li>
+                            </ul>
+                        </li>
+                    </ol>
+
+                    <h3 id="sub-3-4">3.4 Identical Feature Conflict &amp; The Deterministic Ceiling</h3>
+                    <div class="box box-red">
+                        <div class="box-title">Fundamental Theoretical Ceiling: Inconsistent Records</div>
+                        <p>Look at Rows 0 and 6:</p>
+                        <ul>
+                            <li>Row 0: Degree = UG, Field = Science &rarr; Outcome = <strong>E</strong></li>
+                            <li>Row 6: Degree = UG, Field = Science &rarr; Outcome = <strong>U</strong></li>
+                        </ul>
+                        <p>Their feature vectors are <em>completely identical</em>: \(\mathbf{x}_0 = \mathbf{x}_6 = [\text{UG}, \text{Science}]\). Similarly, Rows 4 and 7 share identical features \([\text{PG}, \text{Arts}]\) but have opposite outcomes (Row 4 is U, Row 7 is E).</p>
+                        <p><strong>Conclusion:</strong> No deterministic algorithm relying solely on Degree and Field can ever achieve 100% training accuracy. Rows 0 and 7 are misclassified under majority voting, limiting maximum possible training accuracy to exactly \(8/10 = \mathbf{80\%}\).</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section id="topic-4" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">04</div>
+                    <h2>Overfitting, Underfitting &amp; Pre-Pruning Controls</h2>
+                </div>
+                <div id="content-4" class="collapsible-content">
+                    <h3 id="sub-4-1">4.1 Diagnosing Model Fit with Training vs. Validation Error</h3>
+                    <p>A decision tree's training error monotonically decreases (or stays flat) as its depth increases. However, out-of-sample generalization exhibits the classic U-shaped bias-variance curve:</p>
+                    <ul>
+                        <li><strong>Underfitting (High Bias):</strong> Tree is too small (e.g. single root leaf predicting 60% accuracy). Both training and validation errors are elevated.</li>
+                        <li><strong>Overfitting (High Variance):</strong> Tree grows unbounded, creating tiny leaves isolating single noise instances. Training error approaches 0%, while validation error sharply surges.</li>
+                    </ul>
+
+                    <h3 id="sub-4-2">4.2 Pre-Pruning Stopping Criteria (max_depth, min_samples_split, min_samples_leaf)</h3>
+                    <p><strong>Pre-Pruning</strong> halts the recursive partitioning process early if any predefined threshold is violated:</p>
+                    <table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem;">
+                        <thead>
+                            <tr style="background: var(--bg-mint, #e3ede4); text-align: left;">
+                                <th style="padding: 0.6rem; border: 1px solid var(--border-light);">Hyperparameter</th>
+                                <th style="padding: 0.6rem; border: 1px solid var(--border-light);">Level Evaluated</th>
+                                <th style="padding: 0.6rem; border: 1px solid var(--border-light);">Stopping Mechanism &amp; Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td style="padding: 0.5rem; border: 1px solid var(--border-light);"><code>max_depth</code></td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">Tree / Path</td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">Limits the maximum path length from root (depth 0). If <code>max_depth = 1</code>, root splits, but its children become terminal leaves.</td></tr>
+                            <tr style="background: rgba(19, 34, 25, 0.03);"><td style="padding: 0.5rem; border: 1px solid var(--border-light);"><code>min_samples_split</code></td><td style="padding: 0.5rem; border: 1px solid var(--border-light);"><strong>Parent Node</strong></td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">Minimum samples a node must contain to even consider splitting. If a node has 3 rows and <code>min_samples_split = 4</code>, it remains an unsplit leaf.</td></tr>
+                            <tr><td style="padding: 0.5rem; border: 1px solid var(--border-light);"><code>min_samples_leaf</code></td><td style="padding: 0.5rem; border: 1px solid var(--border-light);"><strong>Child Nodes</strong></td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">A proposed split is rejected if <em>either</em> child would contain fewer than this threshold. If a split produces children of size 1 and 5, and <code>min_samples_leaf = 2</code>, the split is rejected.</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3 id="sub-4-3">4.3 Global Constraints (max_leaf_nodes &amp; min_impurity_decrease)</h3>
+                    <ul>
+                        <li><strong><code>max_leaf_nodes</code>:</strong> Enforces a strict global budget on total terminal leaves. Splits are added best-first until the leaf quota is filled.</li>
+                        <li><strong><code>min_impurity_decrease</code>:</strong> A split is only permitted if the weighted reduction in impurity satisfies:
+                            $$N_{\text{node}} / N_{\text{total}} \times \left( H(D) - \frac{n_Y}{n} H(D_Y) - \frac{n_N}{n} H(D_N) \right) \ge \text{threshold}$$
+                        </li>
+                    </ul>
+
+                    <h3 id="sub-4-4">4.4 Feature Subsampling (max_features) vs. Structural Pruning</h3>
+                    <p><code>max_features</code> randomly subsets the candidate features inspected at each split. While it acts as a powerful regularizer (and forms the cornerstone of <strong>Random Forests</strong>), it is <em>not</em> strictly a pruning parameter because it does not bound tree depth or leaf count.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 5 -->
+            <section id="topic-5" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">05</div>
+                    <h2>Post-Pruning Paradigms</h2>
+                </div>
+                <div id="content-5" class="collapsible-content">
+                    <h3 id="sub-5-1">5.1 Cost-Complexity Pruning (Weakest-Link &amp; Effective Alpha)</h3>
+                    <p>Post-pruning allows the tree to grow fully first, then systematically trims branches from the bottom up. <strong>Cost-Complexity Pruning</strong> (Minimal Cost-Complexity Pruning in CART) defines an objective function parameterized by penalty \(\alpha \ge 0\):</p>
+                    $$\text{Cost}_\alpha(T) = R(T) + \alpha |T|$$
+                    <ul>
+                        <li>\(R(T)\): Total training error or weighted leaf impurity sum: \(R(T) = \sum_{\ell \in \text{leaves}} \frac{n_\ell}{n} H(D_\ell)\).</li>
+                        <li>\(|T| = L(T)\): Number of terminal leaves in tree \(T\).</li>
+                        <li>\(\alpha\): Complexity parameter penalizing tree size. When \(\alpha = 0\), the fully grown tree wins. As \(\alpha \to \infty\), the tree collapses to the single-node root.</li>
+                    </ul>
+
+                    <p><strong>Weakest-Link Principle &amp; Effective Alpha:</strong></p>
+                    <p>At any internal node \(t\) heading a branch \(T_t\), collapsing \(T_t\) into a single leaf increases training error by \(R(t) - R(T_t)\) while eliminating \(|T_t| - 1\) leaves. The <strong>effective alpha</strong> is the cost increase per leaf removed:</p>
+                    $$\alpha_{\text{eff}}(t) = \frac{R(t) - R(T_t)}{|T_t| - 1}$$
+                    <p>The branch with the smallest \(\alpha_{\text{eff}}\) is the "weakest link" and is pruned first.</p>
+
+                    <h3 id="sub-5-2">5.2 Step-by-Step Cost Evaluation Across Alpha Values</h3>
+                    <p>From Worksheet Section 9, consider 4 candidate subtrees with leaves \(\{8, 5, 2, 1\}\) and training scores \(\{0.10, 0.12, 0.15, 0.20\}\):</p>
+                    <table style="width: 100%; border-collapse: collapse; margin: 0.8rem 0; font-size: 0.88rem;">
+                        <thead>
+                            <tr style="background: var(--bg-mint, #e3ede4);">
+                                <th style="padding: 0.4rem; border: 1px solid var(--border-light);">Tree</th>
+                                <th style="padding: 0.4rem; border: 1px solid var(--border-light);">Leaves \(L(T)\)</th>
+                                <th style="padding: 0.4rem; border: 1px solid var(--border-light);">Training \(R(T)\)</th>
+                                <th style="padding: 0.4rem; border: 1px solid var(--border-light);">Cost at \(\alpha = 0.005\)</th>
+                                <th style="padding: 0.4rem; border: 1px solid var(--border-light);">Cost at \(\alpha = 0.010\)</th>
+                                <th style="padding: 0.4rem; border: 1px solid var(--border-light);">Cost at \(\alpha = 0.020\)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td style="padding: 0.4rem; border: 1px solid var(--border-light);">\(T_8\)</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">8</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">0.10</td><td style="padding: 0.4rem; border: 1px solid var(--border-light); font-weight: bold; background: #ecfdf5;">0.10 + 0.005(8) = <strong>0.140</strong> (Best)</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">0.180</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">0.260</td></tr>
+                            <tr style="background: rgba(19, 34, 25, 0.03);"><td style="padding: 0.4rem; border: 1px solid var(--border-light);">\(T_5\)</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">5</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">0.12</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">0.145</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">0.170 (Tie)</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">0.220</td></tr>
+                            <tr><td style="padding: 0.4rem; border: 1px solid var(--border-light);">\(T_2\)</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">2</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">0.15</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">0.160</td><td style="padding: 0.4rem; border: 1px solid var(--border-light); font-weight: bold; background: #ecfdf5;">0.170 (Wins tie: fewer leaves)</td><td style="padding: 0.4rem; border: 1px solid var(--border-light); font-weight: bold; background: #ecfdf5;">0.15 + 0.020(2) = <strong>0.190</strong> (Best)</td></tr>
+                            <tr style="background: rgba(19, 34, 25, 0.03);"><td style="padding: 0.4rem; border: 1px solid var(--border-light);">\(T_1\)</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">1</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">0.20</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">0.205</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">0.210</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">0.220</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3 id="sub-5-3">5.3 Reduced-Error Pruning on Validation Sets</h3>
+                    <p><strong>Reduced-Error Pruning</strong> uses a held-out validation set directly without mathematical penalties:</p>
+                    <ol>
+                        <li>Traverse internal nodes bottom-up (testing deeper subtrees before parents).</li>
+                        <li>Temporarily prune a subtree and replace it with a single leaf predicting the <strong>training majority class</strong> of that node.</li>
+                        <li>Evaluate classification accuracy across the entire validation set.</li>
+                        <li><strong>Decision Rule:</strong>
+                            <ul>
+                                <li>If validation accuracy <em>increases</em> or <em>remains exactly equal</em> (tie) &rarr; <strong>Keep the pruning</strong> (simpler model is strictly preferred).</li>
+                                <li>If validation accuracy <em>decreases</em> &rarr; <strong>Undo the change</strong> and preserve the subtree.</li>
+                            </ul>
+                        </li>
+                    </ol>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 6 -->
+            <section id="topic-6" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-6')">
+                    <div class="topic-number">06</div>
+                    <h2>Comprehensive Problem Set &amp; Exam Practice Solutions</h2>
+                </div>
+                <div id="content-6" class="collapsible-content">
+                    <h3 id="sub-6-1">6.1 Solved Practice P1: Entropy Gain &amp; Weighting Traps</h3>
+                    <ul>
+                        <li><strong>P1a Matches:</strong>
+                            <ol>
+                                <li>Parent entropy &rarr; <em>C: Class uncertainty before a question</em></li>
+                                <li>One child's entropy &rarr; <em>D: Class uncertainty within one group</em></li>
+                                <li>Weighted child entropy &rarr; <em>A: Uncertainty left after all rows have been divided</em></li>
+                                <li>Information gain &rarr; <em>B: Uncertainty removed by a feature</em></li>
+                            </ol>
+                        </li>
+                        <li><strong>P1b True/False Statements:</strong>
+                            <ol>
+                                <li><em>"Swapping class names E and U changes entropy."</em> &rarr; <strong>False.</strong> Entropy depends purely on proportions \(\{p_k\}\); \(-p_E \log p_E - p_U \log p_U\) is strictly symmetric.</li>
+                                <li><em>"If every child is pure, information gain equals parent entropy."</em> &rarr; <strong>True.</strong> Every \(H(D_v) = 0 \implies H_{\text{after}} = 0 \implies IG = H(D) - 0 = H(D)\).</li>
+                                <li><em>"ID3 can separate rows 0 and 6 by splitting Degree or Field again."</em> &rarr; <strong>False.</strong> Both rows have Degree = UG and Field = Science. Neither feature has any remaining variation to split.</li>
+                            </ol>
+                        </li>
+                        <li><strong>P1c Dry Run:</strong> 10 rows (6 E, 4 U), \(H(D) = 0.9710\). Child 1 has 2 E (\(n_1 = 2, H_1 = 0\)). Child 2 has 4 E, 4 U (\(n_2 = 8, H_2 = 1.0\)).
+                            $$H_{\text{after}} = \frac{2}{10}(0) + \frac{8}{10}(1) = \mathbf{0.8000} \text{ bits}$$
+                            $$IG = 0.9710 - 0.8000 = \mathbf{0.1710} \text{ bits}$$
+                            <em>Unweighted error:</em> A student averaging \((0+1)/2 = 0.5\) gets \(IG = 0.9710 - 0.5 = 0.4710\), which artificially overstates gain because it ignores that 80% of rows reside in the totally impure child.
+                        </li>
+                    </ul>
+
+                    <h3 id="sub-6-2">6.2 Solved Practice P2: Complete 6-Row ID3 Dry Run</h3>
+                    <p>Dataset: A(UG, Science, U), B(UG, Arts, U), C(PG, Science, U), D(PG, Arts, E), E(PG, Arts, E), F(PG, Science, E):</p>
+                    <ul>
+                        <li>Total rows: 3 E, 3 U &rarr; \(H(D) = 1.0000\) bit.</li>
+                        <li><strong>Degree Split:</strong>
+                            <ul>
+                                <li>UG (A, B): 0 E, 2 U &rarr; \(H = 0\) (pure).</li>
+                                <li>PG (C, D, E, F): 3 E, 1 U &rarr; \(H = 0.8113\).</li>
+                                <li>\(H_{\text{after}}(\text{Degree}) = \frac{2}{6}(0) + \frac{4}{6}(0.8113) = \frac{2}{3}(0.8113) \approx \mathbf{0.5409}\) &rarr; \(IG \approx \mathbf{0.4591}\) bits.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Field Split:</strong>
+                            <ul>
+                                <li>Science (A, C, F): 1 E, 2 U &rarr; \(H = 0.9183\).</li>
+                                <li>Arts (B, D, E): 2 E, 1 U &rarr; \(H = 0.9183\).</li>
+                                <li>\(H_{\text{after}}(\text{Field}) = \frac{3}{6}(0.9183) + \frac{3}{6}(0.9183) \approx \mathbf{0.9183}\) &rarr; \(IG \approx \mathbf{0.0817}\) bits.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Root:</strong> <strong>Degree</strong> wins. Inside PG (3 E, 1 U), splitting on Field isolates Arts (2 E, 0 U &rarr; E) and Science (1 E, 1 U &rarr; tie-break predicts U). Rows C and F are indistinguishable; training accuracy is \(5/6 = \mathbf{83.33\%}\).</li>
+                    </ul>
+
+                    <h3 id="sub-6-3">6.3 Solved Practice P4 &amp; P5: Pruning Bounds &amp; Alpha Calculations</h3>
+                    <ul>
+                        <li><strong>P4b Pre-Pruning Scenarios:</strong>
+                            <ol>
+                                <li>Parent size 6, children sizes 1 and 5; <code>min_samples_split = 4</code>, <code>min_samples_leaf = 2</code>: <strong>REJECT</strong> because child size 1 &lt; <code>min_samples_leaf</code> (2).</li>
+                                <li>Children sizes 3 and 3 under same limits: <strong>ALLOW</strong> (Parent \(6 \ge 4\), children \(3 \ge 2\)).</li>
+                                <li>Leaf at depth 1 with <code>max_depth = 1</code>: <strong>CANNOT SPLIT</strong>.</li>
+                                <li>Binary tree has 4 leaves, <code>max_leaf_nodes = 5</code>: <strong>CAN SPLIT</strong> (splitting 1 leaf adds 1 net leaf: \(4 - 1 + 2 = 5\)).</li>
+                            </ol>
+                        </li>
+                        <li><strong>P5b Weakest-Link Removal:</strong>
+                            <ul>
+                                <li>Branch C: \(\alpha_{\text{eff}} = \frac{0.14 - 0.08}{4 - 1} = \frac{0.06}{3} = \mathbf{0.020}\)</li>
+                                <li>Branch D: \(\alpha_{\text{eff}} = \frac{0.09 - 0.08}{2 - 1} = \frac{0.01}{1} = \mathbf{0.010}\)</li>
+                                <li><strong>Decision:</strong> Remove <strong>Branch D first</strong> (smallest effective alpha). A larger branch is not automatically removed first; the increase in error per leaf eliminated governs the sequence.</li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <h3 id="sub-6-4">6.4 Solved Practice P6 &amp; P7: Reduced-Error Workflow &amp; Protocol Verification</h3>
+                    <ul>
+                        <li><strong>P6a/b Reduced-Error Workflow:</strong> Subtree training majority is E (3 E vs 1 U). When testing the 6 validation rows, replacing with leaf E gives correct predictions on Rows 1, 2, 4, 5, 6 (5 correct). Across all 20 rows, total correct becomes \(12 + 5 = 17\) (85%), tying the unpruned tree &rarr; <strong>Keep the pruning</strong>. In step P6b, Trial D with 17 correct is undone because the accepted tree baseline had already advanced to 18 correct during Trial C.</li>
+                        <li><strong>P7c Fixing Flawed ML Procedure:</strong>
+                            <div class="box box-red">
+                                <div class="box-title">Data Leakage Violation</div>
+                                <p><strong>Flaw:</strong> Tuning hyperparameter \(\alpha\) on the test set causes test data leakage, leading to optimistic, biased performance estimates.</p>
+                                <p><strong>Correct Protocol:</strong></p>
+                                <ol>
+                                    <li>Partition dataset strictly into <strong>Training (60-70%)</strong>, <strong>Validation (15-20%)</strong>, and <strong>Test (15-20%)</strong> sets.</li>
+                                    <li>Grow full decision trees on the <strong>Training set</strong> only.</li>
+                                    <li>Evaluate candidate \(\alpha\) values (or pre-pruning limits) on the <strong>Validation set</strong> to choose the optimal tree size.</li>
+                                    <li>Evaluate the single chosen tree on the <strong>Test set</strong> exactly once to report true generalization error.</li>
+                                </ol>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <a href="#original-pdf" class="btn"
+                            style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;"
+                            onclick="document.getElementById('original-pdf').scrollIntoView()">Next Section</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number"
+                        style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round"
+                            stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for your reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()"
+                        style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Previous
+                            Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/17.PDF" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+
+</html>

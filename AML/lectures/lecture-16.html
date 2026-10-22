@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Advanced Machine Learning - Lecture 16</title>
+    <meta
+        content="Study notes for Advanced Machine Learning (CSA333), Lecture 16 covering Decision Trees Part I: Learned Rules, Axis-Parallel Splits, CART Classification with Gini Impurity, and CART Regression with Squared Error."
+        name="description" />
+    <link
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>16</text></svg>"
+        rel="icon" />
+    <link href="../css/style.css" rel="stylesheet" />
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}]});"></script>
+</head>
+
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Advanced Machine Learning</h1>
+            <p>Lecture 16 - Decision Trees Part I: Learned Rules, CART Classification &amp; Regression</p>
+            <a href="../index.html"
+                style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">←
+                Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/16.PDF"
+                style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;"
+                target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text" />
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 6</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round"
+                            style="vertical-align: text-bottom; margin-right: 4px;">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>Short Notes</a></li>
+                <li>
+                    <a href="#topic-1">1. Opening Scenario &amp; Decision Tree Foundations<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 Student Placement Motivating Example</a></li>
+                        <li><a href="#sub-1-2">1.2 Axis-Parallel Splits &amp; Partitioning Feature Space</a></li>
+                        <li><a href="#sub-1-3">1.3 Tree Terminology: Root, Nodes, Leaves, and Depth</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. CART Classification Framework &amp; Gini Impurity<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 The CART Splitting Philosophy (Brute-Force Search)</a></li>
+                        <li><a href="#sub-2-2">2.2 Mathematical Formulation of Gini Impurity</a></li>
+                        <li><a href="#sub-2-3">2.3 Intuition of Gini: The Fruit Basket Mismatch Interpretation</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Step-by-Step CART Classification Walkthrough<span class="sub-count">4</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 Evaluating Categorical Splits (Field and Degree)</a></li>
+                        <li><a href="#sub-3-2">3.2 Evaluating Numerical Splits (Thresholding Average Grade)</a></li>
+                        <li><a href="#sub-3-3">3.3 Root Selection &amp; Recursive Partitioning</a></li>
+                        <li><a href="#sub-3-4">3.4 Final Tree Structure &amp; Prediction Regions</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. CART for Regression with Squared Error<span class="sub-count">4</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 Continuous Targets &amp; Variance Impurity Formulation</a></li>
+                        <li><a href="#sub-4-2">4.2 Categorical Split Candidates (Subject and Grade Level)</a></li>
+                        <li><a href="#sub-4-3">4.3 Numerical Split Candidates (Midpoints of Hours Studied)</a></li>
+                        <li><a href="#sub-4-4">4.4 Full Regression Tree Construction &amp; Stepwise Predictions</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Comprehensive Dry Runs &amp; Solved Practice Exercises<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 Practice P1: Mentoring Dataset Classification Dry Run</a></li>
+                        <li><a href="#sub-5-2">5.2 Practice P2: Course &amp; Hours Regression Dry Run</a></li>
+                        <li><a href="#sub-5-3">5.3 Practice P3: Conceptual Mastery, Proofs &amp; Common Fallacies</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-6">6. Strengths, Limitations &amp; Theoretical Tradeoffs<span class="sub-count">2</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-6-1">6.1 Key Advantages of Decision Trees</a></li>
+                        <li><a href="#sub-6-2">6.2 Limitations, Overfitting &amp; Instability</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round"
+                            stroke-linejoin="round" stroke-width="2"
+                            style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>Original PDF</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Short Notes -->
+            <section id="short-notes" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-short-notes')">
+                    <div class="topic-number"
+                        style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                    </div>
+                    <h2>Short Notes &amp; Visual Summary</h2>
+                </div>
+                <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
+                    <p style="margin-bottom: 1rem;">Core principles, formulas, and cheat-sheet summary for Lecture 16:</p>
+
+                    <div style="margin-bottom: 1.5rem; text-align: center;">
+                        <img src="../images/16.png" alt="Lecture 16 Short Notes"
+                            style="max-width: 100%; border-radius: 10px; border: 1px solid var(--border-light); box-shadow: 0 4px 16px rgba(0,0,0,0.08); cursor: pointer;"
+                            onclick="window.open('../images/16.png', '_blank')" title="Click to open full size" />
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">Click image to open full size in a new tab</p>
+                    </div>
+
+                    <div class="box box-blue">
+                        <div class="box-title">Key Decision Tree &amp; CART Takeaways</div>
+                        <ul style="line-height: 1.6;">
+                            <li><strong>Model Nature:</strong> Decision Trees are <em>non-parametric</em> supervised models. They do not assume a linear boundary or fixed coefficient vector; instead, they recursively partition feature space into axis-parallel rectangular regions.</li>
+                            <li><strong>CART Core Mechanism:</strong> CART (<em>Classification and Regression Trees</em>) is strictly <strong>binary</strong>. At every internal node, it searches all available features and all valid candidate values/midpoints to find the single binary question minimizing weighted child impurity.</li>
+                            <li><strong>Classification Metric (Gini Impurity):</strong>
+                                $$G(D) = 1 - \sum_{k=1}^K p_k^2$$
+                                For binary classes: \(G = 1 - p_1^2 - p_2^2 = 2 p_1 p_2\). A pure node has \(G = 0\); an equally balanced binary node has maximum \(G = 0.5\).</li>
+                            <li><strong>Weighted Child Impurity Objective:</strong>
+                                $$J = \frac{n_Y}{n} H(D_Y) + \frac{n_N}{n} H(D_N), \quad \Delta = H(D_{\text{parent}}) - J$$
+                                The split with the lowest weighted child impurity (or highest impurity reduction \(\Delta\)) is selected.</li>
+                            <li><strong>Regression Metric (Mean Squared Error / Variance):</strong>
+                                $$\bar{y} = \frac{1}{n} \sum_{i=1}^n y_i, \quad \text{MSE}(D) = \frac{1}{n} \sum_{i=1}^n (y_i - \bar{y})^2$$
+                                Each regression leaf predicts the training sample mean \(\hat{y} = \bar{y}_{\text{leaf}}\).</li>
+                            <li><strong>Numerical Threshold Generation:</strong> For continuous features, values are sorted in ascending order. Candidate split thresholds \(t\) are the exact midpoints between distinct consecutive values: \(t = \frac{x_{(i)} + x_{(i+1)}}{2}\).</li>
+                            <li><strong>Key Distinction:</strong> Gini impurity measures the probability of mismatch under independent random class assignment. It is <strong>not</strong> the majority-class classification error rate.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 1 -->
+            <section id="topic-1" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">01</div>
+                    <h2>Opening Scenario &amp; Decision Tree Foundations</h2>
+                </div>
+                <div id="content-1" class="collapsible-content">
+                    <h3 id="sub-1-1">1.1 Student Placement Motivating Example</h3>
+                    <p>Consider the introductory NST placement scenario with two continuous predictors: <strong>Hours studied</strong> and <strong>Attendance (%)</strong>, predicting binary target \(y \in \{0, 1\}\) (0 = Not Placed, 1 = Placed):</p>
+
+                    <table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem;">
+                        <thead>
+                            <tr style="background: var(--bg-mint, #e3ede4); text-align: left;">
+                                <th style="padding: 0.6rem; border: 1px solid var(--border-light);">Student</th>
+                                <th style="padding: 0.6rem; border: 1px solid var(--border-light);">Hours studied</th>
+                                <th style="padding: 0.6rem; border: 1px solid var(--border-light);">Attendance (%)</th>
+                                <th style="padding: 0.6rem; border: 1px solid var(--border-light);">Placement \(y\)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td style="padding: 0.5rem; border: 1px solid var(--border-light);">S1</td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">2</td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">60</td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">0</td></tr>
+                            <tr style="background: rgba(19, 34, 25, 0.03);"><td style="padding: 0.5rem; border: 1px solid var(--border-light);">S2</td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">4</td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">80</td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">1</td></tr>
+                            <tr><td style="padding: 0.5rem; border: 1px solid var(--border-light);">S3</td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">6</td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">90</td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">1</td></tr>
+                            <tr style="background: rgba(19, 34, 25, 0.03);"><td style="padding: 0.5rem; border: 1px solid var(--border-light);">S4</td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">5</td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">50</td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">0</td></tr>
+                            <tr><td style="padding: 0.5rem; border: 1px solid var(--border-light);">S5</td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">7</td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">68</td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">0</td></tr>
+                            <tr style="background: rgba(19, 34, 25, 0.03);"><td style="padding: 0.5rem; border: 1px solid var(--border-light);">S6</td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">3</td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">85</td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">0</td></tr>
+                            <tr style="background: #fef3c7; font-weight: bold;"><td style="padding: 0.5rem; border: 1px solid var(--border-light);">New Student</td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">7</td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">82</td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">?</td></tr>
+                        </tbody>
+                    </table>
+
+                    <p>Instead of seeking a single hyper-plane (as in Logistic Regression), a Decision Tree builds nested, human-interpretable <code>if–else</code> logic:</p>
+                    <ol>
+                        <li><strong>Split 1 (Root):</strong> <em>Is Attendance &gt; 75%?</em>
+                            <ul>
+                                <li><strong>No (\(\le 75\%\)):</strong> Rows {S1, S4, S5} &rarr; All targets are 0 &rarr; <strong>Pure Leaf: Predict Not Placed (0)</strong>.</li>
+                                <li><strong>Yes (&gt; 75%):</strong> Rows {S2, S3, S6} &rarr; Targets are {1, 1, 0} &rarr; <em>Mixed node</em>. Answering "Yes" does not guarantee placement (student S6 attended 85% but studied only 3 hours).</li>
+                            </ul>
+                        </li>
+                        <li><strong>Split 2 (Inside the Yes branch only):</strong> <em>Is Hours studied &gt; 3.5?</em>
+                            <ul>
+                                <li><strong>No (\(\le 3.5\)):</strong> Row {S6} &rarr; <strong>Pure Leaf: Predict Not Placed (0)</strong>.</li>
+                                <li><strong>Yes (&gt; 3.5):</strong> Rows {S2, S3} &rarr; <strong>Pure Leaf: Predict Placed (1)</strong>.</li>
+                            </ul>
+                        </li>
+                    </ol>
+
+                    <h3 id="sub-1-2">1.2 Axis-Parallel Splits &amp; Partitioning Feature Space</h3>
+                    <p>Each condition in a decision tree is strictly <strong>axis-parallel</strong> (orthogonal to one feature axis):</p>
+                    <ul>
+                        <li><strong>Region 1:</strong> \(\text{Attendance} \le 75\% \implies \text{Not Placed } (0)\) (Contains S1, S4, S5).</li>
+                        <li><strong>Region 2:</strong> \(\text{Attendance} &gt; 75\% \text{ and } \text{Hours} \le 3.5 \implies \text{Not Placed } (0)\) (Contains S6).</li>
+                        <li><strong>Region 3:</strong> \(\text{Attendance} &gt; 75\% \text{ and } \text{Hours} &gt; 3.5 \implies \text{Placed } (1)\) (Contains S2, S3).</li>
+                    </ul>
+                    <p><strong>Tracing the New Student (Hours = 7, Attendance = 82%):</strong><br>
+                    \(82\% &gt; 75\%\) (Yes) &rarr; \(7 &gt; 3.5\) (Yes) &rarr; Falls squarely into <strong>Region 3 &rarr; Predict Placed (1)</strong>.</p>
+
+                    <div class="box box-green">
+                        <div class="box-title">Key Insight: Local Branch Independence</div>
+                        <p>A subsequent split alters <em>only</em> its own branch. The vertical boundary at \(\text{Hours} = 3.5\) is active exclusively where \(\text{Attendance} &gt; 75\%\); it does not cut across the entire dataset.</p>
+                    </div>
+
+                    <h3 id="sub-1-3">1.3 Tree Terminology: Root, Nodes, Leaves, and Depth</h3>
+                    <table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem;">
+                        <thead>
+                            <tr style="background: var(--bg-mint, #e3ede4); text-align: left;">
+                                <th style="padding: 0.6rem; border: 1px solid var(--border-light);">Term</th>
+                                <th style="padding: 0.6rem; border: 1px solid var(--border-light);">Definition</th>
+                                <th style="padding: 0.6rem; border: 1px solid var(--border-light);">Example in NST Tree</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td style="padding: 0.5rem; border: 1px solid var(--border-light);"><strong>Root Node</strong></td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">The very first question node containing all training instances.</td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">Node A: <em>Attendance &gt; 75%?</em> (Depth 0)</td></tr>
+                            <tr style="background: rgba(19, 34, 25, 0.03);"><td style="padding: 0.5rem; border: 1px solid var(--border-light);"><strong>Internal / Decision Node</strong></td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">Any node that evaluates a feature test and routes rows to sub-branches.</td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">Node B: <em>Hours &gt; 3.5?</em> (Depth 1)</td></tr>
+                            <tr><td style="padding: 0.5rem; border: 1px solid var(--border-light);"><strong>Branch</strong></td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">The outcome of a test (Yes/True or No/False) connecting two nodes.</td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">Yes branch and No branch</td></tr>
+                            <tr style="background: rgba(19, 34, 25, 0.03);"><td style="padding: 0.5rem; border: 1px solid var(--border-light);"><strong>Leaf (Terminal Node)</strong></td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">An endpoint that contains no further questions and outputs a final prediction.</td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">Nodes C (Placed), D (Not Placed), E (Not Placed)</td></tr>
+                            <tr><td style="padding: 0.5rem; border: 1px solid var(--border-light);"><strong>Parent &amp; Child</strong></td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">Directional relation: a parent splits into two or more children.</td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">A is parent of B and E; C and D are children of B</td></tr>
+                            <tr style="background: rgba(19, 34, 25, 0.03);"><td style="padding: 0.5rem; border: 1px solid var(--border-light);"><strong>Depth</strong></td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">The number of edge transitions from the root: Root = 0.</td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">Root A: Depth 0; Node B: Depth 1; Leaves C, D: Depth 2</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="topic-nav">
+                        <button class="btn" disabled="">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section id="topic-2" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">02</div>
+                    <h2>CART Classification Framework &amp; Gini Impurity</h2>
+                </div>
+                <div id="content-2" class="collapsible-content">
+                    <h3 id="sub-2-1">2.1 The CART Splitting Philosophy (Brute-Force Search)</h3>
+                    <p><strong>CART</strong> stands for <em>Classification and Regression Trees</em> (Breiman et al., 1984). It operates via greedy, recursive binary splitting:</p>
+                    <ol>
+                        <li>To create a node from dataset \(D\) of size \(n\), we specify two components: a <strong>feature</strong> \(f\) and a <strong>value/threshold</strong> \(t\).</li>
+                        <li>This question partitions \(D\) into two mutually exclusive sets:
+                            $$D_Y = \{x \in D \mid \text{Question is True}\}, \quad D_N = \{x \in D \mid \text{Question is False}\}$$
+                            where \(n_Y = |D_Y|\), \(n_N = |D_N|\), and \(n_Y + n_N = n\).</li>
+                        <li>We evaluate candidate splits by computing the <strong>weighted child impurity</strong>:
+                            $$J(f, t) = \frac{n_Y}{n} H(D_Y) + \frac{n_N}{n} H(D_N)$$
+                        </li>
+                        <li>CART brute-force searches across <em>every single candidate</em> (all categorical values, all continuous numerical midpoints) and selects the pair \((f^*, t^*)\) achieving the <strong>minimum weighted child impurity</strong>.</li>
+                    </ol>
+
+                    <h3 id="sub-2-2">2.2 Mathematical Formulation of Gini Impurity</h3>
+                    <p>In CART classification, the canonical impurity measure \(H(D)\) is the <strong>Gini Impurity</strong> \(G(D)\):</p>
+                    $$G(D) = 1 - \sum_{k=1}^K p_k^2$$
+                    <p>where \(p_k\) is the empirical fraction of observations in node \(D\) that belong to class \(k\): \(p_k = \frac{n_k}{n}\).</p>
+                    <ul>
+                        <li><strong>For a perfectly pure node (all items belong to one class):</strong> \(p_1 = 1, p_{k \ne 1} = 0 \implies G(D) = 1 - (1)^2 = 0\).</li>
+                        <li><strong>For a two-class binary problem (\(p_1 + p_2 = 1\)):</strong>
+                            $$G(D) = 1 - p_1^2 - p_2^2 = 1 - p_1^2 - (1 - p_1)^2 = 2 p_1 (1 - p_1)$$
+                            When evenly mixed (\(p_1 = 0.5, p_2 = 0.5\)), Gini reaches its maximum of \(2(0.5)(0.5) = 0.5\).
+                        </li>
+                        <li><strong>For general \(K\) classes:</strong> The theoretical maximum Gini occurs when all classes are equally frequent (\(p_k = 1/K\)):
+                            $$G_{\max} = 1 - \sum_{k=1}^K \left(\frac{1}{K}\right)^2 = 1 - K \cdot \frac{1}{K^2} = 1 - \frac{1}{K}$$
+                        </li>
+                    </ul>
+
+                    <h3 id="sub-2-3">2.3 Intuition of Gini: The Fruit Basket Mismatch Interpretation</h3>
+                    <p>Why does \(1 - \sum p_k^2\) represent impurity? The worksheet provides an intuitive probabilistic thought experiment:</p>
+                    <div class="box box-yellow">
+                        <div class="box-title">The Random Guessing Game</div>
+                        <p>Suppose you draw a fruit at random from a basket, observe its true class, and place it back. Then you draw a second fruit at random and guess that the first fruit's class matches the second fruit's class.</p>
+                        <p><strong>Gini Impurity is precisely the probability of making an incorrect guess (a class mismatch):</strong></p>
+                        $$P(\text{Match}) = \sum_{k=1}^K P(\text{Both are class } k) = \sum_{k=1}^K p_k \cdot p_k = \sum_{k=1}^K p_k^2$$
+                        $$P(\text{Mismatch}) = 1 - P(\text{Match}) = 1 - \sum_{k=1}^K p_k^2 = G(D)$$
+                    </div>
+
+                    <p><strong>Concrete Examples from Lecture 16:</strong></p>
+                    <ul>
+                        <li><strong>Basket with 3 Oranges and 2 Apples (\(n=5\)):</strong>
+                            $$p_O = 3/5, \quad p_A = 2/5$$
+                            $$P(\text{Match}) = (3/5)^2 + (2/5)^2 = \frac{9 + 4}{25} = \frac{13}{25} = 0.52$$
+                            $$G = P(\text{Mismatch}) = 1 - \frac{13}{25} = \frac{12}{25} = 0.48$$
+                        </li>
+                        <li><strong>Basket with 5 equally frequent fruits (Orange, Mango, Grape, Banana, Cranberry; \(p_k = 1/5\)):</strong>
+                            $$P(\text{Match}) = 5 \times (1/5)^2 = 5/25 = 1/5 = 0.20$$
+                            $$G = 1 - 0.20 = 0.80$$
+                        </li>
+                    </ul>
+
+                    <div class="box box-red">
+                        <div class="box-title">Common Trap: Gini Impurity &ne; Majority Classification Error</div>
+                        <p>In the 3-Orange / 2-Apple basket, a deterministic majority-class leaf always predicts "Orange", yielding an error rate of \(2/5 = 0.40\) (40%). Its Gini impurity, however, is \(0.48\) (48%). Gini measures <em>random label assignment mismatch</em>, which heavily penalizes mixed probability distributions.</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section id="topic-3" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">03</div>
+                    <h2>Step-by-Step CART Classification Walkthrough</h2>
+                </div>
+                <div id="content-3" class="collapsible-content">
+                    <p>We work through the complete 10-row employment dataset from Worksheet 16:</p>
+                    <table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.88rem;">
+                        <thead>
+                            <tr style="background: var(--bg-mint, #e3ede4); text-align: left;">
+                                <th style="padding: 0.5rem; border: 1px solid var(--border-light);">Row</th>
+                                <th style="padding: 0.5rem; border: 1px solid var(--border-light);">Degree</th>
+                                <th style="padding: 0.5rem; border: 1px solid var(--border-light);">Field</th>
+                                <th style="padding: 0.5rem; border: 1px solid var(--border-light);">Average Grade</th>
+                                <th style="padding: 0.5rem; border: 1px solid var(--border-light);">Job Outcome (\(y\))</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td style="padding: 0.4rem; border: 1px solid var(--border-light);">0</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">UG</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">Science</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">89</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">E (Employed)</td></tr>
+                            <tr style="background: rgba(19, 34, 25, 0.03);"><td style="padding: 0.4rem; border: 1px solid var(--border-light);">1</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">UG</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">Arts</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">92</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">U (Unemployed)</td></tr>
+                            <tr><td style="padding: 0.4rem; border: 1px solid var(--border-light);">2</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">PG</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">Science</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">95</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">E</td></tr>
+                            <tr style="background: rgba(19, 34, 25, 0.03);"><td style="padding: 0.4rem; border: 1px solid var(--border-light);">3</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">PhD</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">Science</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">85</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">E</td></tr>
+                            <tr><td style="padding: 0.4rem; border: 1px solid var(--border-light);">4</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">PG</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">Arts</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">98</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">U</td></tr>
+                            <tr style="background: rgba(19, 34, 25, 0.03);"><td style="padding: 0.4rem; border: 1px solid var(--border-light);">5</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">PhD</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">Arts</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">90</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">E</td></tr>
+                            <tr><td style="padding: 0.4rem; border: 1px solid var(--border-light);">6</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">UG</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">Science</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">88</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">U</td></tr>
+                            <tr style="background: rgba(19, 34, 25, 0.03);"><td style="padding: 0.4rem; border: 1px solid var(--border-light);">7</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">PG</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">Arts</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">93</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">E</td></tr>
+                            <tr><td style="padding: 0.4rem; border: 1px solid var(--border-light);">8</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">UG</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">Arts</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">94</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">U</td></tr>
+                            <tr style="background: rgba(19, 34, 25, 0.03);"><td style="padding: 0.4rem; border: 1px solid var(--border-light);">9</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">PhD</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">Science</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">86</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">E</td></tr>
+                        </tbody>
+                    </table>
+
+                    <p><strong>Parent Dataset Metrics:</strong> Total rows \(n = 10\) (6 Employed, 4 Unemployed):</p>
+                    $$p_E = 6/10 = 0.6, \quad p_U = 4/10 = 0.4$$
+                    $$G(D_{\text{parent}}) = 1 - (0.6)^2 - (0.4)^2 = 1 - 0.36 - 0.16 = \frac{12}{25} = 0.4800$$
+
+                    <h3 id="sub-3-1">3.1 Evaluating Categorical Splits (Field and Degree)</h3>
+                    <p><strong>Candidate 1: Is Field = Science?</strong></p>
+                    <ul>
+                        <li><strong>Yes Child (\(n_Y = 5\), rows {0, 2, 3, 6, 9}):</strong> 4 E, 1 U
+                            $$G_Y = 1 - (4/5)^2 - (1/5)^2 = 1 - 16/25 - 1/25 = \frac{8}{25} = 0.3200$$
+                        </li>
+                        <li><strong>No Child (\(n_N = 5\), rows {1, 4, 5, 7, 8}):</strong> 2 E, 3 U
+                            $$G_N = 1 - (2/5)^2 - (3/5)^2 = 1 - 4/25 - 9/25 = \frac{12}{25} = 0.4800$$
+                        </li>
+                        <li><strong>Weighted Impurity \(J_G\):</strong>
+                            $$J_G = \frac{5}{10}(0.3200) + \frac{5}{10}(0.4800) = \frac{2}{5} = 0.4000$$
+                            $$\Delta G = 0.4800 - 0.4000 = 0.0800$$
+                            <em>Note:</em> Asking <em>Field = Arts?</em> merely inverts the Yes and No labels, yielding identical \(J_G = 0.4000\).
+                        </li>
+                    </ul>
+
+                    <p><strong>Candidate 2: Is Degree = UG?</strong></p>
+                    <ul>
+                        <li><strong>Yes Child (\(n_Y = 4\), rows {0, 1, 6, 8}):</strong> 1 E, 3 U
+                            $$G_Y = 1 - (1/4)^2 - (3/4)^2 = 1 - 1/16 - 9/16 = \frac{6}{16} = \frac{3}{8} = 0.3750$$
+                        </li>
+                        <li><strong>No Child (\(n_N = 6\), rows {2, 3, 4, 5, 7, 9}):</strong> 5 E, 1 U
+                            $$G_N = 1 - (5/6)^2 - (1/6)^2 = 1 - 25/36 - 1/36 = \frac{10}{36} = \frac{5}{18} \approx 0.2778$$
+                        </li>
+                        <li><strong>Weighted Impurity \(J_G\):</strong>
+                            $$J_G = \frac{4}{10}\left(\frac{3}{8}\right) + \frac{6}{10}\left(\frac{5}{18}\right) = \frac{3}{20} + \frac{1}{6} = \frac{9 + 10}{60} = \frac{19}{60} \approx 0.3167$$
+                            $$\Delta G = \frac{12}{25} - \frac{19}{60} = \frac{144 - 95}{300} = \frac{49}{300} \approx 0.1633$$
+                        </li>
+                    </ul>
+
+                    <p><strong>Other Degree Candidates:</strong></p>
+                    <ul>
+                        <li><em>Degree = PG?</em> \(J_G = 10/21 \approx 0.4762\)</li>
+                        <li><em>Degree = PhD?</em> \(J_G = 12/35 \approx 0.3429\)</li>
+                    </ul>
+
+                    <h3 id="sub-3-2">3.2 Evaluating Numerical Splits (Thresholding Average Grade)</h3>
+                    <p>To evaluate numerical feature <strong>Average Grade</strong>, we sort distinct values in ascending order and compute all adjacent midpoints:</p>
+                    <table style="width: 100%; border-collapse: collapse; margin: 0.8rem 0; font-size: 0.85rem;">
+                        <thead>
+                            <tr style="background: var(--bg-mint, #e3ede4);">
+                                <th style="padding: 0.4rem; border: 1px solid var(--border-light);">Sorted Grade</th>
+                                <th style="padding: 0.4rem; border: 1px solid var(--border-light);">Outcome</th>
+                                <th style="padding: 0.4rem; border: 1px solid var(--border-light);">Midpoint Candidate (\(t\))</th>
+                                <th style="padding: 0.4rem; border: 1px solid var(--border-light);">Weighted Gini \(J_G\)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td style="padding: 0.3rem; border: 1px solid var(--border-light);">85</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">E</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">(85+86)/2 = <strong>85.5</strong></td><td style="padding: 0.3rem; border: 1px solid var(--border-light);"><span class="math inline">\(\frac{9}{10}(\frac{40}{81}) + \frac{1}{10}(0) = \frac{4}{9} \approx 0.4444\)</span></td></tr>
+                            <tr><td style="padding: 0.3rem; border: 1px solid var(--border-light);">86</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">E</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">(86+88)/2 = <strong>87.0</strong></td><td style="padding: 0.3rem; border: 1px solid var(--border-light);"><span class="math inline">\(\frac{8}{10}(\frac{1}{2}) + \frac{2}{10}(0) = \frac{2}{5} = \mathbf{0.4000}\)</span></td></tr>
+                            <tr><td style="padding: 0.3rem; border: 1px solid var(--border-light);">88</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">U</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">(88+89)/2 = <strong>88.5</strong></td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">\(10/21 \approx 0.4762\)</td></tr>
+                            <tr><td style="padding: 0.3rem; border: 1px solid var(--border-light);">89</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">E</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">(89+90)/2 = <strong>89.5</strong></td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">\(9/20 = 0.4500\)</td></tr>
+                            <tr><td style="padding: 0.3rem; border: 1px solid var(--border-light);">90</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">E</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">(90+92)/2 = <strong>91.0</strong></td><td style="padding: 0.3rem; border: 1px solid var(--border-light);"><span class="math inline">\(\frac{2}{5} = \mathbf{0.4000}\)</span></td></tr>
+                            <tr><td style="padding: 0.3rem; border: 1px solid var(--border-light);">92</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">U</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">(92+93)/2 = <strong>92.5</strong></td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">\(7/15 \approx 0.4667\)</td></tr>
+                            <tr><td style="padding: 0.3rem; border: 1px solid var(--border-light);">93</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">E</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">(93+94)/2 = <strong>93.5</strong></td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">\(44/105 \approx 0.4190\)</td></tr>
+                            <tr><td style="padding: 0.3rem; border: 1px solid var(--border-light);">94</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">U</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">(94+95)/2 = <strong>94.5</strong></td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">\(19/40 = 0.4750\)</td></tr>
+                            <tr><td style="padding: 0.3rem; border: 1px solid var(--border-light);">95</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">E</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">(95+98)/2 = <strong>96.5</strong></td><td style="padding: 0.3rem; border: 1px solid var(--border-light);"><span class="math inline">\(\frac{2}{5} = \mathbf{0.4000}\)</span></td></tr>
+                            <tr><td style="padding: 0.3rem; border: 1px solid var(--border-light);">98</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">U</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);"><em>(End of list)</em></td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">&mdash;</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3 id="sub-3-3">3.3 Root Selection &amp; Recursive Partitioning</h3>
+                    <p>Comparing the best candidate from every feature:</p>
+                    <ul>
+                        <li>Best from Field: \(J_G = 0.4000\)</li>
+                        <li>Best from Grade: \(J_G = 0.4000\) (at thresholds 87, 91, 96.5)</li>
+                        <li><strong>Best from Degree: \(J_G = \mathbf{0.3167}\) (at \(\text{Degree} = \text{UG}\)) &larr; GLOBAL WINNER!</strong></li>
+                    </ul>
+
+                    <p><strong>Recursive Splitting within Children:</strong></p>
+                    <ul>
+                        <li><strong>UG Child (\(n=4\), rows {0, 1, 6, 8} with 1 E, 3 U):</strong>
+                            Testing <em>Field = Science?</em> splits into:
+                            <ul>
+                                <li>Yes (\(n=2\), rows {0, 6}: 1 E, 1 U). Next split: <em>Grade \(\le 88.5\)?</em> &rarr; Yes gives Row 6 (U, pure); No gives Row 0 (E, pure).</li>
+                                <li>No (\(n=2\), rows {1, 8}: 2 U) &rarr; <strong>Pure Leaf: Predict U</strong>.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Non-UG Child (\(n=6\), rows {2, 3, 4, 5, 7, 9} with 5 E, 1 U):</strong>
+                            Testing <em>Grade \(\le 96.5\)?</em> isolates Row 4 (Grade 98, U) from Rows {2, 3, 5, 7, 9} (all E, pure) &rarr; Both leaves pure!
+                        </li>
+                    </ul>
+
+                    <h3 id="sub-3-4">3.4 Final Tree Structure &amp; Prediction Regions</h3>
+                    <p>The resulting tree reaches <strong>zero training impurity</strong> (\(G_{\text{tree}} = 0\)) with five pure leaves at maximum depth 3:</p>
+                    <ol>
+                        <li>Path 1: \(\text{UG} \to \text{Science} \to \text{Grade} \le 88.5 \implies \mathbf{U}\) (Row 6)</li>
+                        <li>Path 2: \(\text{UG} \to \text{Science} \to \text{Grade} &gt; 88.5 \implies \mathbf{E}\) (Row 0)</li>
+                        <li>Path 3: \(\text{UG} \to \text{Arts} \implies \mathbf{U}\) (Rows 1, 8)</li>
+                        <li>Path 4: \(\text{Non-UG} \to \text{Grade} \le 96.5 \implies \mathbf{E}\) (Rows 2, 3, 5, 7, 9)</li>
+                        <li>Path 5: \(\text{Non-UG} \to \text{Grade} &gt; 96.5 \implies \mathbf{U}\) (Row 4)</li>
+                    </ol>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section id="topic-4" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">04</div>
+                    <h2>CART for Regression with Squared Error</h2>
+                </div>
+                <div id="content-4" class="collapsible-content">
+                    <h3 id="sub-4-1">4.1 Continuous Targets &amp; Variance Impurity Formulation</h3>
+                    <p>When target \(y\) is continuous, CART measures node impurity using <strong>Mean Squared Error (sample variance)</strong> around the node's target mean \(\bar{y}\):</p>
+                    $$\bar{y} = \frac{1}{n} \sum_{i=1}^n y_i, \quad \text{MSE}(D) = \frac{1}{n} \sum_{i=1}^n (y_i - \bar{y})^2$$
+                    <p>The splitting criterion minimizes the weighted child MSE:</p>
+                    $$J_{\text{MSE}} = \frac{n_Y}{n} \text{MSE}(D_Y) + \frac{n_N}{n} \text{MSE}(D_N), \quad \Delta = \text{MSE}(D_{\text{parent}}) - J_{\text{MSE}}$$
+                    <p><strong>Leaf Prediction Rule:</strong> Every regression leaf predicts the arithmetic mean of its training observations:</p>
+                    $$\hat{y}_{\text{leaf}} = \bar{y}_{\text{leaf}} = \frac{1}{n_{\text{leaf}}} \sum_{i \in \text{leaf}} y_i$$
+
+                    <h3 id="sub-4-2">4.2 Categorical Split Candidates (Subject and Grade Level)</h3>
+                    <p>Consider the 8-row Test Score dataset from Section 4 of Worksheet 16:</p>
+                    <table style="width: 100%; border-collapse: collapse; margin: 0.8rem 0; font-size: 0.85rem;">
+                        <thead>
+                            <tr style="background: var(--bg-mint, #e3ede4);">
+                                <th style="padding: 0.4rem; border: 1px solid var(--border-light);">Row</th>
+                                <th style="padding: 0.4rem; border: 1px solid var(--border-light);">Subject</th>
+                                <th style="padding: 0.4rem; border: 1px solid var(--border-light);">Grade Level</th>
+                                <th style="padding: 0.4rem; border: 1px solid var(--border-light);">Hours studied</th>
+                                <th style="padding: 0.4rem; border: 1px solid var(--border-light);">Test Score \(y\)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td style="padding: 0.3rem; border: 1px solid var(--border-light);">0</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">Math</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">Freshman</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">4</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">59</td></tr>
+                            <tr style="background: rgba(19, 34, 25, 0.03);"><td style="padding: 0.3rem; border: 1px solid var(--border-light);">1</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">Physics</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">Freshman</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">1</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">82</td></tr>
+                            <tr><td style="padding: 0.3rem; border: 1px solid var(--border-light);">2</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">Physics</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">Freshman</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">4</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">81</td></tr>
+                            <tr style="background: rgba(19, 34, 25, 0.03);"><td style="padding: 0.3rem; border: 1px solid var(--border-light);">3</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">Math</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">Junior</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">6</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">60</td></tr>
+                            <tr><td style="padding: 0.3rem; border: 1px solid var(--border-light);">4</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">Physics</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">Sophomore</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">1</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">73</td></tr>
+                            <tr style="background: rgba(19, 34, 25, 0.03);"><td style="padding: 0.3rem; border: 1px solid var(--border-light);">5</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">Physics</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">Junior</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">3</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">85</td></tr>
+                            <tr><td style="padding: 0.3rem; border: 1px solid var(--border-light);">6</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">Physics</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">Junior</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">4</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">61</td></tr>
+                            <tr style="background: rgba(19, 34, 25, 0.03);"><td style="padding: 0.3rem; border: 1px solid var(--border-light);">7</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">Physics</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">Freshman</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">9</td><td style="padding: 0.3rem; border: 1px solid var(--border-light);">78</td></tr>
+                        </tbody>
+                    </table>
+
+                    <p><strong>Parent Node Metrics:</strong></p>
+                    $$\bar{y}_P = \frac{59 + 82 + 81 + 60 + 73 + 85 + 61 + 78}{8} = \frac{579}{8} = 72.375$$
+                    $$\text{MSE}_P = \frac{6559}{64} \approx 102.4844$$
+
+                    <p><strong>Candidate: Is Subject = Math?</strong></p>
+                    <ul>
+                        <li><strong>Yes Child (Math; rows {0, 3}):</strong> Scores [59, 60]
+                            $$\mu_Y = \frac{59+60}{2} = 59.5, \quad \text{MSE}_Y = \frac{(59-59.5)^2 + (60-59.5)^2}{2} = \frac{0.25+0.25}{2} = 0.25$$
+                        </li>
+                        <li><strong>No Child (Physics; rows {1, 2, 4, 5, 6, 7}):</strong> Scores [82, 81, 73, 85, 61, 78]
+                            $$\mu_N = \frac{460}{6} = \frac{230}{3} \approx 76.6667, \quad \text{MSE}_N = \frac{566}{9} \approx 62.8889$$
+                        </li>
+                        <li><strong>Weighted MSE \(J\):</strong>
+                            $$J = \frac{2}{8}(0.25) + \frac{6}{8}\left(\frac{566}{9}\right) = \frac{1}{16} + \frac{566}{12} = \frac{2267}{48} \approx \mathbf{47.2292}$$
+                            $$\Delta = 102.4844 - 47.2292 = 55.2552$$
+                        </li>
+                    </ul>
+
+                    <p><strong>Other Categorical Candidates:</strong></p>
+                    <ul>
+                        <li><em>Grade = Freshman?</em> \(J = 3059/32 \approx 95.5938\)</li>
+                        <li><em>Grade = Junior?</em> \(J = 2827/30 \approx 94.2333\)</li>
+                        <li><em>Grade = Sophomore?</em> \(J = 717/7 \approx 102.4286\)</li>
+                    </ul>
+
+                    <h3 id="sub-4-3">4.3 Numerical Split Candidates (Midpoints of Hours Studied)</h3>
+                    <p>Distinct sorted values of <strong>Hours studied</strong> are {1, 3, 4, 6, 9}. Midpoints are:</p>
+                    <ul>
+                        <li><strong>Hours &le; 2:</strong> \(J = 4499/48 \approx 93.7292\)</li>
+                        <li><strong>Hours &le; 3.5:</strong> \(J = 338/5 = \mathbf{67.6000}\)</li>
+                        <li><strong>Hours &le; 5:</strong> \(J = 1579/16 \approx 98.6875\)</li>
+                        <li><strong>Hours &le; 7.5:</strong> \(J = 2743/28 \approx 97.9643\)</li>
+                    </ul>
+
+                    <div class="box box-mint">
+                        <div class="box-title">Root Split Comparison</div>
+                        <p>Comparing the strongest questions across all features:</p>
+                        <ul>
+                            <li>Subject: <em>Subject = Math?</em> &rarr; \(J = \mathbf{47.2292}\) (Winner!)</li>
+                            <li>Grade: <em>Grade = Junior?</em> &rarr; \(J = 94.2333\)</li>
+                            <li>Hours: <em>Hours &le; 3.5?</em> &rarr; \(J = 67.6000\)</li>
+                        </ul>
+                        <p><strong>Selected Root:</strong> <code>Subject = Math</code>. At this initial split, predictions are <strong>59.5</strong> for Math and <strong>76.67</strong> for Physics.</p>
+                    </div>
+
+                    <h3 id="sub-4-4">4.4 Full Regression Tree Construction &amp; Stepwise Predictions</h3>
+                    <p>Recursively partitioning until every leaf contains exactly one training row produces an 8-leaf tree with zero training MSE (\(\text{MSE}_{\text{tree}} = 0\)):</p>
+                    <ul>
+                        <li>Math branch: Split by <em>Grade = Freshman?</em> &rarr; Row 0 (\(\hat{y} = 59\)) and Row 3 (\(\hat{y} = 60\)).</li>
+                        <li>Physics branch: Split by <em>Grade = Freshman?</em>
+                            <ul>
+                                <li>Physics Freshman: Split on <em>Hours &le; 6.5</em>, then <em>Hours &le; 2.5</em> &rarr; yields Row 1 (\(\hat{y} = 82\)), Row 2 (\(\hat{y} = 81\)), Row 7 (\(\hat{y} = 78\)).</li>
+                                <li>Physics other Grades: Split on <em>Hours &le; 3.5</em> &rarr; Row 6 (\(\hat{y} = 61\)); remaining branch split by <em>Sophomore?</em> &rarr; Row 4 (\(\hat{y} = 73\)), Row 5 (\(\hat{y} = 85\)).</li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 5 -->
+            <section id="topic-5" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">05</div>
+                    <h2>Comprehensive Dry Runs &amp; Solved Practice Exercises</h2>
+                </div>
+                <div id="content-5" class="collapsible-content">
+                    <h3 id="sub-5-1">5.1 Practice P1: Mentoring Dataset Classification Dry Run</h3>
+                    <p><strong>Problem Setup:</strong> 6 students with Hours \(\{1, 2, 3, 4, 5, 6\}\), Mentor \(\{\text{No, Yes, No, Yes, Yes, No}\}\), Selection \(y \in \{0, 1\}\):</p>
+                    <ul>
+                        <li>Rows: A(1, No, 0), B(2, Yes, 1), C(3, No, 0), D(4, Yes, 1), E(5, Yes, 0), F(6, No, 0).</li>
+                        <li>Parent class counts: 2 Selected (1), 4 Not Selected (0) &rarr; \(n=6\).</li>
+                        <li>Parent Gini: \(G(D_P) = 1 - (2/6)^2 - (4/6)^2 = 1 - 1/9 - 4/9 = \frac{4}{9} \approx 0.4444\).</li>
+                    </ul>
+
+                    <p><strong>Comparing Root Split Candidates:</strong></p>
+                    <table style="width: 100%; border-collapse: collapse; margin: 0.8rem 0; font-size: 0.88rem;">
+                        <thead>
+                            <tr style="background: var(--bg-mint, #e3ede4);">
+                                <th style="padding: 0.4rem; border: 1px solid var(--border-light);">Question</th>
+                                <th style="padding: 0.4rem; border: 1px solid var(--border-light);">Yes Counts (1/0)</th>
+                                <th style="padding: 0.4rem; border: 1px solid var(--border-light);">No Counts (1/0)</th>
+                                <th style="padding: 0.4rem; border: 1px solid var(--border-light);">\(G_Y\)</th>
+                                <th style="padding: 0.4rem; border: 1px solid var(--border-light);">\(G_N\)</th>
+                                <th style="padding: 0.4rem; border: 1px solid var(--border-light);">Weighted Gini \(J_G\)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="background: #ecfdf5; font-weight: bold;"><td style="padding: 0.4rem; border: 1px solid var(--border-light);">Mentor = Yes</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">2/1 (B, D, E)</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">0/3 (A, C, F)</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">4/9 &approx; 0.4444</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">0.0000</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);"><span class="math inline">\(\frac{3}{6}(\frac{4}{9}) + \frac{3}{6}(0) = \mathbf{0.2222}\)</span></td></tr>
+                            <tr><td style="padding: 0.4rem; border: 1px solid var(--border-light);">Hours &le; 1.5</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">0/1 (A)</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">2/3 (B,C,D,E,F)</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">0.0000</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">12/25 = 0.4800</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);"><span class="math inline">\(\frac{1}{6}(0) + \frac{5}{6}(0.48) = 0.4000\)</span></td></tr>
+                            <tr><td style="padding: 0.4rem; border: 1px solid var(--border-light);">Hours &le; 2.5</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">1/1 (A, B)</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">1/3 (C,D,E,F)</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">0.5000</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">3/8 = 0.3750</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);"><span class="math inline">\(\frac{2}{6}(0.5) + \frac{4}{6}(0.375) = 0.4167\)</span></td></tr>
+                            <tr><td style="padding: 0.4rem; border: 1px solid var(--border-light);">Hours &le; 3.5</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">1/2 (A, B, C)</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">1/2 (D, E, F)</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">4/9 &approx; 0.4444</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">4/9 &approx; 0.4444</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);"><span class="math inline">\(\frac{3}{6}(0.4444) + \frac{3}{6}(0.4444) = 0.4444\)</span></td></tr>
+                            <tr><td style="padding: 0.4rem; border: 1px solid var(--border-light);">Hours &le; 4.5</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">2/2 (A,B,C,D)</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">0/2 (E, F)</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">0.5000</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">0.0000</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);"><span class="math inline">\(\frac{4}{6}(0.5) + \frac{2}{6}(0) = 0.3333\)</span></td></tr>
+                            <tr><td style="padding: 0.4rem; border: 1px solid var(--border-light);">Hours &le; 5.5</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">2/3 (A,B,C,D,E)</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">0/1 (F)</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">12/25 = 0.4800</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);">0.0000</td><td style="padding: 0.4rem; border: 1px solid var(--border-light);"><span class="math inline">\(\frac{5}{6}(0.48) + \frac{1}{6}(0) = 0.4000\)</span></td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="box box-blue">
+                        <div class="box-title">Challenge Question Resolution (Worksheet P1c)</div>
+                        <p><strong>Student claim:</strong> <em>"The Hours split at 1.5 has a pure Yes child (\(G_Y = 0\)), so it must beat the Mentor split."</em></p>
+                        <p><strong>Refutation:</strong> <strong>False.</strong> A split must be evaluated on its <em>weighted total child impurity</em> across both branches. The \(\text{Hours} \le 1.5\) split isolates only 1 row in its pure child (\(w_Y = 1/6\)) while leaving 5 rows heavily mixed in the other child (\(G_N = 0.48\)), resulting in \(J_G = 0.4000\). Conversely, <code>Mentor = Yes</code> creates a pure 3-row No child (\(w_N = 3/6\)) and a smaller mixed child (\(n=3\)), achieving \(J_G = \mathbf{0.2222}\). Mentor is vastly superior.</p>
+                    </div>
+
+                    <h3 id="sub-5-2">5.2 Practice P2: Course &amp; Hours Regression Dry Run</h3>
+                    <p>6 rows: A(1, Course A, 10), B(2, Course B, 50), C(3, Course A, 12), D(4, Course B, 50), E(5, Course A, 30), F(6, Course B, 50):</p>
+                    <ul>
+                        <li>Parent target values: [10, 50, 12, 50, 30, 50] &rarr; \(\sum y = 202 \implies \bar{y} = 202/6 = 33.67\).</li>
+                        <li>Testing <code>Course = A</code>:
+                            <ul>
+                                <li>Yes Child (Course A; rows {A, C, E}): Scores [10, 12, 30] &rarr; \(\mu_Y = 52/3 \approx 17.33, \text{MSE}_Y = 82.89\).</li>
+                                <li>No Child (Course B; rows {B, D, F}): Scores [50, 50, 50] &rarr; \(\mu_N = 50.0, \text{MSE}_N = \mathbf{0.0000}\) (Perfect leaf!).</li>
+                                <li>Weighted MSE: \(J_{\text{MSE}} = \frac{3}{6}(82.89) + \frac{3}{6}(0) = \mathbf{41.44}\). This dominates all candidate Hours thresholds.</li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <h3 id="sub-5-3">5.3 Practice P3: Conceptual Mastery, Proofs &amp; Common Fallacies</h3>
+                    <ol>
+                        <li><strong>Gini vs. Majority Misclassification:</strong> A node with 6 employed and 4 unemployed has \(G = 0.48\). If it predicts majority class (Employed), the misclassification rate is \(4/10 = 40\%\), <em>not</em> 48%.</li>
+                        <li><strong>Binary Encoding vs. Task Nature:</strong> Coding binary Placement as 0 and 1 does <em>not</em> make it a regression task. The nature of the target (discrete categorical classes vs. continuous real-valued metric) dictates whether the task is classification or regression.</li>
+                        <li><strong>Zero Training Error &ne; Perfect Generalization:</strong> A tree grown until every leaf contains 1 observation achieves zero training MSE/impurity by memorizing noise and training outliers. It typically overfits and degrades on unseen test data.</li>
+                        <li><strong>Identical Leaf Predictions:</strong> Any two test observations that traverse the tree and terminate in the same leaf receive the <strong>exact same prediction</strong>, regardless of differences in their individual feature values.</li>
+                    </ol>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 6 -->
+            <section id="topic-6" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-6')">
+                    <div class="topic-number">06</div>
+                    <h2>Strengths, Limitations &amp; Theoretical Tradeoffs</h2>
+                </div>
+                <div id="content-6" class="collapsible-content">
+                    <h3 id="sub-6-1">6.1 Key Advantages of Decision Trees</h3>
+                    <table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem;">
+                        <thead>
+                            <tr style="background: var(--bg-mint, #e3ede4); text-align: left;">
+                                <th style="padding: 0.6rem; border: 1px solid var(--border-light);">Advantage</th>
+                                <th style="padding: 0.6rem; border: 1px solid var(--border-light);">Description &amp; Concrete Practical Significance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td style="padding: 0.5rem; border: 1px solid var(--border-light);"><strong>White-Box Interpretability</strong></td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">Unlike black-box models (deep neural nets, SVMs), small trees can be parsed directly as explicit, human-readable logic rules (flowcharts).</td></tr>
+                            <tr style="background: rgba(19, 34, 25, 0.03);"><td style="padding: 0.5rem; border: 1px solid var(--border-light);"><strong>No Feature Scaling Required</strong></td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">Because splits depend only on the rank order of features, monotonic transformations (standardization, normalization, log transforms) have zero effect on split selection.</td></tr>
+                            <tr><td style="padding: 0.5rem; border: 1px solid var(--border-light);"><strong>Inherent Non-Linearity &amp; Interactions</strong></td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">Naturally models feature interactions without manually engineering cross-product terms (e.g., condition on Hours only when Attendance &gt; 75%).</td></tr>
+                            <tr style="background: rgba(19, 34, 25, 0.03);"><td style="padding: 0.5rem; border: 1px solid var(--border-light);"><strong>Rapid Inference Time</strong></td><td style="padding: 0.5rem; border: 1px solid var(--border-light);">Predicting a new row requires evaluating at most \(O(\text{depth})\) scalar comparisons along a single path from root to leaf, rather than matrix multiplications across all features.</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3 id="sub-6-2">6.2 Limitations, Overfitting &amp; Instability</h3>
+                    <ul>
+                        <li><strong>High Variance &amp; Instability:</strong> Decision trees are notoriously high-variance estimators. A small perturbation in the training dataset can alter the root split, cascading completely different decision boundaries throughout all subsequent subtrees.</li>
+                        <li><strong>Proneness to Severe Overfitting:</strong> Without stopping conditions (depth limits, leaf size constraints), trees expand until every leaf is pure, memorizing spurious noise and idiosyncratic training outliers.</li>
+                        <li><strong>Axis-Parallel Constraint:</strong> Cannot smoothly capture diagonal boundaries (\(x_1 + x_2 &gt; c\)); must approximate linear diagonal relationships with an inefficient "staircase" of horizontal and vertical splits.</li>
+                    </ul>
+
+                    <div class="box box-purple">
+                        <div class="box-title">Looking Forward to Lecture 17</div>
+                        <p>How do we prevent trees from growing excessively complex and memorizing training noise? In <strong>Lecture 17</strong>, we study the <strong>ID3 algorithm</strong> (entropy and information gain), compare multi-way vs. binary splits, and develop systematic pruning methods: <strong>Pre-Pruning</strong> (hyperparameter stopping criteria) and <strong>Post-Pruning</strong> (Cost-Complexity and Reduced-Error Pruning).</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <a href="#original-pdf" class="btn"
+                            style="text-decoration:none; display:inline-block; line-height:2rem; text-align:center;"
+                            onclick="document.getElementById('original-pdf').scrollIntoView()">Next Section</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number"
+                        style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round"
+                            stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for your reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()"
+                        style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Previous
+                            Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/16.PDF" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+
+</html>

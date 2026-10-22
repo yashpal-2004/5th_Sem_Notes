@@ -68,7 +68,10 @@
                 { index: 11, displayNum: '11', title: 'Dimensionality Reduction & PCA', imgUrl: 'images/11.png' },
                 { index: 12, displayNum: '12', title: 'Regularization: L1 (Lasso) & L2 (Ridge)', imgUrl: 'images/12.png' },
                 { index: 13, displayNum: '13', title: 'Time Series Analysis: Stationarity, AR & MA', imgUrl: 'images/13.png' },
-                { index: 14, displayNum: '14', title: 'Maximum Likelihood Estimation & Logistic Regression', imgUrl: 'images/14.png' }
+                { index: 14, displayNum: '14', title: 'Maximum Likelihood Estimation & Logistic Regression', imgUrl: 'images/14.png' },
+                { index: 15, displayNum: '15', title: 'Gradient Descent on Logistic Regression & Multiclass Classification', imgUrl: 'images/15.png' },
+                { index: 16, displayNum: '16', title: 'Decision Trees Part I: Learned Rules & CART', imgUrl: 'images/16.png' },
+                { index: 17, displayNum: '17', title: 'Decision Trees Part II: ID3 & Tree Pruning', imgUrl: 'images/17.png' }
             ]
         },
         cn: {

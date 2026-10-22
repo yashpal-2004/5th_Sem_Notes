@@ -581,8 +581,32 @@
 
         function updateProgress() {
             const cards = document.querySelectorAll('.lecture-card');
+            const totalLectures = cards.length;
             const completed = document.querySelectorAll('.lecture-card.completed').length;
-            const remaining = cards.length - completed;
+            const remaining = totalLectures - completed;
+
+            // Dynamically sum topics from cards
+            let totalTopics = 0;
+            document.querySelectorAll('.lecture-stats').forEach(stat => {
+                const match = stat.textContent.match(/(\d+)\s+Topics/i);
+                if (match) {
+                    totalTopics += parseInt(match[1], 10);
+                }
+            });
+
+            // Update Navbar Stats Badge
+            const navStats = document.querySelector('.nav-stats');
+            if (navStats) {
+                navStats.innerHTML = `${totalLectures} Lectures &bull; ${totalTopics} Topics`;
+            }
+
+            // Update Metrics section
+            const totalLecturesEl = document.querySelector('#metrics .stat-item:nth-child(1) .stat-val');
+            if (totalLecturesEl) totalLecturesEl.innerText = totalLectures;
+
+            const totalTopicsEl = document.querySelector('#metrics .stat-item:nth-child(2) .stat-val');
+            if (totalTopicsEl) totalTopicsEl.innerText = totalTopics;
+
             const completedEl = document.getElementById('stat-completed');
             const remainingEl = document.getElementById('stat-remaining');
             if (completedEl) completedEl.innerText = completed;
