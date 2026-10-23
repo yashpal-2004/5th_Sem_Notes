@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Computer Networks - Lecture 07</title>
-    <meta content="Study notes for Computer Networks (CSAI321), Lecture 07 covering Email Architecture, SMTP, POP3 vs IMAP, MIME encoding, and DNS MX Records." name="description" />
+    <meta content="Study notes for Computer Networks (CSAI321), Lecture 07 covering Email Architecture, SMTP, POP3 vs IMAP, Web Caching Mechanics & Headers, and Content Delivery Networks (CDNs)." name="description" />
     <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>07</text></svg>" rel="icon" />
     <link href="../css/style.css" rel="stylesheet" />
     <!-- KaTeX for math rendering -->
@@ -18,7 +18,7 @@
     <header>
         <div class="header-titles">
             <h1>Computer Networks Foundations</h1>
-            <p>Lecture 07 - Electronic Mail Protocols: SMTP, POP3, IMAP & DNS MX</p>
+            <p>Lecture 07 - Email Protocols, Web Caching &amp; Content Delivery Networks (CDNs)</p>
             <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
             <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
             <a href="../pdfs/7.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
@@ -37,33 +37,42 @@
             <ul class="index-list" id="indexList">
                 <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>Short Notes</a></li>
                 <li>
-                    <a href="#topic-1">1. Electronic Mail Architecture & Core Components<span class="sub-count">3</span></a>
+                    <a href="#topic-1">1. Electronic Mail Architecture &amp; Push/Pull Principles<span class="sub-count">3</span></a>
                     <ul class="sub-index">
-                        <li><a href="#sub-1-1">1.1 User Agents & Mail Servers</a></li><li><a href="#sub-1-2">1.2 Spooling & Message Queue System</a></li><li><a href="#sub-1-3">1.3 Asynchronous Email Delivery</a></li>
+                        <li><a href="#sub-1-1">1.1 User Agents &amp; Mail Servers</a></li>
+                        <li><a href="#sub-1-2">1.2 Outgoing Spool &amp; Message Queueing</a></li>
+                        <li><a href="#sub-1-3">1.3 Push vs. Pull Protocol Workflow</a></li>
                     </ul>
                 </li>
                 <li>
-                    <a href="#topic-2">2. Simple Mail Transfer Protocol (SMTP)<span class="sub-count">3</span></a>
+                    <a href="#topic-2">2. SMTP &amp; Mail Access: POP3 vs. IMAP<span class="sub-count">3</span></a>
                     <ul class="sub-index">
-                        <li><a href="#sub-2-1">2.1 SMTP Mechanics & Push Protocol Paradigm</a></li><li><a href="#sub-2-2">2.2 TCP Port 25 & Handshake Commands</a></li><li><a href="#sub-2-3">2.3 In-Band Command Execution & Response Codes</a></li>
+                        <li><a href="#sub-2-1">2.1 Simple Mail Transfer Protocol (SMTP)</a></li>
+                        <li><a href="#sub-2-2">2.2 POP3 (Post Office Protocol v3)</a></li>
+                        <li><a href="#sub-2-3">2.3 IMAP (Internet Message Access Protocol)</a></li>
                     </ul>
                 </li>
                 <li>
-                    <a href="#topic-3">3. Mail Access Protocols: POP3 vs. IMAP<span class="sub-count">3</span></a>
+                    <a href="#topic-3">3. Caching Mechanics, Headers &amp; Storage Layers<span class="sub-count">3</span></a>
                     <ul class="sub-index">
-                        <li><a href="#sub-3-1">3.1 The Need for Pull Protocols</a></li><li><a href="#sub-3-2">3.2 POP3 (Post Office Protocol v3)</a></li><li><a href="#sub-3-3">3.3 IMAP (Internet Message Access Protocol)</a></li>
+                        <li><a href="#sub-3-1">3.1 Cache Hit, Cache Miss &amp; Revalidation</a></li>
+                        <li><a href="#sub-3-2">3.2 HTTP Cache-Control Headers</a></li>
+                        <li><a href="#sub-3-3">3.3 Layers of Caching &amp; Netflix OCA Case</a></li>
                     </ul>
                 </li>
                 <li>
-                    <a href="#topic-4">4. MIME Extension & Binary Content Encoding<span class="sub-count">3</span></a>
+                    <a href="#topic-4">4. Content Delivery Networks (CDNs) Architecture<span class="sub-count">3</span></a>
                     <ul class="sub-index">
-                        <li><a href="#sub-4-1">4.1 ASCII Limitation of Legacy SMTP</a></li><li><a href="#sub-4-2">4.2 MIME Headers (RFC 2045)</a></li><li><a href="#sub-4-3">4.3 Base64 & Quoted-Printable Encoding Algorithms</a></li>
+                        <li><a href="#sub-4-1">4.1 CDN Overview &amp; The Grocery Store Analogy</a></li>
+                        <li><a href="#sub-4-2">4.2 Edge Server vs. Origin Server Mechanics</a></li>
+                        <li><a href="#sub-4-3">4.3 History, Major Providers &amp; Detection Tools</a></li>
                     </ul>
                 </li>
                 <li>
-                    <a href="#topic-5">5. Email Infrastructure & Security Alignment<span class="sub-count">3</span></a>
+                    <a href="#topic-5">5. CDN Benefits &amp; Fastly Outage Case Study<span class="sub-count">2</span></a>
                     <ul class="sub-index">
-                        <li><a href="#sub-5-1">5.1 DNS MX (Mail Exchanger) Records</a></li><li><a href="#sub-5-2">5.2 Email Spoofing & Security Vulnerabilities</a></li><li><a href="#sub-5-3">5.3 Authentication Frameworks: SPF, DKIM & DMARC</a></li>
+                        <li><a href="#sub-5-1">5.1 The 5 Core CDN Benefits Matrix</a></li>
+                        <li><a href="#sub-5-2">5.2 June 2021 Fastly Outage Incident Analysis</a></li>
                     </ul>
                 </li>
                 <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
@@ -96,25 +105,38 @@
                 </div>
             </section>
 
+            <!-- Topic 1 -->
             <section class="topic-section" id="topic-1">
                 <div class="topic-header" onclick="toggleSection('content-1')">
                     <div class="topic-number">1</div>
-                    <h2>Electronic Mail Architecture & Core Components</h2>
+                    <h2>Electronic Mail Architecture &amp; Push/Pull Principles</h2>
                 </div>
                 <div class="collapsible-content" id="content-1">
-                    
-                    <h3 id="sub-1-1">1.1 User Agents & Mail Servers</h3>
-                    <p>Electronic mail (email) is a high-level distributed application consisting of three main structural components: <strong>User Agents (UAs)</strong>, <strong>Mail Servers</strong>, and the <strong>Simple Mail Transfer Protocol (SMTP)</strong>.</p>
+                    <h3 id="sub-1-1">1.1 User Agents &amp; Mail Servers</h3>
+                    <p>Electronic mail is a distributed asynchronous messaging service composed of two core software entities:</p>
                     <ul>
-                        <li><strong>User Agent (UA):</strong> Software allowing users to read, compose, reply to, forward, and organize messages (e.g., Outlook, Apple Mail, Thunderbird, Webmail interfaces like Gmail).</li>
-                        <li><strong>Mail Server:</strong> The core infrastructure hosting user mailboxes, managing outgoing/incoming message queues, and executing background routing protocols.</li>
+                        <li><strong>User Agent (UA):</strong> Software that allows users to compose, send, read, and manage email (e.g., Outlook, Apple Mail, Thunderbird, Gmail web app).</li>
+                        <li><strong>Mail Server:</strong> Always-on central infrastructure that stores incoming messages in individual user mailboxes, manages outbound message queues, and negotiates network transfers with remote mail servers.</li>
                     </ul>
-                    <h3 id="sub-1-2">1.2 Spooling & Message Queue System</h3>
-                    <p>When a user sends a message, it does not travel directly to the recipient's personal device. Instead, the sender's User Agent pushes the email to their local mail server's <strong>outgoing message queue (spool)</strong>.</p>
-                    <p>If the recipient's mail server is temporarily unreachable or offline, the sender's server holds the message in its queue and retries transmission periodically (typically every 15–30 minutes for up to several days) before generating a non-delivery report (bounce email).</p>
-                    <h3 id="sub-1-3">1.3 Asynchronous Email Delivery</h3>
-                    <p>Email delivery operates asynchronously. The sender and recipient do not need to be online simultaneously. Communication happens in two distinct stages: (1) Push via SMTP from sender UA to sender mail server, and across mail servers; (2) Pull via POP3/IMAP/HTTP from recipient mail server to recipient UA.</p>
-                
+
+                    <h3 id="sub-1-2">1.2 Outgoing Spool &amp; Message Queueing</h3>
+                    <p>When a user sends an email, it is transmitted immediately to the sender's local mail server, where it is placed into an <strong>outgoing message queue (spool)</strong>:</p>
+                    <ul>
+                        <li>The server attempts delivery to the recipient's mail server over TCP.</li>
+                        <li>If the receiving server is unreachable (down, network partition, or overloaded), the message remains safely in the spool.</li>
+                        <li>The server automatically retries transmission at scheduled intervals (typically every 15–30 minutes) for several days before returning a delivery failure notification (bounce email).</li>
+                    </ul>
+
+                    <h3 id="sub-1-3">1.3 Push vs. Pull Protocol Workflow</h3>
+                    <p>Email delivery requires distinct protocols because communicating endpoints have different availability profiles:</p>
+                    <div class="box box-blue">
+                        <div class="box-title">Two-Stage Delivery Architecture</div>
+                        <ol>
+                            <li><strong>Push Protocol (SMTP):</strong> Used by the sender's User Agent to upload the email to the sender's mail server, and used between mail servers to forward the email across the Internet. The sending side initiates the TCP connection.</li>
+                            <li><strong>Pull Protocol (POP3 / IMAP / Webmail HTTP):</strong> End-user recipient devices are frequently offline, dynamic, or behind NAT firewalls. Therefore, the recipient's User Agent must actively initiate a connection to <em>pull</em> messages from its mail server mailbox.</li>
+                        </ol>
+                    </div>
+
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('short-notes').scrollIntoView()">Previous Topic</button>
                         <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
@@ -122,36 +144,37 @@
                 </div>
             </section>
 
+            <!-- Topic 2 -->
             <section class="topic-section" id="topic-2">
                 <div class="topic-header" onclick="toggleSection('content-2')">
                     <div class="topic-number">2</div>
-                    <h2>Simple Mail Transfer Protocol (SMTP)</h2>
+                    <h2>SMTP &amp; Mail Access: POP3 vs. IMAP</h2>
                 </div>
                 <div class="collapsible-content" id="content-2">
-                    
-                    <h3 id="sub-2-1">2.1 SMTP Mechanics & Push Protocol Paradigm</h3>
-                    <p><strong>SMTP (Simple Mail Transfer Protocol)</strong> is a legacy client-server protocol (RFC 5321) used to transfer mail messages reliably across TCP connections. SMTP is strictly a <strong>push protocol</strong>: the client initiating the TCP connection is always the party pushing a message.</p>
-                    <h3 id="sub-2-2">2.2 TCP Port 25 & Handshake Commands</h3>
-                    <p>SMTP operates over <strong>TCP port 25</strong> (standard server-to-server relay) or <strong>port 587</strong> (authenticated client-to-server submission). The session consists of plain ASCII text commands sent by the client and 3-digit status codes returned by the server.</p>
-                    <div class="box box-blue">
-                        <div class="box-title">Core SMTP Command Sequence</div>
-                        <ul>
-                            <li><code>HELO / EHLO</code>: Client identifies itself to the SMTP server.</li>
-                            <li><code>MAIL FROM: &lt;sender@domain.com&gt;</code>: Identifies the message originator.</li>
-                            <li><code>RCPT TO: &lt;recipient@domain.com&gt;</code>: Identifies the target mailbox recipient.</li>
-                            <li><code>DATA</code>: Signals the start of the message body (terminated by a single dot <code>.</code> on its own line).</li>
-                            <li><code>QUIT</code>: Terminates the SMTP session.</li>
-                        </ul>
-                    </div>
-                    <h3 id="sub-2-3">2.3 In-Band Command Execution & Response Codes</h3>
-                    <p>SMTP commands and message payload share the exact same TCP stream (in-band transmission). Server responses begin with 3-digit numerical codes followed by explanatory text:</p>
+                    <h3 id="sub-2-1">2.1 Simple Mail Transfer Protocol (SMTP)</h3>
+                    <p><strong>SMTP (RFC 5321)</strong> is the standard protocol for sending emails across the Internet. Key characteristics include:</p>
                     <ul>
-                        <li><code>220</code>: Service Ready</li>
-                        <li><code>250</code>: Requested mail action okay / completed</li>
-                        <li><code>354</code>: Start mail input; end with <code>&lt;CR&gt;&lt;LF&gt;.&lt;CR&gt;&lt;LF&gt;</code></li>
-                        <li><code>550</code>: Requested action not taken (e.g., mailbox unavailable)</li>
+                        <li>Operates over reliable <strong>TCP port 25</strong> (server-to-server relay) or <strong>port 587</strong> (authenticated client submission).</li>
+                        <li>In-band plain ASCII command/response dialogue: commands like <code>HELO/EHLO</code>, <code>MAIL FROM:</code>, <code>RCPT TO:</code>, and <code>DATA</code> (terminated by a single dot <code>.</code> on a new line).</li>
+                        <li>Server responds with 3-digit numerical status codes (e.g., <code>250 OK</code>, <code>354 Start Mail Input</code>, <code>550 Mailbox Unavailable</code>).</li>
                     </ul>
-                
+
+                    <h3 id="sub-2-2">2.2 POP3 (Post Office Protocol v3)</h3>
+                    <p><strong>POP3 (RFC 1939)</strong> operates on TCP port 110 (or 995 over TLS). It is a simple pull protocol:</p>
+                    <ul>
+                        <li><strong>Download-and-Delete:</strong> Messages are downloaded to the client device and permanently deleted from the mail server.</li>
+                        <li><strong>Download-and-Keep:</strong> Messages remain on the server, but changes (such as reading an email or deleting it) on one device are not synchronized to other devices.</li>
+                        <li>Does not support remote server-side folder organization.</li>
+                    </ul>
+
+                    <h3 id="sub-2-3">2.3 IMAP (Internet Message Access Protocol)</h3>
+                    <p><strong>IMAP (RFC 3501)</strong> operates on TCP port 143 (or 993 over TLS). Designed for modern multi-device access:</p>
+                    <ul>
+                        <li>Stores all emails, folders, and message status flags (Read, Flagged, Draft) centrally on the server.</li>
+                        <li>Provides seamless real-time synchronization across phones, laptops, and webmail clients.</li>
+                        <li>Supports bandwidth-friendly header-only previews and selective downloading of attachments.</li>
+                    </ul>
+
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
                         <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
@@ -159,43 +182,55 @@
                 </div>
             </section>
 
+            <!-- Topic 3 -->
             <section class="topic-section" id="topic-3">
                 <div class="topic-header" onclick="toggleSection('content-3')">
                     <div class="topic-number">3</div>
-                    <h2>Mail Access Protocols: POP3 vs. IMAP</h2>
+                    <h2>Caching Mechanics, Headers &amp; Storage Layers</h2>
                 </div>
                 <div class="collapsible-content" id="content-3">
-                    
-                    <h3 id="sub-3-1">3.1 The Need for Pull Protocols</h3>
-                    <p>SMTP cannot be used to deliver emails directly to a recipient's user agent because end-user devices are frequently turned off, mobile, or behind NAT firewalls. Therefore, recipient mail servers hold incoming messages in mailboxes until the user agent uses a <strong>pull protocol</strong> to fetch them.</p>
-                    <h3 id="sub-3-2">3.2 POP3 (Post Office Protocol v3)</h3>
-                    <p><strong>POP3 (RFC 1939)</strong> operates on TCP port 110 (or 995 over TLS). It follows an extremely simple 3-phase workflow: <em>Authorization</em>, <em>Transaction</em>, and <em>Update</em>.</p>
+                    <h3 id="sub-3-1">3.1 Cache Hit, Cache Miss &amp; Revalidation</h3>
+                    <p><strong>Caching</strong> is the technique of storing copies of frequently accessed files or computational results in a temporary, high-speed storage layer so future requests can be served significantly faster:</p>
                     <ul>
-                        <li><strong>Download-and-Delete Mode:</strong> Messages are downloaded to the client device and permanently deleted from the mail server.</li>
-                        <li><strong>Download-and-Keep Mode:</strong> Messages are retained on the server, but client states (e.g., read/unread status) are localized to one device.</li>
-                        <li><strong>Limitation:</strong> Does not support server-side folder creation or multi-device synchronization.</li>
+                        <li><strong>Cache Hit:</strong> The requested resource exists in the cache and is still valid (fresh). The content is served instantly without querying the original server.</li>
+                        <li><strong>Cache Miss:</strong> The requested resource is absent or expired (stale). The request is forwarded upstream to the origin server, which returns the content to the client while simultaneously storing a copy in the cache.</li>
+                        <li><strong>Cache Revalidation:</strong> A cached copy whose time has expired is checked against the origin server (using HTTP headers like <code>If-Modified-Since</code> or <code>ETag</code>) to verify if the file has changed. If unchanged, the origin returns <code>304 Not Modified</code> with zero payload, saving bandwidth.</li>
                     </ul>
-                    <h3 id="sub-3-3">3.3 IMAP (Internet Message Access Protocol)</h3>
-                    <p><strong>IMAP (RFC 3501)</strong> operates on TCP port 143 (or 993 over TLS). Unlike POP3, IMAP maintains state across multiple devices by storing all messages, folders, and flag metadata directly on the central mail server.</p>
-                    <div class="box box-green">
-                        <div class="box-title">POP3 vs IMAP Architectural Comparison</div>
-                        <table style="width:100%; border-collapse:collapse; margin-top:0.5rem;">
-                            <thead>
-                                <tr style="border-bottom: 2px solid var(--border-light); text-align:left;">
-                                    <th style="padding:6px;">Feature</th>
-                                    <th style="padding:6px;">POP3</th>
-                                    <th style="padding:6px;">IMAP</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr><td style="padding:6px;">Server State</td><td style="padding:6px;">Stateless across sessions</td><td style="padding:6px;">Stateful (folder tree & flags)</td></tr>
-                                <tr><td style="padding:6px;">Multi-Device Sync</td><td style="padding:6px;">Poor / Unsynchronized</td><td style="padding:6px;">Full multi-device synchronization</td></tr>
-                                <tr><td style="padding:6px;">Bandwidth Efficiency</td><td style="padding:6px;">Downloads full messages</td><td style="padding:6px;">Header-only preview & selective fetch</td></tr>
-                                <tr><td style="padding:6px;">Offline Access</td><td style="padding:6px;">Full offline access (local copies)</td><td style="padding:6px;">Requires local caching config</td></tr>
-                            </tbody>
-                        </table>
+
+                    <h3 id="sub-3-2">3.2 HTTP Cache-Control Headers</h3>
+                    <p>Web servers dictate caching behavior using HTTP response headers:</p>
+                    <div class="box box-blue">
+                        <div class="box-title">HTTP Cache-Control Directives</div>
+                        <pre style="background: var(--bg-secondary); padding: 0.75rem; border-radius: 6px; font-family: monospace; font-size: 0.95rem; border: 1px solid var(--gray-border);">
+Cache-Control: public, max-age=3600
+</pre>
+                        <ul>
+                            <li><code>public</code>: Response can be cached by any cache layer (browser, proxy, CDN).</li>
+                            <li><code>private</code>: Content is user-specific (e.g., account profile) and can only be stored in the end-user's browser cache.</li>
+                            <li><code>max-age=3600</code>: The cached copy remains fresh for 3600 seconds (1 hour). After this window, revalidation is required.</li>
+                            <li><code>no-cache</code>: Caches may store the asset but must revalidate with the origin before serving it.</li>
+                            <li><code>no-store</code>: Absolute restriction: do not save or cache any part of the request or response (used for banking and sensitive data).</li>
+                        </ul>
                     </div>
-                
+
+                    <h3 id="sub-3-3">3.3 Layers of Caching &amp; Netflix OCA Case</h3>
+                    <p>Caching occurs across multiple hierarchical tiers along the client-to-server path:</p>
+                    <ol>
+                        <li><strong>Browser Cache:</strong> Stored directly on the client's local disk/memory (HTML, CSS, JS, images).</li>
+                        <li><strong>Proxy Cache:</strong> Maintained on corporate or university gateways to serve repeated web requests from multiple local network users.</li>
+                        <li><strong>CDN Edge Cache:</strong> Globally distributed points-of-presence (PoPs) caching static and streaming media near end users.</li>
+                        <li><strong>Reverse Proxy Server Cache:</strong> Deployed in front of the application origin (e.g., Nginx, Varnish, Redis) to offload repeated queries from primary backend databases.</li>
+                    </ol>
+                    <div class="box box-green">
+                        <div class="box-title">Real-World Case: Netflix Open Connect Appliances (OCA)</div>
+                        <p>Netflix serves over $15\%$ of global internet downstream traffic. Rather than streaming petabytes across transit backbones from AWS data centers, Netflix embeds custom storage appliances called <strong>Open Connect Appliances (OCAs)</strong> directly inside ISP networks and Point-of-Presence (PoP) locations worldwide:</p>
+                        <ul>
+                            <li>Individual OCA server racks hold up to <strong>350 TB</strong> of popular video titles.</li>
+                            <li>During off-peak overnight hours, OCAs pre-populate with content forecasted to be in high demand.</li>
+                            <li>When a subscriber presses play, the video streams from an OCA server located just a few network hops away within their own ISP, bypassing the wider internet completely.</li>
+                        </ul>
+                    </div>
+
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
                         <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
@@ -203,32 +238,51 @@
                 </div>
             </section>
 
+            <!-- Topic 4 -->
             <section class="topic-section" id="topic-4">
                 <div class="topic-header" onclick="toggleSection('content-4')">
                     <div class="topic-number">4</div>
-                    <h2>MIME Extension & Binary Content Encoding</h2>
+                    <h2>Content Delivery Networks (CDNs) Architecture</h2>
                 </div>
                 <div class="collapsible-content" id="content-4">
-                    
-                    <h3 id="sub-4-1">4.1 ASCII Limitation of Legacy SMTP</h3>
-                    <p>Original SMTP was restricted to 7-bit ASCII text formatting. Non-ASCII characters (Unicode, foreign alphabets) and binary attachments (images, audio, PDF files, executables) could not be transmitted natively over 7-bit ASCII SMTP streams.</p>
-                    <h3 id="sub-4-2">4.2 MIME Headers (RFC 2045)</h3>
-                    <p><strong>MIME (Multipurpose Internet Mail Extensions)</strong> extends the structure of email headers to declare arbitrary content types and encoding methods without modifying underlying SMTP protocol rules.</p>
+                    <h3 id="sub-4-1">4.1 CDN Overview &amp; The Grocery Store Analogy</h3>
+                    <p>A <strong>Content Delivery Network (CDN)</strong> is a geographically distributed network of proxy servers and data centers designed to deliver web assets (HTML, CSS, JavaScript, images, 4K video) to users with high availability and high performance.</p>
                     <div class="box box-blue">
-                        <div class="box-title">Key MIME Header Lines</div>
-                        <ul>
-                            <li><code>MIME-Version: 1.0</code></li>
-                            <li><code>Content-Type: multipart/mixed; boundary="----=_NextPart"</code></li>
-                            <li><code>Content-Transfer-Encoding: base64</code></li>
-                        </ul>
+                        <div class="box-title">The Grocery Store Chain Analogy</div>
+                        <p>Imagine if every time you wanted to buy milk or apples, you had to travel directly to the dairy farm or fruit orchard located 2,000 miles away. The trip would take days, cost immense fuel, and cause massive traffic congestion at the farm gate.</p>
+                        <p>Instead, grocery store chains build regional retail stores in every neighborhood and restock them from the central farms. When you need groceries, you walk to the local neighborhood supermarket. A <strong>CDN</strong> works identically: the origin server is the distant farm, and the CDN edge servers are the local grocery stores placed close to consumers.</p>
                     </div>
-                    <h3 id="sub-4-3">4.3 Base64 & Quoted-Printable Encoding Algorithms</h3>
-                    <p>Binary attachments are encoded into 7-bit ASCII strings prior to SMTP transmission:</p>
+
+                    <h3 id="sub-4-2">4.2 Edge Server vs. Origin Server Mechanics</h3>
                     <ul>
-                        <li><strong>Base64 Encoding:</strong> Groups binary data into 3-byte blocks (24 bits), splits them into four 6-bit integers, and maps each 6-bit integer (0–63) to printable ASCII characters <code>[A-Z, a-z, 0-9, +, /]</code>. Introduces a fixed 33% size expansion overhead.</li>
-                        <li><strong>Quoted-Printable:</strong> Used for mostly-text content containing occasional non-ASCII bytes. Replaces non-ASCII bytes with an equals sign followed by two hexadecimal digits (e.g., <code>=E2=82=AC</code> for €).</li>
+                        <li><strong>Origin Server:</strong> The primary hosting server where the authoritative source code, database, and primary content reside (e.g., an AWS EC2 instance in Virginia).</li>
+                        <li><strong>Edge Server (PoP):</strong> Caching servers positioned at the "edge" of the internet near end-user access networks (e.g., in London, Tokyo, Mumbai, São Paulo).</li>
+                        <li><strong>Request Flow:</strong>
+                            <ol>
+                                <li>User browser requests an asset (e.g., <code>https://cdn.example.com/hero.png</code>).</li>
+                                <li>DNS automatically routes the user to the geographically closest CDN Edge Server (via Anycast routing or Geo-DNS).</li>
+                                <li>If the Edge Server has the file cached (Cache Hit), it serves the user in a few milliseconds.</li>
+                                <li>If not cached (Cache Miss), the Edge Server queries the Origin Server once, saves the copy locally, and returns it to the user.</li>
+                            </ol>
+                        </li>
                     </ul>
-                
+
+                    <h3 id="sub-4-3">4.3 History, Major Providers &amp; Detection Tools</h3>
+                    <ul>
+                        <li><strong>Pioneer:</strong> <strong>Akamai Technologies</strong> pioneered the commercial CDN industry in 1998, founded out of MIT research to solve the "World Wide Wait" web congestion problem.</li>
+                        <li><strong>Leading Cloud &amp; CDN Providers:</strong>
+                            <ul>
+                                <li>Akamai</li>
+                                <li>Cloudflare</li>
+                                <li>Fastly</li>
+                                <li>Amazon CloudFront (AWS)</li>
+                                <li>Google Cloud CDN</li>
+                                <li>Microsoft Azure CDN</li>
+                            </ul>
+                        </li>
+                        <li><strong>CDN Detection Tools:</strong> Web diagnostic platforms like <strong>CDNPlanet</strong> or <code>cdnplanet.com</code> allow engineers to inspect HTTP headers (e.g., <code>cf-cache-status</code>, <code>x-cache</code>, <code>server</code>) to detect which CDN powers any public domain.</li>
+                    </ul>
+
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
                         <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
@@ -236,27 +290,70 @@
                 </div>
             </section>
 
+            <!-- Topic 5 -->
             <section class="topic-section" id="topic-5">
                 <div class="topic-header" onclick="toggleSection('content-5')">
                     <div class="topic-number">5</div>
-                    <h2>Email Infrastructure & Security Alignment</h2>
+                    <h2>CDN Benefits &amp; Fastly Outage Case Study</h2>
                 </div>
                 <div class="collapsible-content" id="content-5">
-                    
-                    <h3 id="sub-5-1">5.1 DNS MX (Mail Exchanger) Records</h3>
-                    <p>When a mail server needs to send an email to <code>user@example.com</code>, it performs a DNS query requesting the <strong>MX (Mail Exchanger) record</strong> for <code>example.com</code>. The DNS response returns the domain name and priority preference of the destination mail server.</p>
-                    <h3 id="sub-5-2">5.2 Email Spoofing & Security Vulnerabilities</h3>
-                    <p>Because SMTP <code>MAIL FROM</code> and header <code>From:</code> fields are plain ASCII strings supplied by the client, malicious actors can easily forge sender addresses (Email Spoofing) to execute phishing attacks.</p>
-                    <h3 id="sub-5-3">5.3 Authentication Frameworks: SPF, DKIM & DMARC</h3>
-                    <div class="box box-orange">
-                        <div class="box-title">Email Anti-Spoofing Triad</div>
+                    <h3 id="sub-5-1">5.1 The 5 Core CDN Benefits Matrix</h3>
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 1rem; border: 1px solid var(--gray-border);">
+                        <thead>
+                            <tr style="background: var(--bg-secondary); text-align: left;">
+                                <th style="padding: 0.75rem; border: 1px solid var(--gray-border);">Benefit</th>
+                                <th style="padding: 0.75rem; border: 1px solid var(--gray-border);">Mechanism</th>
+                                <th style="padding: 0.75rem; border: 1px solid var(--gray-border);">Business Impact</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);"><strong>1. Reduced Latency</strong></td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Shortens physical distance data travels; terminates TCP/TLS handshakes at local edge PoPs.</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Near-instant page loads; higher conversion rates and lower bounce rates.</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);"><strong>2. Extreme Scalability</strong></td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Absorbs massive traffic spikes across thousands of distributed edge nodes.</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Survives viral social spikes, Black Friday shopping surges, and flash sales.</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);"><strong>3. Enhanced Security</strong></td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Absorbs multi-terabit Distributed Denial of Service (DDoS) attacks; integrates Web Application Firewalls (WAF).</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Protects origin IP addresses from discovery and prevents volumetric outages.</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);"><strong>4. Bandwidth Cost Reduction</strong></td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Caches static assets at the edge, reducing data egress from origin cloud providers.</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Drastically lowers AWS/GCP/Azure outbound egress bills (often by 50%&ndash;80%).</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);"><strong>5. Resilience &amp; High Availability</strong></td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Automatic failover; serves stale cached pages if the origin database crashes.</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Guarantees 99.999% uptime even during upstream data center outages.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3 id="sub-5-2">5.2 June 2021 Fastly Outage Incident Analysis</h3>
+                    <div class="box box-red">
+                        <div class="box-title">The June 8, 2021 Global Internet Outage</div>
+                        <p>On June 8, 2021, an incident demonstrated the world's absolute dependency on CDN infrastructure:</p>
                         <ul>
-                            <li><strong>SPF (Sender Policy Framework):</strong> Domain owners publish a DNS TXT record listing all IP addresses authorized to send mail on behalf of their domain.</li>
-                            <li><strong>DKIM (DomainKeys Identified Mail):</strong> Outgoing mail servers append a cryptographic digital signature (RSA/Ed25519) to header lines. Receiving servers verify the signature using the domain's public key published in DNS.</li>
-                            <li><strong>DMARC:</strong> Combines SPF and DKIM validation checks, allowing domain owners to specify policy rules (<code>none</code>, <code>quarantine</code>, <code>reject</code>) for handling unauthenticated emails.</li>
+                            <li><strong>What Happened:</strong> A customer of CDN provider <strong>Fastly</strong> pushed a valid, standard configuration change that unexpectedly triggered an undiscovered software bug in Fastly's edge routing software.</li>
+                            <li><strong>Global Impact:</strong> Approximately $85\%$ of Fastly's global CDN network failed simultaneously. Instantaneously, major worldwide websites became unreachable, returning <code>503 Service Unavailable</code> errors. Impacted services included:
+                                <ul>
+                                    <li><strong>E-Commerce:</strong> Amazon.com</li>
+                                    <li><strong>Social &amp; Tech Platforms:</strong> Reddit, Spotify, Twitch, GitHub, Stack Overflow</li>
+                                    <li><strong>Major News Organizations:</strong> The New York Times, CNN, BBC, The Guardian, Financial Times</li>
+                                    <li><strong>Government Services:</strong> The UK government's primary portal (gov.uk)</li>
+                                </ul>
+                            </li>
+                            <li><strong>Resolution:</strong> Fastly engineers identified the issue within 40 minutes, disabled the buggy configuration, and restored $95\%$ of network traffic within an hour.</li>
+                            <li><strong>Architectural Takeaway:</strong> Modern internet applications rarely connect directly to origin servers. While CDNs provide immense speed, caching, and security, placing an entire service behind a single centralized CDN creates a concentrated single point of failure (SPOF), prompting enterprise architectures to adopt multi-CDN redundancy strategies.</li>
                         </ul>
                     </div>
-                
+
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
                         <button class="btn" onclick="document.getElementById('original-pdf').scrollIntoView()">Next Topic</button>
@@ -306,4 +403,5 @@
     </script>
     <script src="../js/script.js"></script>
 </body>
+
 </html>

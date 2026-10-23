@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Computer Networks - Lecture 09</title>
-    <meta content="Study notes for Computer Networks (CSAI321), Lecture 09 covering Transport Layer Fundamentals, Multiplexing/Demultiplexing, UDP Header Structure, Checksum Calculation, and Protocol Tradeoffs." name="description" />
+    <meta content="Study notes for Computer Networks (CSAI321), Lecture 09 covering Transport Layer Fundamentals, UDP Datagrams, TCP 3-Way Handshake, Connection Teardown, Sequence Numbers, Retransmissions, and Full TCP Segment Header Anatomy." name="description" />
     <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>09</text></svg>" rel="icon" />
     <link href="../css/style.css" rel="stylesheet" />
     <!-- KaTeX for math rendering -->
@@ -18,7 +18,7 @@
     <header>
         <div class="header-titles">
             <h1>Computer Networks Foundations</h1>
-            <p>Lecture 09 - The Transport Layer & User Datagram Protocol (UDP)</p>
+            <p>Lecture 09 - The Transport Layer: UDP &amp; TCP Fundamentals</p>
             <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
             <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
             <a href="../pdfs/9.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
@@ -37,33 +37,43 @@
             <ul class="index-list" id="indexList">
                 <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>Short Notes</a></li>
                 <li>
-                    <a href="#topic-1">1. Transport Layer Principles & Multiplexing / Demultiplexing<span class="sub-count">3</span></a>
+                    <a href="#topic-1">1. Transport Layer Principles &amp; UDP Architecture<span class="sub-count">3</span></a>
                     <ul class="sub-index">
-                        <li><a href="#sub-1-1">1.1 Process-to-Process Logical Communication</a></li><li><a href="#sub-1-2">1.2 Transport Layer vs. Network Layer Responsibilities</a></li><li><a href="#sub-1-3">1.3 Multiplexing & Demultiplexing Mechanics</a></li>
+                        <li><a href="#sub-1-1">1.1 Process-to-Process Logical Communication</a></li>
+                        <li><a href="#sub-1-2">1.2 Multiplexing &amp; Demultiplexing Mechanics</a></li>
+                        <li><a href="#sub-1-3">1.3 UDP 8-Byte Header &amp; Lightweight Operation</a></li>
                     </ul>
                 </li>
                 <li>
-                    <a href="#topic-2">2. Connectionless Transport: User Datagram Protocol (UDP)<span class="sub-count">3</span></a>
+                    <a href="#topic-2">2. TCP 3-Way Handshake Ritual<span class="sub-count">3</span></a>
                     <ul class="sub-index">
-                        <li><a href="#sub-2-1">2.1 Philosophy & RFC 768 Specification</a></li><li><a href="#sub-2-2">2.2 Lightweight Bare-Bones Transport</a></li><li><a href="#sub-2-3">2.3 Advantages of UDP over TCP</a></li>
+                        <li><a href="#sub-2-1">2.1 Step 1 (SYN): Client Initialization (ISN = 100)</a></li>
+                        <li><a href="#sub-2-2">2.2 Step 2 (SYN-ACK): Server Response (ISN = 350, ACK = 101)</a></li>
+                        <li><a href="#sub-2-3">2.3 Step 3 (ACK): Client Confirmation (ACK = 351, Established)</a></li>
                     </ul>
                 </li>
                 <li>
-                    <a href="#topic-3">3. UDP Header Architecture & Checksum Computation<span class="sub-count">3</span></a>
+                    <a href="#topic-3">3. TCP Connection Teardown (4-Way Handshake)<span class="sub-count">3</span></a>
                     <ul class="sub-index">
-                        <li><a href="#sub-3-1">3.1 8-Byte UDP Header Field Structure</a></li><li><a href="#sub-3-2">3.2 Pseudo-Header Construction</a></li><li><a href="#sub-3-3">3.3 One's Complement Summation Algorithm</a></li>
+                        <li><a href="#sub-3-1">3.1 Step 1 &amp; Step 2: Client FIN and Server ACK</a></li>
+                        <li><a href="#sub-3-2">3.2 Step 3 &amp; Step 4: Server FIN and Client Final ACK</a></li>
+                        <li><a href="#sub-3-3">3.3 Half-Closed State &amp; Connection Lifecycle</a></li>
                     </ul>
                 </li>
                 <li>
-                    <a href="#topic-4">4. UDP Use Cases & Application Suitability<span class="sub-count">3</span></a>
+                    <a href="#topic-4">4. TCP Sequence Numbers &amp; Reliable Retransmission<span class="sub-count">3</span></a>
                     <ul class="sub-index">
-                        <li><a href="#sub-4-1">4.1 Domain Name System (DNS)</a></li><li><a href="#sub-4-2">4.2 Real-Time Streaming & Multimedia (RTP, VoIP)</a></li><li><a href="#sub-4-3">4.3 HTTP/3 & QUIC Protocol Evolution</a></li>
+                        <li><a href="#sub-4-1">4.1 Byte-Stream Numbering &amp; Ordered Delivery</a></li>
+                        <li><a href="#sub-4-2">4.2 Cumulative ACKs &amp; Handling Reordering</a></li>
+                        <li><a href="#sub-4-3">4.3 Retransmission Timers for Lost Segments</a></li>
                     </ul>
                 </li>
                 <li>
-                    <a href="#topic-5">5. Transport Layer Tradeoffs & Service Comparison<span class="sub-count">2</span></a>
+                    <a href="#topic-5">5. TCP Segment Header Anatomy &amp; Control Flags<span class="sub-count">3</span></a>
                     <ul class="sub-index">
-                        <li><a href="#sub-5-1">5.1 UDP vs. TCP Feature Comparison Matrix</a></li><li><a href="#sub-5-2">5.2 Choice Criteria for Network Software Engineers</a></li>
+                        <li><a href="#sub-5-1">5.1 20-to-60 Byte Header Structure</a></li>
+                        <li><a href="#sub-5-2">5.2 Data Offset, Window Size &amp; Checksum Fields</a></li>
+                        <li><a href="#sub-5-3">5.3 The 6 Control Flags (URG, ACK, PSH, RST, SYN, FIN)</a></li>
                     </ul>
                 </li>
                 <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
@@ -96,23 +106,47 @@
                 </div>
             </section>
 
+            <!-- Topic 1 -->
             <section class="topic-section" id="topic-1">
                 <div class="topic-header" onclick="toggleSection('content-1')">
                     <div class="topic-number">1</div>
-                    <h2>Transport Layer Principles & Multiplexing / Demultiplexing</h2>
+                    <h2>Transport Layer Principles &amp; UDP Architecture</h2>
                 </div>
                 <div class="collapsible-content" id="content-1">
-                    
                     <h3 id="sub-1-1">1.1 Process-to-Process Logical Communication</h3>
-                    <p>The Transport Layer provides <strong>logical communication</strong> between application processes running on different network hosts. While the Network Layer delivers packets between host IP addresses (host-to-host), the Transport Layer extends this to process-to-process delivery.</p>
-                    <h3 id="sub-1-2">1.2 Transport Layer vs. Network Layer Responsibilities</h3>
-                    <p>An analogy: Host IP addresses are like physical apartment building addresses; Port numbers are like individual mailbox numbers or apartment occupant names within a building.</p>
-                    <h3 id="sub-1-3">1.3 Multiplexing & Demultiplexing Mechanics</h3>
+                    <p>The <strong>Transport Layer</strong> provides logical communication between application processes running on distinct hosts. While the underlying Network Layer (IP) delivers datagrams from host to host (using IP addresses), the transport layer extends this to individual application processes (using port numbers).</p>
+
+                    <h3 id="sub-1-2">1.2 Multiplexing &amp; Demultiplexing Mechanics</h3>
                     <ul>
-                        <li><strong>Multiplexing (Sender):</strong> Gathering data chunks from multiple application sockets, encapsulating them with transport headers (ports), and passing segment packages to the Network Layer.</li>
-                        <li><strong>Demultiplexing (Receiver):</strong> Inspecting transport header fields of incoming segments to direct data to the correct target application socket.</li>
+                        <li><strong>Multiplexing (Sender):</strong> Collecting data chunks from multiple application sockets, adding transport header fields (source and destination ports), and passing the resulting segments down to the Network Layer.</li>
+                        <li><strong>Demultiplexing (Receiver):</strong> Inspecting transport header port numbers to direct incoming segments to the exact target socket buffer among multiple concurrent processes.</li>
                     </ul>
-                
+
+                    <h3 id="sub-1-3">1.3 UDP 8-Byte Header &amp; Lightweight Operation</h3>
+                    <p>The <strong>User Datagram Protocol (UDP, RFC 768)</strong> is an unvarnished, connectionless transport service. It adds minimal functionality to IP: process demultiplexing and lightweight error checking.</p>
+                    <div class="box box-green">
+                        <div class="box-title">UDP 8-Byte Fixed Header</div>
+                        <table style="width:100%; border-collapse:collapse; margin-top:0.5rem; text-align:center; border: 1px solid var(--gray-border);">
+                            <thead>
+                                <tr style="background: var(--bg-secondary); border-bottom: 2px solid var(--gray-border);">
+                                    <th style="padding:6px; width:50%; border: 1px solid var(--gray-border);">Bits 0–15</th>
+                                    <th style="padding:6px; width:50%; border: 1px solid var(--gray-border);">Bits 16–31</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="padding:6px; border: 1px solid var(--gray-border);">Source Port (16 bits)</td>
+                                    <td style="padding:6px; border: 1px solid var(--gray-border);">Destination Port (16 bits)</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:6px; border: 1px solid var(--gray-border);">Length (16 bits, Header + Data)</td>
+                                    <td style="padding:6px; border: 1px solid var(--gray-border);">Checksum (16 bits)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p>UDP requires no handshake, maintains zero connection state, and has minimal 8-byte overhead, making it ideal for DNS, VoIP, live streaming, and HTTP/3 (QUIC).</p>
+
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('short-notes').scrollIntoView()">Previous Topic</button>
                         <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
@@ -120,28 +154,52 @@
                 </div>
             </section>
 
+            <!-- Topic 2 -->
             <section class="topic-section" id="topic-2">
                 <div class="topic-header" onclick="toggleSection('content-2')">
                     <div class="topic-number">2</div>
-                    <h2>Connectionless Transport: User Datagram Protocol (UDP)</h2>
+                    <h2>TCP 3-Way Handshake Ritual</h2>
                 </div>
                 <div class="collapsible-content" id="content-2">
-                    
-                    <h3 id="sub-2-1">2.1 Philosophy & RFC 768 Specification</h3>
-                    <p><strong>UDP (User Datagram Protocol, RFC 768)</strong> is a minimal, connectionless transport protocol. It provides direct access to the underlying IP layer with only two added services: port-based demultiplexing and lightweight error checking (checksum).</p>
-                    <h3 id="sub-2-2">2.2 Lightweight Bare-Bones Transport</h3>
-                    <p>UDP does not establish connections (no handshake delays), does not maintain connection state at endpoints, does not control congestion, and does not guarantee packet arrival order or delivery.</p>
-                    <h3 id="sub-2-3">2.3 Advantages of UDP over TCP</h3>
+                    <p>Before any application data can be exchanged over TCP, client and server must establish connection state, initialize sequence numbers, and allocate buffer space through a <strong>3-Way Handshake</strong>.</p>
                     <div class="box box-blue">
-                        <div class="box-title">Why Developers Choose UDP</div>
+                        <div class="box-title">Concrete Numerical Example: Handshake Sequence Numbers</div>
+                        <p>Consider a client connecting to a server with Initial Sequence Numbers (ISNs) chosen independently:</p>
                         <ul>
-                            <li><strong>Fine-Grained Application Control:</strong> Application decides exactly what data to send and when (no delays caused by TCP congestion throttling).</li>
-                            <li><strong>Zero Connection Setup Overhead:</strong> Eliminates the 1 RTT (Round Trip Time) 3-way handshake delay.</li>
-                            <li><strong>No Connection State:</strong> Server memory requirements are minimal (no buffers, sequence parameters, or timers).</li>
-                            <li><strong>Small Header Overhead:</strong> UDP header is only 8 bytes long, compared to 20+ bytes for TCP.</li>
+                            <li>Client chooses ISN = <strong>100</strong></li>
+                            <li>Server chooses ISN = <strong>350</strong></li>
                         </ul>
                     </div>
-                
+
+                    <h3 id="sub-2-1">2.1 Step 1 (SYN): Client Initialization (ISN = 100)</h3>
+                    <p>The client initiates the connection by transmitting a special TCP segment with the <strong>SYN flag set to 1</strong>:</p>
+                    <ul>
+                        <li><code>Flags: [SYN=1, ACK=0]</code></li>
+                        <li><code>Sequence Number = 100</code> (Client ISN)</li>
+                        <li><code>Acknowledgment Number = 0</code> (or ignored; no data received yet)</li>
+                        <li>Payload: 0 bytes of application data. The SYN segment consumes exactly 1 sequence number.</li>
+                        <li>Client state changes to <code>SYN_SENT</code>.</li>
+                    </ul>
+
+                    <h3 id="sub-2-2">2.2 Step 2 (SYN-ACK): Server Response (ISN = 350, ACK = 101)</h3>
+                    <p>The server receives the SYN, allocates socket buffers and variables, and replies with a segment acknowledging the client and proposing its own starting sequence number:</p>
+                    <ul>
+                        <li><code>Flags: [SYN=1, ACK=1]</code></li>
+                        <li><code>Sequence Number = 350</code> (Server's own ISN)</li>
+                        <li><code>Acknowledgment Number = 101</code> (Acknowledges client SYN by requesting byte $100 + 1$)</li>
+                        <li>Server state changes to <code>SYN_RCVD</code>.</li>
+                    </ul>
+
+                    <h3 id="sub-2-3">2.3 Step 3 (ACK): Client Confirmation (ACK = 351, Established)</h3>
+                    <p>The client receives the SYN-ACK, completes the handshake, and acknowledges the server's sequence number:</p>
+                    <ul>
+                        <li><code>Flags: [SYN=0, ACK=1]</code></li>
+                        <li><code>Sequence Number = 101</code></li>
+                        <li><code>Acknowledgment Number = 351</code> (Acknowledges server SYN by requesting byte $350 + 1$)</li>
+                        <li>This segment may already carry client application payload data (e.g., an HTTP GET request).</li>
+                        <li>Both endpoints now transition to the <code>ESTABLISHED</code> state, ready for bidirectional full-duplex data streaming.</li>
+                    </ul>
+
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
                         <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
@@ -149,36 +207,36 @@
                 </div>
             </section>
 
+            <!-- Topic 3 -->
             <section class="topic-section" id="topic-3">
                 <div class="topic-header" onclick="toggleSection('content-3')">
                     <div class="topic-number">3</div>
-                    <h2>UDP Header Architecture & Checksum Computation</h2>
+                    <h2>TCP Connection Teardown (4-Way Handshake)</h2>
                 </div>
                 <div class="collapsible-content" id="content-3">
-                    
-                    <h3 id="sub-3-1">3.1 8-Byte UDP Header Field Structure</h3>
-                    <p>The UDP header consists of exactly four 16-bit (2-byte) fields totaling 8 bytes:</p>
-                    $$\text{UDP Header Size} = 8 \text{ Bytes}$$
-                    <div class="box box-green">
-                        <div class="box-title">UDP Header Anatomy</div>
-                        <table style="width:100%; border-collapse:collapse; margin-top:0.5rem; text-align:center;">
-                            <thead>
-                                <tr style="border-bottom: 2px solid var(--border-light);">
-                                    <th style="padding:6px; width:50%;">Bits 0–15</th>
-                                    <th style="padding:6px; width:50%;">Bits 16–31</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr><td style="padding:6px;">Source Port (16 bits)</td><td style="padding:6px;">Destination Port (16 bits)</td></tr>
-                                <tr><td style="padding:6px;">Length (16 bits, Header + Data)</td><td style="padding:6px;">Checksum (16 bits)</td></tr>
-                            </tbody>
-                        </table>
+                    <p>Because a TCP connection is <strong>full-duplex</strong> (two independent byte streams flowing in opposite directions), each direction must be terminated individually using a <strong>4-Way Handshake</strong>.</p>
+
+                    <h3 id="sub-3-1">3.1 Step 1 &amp; Step 2: Client FIN and Server ACK</h3>
+                    <ol>
+                        <li><strong>Step 1 (Client FIN):</strong> The client application calls <code>close()</code>. The client TCP sends a segment with <strong>FIN=1</strong> ($seq = u$). This signals that the client has no further application bytes to transmit. The client enters <code>FIN_WAIT_1</code>.</li>
+                        <li><strong>Step 2 (Server ACK):</strong> The server receives the FIN and immediately responds with an <strong>ACK</strong> ($ack = u + 1$). The server enters <code>CLOSE_WAIT</code>, and the client receives the ACK to transition into <code>FIN_WAIT_2</code>.</li>
+                    </ol>
+
+                    <h3 id="sub-3-2">3.2 Step 3 &amp; Step 4: Server FIN and Client Final ACK</h3>
+                    <ol start="3">
+                        <li><strong>Step 3 (Server FIN):</strong> The server application completes any remaining outgoing data transfers. Once drained, the server calls <code>close()</code> and transmits its own <strong>FIN=1</strong> segment ($seq = w, ack = u + 1$). The server transitions to <code>LAST_ACK</code>.</li>
+                        <li><strong>Step 4 (Client Final ACK):</strong> The client receives the server's FIN and transmits the final <strong>ACK</strong> ($ack = w + 1$). The server receives this ACK and moves to <code>CLOSED</code>.</li>
+                    </ol>
+
+                    <h3 id="sub-3-3">3.3 Half-Closed State &amp; Connection Lifecycle</h3>
+                    <div class="box box-blue">
+                        <div class="box-title">Key Teardown Mechanics</div>
+                        <ul>
+                            <li><strong>Half-Closed Operation:</strong> After Step 2, the client-to-server direction is closed, but the server-to-client channel remains fully active until the server sends its own FIN.</li>
+                            <li><strong>TIME_WAIT Safety Buffer:</strong> The client stays in <code>TIME_WAIT</code> for $2 \times \text{MSL}$ (Maximum Segment Lifetime, $\approx 1-2$ minutes) before closing permanently. This ensures the server receives the final ACK (retransmitting it if lost) and prevents old delayed packets from interfering with future connections reusing the same ports.</li>
+                        </ul>
                     </div>
-                    <h3 id="sub-3-2">3.2 Pseudo-Header Construction</h3>
-                    <p>To compute the UDP checksum, the sender prepends a 12-byte <strong>Pseudo-Header</strong> (containing Source IP, Destination IP, Protocol ID=17, and UDP Length) to the UDP segment. This ensures that IP routing errors are caught by transport validation.</p>
-                    <h3 id="sub-3-3">3.3 One's Complement Summation Algorithm</h3>
-                    <p>The sender treats all 16-bit words in the pseudo-header, UDP header, and payload as integers, sums them using 1's complement arithmetic (carrying overflow bits back into the sum), and takes the bitwise NOT of the result.</p>
-                
+
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
                         <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
@@ -186,20 +244,39 @@
                 </div>
             </section>
 
+            <!-- Topic 4 -->
             <section class="topic-section" id="topic-4">
                 <div class="topic-header" onclick="toggleSection('content-4')">
                     <div class="topic-number">4</div>
-                    <h2>UDP Use Cases & Application Suitability</h2>
+                    <h2>TCP Sequence Numbers &amp; Reliable Retransmission</h2>
                 </div>
                 <div class="collapsible-content" id="content-4">
-                    
-                    <h3 id="sub-4-1">4.1 Domain Name System (DNS)</h3>
-                    <p>DNS queries use UDP port 53. Request/response exchanges fit inside a single datagram. Avoiding TCP handshake overhead speeds up domain lookup latency globally.</p>
-                    <h3 id="sub-4-2">4.2 Real-Time Streaming & Multimedia (RTP, VoIP)</h3>
-                    <p>In live audio/video calls (VoIP, Zoom, WebRTC), losing a frame is preferable to delaying subsequent audio frames waiting for retransmission. Low latency is prioritized over 100% reliability.</p>
-                    <h3 id="sub-4-3">4.3 HTTP/3 & QUIC Protocol Evolution</h3>
-                    <p>Modern web protocol <strong>HTTP/3</strong> replaces TCP with <strong>QUIC</strong>, a user-space reliable protocol built on top of UDP. QUIC eliminates Head-of-Line (HoL) blocking and accelerates TLS handshakes.</p>
-                
+                    <h3 id="sub-4-1">4.1 Byte-Stream Numbering &amp; Ordered Delivery</h3>
+                    <p>TCP views data not as discrete isolated packets, but as an unstructured, continuous <strong>byte stream</strong>. Sequence numbers represent the <strong>byte offset</strong> of the first byte in the segment's data payload:</p>
+                    <ul>
+                        <li>If a segment carries 100 bytes of payload and begins at byte 101, its <strong>Sequence Number = 101</strong> (covering bytes 101 through 200).</li>
+                        <li>The subsequent segment will carry <strong>Sequence Number = 201</strong>.</li>
+                        <li><strong>Handling Out-of-Order Arrival:</strong> If segments arrive shuffled due to differing network paths, the receiving TCP stack places them into their correct position in the socket reassembly buffer using their sequence numbers before delivering an unbroken byte stream to the application.</li>
+                    </ul>
+
+                    <h3 id="sub-4-2">4.2 Cumulative ACKs &amp; Handling Reordering</h3>
+                    <p>TCP acknowledgments are <strong>cumulative</strong>: an acknowledgment number specifies the sequence number of the <strong>next byte</strong> the receiver expects to receive:</p>
+                    <div class="box box-green">
+                        <div class="box-title">Cumulative ACK Example</div>
+                        <p>When the receiver successfully ingests bytes 101 through 200, it responds with:</p>
+                        $$\text{ACK Number} = 201$$
+                        <p>This explicitly confirms receipt of all bytes up to 200 and requests byte 201 onward.</p>
+                        <p>If Segment 301&ndash;400 arrives while Segment 201&ndash;300 is delayed or lost, the receiver buffers 301&ndash;400 but repeats <code>ACK = 201</code> (duplicate ACK), indicating a gap in the byte stream.</p>
+                    </div>
+
+                    <h3 id="sub-4-3">4.3 Retransmission Timers for Lost Segments</h3>
+                    <p>To ensure reliable delivery across lossy networks:</p>
+                    <ul>
+                        <li>Whenever TCP transmits a segment, it tracks a <strong>Retransmission Timeout (RTO)</strong> timer.</li>
+                        <li>If an ACK covering the segment is not received before the timer expires, TCP assumes the segment (or its ACK) was lost in transit and automatically retransmits the segment.</li>
+                        <li>RTO is dynamically calculated from ongoing Round Trip Time (RTT) sample measurements using exponential smoothing.</li>
+                    </ul>
+
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
                         <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
@@ -207,31 +284,106 @@
                 </div>
             </section>
 
+            <!-- Topic 5 -->
             <section class="topic-section" id="topic-5">
                 <div class="topic-header" onclick="toggleSection('content-5')">
                     <div class="topic-number">5</div>
-                    <h2>Transport Layer Tradeoffs & Service Comparison</h2>
+                    <h2>TCP Segment Header Anatomy &amp; Control Flags</h2>
                 </div>
                 <div class="collapsible-content" id="content-5">
-                    
-                    <h3 id="sub-5-1">5.1 UDP vs. TCP Feature Comparison Matrix</h3>
-                    <table style="width:100%; border-collapse:collapse; margin-top:0.5rem;">
+                    <h3 id="sub-5-1">5.1 20-to-60 Byte Header Structure</h3>
+                    <p>A TCP segment header has a minimum size of <strong>20 bytes</strong> (when no optional fields are appended) and can scale up to <strong>60 bytes</strong> with TCP options (such as MSS negotiation, Window Scaling, or SACK):</p>
+                    <div class="box box-blue">
+                        <div class="box-title">TCP Segment Header Format (32-Bit Grid)</div>
+                        <table style="width:100%; border-collapse:collapse; margin-top:0.5rem; text-align:center; border: 1px solid var(--gray-border);">
+                            <thead>
+                                <tr style="background: var(--bg-secondary); border-bottom: 2px solid var(--gray-border);">
+                                    <th style="padding:6px; border: 1px solid var(--gray-border); width:25%;">Bits 0–7</th>
+                                    <th style="padding:6px; border: 1px solid var(--gray-border); width:25%;">Bits 8–15</th>
+                                    <th style="padding:6px; border: 1px solid var(--gray-border); width:25%;">Bits 16–23</th>
+                                    <th style="padding:6px; border: 1px solid var(--gray-border); width:25%;">Bits 24–31</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="2" style="padding:6px; border: 1px solid var(--gray-border);">Source Port (16 bits)</td>
+                                    <td colspan="2" style="padding:6px; border: 1px solid var(--gray-border);">Destination Port (16 bits)</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4" style="padding:6px; border: 1px solid var(--gray-border);">Sequence Number (32 bits)</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4" style="padding:6px; border: 1px solid var(--gray-border);">Acknowledgment Number (32 bits)</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:6px; border: 1px solid var(--gray-border);">Data Offset (4 bits)</td>
+                                    <td style="padding:6px; border: 1px solid var(--gray-border);">Reserved (4 bits)</td>
+                                    <td style="padding:6px; border: 1px solid var(--gray-border);">Flags: URG, ACK, PSH, RST, SYN, FIN</td>
+                                    <td style="padding:6px; border: 1px solid var(--gray-border);">Window Size (16 bits)</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" style="padding:6px; border: 1px solid var(--gray-border);">Checksum (16 bits)</td>
+                                    <td colspan="2" style="padding:6px; border: 1px solid var(--gray-border);">Urgent Pointer (16 bits)</td>
+                                </tr>
+                                <tr style="background: var(--bg-secondary);">
+                                    <td colspan="4" style="padding:6px; border: 1px solid var(--gray-border); font-style:italic;">Options &amp; Padding (0–40 bytes, optional)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3 id="sub-5-2">5.2 Data Offset, Window Size &amp; Checksum Fields</h3>
+                    <ul>
+                        <li><strong>Data Offset (4 bits):</strong> Specifies TCP header length measured in <strong>32-bit (4-byte) words</strong>. A value of 5 indicates $5 \times 4 = 20\text{ bytes}$ (standard header without options). The maximum value of 15 allows $15 \times 4 = 60\text{ bytes}$.</li>
+                        <li><strong>Reserved (4–6 bits):</strong> Reserved for future protocol enhancements, set to zero.</li>
+                        <li><strong>Window Size (16 bits):</strong> Carries the receiver's advertised <strong>Receive Window (rwnd)</strong> for flow control, indicating available space in bytes in the receiver's socket buffer.</li>
+                        <li><strong>Checksum (16 bits):</strong> Error-detection field covering the TCP pseudo-header, TCP header, and segment payload.</li>
+                        <li><strong>Urgent Pointer (16 bits):</strong> Points to the sequence number of the final byte of urgent data when the URG flag is set.</li>
+                    </ul>
+
+                    <h3 id="sub-5-3">5.3 The 6 Control Flags (URG, ACK, PSH, RST, SYN, FIN)</h3>
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 1rem; border: 1px solid var(--gray-border);">
                         <thead>
-                            <tr style="border-bottom: 2px solid var(--border-light); text-align:left;">
-                                <th style="padding:6px;">Property</th>
-                                <th style="padding:6px;">UDP</th>
-                                <th style="padding:6px;">TCP</th>
+                            <tr style="background: var(--bg-secondary); text-align: left;">
+                                <th style="padding: 0.75rem; border: 1px solid var(--gray-border);">Flag</th>
+                                <th style="padding: 0.75rem; border: 1px solid var(--gray-border);">Full Name</th>
+                                <th style="padding: 0.75rem; border: 1px solid var(--gray-border);">Functional Purpose</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr><td style="padding:6px;">Connection State</td><td style="padding:6px;">Connectionless</td><td style="padding:6px;">Connection-oriented (3-way handshake)</td></tr>
-                            <tr><td style="padding:6px;">Reliability</td><td style="padding:6px;">Unreliable (best-effort)</td><td style="padding:6px;">Reliable (ACKs & retransmissions)</td></tr>
-                            <tr><td style="padding:6px;">Ordering</td><td style="padding:6px;">Unordered datagrams</td><td style="padding:6px;">Ordered byte-stream</td></tr>
-                            <tr><td style="padding:6px;">Header Overhead</td><td style="padding:6px;">8 Bytes</td><td style="padding:6px;">20–60 Bytes</td></tr>
-                            <tr><td style="padding:6px;">Congestion Control</td><td style="padding:6px;">None (sends at app rate)</td><td style="padding:6px;">Adaptive (AIMD, Slow Start)</td></tr>
+                            <tr>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);"><strong>SYN</strong></td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Synchronize</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Used strictly in the 1st and 2nd segments of connection establishment to synchronize initial sequence numbers (ISNs).</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);"><strong>ACK</strong></td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Acknowledgment</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Indicates that the Acknowledgment Number field contains a valid value. Set on almost all segments after connection setup.</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);"><strong>FIN</strong></td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Finish</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Initiates graceful connection teardown, signaling that the sender has no more application data to transmit.</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);"><strong>RST</strong></td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Reset</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Aborts an active connection abruptly or rejects an invalid connection attempt (e.g., segment sent to a closed port).</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);"><strong>PSH</strong></td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Push</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Directs the receiver TCP to deliver buffered data to the receiving application immediately without waiting for buffers to fill.</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);"><strong>URG</strong></td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Urgent</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Indicates that the Urgent Pointer field is valid, pointing to high-priority out-of-band data (e.g., Telnet interrupt command).</td>
+                            </tr>
                         </tbody>
                     </table>
-                
+
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
                         <button class="btn" onclick="document.getElementById('original-pdf').scrollIntoView()">Next Topic</button>
@@ -281,4 +433,5 @@
     </script>
     <script src="../js/script.js"></script>
 </body>
+
 </html>

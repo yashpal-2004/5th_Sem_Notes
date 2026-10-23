@@ -5,8 +5,8 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Computer Networks - Lecture 12</title>
-    <meta content="Study notes for Computer Networks (CSAI321), Lecture 12 covering Cloud Load Balancing, L4 vs L7 Load Balancers, Scheduling Algorithms, Consistent Hashing, and GSLB." name="description" />
-    <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>12</text></svg>" rel="icon" />
+    <meta content="Study notes for Computer Networks (CSAI321), Lecture 12 covering AWS NLB vs ALB, Target Groups, Health Checks, Auto Scaling Groups, and Multi-AZ High Availability." name="description" />
+    <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%230d282d%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>12</text></svg>" rel="icon" />
     <link href="../css/style.css" rel="stylesheet" />
     <!-- KaTeX for math rendering -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
@@ -18,7 +18,7 @@
     <header>
         <div class="header-titles">
             <h1>Computer Networks Foundations</h1>
-            <p>Lecture 12 - Cloud Load Balancing & Traffic Management</p>
+            <p>Lecture 12 - Cloud Load Balancing &amp; Traffic Management</p>
             <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
             <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
             <a href="../pdfs/12.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
@@ -37,33 +37,41 @@
             <ul class="index-list" id="indexList">
                 <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>Short Notes</a></li>
                 <li>
-                    <a href="#topic-1">1. Load Balancing Fundamentals & Cloud Architecture<span class="sub-count">3</span></a>
+                    <a href="#topic-1">1. Load Balancing Fundamentals &amp; Cloud Architecture<span class="sub-count">2</span></a>
                     <ul class="sub-index">
-                        <li><a href="#sub-1-1">1.1 High Availability & Horizontal Scaling</a></li><li><a href="#sub-1-2">1.2 Virtual IP (VIP) Abstraction</a></li><li><a href="#sub-1-3">1.3 Active Health Checks & Failover</a></li>
+                        <li><a href="#sub-1-1">1.1 High Availability &amp; Horizontal Scaling</a></li>
+                        <li><a href="#sub-1-2">1.2 Virtual IP (VIP) Abstraction</a></li>
                     </ul>
                 </li>
                 <li>
-                    <a href="#topic-2">2. Layer 4 (L4) vs. Layer 7 (L7) Load Balancing<span class="sub-count">3</span></a>
+                    <a href="#topic-2">2. Layer 4 (L4) vs. Layer 7 (L7) Load Balancing<span class="sub-count">2</span></a>
                     <ul class="sub-index">
-                        <li><a href="#sub-2-1">2.1 L4 Network/Transport Load Balancing</a></li><li><a href="#sub-2-2">2.2 L7 Application Load Balancing</a></li><li><a href="#sub-2-3">2.3 Architectural Comparison & TLS Offloading</a></li>
+                        <li><a href="#sub-2-1">2.1 L4 Network/Transport Load Balancing</a></li>
+                        <li><a href="#sub-2-2">2.2 L7 Application Load Balancing</a></li>
                     </ul>
                 </li>
                 <li>
-                    <a href="#topic-3">3. Load Balancing Scheduling Algorithms<span class="sub-count">3</span></a>
+                    <a href="#topic-3">3. AWS NLB vs. ALB Deep-Dive<span class="sub-count">3</span></a>
                     <ul class="sub-index">
-                        <li><a href="#sub-3-1">3.1 Round Robin & Weighted Round Robin</a></li><li><a href="#sub-3-2">3.2 Least Connections Strategy</a></li><li><a href="#sub-3-3">3.3 IP Hash & Session Affinity (Sticky Sessions)</a></li>
+                        <li><a href="#sub-3-1">3.1 Network Load Balancer (NLB) — Layer 4</a></li>
+                        <li><a href="#sub-3-2">3.2 Application Load Balancer (ALB) — Layer 7</a></li>
+                        <li><a href="#sub-3-3">3.3 NLB vs. ALB Feature Comparison</a></li>
                     </ul>
                 </li>
                 <li>
-                    <a href="#topic-4">4. Consistent Hashing & Distributed Cache Distribution<span class="sub-count">3</span></a>
+                    <a href="#topic-4">4. Target Groups &amp; Health Checks<span class="sub-count">3</span></a>
                     <ul class="sub-index">
-                        <li><a href="#sub-4-1">4.1 The Traditional Hash Problem ($K \pmod N$)</a></li><li><a href="#sub-4-2">4.2 Hash Ring Topology</a></li><li><a href="#sub-4-3">4.3 Virtual Nodes for Uniform Load Distribution</a></li>
+                        <li><a href="#sub-4-1">4.1 Target Group Role</a></li>
+                        <li><a href="#sub-4-2">4.2 Health Check Probing Mechanism</a></li>
+                        <li><a href="#sub-4-3">4.3 Automatic Target Removal (Self-Healing)</a></li>
                     </ul>
                 </li>
                 <li>
-                    <a href="#topic-5">5. Global Server Load Balancing (GSLB) & DNS Routing<span class="sub-count">3</span></a>
+                    <a href="#topic-5">5. Auto Scaling Groups &amp; Multi-AZ High Availability<span class="sub-count">3</span></a>
                     <ul class="sub-index">
-                        <li><a href="#sub-5-1">5.1 Multi-Region High Availability</a></li><li><a href="#sub-5-2">5.2 Anycast BGP Routing Mechanics</a></li><li><a href="#sub-5-3">5.3 GeoDNS & Latency-Based Routing</a></li>
+                        <li><a href="#sub-5-1">5.1 Auto Scaling Groups (ASG) &amp; Elasticity</a></li>
+                        <li><a href="#sub-5-2">5.2 Availability Zones (AZ) &amp; Fault Isolation</a></li>
+                        <li><a href="#sub-5-3">5.3 Multi-AZ ELB Deployment Architecture</a></li>
                     </ul>
                 </li>
                 <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
@@ -96,18 +104,24 @@
                 </div>
             </section>
 
+            <!-- Topic 1 -->
             <section class="topic-section" id="topic-1">
                 <div class="topic-header" onclick="toggleSection('content-1')">
                     <div class="topic-number">1</div>
-                    <h2>Load Balancing Fundamentals & Cloud Architecture</h2>
+                    <h2>Load Balancing Fundamentals &amp; Cloud Architecture</h2>
                 </div>
                 <div class="collapsible-content" id="content-1">
-                    
-                    <h3 id="sub-1-1">1.1 High Availability & Horizontal Scaling</h3>
-                    <p>Load Balancers sit in front of server pools, distributing incoming application traffic evenly across multiple backend instances to ensure <strong>High Availability (HA)</strong> and seamless horizontal scaling.</p>
+
+                    <h3 id="sub-1-1">1.1 High Availability &amp; Horizontal Scaling</h3>
+                    <p>A <strong>Load Balancer (LB)</strong> sits in front of a pool of backend servers and distributes incoming application traffic across them. This achieves two goals:</p>
+                    <ul>
+                        <li><strong>High Availability (HA):</strong> If one backend instance fails, the LB stops sending traffic to it and redirects to healthy instances &mdash; no single point of failure.</li>
+                        <li><strong>Horizontal Scaling:</strong> As demand grows, additional backend instances are added to the pool. The LB automatically distributes load across all of them without any change visible to clients.</li>
+                    </ul>
+
                     <h3 id="sub-1-2">1.2 Virtual IP (VIP) Abstraction</h3>
-                    <p>Clients send requests to a single public <strong>Virtual IP (VIP)</strong>. The Load Balancer proxies or forwards requests to internal Private IPs (DIPs) of backend servers.</p>
-                
+                    <p>Clients connect to a single public <strong>Virtual IP (VIP)</strong> or DNS name. The Load Balancer transparently proxies or forwards requests to the internal <strong>Direct IP (DIP)</strong> addresses of healthy backend servers. Clients never need to know individual server addresses &mdash; the VIP remains stable even as backend instances are added, removed, or replaced.</p>
+
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('short-notes').scrollIntoView()">Previous Topic</button>
                         <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
@@ -115,18 +129,33 @@
                 </div>
             </section>
 
+            <!-- Topic 2 -->
             <section class="topic-section" id="topic-2">
                 <div class="topic-header" onclick="toggleSection('content-2')">
                     <div class="topic-number">2</div>
                     <h2>Layer 4 (L4) vs. Layer 7 (L7) Load Balancing</h2>
                 </div>
                 <div class="collapsible-content" id="content-2">
-                    
+
                     <h3 id="sub-2-1">2.1 L4 Network/Transport Load Balancing</h3>
-                    <p>Operates at TCP/UDP layer without inspecting application payloads. High throughput, low latency (e.g., AWS Network Load Balancer, IPVS).</p>
+                    <p><strong>L4 load balancers</strong> operate at the TCP/UDP layer. They make routing decisions based only on the <strong>4-tuple</strong>: (Source IP, Source Port, Destination IP, Destination Port). They do <em>not</em> inspect application payloads, making them extremely fast and lightweight:</p>
+                    <ul>
+                        <li>Ultra-low latency — no packet reassembly or HTTP parsing overhead.</li>
+                        <li>Handles any TCP/UDP protocol (databases, SMTP, game servers, etc.).</li>
+                        <li>Preserves the client's original source IP end-to-end (no SNAT by default in NLB).</li>
+                        <li>Examples: AWS Network Load Balancer (NLB), Linux IPVS, HAProxy TCP mode.</li>
+                    </ul>
+
                     <h3 id="sub-2-2">2.2 L7 Application Load Balancing</h3>
-                    <p>Terminates TCP/TLS connections and inspects HTTP headers, URLs, cookies, and payloads to route traffic intelligently (e.g., NGINX, HAProxy, AWS ALB).</p>
-                
+                    <p><strong>L7 load balancers</strong> terminate the TCP/TLS connection and fully parse the HTTP request before making a routing decision. This enables rich, content-aware routing:</p>
+                    <ul>
+                        <li>Path-based routing: <code>/api/*</code> &rarr; API servers, <code>/web/*</code> &rarr; web servers.</li>
+                        <li>Host-based routing: different virtual hosts routed to different backend pools.</li>
+                        <li>Header and cookie inspection, sticky sessions, TLS termination.</li>
+                        <li>Higher overhead than L4 due to full HTTP parsing; slightly higher latency.</li>
+                        <li>Examples: AWS Application Load Balancer (ALB), NGINX, HAProxy HTTP mode.</li>
+                    </ul>
+
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
                         <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
@@ -134,18 +163,83 @@
                 </div>
             </section>
 
+            <!-- Topic 3 -->
             <section class="topic-section" id="topic-3">
                 <div class="topic-header" onclick="toggleSection('content-3')">
                     <div class="topic-number">3</div>
-                    <h2>Load Balancing Scheduling Algorithms</h2>
+                    <h2>AWS NLB vs. ALB Deep-Dive</h2>
                 </div>
                 <div class="collapsible-content" id="content-3">
-                    
-                    <h3 id="sub-3-1">3.1 Round Robin & Weighted Round Robin</h3>
-                    <p>Round Robin cycles sequentially through backend servers. Weighted Round Robin assigns higher traffic proportions to more powerful servers.</p>
-                    <h3 id="sub-3-2">3.2 Least Connections Strategy</h3>
-                    <p>Directs new requests to the backend server currently handling the fewest active connections; optimal for long-lived sessions.</p>
-                
+
+                    <h3 id="sub-3-1">3.1 Network Load Balancer (NLB) — Layer 4</h3>
+                    <p>AWS <strong>NLB</strong> operates at Layer 4, routing based on the full <strong>4-tuple</strong>: (Source IP, Source Port, Destination IP, Destination Port). Key characteristics:</p>
+                    <ul>
+                        <li><strong>Ultra-low latency:</strong> No application-layer parsing — millions of requests per second with sub-millisecond latency.</li>
+                        <li><strong>Source IP preservation:</strong> The client's original IP is visible to backend EC2 instances end-to-end (no NAT rewrite on the source IP).</li>
+                        <li><strong>Static IP / Elastic IP support:</strong> Each NLB gets a fixed static IP per AZ, which can be whitelisted in firewalls.</li>
+                        <li><strong>Protocol support:</strong> TCP, UDP, TLS (pass-through or termination).</li>
+                        <li><strong>Cannot</strong> route by URL path, HTTP headers, hostname, or perform cookie-based sticky sessions.</li>
+    </ul>
+
+                    <h3 id="sub-3-2">3.2 Application Load Balancer (ALB) — Layer 7</h3>
+                    <p>AWS <strong>ALB</strong> operates at Layer 7, fully parsing HTTP/HTTPS. It enables sophisticated content-aware routing:</p>
+                    <ul>
+                        <li><strong>Path-based routing:</strong> Rules forward <code>/api/*</code> to one target group and <code>/web/*</code> to another — running multiple microservices behind a single DNS name.</li>
+                        <li><strong>Host-based routing:</strong> Route <code>api.example.com</code> and <code>shop.example.com</code> to separate backend pools using the HTTP <code>Host</code> header.</li>
+                        <li><strong>Header &amp; query-string rules:</strong> Forward or redirect based on any HTTP header or query parameter value.</li>
+                        <li><strong>Sticky sessions:</strong> ALB inserts a cookie (<code>AWSALB</code>) to pin a client's session to the same target for stateful applications.</li>
+                        <li><strong>TLS termination:</strong> Decrypts HTTPS at the LB; backend EC2 instances can operate over plain HTTP internally.</li>
+                        <li><strong>Dynamic IP / DNS name:</strong> ALB does not provide static IPs — clients must use the DNS name (which may resolve to changing IPs).</li>
+                    </ul>
+
+                    <h3 id="sub-3-3">3.3 NLB vs. ALB Feature Comparison</h3>
+                    <table style="width:100%; border-collapse: collapse; margin: 1rem 0;">
+                        <thead>
+                            <tr style="background: var(--bg-secondary); border-bottom: 2px solid var(--gray-border); text-align: left;">
+                                <th style="padding: 0.5rem 1rem;">Feature</th>
+                                <th style="padding: 0.5rem 1rem;">NLB (Layer 4)</th>
+                                <th style="padding: 0.5rem 1rem;">ALB (Layer 7)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid var(--gray-border);">
+                                <td style="padding: 0.5rem 1rem;"><strong>OSI Layer</strong></td>
+                                <td style="padding: 0.5rem 1rem;">Layer 4 (TCP/UDP)</td>
+                                <td style="padding: 0.5rem 1rem;">Layer 7 (HTTP/HTTPS)</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--gray-border);">
+                                <td style="padding: 0.5rem 1rem;"><strong>HTTP Awareness</strong></td>
+                                <td style="padding: 0.5rem 1rem;">No</td>
+                                <td style="padding: 0.5rem 1rem;">Yes</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--gray-border);">
+                                <td style="padding: 0.5rem 1rem;"><strong>URL / Path Routing</strong></td>
+                                <td style="padding: 0.5rem 1rem;">No</td>
+                                <td style="padding: 0.5rem 1rem;">Yes</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--gray-border);">
+                                <td style="padding: 0.5rem 1rem;"><strong>TLS Termination</strong></td>
+                                <td style="padding: 0.5rem 1rem;">Optional (pass-through default)</td>
+                                <td style="padding: 0.5rem 1rem;">Yes (native HTTPS)</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--gray-border);">
+                                <td style="padding: 0.5rem 1rem;"><strong>Source IP Preservation</strong></td>
+                                <td style="padding: 0.5rem 1rem;">Yes (end-to-end)</td>
+                                <td style="padding: 0.5rem 1rem;">Via X-Forwarded-For header</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--gray-border);">
+                                <td style="padding: 0.5rem 1rem;"><strong>Static IP Support</strong></td>
+                                <td style="padding: 0.5rem 1rem;">Yes (Elastic IP per AZ)</td>
+                                <td style="padding: 0.5rem 1rem;">No (DNS name only)</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.5rem 1rem;"><strong>Latency</strong></td>
+                                <td style="padding: 0.5rem 1rem;">Ultra-low (&lt;1 ms)</td>
+                                <td style="padding: 0.5rem 1rem;">Low (slightly higher due to HTTP parsing)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
                         <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
@@ -153,18 +247,43 @@
                 </div>
             </section>
 
+            <!-- Topic 4 -->
             <section class="topic-section" id="topic-4">
                 <div class="topic-header" onclick="toggleSection('content-4')">
                     <div class="topic-number">4</div>
-                    <h2>Consistent Hashing & Distributed Cache Distribution</h2>
+                    <h2>Target Groups &amp; Health Checks</h2>
                 </div>
                 <div class="collapsible-content" id="content-4">
-                    
-                    <h3 id="sub-4-1">4.1 The Traditional Hash Problem</h3>
-                    <p>Standard modulo hashing $\text{hash}(key) \pmod N$ causes nearly 100% of keys to remap when adding or removing a node ($N \to N+1$), invalidating caches.</p>
-                    <h3 id="sub-4-2">4.2 Hash Ring Topology</h3>
-                    <p><strong>Consistent Hashing</strong> maps both servers and keys onto a circular $2^{32}-1$ hash ring space. Adding or removing a server remaps only $K / N$ keys on average.</p>
-                
+
+                    <h3 id="sub-4-1">4.1 Target Group Role</h3>
+                    <p>A <strong>Target Group</strong> is a logical grouping of backend compute resources (EC2 instances, containers, Lambda functions, or IP addresses) that an AWS Load Balancer routes requests to. It acts as the intermediary health-monitoring layer between the load balancer and the actual targets:</p>
+                    <ul>
+                        <li>A single ALB/NLB can route to multiple target groups using listener rules.</li>
+                        <li>Each target group has its own independently configured health check settings, port, and protocol.</li>
+                        <li>Auto Scaling Groups can be associated with a target group so newly launched instances are registered automatically.</li>
+                    </ul>
+
+                    <h3 id="sub-4-2">4.2 Health Check Probing Mechanism</h3>
+                    <p>The load balancer periodically sends health check probes to each registered target. A typical HTTP health check works as follows:</p>
+                    <div class="box box-blue">
+                        <div class="box-title">HTTP Health Check Flow</div>
+                        <ul>
+                            <li><strong>Probe:</strong> LB sends <code>GET /health HTTP/1.1</code> to each target on the configured port at a set interval (e.g., every 30 seconds).</li>
+                            <li><strong>Healthy response:</strong> Target returns <code>HTTP 200 OK</code> &rarr; target remains in the rotation and continues receiving traffic.</li>
+                            <li><strong>Unhealthy response:</strong> Target returns <code>HTTP 500</code>, connection timeout, or connection refused &rarr; failure counter increments.</li>
+                            <li><strong>Threshold:</strong> After a configurable number of consecutive failures (e.g., 3), the target is marked <strong>Unhealthy</strong> and removed from the rotation.</li>
+                            <li><strong>Recovery:</strong> Once a target passes a configurable number of consecutive health checks again (e.g., 2), it is automatically returned to service.</li>
+                        </ul>
+                    </div>
+
+                    <h3 id="sub-4-3">4.3 Automatic Target Removal (Self-Healing Architecture)</h3>
+                    <p>When a target is marked unhealthy, the load balancer stops routing new connections to it. In-flight requests on existing connections are allowed to complete (connection draining). This creates a <strong>self-healing architecture</strong>:</p>
+                    <ul>
+                        <li>A crashed EC2 instance is automatically removed from traffic rotation without human intervention.</li>
+                        <li>When the instance recovers (or a replacement launches via ASG), it re-passes health checks and is automatically added back into the pool.</li>
+                        <li>End users experience no downtime — they are transparently served by remaining healthy targets throughout the failure and recovery cycle.</li>
+                    </ul>
+
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
                         <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
@@ -172,18 +291,53 @@
                 </div>
             </section>
 
+            <!-- Topic 5 -->
             <section class="topic-section" id="topic-5">
                 <div class="topic-header" onclick="toggleSection('content-5')">
                     <div class="topic-number">5</div>
-                    <h2>Global Server Load Balancing (GSLB) & DNS Routing</h2>
+                    <h2>Auto Scaling Groups &amp; Multi-AZ High Availability</h2>
                 </div>
                 <div class="collapsible-content" id="content-5">
-                    
-                    <h3 id="sub-5-1">5.1 Multi-Region High Availability</h3>
-                    <p>Global Server Load Balancing (GSLB) routes user traffic across geographically dispersed data centers worldwide.</p>
-                    <h3 id="sub-5-2">5.2 Anycast BGP Routing Mechanics</h3>
-                    <p>In Anycast, multiple data centers announce the <em>same IP address</em> via BGP. Internet routers automatically direct user packets to the topologically closest data center.</p>
-                
+
+                    <h3 id="sub-5-1">5.1 Auto Scaling Groups (ASG) &amp; Elasticity</h3>
+                    <p><strong>Problem:</strong> Real-world traffic is not constant. A service might have 500 users at 8 AM but 50,000 users at 8 PM. Running enough servers to handle the peak 24/7 wastes money; running only enough for the average leaves users with a degraded experience during spikes.</p>
+                    <p><strong>Solution — Elasticity:</strong> An <strong>Auto Scaling Group (ASG)</strong> manages a fleet of EC2 instances and dynamically adjusts the fleet size in response to demand:</p>
+                    <div class="box box-blue">
+                        <div class="box-title">ASG Scaling Actions</div>
+                        <ul>
+                            <li><strong>Scale Out (Add capacity):</strong> When a CloudWatch metric exceeds a threshold (e.g., average CPU &gt; 70% for 5 minutes), ASG launches new EC2 instances and automatically registers them with the associated Target Group/Load Balancer.</li>
+                            <li><strong>Scale In (Remove capacity):</strong> When demand drops (e.g., average CPU &lt; 30%), ASG terminates surplus instances after connection draining, reducing cost.</li>
+                            <li><strong>Desired Capacity:</strong> The ASG always tries to maintain a configured desired count, replacing any instances that fail health checks.</li>
+                            <li><strong>Scheduled Scaling:</strong> Capacity can be pre-scaled for predictable events (e.g., 9 AM Monday morning surge).</li>
+                        </ul>
+                    </div>
+
+                    <h3 id="sub-5-2">5.2 Availability Zones (AZ) &amp; Fault Isolation</h3>
+                    <p>An <strong>Availability Zone (AZ)</strong> is a physically separate, independently powered and cooled AWS data center (or cluster of data centers) within an AWS Region. AZs within a Region are connected via high-bandwidth, low-latency private fiber links but are isolated from each other's failure domains:</p>
+                    <ul>
+                        <li>A power outage, hardware failure, or natural disaster in one AZ does not impact other AZs in the same Region.</li>
+                        <li>Each AWS Region typically has 3&ndash;6 AZs (e.g., <code>us-east-1a</code>, <code>us-east-1b</code>, <code>us-east-1c</code>).</li>
+                        <li>Resources deployed across multiple AZs eliminate the <strong>single point of failure (SPOF)</strong> risk at the data center level.</li>
+                    </ul>
+
+                    <h3 id="sub-5-3">5.3 Multi-AZ ELB Deployment Architecture</h3>
+                    <p>AWS Elastic Load Balancers are inherently <strong>multi-AZ</strong>. A managed ELB is deployed across multiple <strong>public subnets</strong> (one per AZ) behind an <strong>Internet Gateway (IGW)</strong>:</p>
+                    <ul>
+                        <li>The ELB has a node in each configured AZ. If one AZ fails, the ELB nodes in surviving AZs continue to serve traffic.</li>
+                        <li>The ASG distributes EC2 backend instances evenly across private subnets in each AZ.</li>
+                        <li>Traffic flow: Internet &rarr; IGW &rarr; ELB (public subnets, multi-AZ) &rarr; Target Group &rarr; EC2 instances (private subnets, multi-AZ).</li>
+                    </ul>
+                    <div class="box box-blue">
+                        <div class="box-title">Reference Architecture: Public-Facing Web Application</div>
+                        <ul>
+                            <li><strong>Internet Gateway (IGW)</strong> &mdash; single entry/exit for VPC internet traffic.</li>
+                            <li><strong>ALB</strong> deployed across public subnets in AZ-A and AZ-B &mdash; receives all inbound HTTP/HTTPS.</li>
+                            <li><strong>Target Group</strong> &mdash; health-monitors EC2 instances in private subnets in AZ-A and AZ-B.</li>
+                            <li><strong>ASG</strong> &mdash; maintains desired count of EC2 instances, scales out under load, replaces failed instances automatically.</li>
+                            <li>If AZ-A fails entirely: ALB routes all traffic to AZ-B instances; ASG launches replacements in AZ-B.</li>
+                        </ul>
+                    </div>
+
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
                         <button class="btn" onclick="document.getElementById('original-pdf').scrollIntoView()">Next Topic</button>
@@ -233,4 +387,5 @@
     </script>
     <script src="../js/script.js"></script>
 </body>
+
 </html>

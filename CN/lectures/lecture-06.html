@@ -1,24 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Computer Networks - Lecture 06</title>
-    <meta content="Study notes for Computer Networks (CSAI321), Lecture 06 covering HTTPS, SSL/TLS, symmetric vs asymmetric encryption, cryptographic goals, the TLS handshake, Certificate Authorities, and AWS ACM." name="description"/>
-    <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>06</text></svg>" rel="icon"/>
-    <link href="../css/style.css" rel="stylesheet"/>
+    <meta content="Study notes for Computer Networks (CSAI321), Lecture 06 covering HTTPS, HTTP Evolution (HTTP/1.0, HTTP/2, HTTP/3), Digital Certificates & Field Anatomy, the 4-step TLS Handshake with 32-byte nonces, and AWS ACM." name="description" />
+    <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>06</text></svg>" rel="icon" />
+    <link href="../css/style.css" rel="stylesheet" />
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}, {left: '$', right: '$', display: false}]});"></script>
 </head>
+
 <body>
     <header>
         <div class="header-titles">
             <h1>Computer Networks Foundations</h1>
-            <p>Lecture 06 - HTTPS and The TLS Handshake: Securing the Web</p>
+            <p>Lecture 06 - HTTPS, HTTP Evolution &amp; The TLS Handshake</p>
             <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
             <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
             <a href="../pdfs/6.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
         </div>
         <div class="search-container">
-            <input id="searchInput" placeholder="Search notes..." type="text"/>
+            <input id="searchInput" placeholder="Search notes..." type="text" />
         </div>
     </header>
     <div class="container">
@@ -31,14 +37,15 @@
             <ul class="index-list" id="indexList">
                 <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>Short Notes</a></li>
                 <li>
-                    <a href="#topic-1">1. The Padlock & Plaintext Vulnerabilities<span class="sub-count">2</span></a>
+                    <a href="#topic-1">1. The Padlock, Plaintext Risks &amp; HTTP Evolution<span class="sub-count">3</span></a>
                     <ul class="sub-index">
                         <li><a href="#sub-1-1">1.1 Browser Padlock Breakdown</a></li>
                         <li><a href="#sub-1-2">1.2 Plaintext Eavesdropping Risk</a></li>
+                        <li><a href="#sub-1-3">1.3 HTTP Protocol Stack Evolution (HTTP/1.0 to HTTP/3)</a></li>
                     </ul>
                 </li>
                 <li>
-                    <a href="#topic-2">2. HTTPS & Cryptographic Core Goals<span class="sub-count">3</span></a>
+                    <a href="#topic-2">2. HTTPS &amp; Cryptographic Core Goals<span class="sub-count">3</span></a>
                     <ul class="sub-index">
                         <li><a href="#sub-2-1">2.1 The HTTPS Definition</a></li>
                         <li><a href="#sub-2-2">2.2 Transition: SSL to TLS</a></li>
@@ -54,32 +61,38 @@
                     </ul>
                 </li>
                 <li>
-                    <a href="#topic-4">4. The TLS Handshake Flow<span class="sub-count">4</span></a>
+                    <a href="#topic-4">4. The TLS Handshake &amp; Session Key Derivation<span class="sub-count">4</span></a>
                     <ul class="sub-index">
-                        <li><a href="#sub-4-1">4.1 Step 1: ClientHello</a></li>
-                        <li><a href="#sub-4-2">4.2 Step 2: ServerHello + Certificate</a></li>
+                        <li><a href="#sub-4-1">4.1 Step 1: ClientHello (Cipher Suites &amp; 32-Byte Nonce)</a></li>
+                        <li><a href="#sub-4-2">4.2 Step 2: ServerHello + Digital Certificate</a></li>
                         <li><a href="#sub-4-3">4.3 Step 3: Certificate Authentication</a></li>
-                        <li><a href="#sub-4-4">4.4 Step 4: Key Exchange & Encryption Start</a></li>
+                        <li><a href="#sub-4-4">4.4 Step 4: Key Exchange &amp; Session Key Derivation</a></li>
                     </ul>
                 </li>
                 <li>
-                    <a href="#topic-5">5. Trust Chains & Cloud Deployments<span class="sub-count">2</span></a>
+                    <a href="#topic-5">5. Digital Certificates, Trust Chains &amp; AWS ACM<span class="sub-count">3</span></a>
                     <ul class="sub-index">
-                        <li><a href="#sub-5-1">5.1 Certificate Authorities & Chain of Trust</a></li>
-                        <li><a href="#sub-5-2">5.2 AWS Certificate Manager (ACM) Deployment</a></li>
+                        <li><a href="#sub-5-1">5.1 Digital Certificate Field Anatomy</a></li>
+                        <li><a href="#sub-5-2">5.2 Certificate Authorities (CAs) &amp; Chain of Trust</a></li>
+                        <li><a href="#sub-5-3">5.3 AWS Certificate Manager (ACM) Deployment</a></li>
                     </ul>
                 </li>
                 <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
             </ul>
         </aside>
+
         <!-- Main Content -->
         <main id="notesContent">
-            
-            <!-- Short Notes Image -->
+            <!-- Short Notes -->
             <section class="topic-section" id="short-notes">
                 <div class="topic-header" onclick="toggleSection('content-short-notes')">
                     <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
                     </div>
                     <h2>Short Notes &amp; Visual Summary</h2>
                 </div>
@@ -87,32 +100,66 @@
                     <p style="margin-bottom: 1rem;">Handwritten / quick summary notes for Lecture 06:</p>
                     <div style="text-align: center; background: var(--bg-secondary, #f8f9fa); padding: 1rem; border-radius: 8px; border: 1px solid var(--gray-border);">
                         <a href="../images/6.png" target="_blank" title="Click to view full size">
-                            <img src="../images/6.png" alt="Lecture 06 Short Notes" style="max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22800%22 height=%22400%22 viewBox=%220 0 800 400%22><rect width=%22100%%22 height=%22100%%22 fill=%22%231a221e%22/><text x=%2250%%22 y=%2250%%22 font-family=%22Inter, sans-serif%22 font-size=%2224%22 fill=%22%23a0aec0%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>Short Notes Visual (images/6.png) Pending Upload</text><text x=%2250%%22 y=%2260%%22 font-family=%22Inter, sans-serif%22 font-size=%2214%22 fill=%22%23718096%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>HTML notes are fully functional. PDF is linked below.</text></svg>'" />
+                            <img src="../images/6.png" alt="Lecture 06 Short Notes" style="max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
                         </a>
                         <p style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-muted);">Click image to open high-resolution version in new tab</p>
                     </div>
                 </div>
             </section>
-            
+
             <!-- Topic 1 -->
             <section class="topic-section" id="topic-1">
                 <div class="topic-header" onclick="toggleSection('content-1')">
                     <div class="topic-number">1</div>
-                    <h2>The Padlock & Plaintext Vulnerabilities</h2>
+                    <h2>The Padlock, Plaintext Risks &amp; HTTP Evolution</h2>
                 </div>
                 <div class="collapsible-content" id="content-1">
                     <h3 id="sub-1-1">1.1 Browser Padlock Breakdown</h3>
                     <p>What does the padlock icon (🔒) in your browser address bar actually mean?</p>
                     <ul>
                         <li><strong>Safe Website?</strong> ❌ No. Bad actors can buy domains and obtain secure lock icons too.</li>
-                        <li><strong>Encrypted Connection?</strong> ✅ Yes. Data cannot be read by middle hops.</li>
-                        <li><strong>Verified Identity?</strong> ✅ Yes. The site domain matches the digital certificate identity.</li>
+                        <li><strong>Encrypted Connection?</strong> ✅ Yes. Data cannot be read by middle hops or eavesdroppers.</li>
+                        <li><strong>Verified Identity?</strong> ✅ Yes. The site domain matches the authenticated digital certificate identity issued by a trusted Certificate Authority.</li>
                     </ul>
-                    
+
                     <h3 id="sub-1-2">1.2 Plaintext Eavesdropping Risk</h3>
-                    <p>HTTP is plaintext by design. If you send data using regular HTTP, anyone capturing the network packets (like an attacker on public Wi-Fi or an intermediary router) can read raw logins, credentials, and message content easily.</p>
+                    <p>Standard HTTP is plaintext by design. If you send data using regular HTTP, anyone capturing network packets (such as an attacker on public Wi-Fi or an intermediary router operator) can read passwords, session cookies, personal identity data, and credit card numbers without restriction.</p>
+
+                    <h3 id="sub-1-3">1.3 HTTP Protocol Stack Evolution (HTTP/1.0 to HTTP/3)</h3>
+                    <p>To address security, latency, and transport bottlenecks, HTTP evolved across the protocol stack as follows:</p>
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 1rem; border: 1px solid var(--gray-border);">
+                        <thead>
+                            <tr style="background: var(--bg-secondary); text-align: left;">
+                                <th style="padding: 0.75rem; border: 1px solid var(--gray-border);">Protocol Version</th>
+                                <th style="padding: 0.75rem; border: 1px solid var(--gray-border);">Application Data Layer</th>
+                                <th style="padding: 0.75rem; border: 1px solid var(--gray-border);">Security &amp; Transport Stack</th>
+                                <th style="padding: 0.75rem; border: 1px solid var(--gray-border);">Key Technical Characteristic</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);"><strong>HTTP/1.0 / 1.1</strong></td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Plaintext Text Data</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Directly over <strong>TCP</strong></td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Unencrypted (port 80) or optional SSL wrapper; suffers from Head-of-Line (HoL) blocking across separate connections.</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);"><strong>HTTP/2</strong></td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Stream Abstraction &amp; Binary Framing</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Over <strong>TLS / TCP</strong></td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Multiplexes multiple streams over a single TCP connection; header compression (HPACK); mandated TLS encryption in browsers.</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);"><strong>HTTP/3</strong></td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Stream Abstraction &amp; Multistreaming</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Over <strong>QUIC / UDP</strong></td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Replaces TCP with QUIC; embeds TLS 1.3 handshake natively; eliminates TCP-level Head-of-Line blocking; supports 0-RTT connection resumption.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
                     <div class="topic-nav">
-                        <button class="btn" disabled="">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('short-notes').scrollIntoView()">Previous Topic</button>
                         <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
                     </div>
                 </div>
@@ -122,25 +169,27 @@
             <section class="topic-section" id="topic-2">
                 <div class="topic-header" onclick="toggleSection('content-2')">
                     <div class="topic-number">2</div>
-                    <h2>HTTPS & Cryptographic Core Goals</h2>
+                    <h2>HTTPS &amp; Cryptographic Core Goals</h2>
                 </div>
                 <div class="collapsible-content" id="content-2">
                     <h3 id="sub-2-1">2.1 The HTTPS Definition</h3>
-                    <p>HTTPS is the secure version of HTTP. It wraps standard web request traffic inside an encrypted transport layer tunnel to defend against snooping.</p>
-                    <div class="formula-box">
-                        HTTPS = HTTP + TLS
+                    <p>HTTPS is the secure implementation of HTTP. It encapsulates standard HTTP request and response messages inside an encrypted cryptographic tunnel (operating over standard TCP port 443):</p>
+                    <div class="box box-blue">
+                        <div class="box-title">Cryptographic Equation</div>
+                        $$\text{HTTPS} = \text{HTTP} + \text{TLS}$$
                     </div>
-                    
+
                     <h3 id="sub-2-2">2.2 Transition: SSL to TLS</h3>
-                    <p>Historically, HTTPS utilized <strong>SSL</strong> (Secure Sockets Layer). Because of security flaws discovered in SSL over time, modern web systems use <strong>TLS</strong> (Transport Layer Security) to encrypt client-server communication channels.</p>
-                    
+                    <p>Historically, secure communications used <strong>SSL (Secure Sockets Layer)</strong> developed by Netscape in the 1990s. Due to serious cryptographic vulnerabilities discovered in SSL 2.0 and SSL 3.0 (e.g., POODLE attack), SSL was formally deprecated. Modern systems use the updated and standardized successor: <strong>TLS (Transport Layer Security)</strong>, currently at TLS 1.2 and TLS 1.3.</p>
+
                     <h3 id="sub-2-3">2.3 Core Goals: Confidentiality, Integrity, Authentication</h3>
-                    <p>Secure communications rely on three major pillars:</p>
+                    <p>Secure web communications depend on three fundamental security guarantees:</p>
                     <ul>
-                        <li><strong>Confidentiality (Privacy):</strong> Ensures information is readable only by authorized endpoints ("No eavesdropping").</li>
-                        <li><strong>Integrity:</strong> Guarantees data remains unaltered and accurate during transit ("No tampering").</li>
-                        <li><strong>Authentication:</strong> Verifies the actual identity of the server (and sometimes the client) to stop impersonation.</li>
+                        <li><strong>Confidentiality (Privacy):</strong> Guarantees that transmitted data is readable only by authorized endpoints ("No eavesdropping"). Even if an attacker captures the packets, they see only indecipherable ciphertext.</li>
+                        <li><strong>Integrity:</strong> Guarantees that data cannot be altered or injected in transit ("No tampering"). Verified through cryptographic message authentication codes (MACs).</li>
+                        <li><strong>Authentication:</strong> Confirms that the communicating party is who they claim to be ("No impersonation"). Ensures clients connect to the authentic server and not a rogue intermediary.</li>
                     </ul>
+
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
                         <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
@@ -156,17 +205,31 @@
                 </div>
                 <div class="collapsible-content" id="content-3">
                     <h3 id="sub-3-1">3.1 Symmetric Key Exchange Issue</h3>
-                    <p>Symmetric encryption uses a single shared secret key for both encryption and decryption. It is fast and efficient, but presents a massive logistical issue: <strong>how do strangers securely share the symmetric key</strong> on an insecure open internet without someone eavesdropping on it during exchange?</p>
-                    
+                    <p><strong>Symmetric Encryption</strong> uses a single shared secret key for both encryption and decryption (e.g., AES-128, AES-256):</p>
+                    <ul>
+                        <li><strong>Advantage:</strong> Extremely fast, lightweight, and hardware-accelerated.</li>
+                        <li><strong>Critical Dilemma:</strong> <em>How can a browser and a web server securely share this secret key</em> across an untrusted, public internet without an eavesdropper intercepting the key as it is being sent?</li>
+                    </ul>
+
                     <h3 id="sub-3-2">3.2 Asymmetric Public/Private Keys</h3>
-                    <p>Asymmetric encryption uses a mathematically linked pair: a <strong>Public Key</strong> (can be shared with anyone to encrypt data) and a <strong>Private Key</strong> (kept secure by the owner to decrypt). Anyone can encrypt a message for the server, but only the server can decrypt it.</p>
-                    
+                    <p><strong>Asymmetric Encryption (Public-Key Cryptography)</strong> solves the key distribution paradox using a mathematically bound pair of keys (e.g., RSA, ECC):</p>
+                    <ul>
+                        <li><strong>Public Key:</strong> Freely published to the world. Anyone can use the public key to encrypt a message intended for the server.</li>
+                        <li><strong>Private Key:</strong> Kept strictly secret on the server. Only the private key can decrypt messages that were encrypted with its matching public key.</li>
+                        <li><strong>Limitation:</strong> Asymmetric cryptographic algorithms require intense mathematical computations (modular exponentiation or elliptic curve arithmetic), making them roughly 1,000 times slower than symmetric ciphers.</li>
+                    </ul>
+
                     <h3 id="sub-3-3">3.3 The TLS Hybrid Key Insight</h3>
-                    <p>Why not use only asymmetric encryption? It is mathematically heavy and slow. TLS solves this by combining both methods:</p>
-                    <ol>
-                        <li>Uses <strong>Asymmetric Encryption</strong> initially to share a symmetric key securely.</li>
-                        <li>Switches immediately to <strong>Symmetric Encryption</strong> using that shared key for fast session communications.</li>
-                    </ol>
+                    <div class="box box-green">
+                        <div class="box-title">The Hybrid Encryption Solution</div>
+                        <p>TLS ingeniously combines the security of asymmetric encryption with the raw speed of symmetric encryption:</p>
+                        <ol>
+                            <li>Use <strong>Asymmetric Encryption</strong> during the initial handshake to authenticate the server and securely exchange the foundation for a secret key.</li>
+                            <li>Both sides derive a shared <strong>Symmetric Session Key</strong>.</li>
+                            <li>Immediately switch to <strong>Symmetric Encryption</strong> using that session key to encrypt all subsequent high-volume application payload data (HTML, JSON, media).</li>
+                        </ol>
+                    </div>
+
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
                         <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
@@ -178,21 +241,48 @@
             <section class="topic-section" id="topic-4">
                 <div class="topic-header" onclick="toggleSection('content-4')">
                     <div class="topic-number">4</div>
-                    <h2>The TLS Handshake Flow</h2>
+                    <h2>The TLS Handshake &amp; Session Key Derivation</h2>
                 </div>
                 <div class="collapsible-content" id="content-4">
-                    <h3 id="sub-4-1">4.1 Step 1: ClientHello</h3>
-                    <p>The client initiates the handshake by offering supported TLS versions, cipher suites (algorithm preferences), and a random nonce string used for session calculations.</p>
-                    
-                    <h3 id="sub-4-2">4.2 Step 2: ServerHello + Certificate</h3>
-                    <p>The server responds by choosing the preferred cipher suite, sending its own random nonce, and sharing its <strong>Digital Certificate</strong> containing the server's public key and authority signatures.</p>
-                    
+                    <p>The TLS Handshake establishes cryptographic parameters before any HTTP data is transmitted:</p>
+
+                    <h3 id="sub-4-1">4.1 Step 1: ClientHello (Cipher Suites &amp; 32-Byte Nonce)</h3>
+                    <p>The client initiates the handshake by transmitting a <code>ClientHello</code> message containing:</p>
+                    <ul>
+                        <li>Supported TLS protocol versions (e.g., TLS 1.2, TLS 1.3).</li>
+                        <li>An ordered list of supported <strong>cipher suites</strong> (e.g., <code>TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256</code>).</li>
+                        <li>A <strong>32-byte cryptographic random nonce (client_random)</strong> used to prevent replay attacks and ensure unique session keys.</li>
+                    </ul>
+
+                    <h3 id="sub-4-2">4.2 Step 2: ServerHello + Digital Certificate</h3>
+                    <p>The server replies with a <code>ServerHello</code> message containing:</p>
+                    <ul>
+                        <li>The selected TLS protocol version and chosen cipher suite.</li>
+                        <li>Its own <strong>32-byte cryptographic random nonce (server_random)</strong>.</li>
+                        <li>The server's <strong>Digital Certificate</strong>, which contains the server's identity and its <strong>Public Key</strong>.</li>
+                    </ul>
+
                     <h3 id="sub-4-3">4.3 Step 3: Certificate Authentication</h3>
-                    <p>The client validates the server's certificate chain through Certificate Authorities (CAs). If the signature checks pass, the client trusts the server's identity, preventing Man-in-the-Middle (MitM) attacks.</p>
-                    
-                    <h3 id="sub-4-4">4.4 Step 4: Key Exchange & Encryption Start</h3>
-                    <p>Client and server compute a shared <strong>session key</strong> using the exchanged nonces. Once calculated, they signal the switch, and all subsequent application traffic is encrypted symmetrically.</p>
-                    
+                    <p>The client's browser verifies the digital certificate against its local OS trust store:</p>
+                    <ul>
+                        <li>Validates the issuing Certificate Authority (CA) digital signature.</li>
+                        <li>Verifies the domain name matches (e.g., <code>*.canva.com</code>).</li>
+                        <li>Confirms the certificate has not expired or been revoked.</li>
+                    </ul>
+
+                    <h3 id="sub-4-4">4.4 Step 4: Key Exchange &amp; Session Key Derivation</h3>
+                    <div class="box box-blue">
+                        <div class="box-title">Session Key Computation</div>
+                        <ol>
+                            <li>The client generates a random <strong>Pre-Master Secret</strong>, encrypts it using the server's verified <strong>Public Key</strong>, and sends it to the server. (In modern (EC)Diffie-Hellman handshakes, client and server exchange ephemeral public parameters instead).</li>
+                            <li>The server decrypts the Pre-Master Secret using its <strong>Private Key</strong>.</li>
+                            <li><strong>Key Derivation:</strong> Both client and server now independently compute the exact same <strong>symmetric session key</strong> using the combination of:
+                                $$\text{Session Key} = \text{PRF}(\text{Pre-Master Secret}, \text{client\_random}, \text{server\_random})$$
+                            </li>
+                            <li>Both sides exchange encrypted <code>Finished</code> messages confirming successful setup. All subsequent application data is encrypted symmetrically using this session key.</li>
+                        </ol>
+                    </div>
+
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
                         <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
@@ -204,15 +294,38 @@
             <section class="topic-section" id="topic-5">
                 <div class="topic-header" onclick="toggleSection('content-5')">
                     <div class="topic-number">5</div>
-                    <h2>Trust Chains & Cloud Deployments</h2>
+                    <h2>Digital Certificates, Trust Chains &amp; AWS ACM</h2>
                 </div>
                 <div class="collapsible-content" id="content-5">
-                    <h3 id="sub-5-1">5.1 Certificate Authorities & Chain of Trust</h3>
-                    <p>Browsers trust digital certificates because they are signed by trusted <strong>Certificate Authorities (CAs)</strong>. Browsers ship pre-loaded with root certificates, validating the signature chain of intermediate CAs down to individual web endpoints.</p>
-                    
-                    <h3 id="sub-5-2">5.2 AWS Certificate Manager (ACM) Deployment</h3>
-                    <p>In cloud deployments, provisioning SSL/TLS certificates manually is tedious. Services like <strong>AWS Certificate Manager (ACM)</strong> automate certificate issuance, validation, and renewal, attaching them directly to CloudFront CDNs or Application Load Balancers (ALBs).</p>
-                    
+                    <h3 id="sub-5-1">5.1 Digital Certificate Field Anatomy</h3>
+                    <p>A digital certificate binds an organization's public key to their domain name. Standard certificate fields (such as those observed on Canva's SSL certificate) include:</p>
+                    <div class="box box-blue">
+                        <div class="box-title">Canva SSL Certificate Anatomy Example</div>
+                        <ul>
+                            <li><strong>Subject / Common Name (CN):</strong> <code>*.canva.com</code> (Wildcard certificate protecting all Canva subdomains).</li>
+                            <li><strong>Issuer Name &amp; CA:</strong> <code>Amazon RSA 2048 M04</code> (Issued by Amazon Trust Services).</li>
+                            <li><strong>Validity Period:</strong> Activation date and Expiration date (e.g., valid for 13 months).</li>
+                            <li><strong>Public Key Algorithm &amp; Key:</strong> RSA (2048 bits).</li>
+                            <li><strong>Serial Number:</strong> Unique hex identifier issued by the CA to track the certificate.</li>
+                            <li><strong>Country (C) &amp; Organization (O):</strong> <code>C=US</code>, <code>O=Amazon</code> (Issuer identifiers).</li>
+                            <li><strong>Fingerprint / Thumbprint:</strong> Cryptographic SHA-256 hash identifying the certificate document.</li>
+                        </ul>
+                    </div>
+
+                    <h3 id="sub-5-2">5.2 Certificate Authorities (CAs) &amp; Chain of Trust</h3>
+                    <p>How does a client know the certificate is authentic?</p>
+                    <ul>
+                        <li><strong>Root Certificate Authorities (CAs):</strong> Trusted global organizations (e.g., DigiCert, Let's Encrypt, Amazon Trust Services, Sectigo) whose root public keys are pre-installed in browsers and operating systems.</li>
+                        <li><strong>Chain of Trust:</strong> Root CA signs an Intermediate CA certificate, which in turn signs the End-Entity (Server) certificate. Browsers verify the signature path hierarchically up to a trusted root anchor.</li>
+                    </ul>
+
+                    <h3 id="sub-5-3">5.3 AWS Certificate Manager (ACM) Deployment</h3>
+                    <p>In modern cloud engineering, managing SSL/TLS certificates manually is slow and prone to downtime from forgotten expiration renewals:</p>
+                    <ul>
+                        <li><strong>AWS Certificate Manager (ACM):</strong> A managed AWS service that provisions, manages, and automatically renews public and private SSL/TLS certificates for free.</li>
+                        <li><strong>Direct Integration:</strong> ACM certificates bind seamlessly to AWS cloud resources such as <strong>Application Load Balancers (ALB)</strong> and <strong>Amazon CloudFront CDNs</strong>, enabling automated TLS termination at cloud edge locations.</li>
+                    </ul>
+
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
                         <button class="btn" onclick="document.getElementById('original-pdf').scrollIntoView()">Next Topic</button>
@@ -224,7 +337,13 @@
             <section class="topic-section" id="original-pdf">
                 <div class="topic-header" onclick="toggleSection('content-pdf')">
                     <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
-                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" x2="8" y1="13" y2="13"></line>
+                            <line x1="16" x2="8" y1="17" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
                     </div>
                     <h2>Original PDF Notes</h2>
                 </div>
@@ -256,4 +375,5 @@
     </script>
     <script src="../js/script.js"></script>
 </body>
+
 </html>

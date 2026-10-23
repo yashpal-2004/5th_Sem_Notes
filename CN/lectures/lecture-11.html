@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Computer Networks - Lecture 11</title>
-    <meta content="Study notes for Computer Networks (CSAI321), Lecture 11 covering Flow Control (rwnd), Congestion Principles, TCP AIMD, Slow Start, and TCP Tahoe/Reno state machines." name="description" />
+    <meta content="Study notes for Computer Networks (CSAI321), Lecture 11 covering Flow Control, Traffic Jam Analogy, Sliding Window, TCP Timeouts, Congestion Control Phases, AIMD, Fast Recovery, and TCP CUBIC." name="description" />
     <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>11</text></svg>" rel="icon" />
     <link href="../css/style.css" rel="stylesheet" />
     <!-- KaTeX for math rendering -->
@@ -18,7 +18,7 @@
     <header>
         <div class="header-titles">
             <h1>Computer Networks Foundations</h1>
-            <p>Lecture 11 - TCP Congestion Control & Flow Control</p>
+            <p>Lecture 11 - TCP Congestion Control, Flow Control & Modern Protocols</p>
             <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
             <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
             <a href="../pdfs/11.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
@@ -37,33 +37,43 @@
             <ul class="index-list" id="indexList">
                 <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>Short Notes</a></li>
                 <li>
-                    <a href="#topic-1">1. Network Congestion Principles & Cost of Congestion<span class="sub-count">3</span></a>
+                    <a href="#topic-1">1. Principles of Congestion &amp; Traffic Jam Analogy<span class="sub-count">3</span></a>
                     <ul class="sub-index">
-                        <li><a href="#sub-1-1">1.1 Definition of Congestion</a></li><li><a href="#sub-1-2">1.2 Causes & Costs of Congestion</a></li><li><a href="#sub-1-3">1.3 Congestion Collapse Scenario</a></li>
+                        <li><a href="#sub-1-1">1.1 Causes &amp; High Costs of Congestion</a></li>
+                        <li><a href="#sub-1-2">1.2 Traffic Jam Analogy (Flow vs. Congestion Control)</a></li>
+                        <li><a href="#sub-1-3">1.3 Special Cases of TCP Timeouts</a></li>
                     </ul>
                 </li>
                 <li>
-                    <a href="#topic-2">2. TCP Flow Control: The Receive Window (rwnd)<span class="sub-count">3</span></a>
+                    <a href="#topic-2">2. TCP Flow Control &amp; Sliding Window Mechanics<span class="sub-count">3</span></a>
                     <ul class="sub-index">
-                        <li><a href="#sub-2-1">2.1 Flow Control vs. Congestion Control</a></li><li><a href="#sub-2-2">2.2 TCP Receive Buffer Architecture</a></li><li><a href="#sub-2-3">2.3 The rwnd Matching Equation</a></li>
+                        <li><a href="#sub-2-1">2.1 Sliding Window Protocol &amp; Pipelining</a></li>
+                        <li><a href="#sub-2-2">2.2 TCP Receive Buffer Architecture</a></li>
+                        <li><a href="#sub-2-3">2.3 The rwnd Flow Control Equation</a></li>
                     </ul>
                 </li>
                 <li>
-                    <a href="#topic-3">3. TCP Congestion Control Principles & State Machine<span class="sub-count">3</span></a>
+                    <a href="#topic-3">3. TCP Congestion Control: 3 Phases &amp; Slow Start<span class="sub-count">3</span></a>
                     <ul class="sub-index">
-                        <li><a href="#sub-3-1">3.1 The Congestion Window (cwnd)</a></li><li><a href="#sub-3-2">3.2 Dynamic Transmission Limit Formula</a></li><li><a href="#sub-3-3">3.3 Three States: Slow Start, Congestion Avoidance, Fast Recovery</a></li>
+                        <li><a href="#sub-3-1">3.1 Overview of the 3 Operational Phases</a></li>
+                        <li><a href="#sub-3-2">3.2 Slow Start Deep-Dive &amp; Exponential Growth</a></li>
+                        <li><a href="#sub-3-3">3.3 The Slow Start Threshold (ssthresh) Transition</a></li>
                     </ul>
                 </li>
                 <li>
-                    <a href="#topic-4">4. Additive Increase / Multiplicative Decrease (AIMD)<span class="sub-count">3</span></a>
+                    <a href="#topic-4">4. AIMD &amp; Fast Recovery RTT Trace<span class="sub-count">3</span></a>
                     <ul class="sub-index">
-                        <li><a href="#sub-4-1">4.1 AIMD Sawtooth Pattern</a></li><li><a href="#sub-4-2">4.2 Additive Increase (+1 MSS per RTT)</a></li><li><a href="#sub-4-3">4.3 Multiplicative Decrease (Halving cwnd)</a></li>
+                        <li><a href="#sub-4-1">4.1 Congestion Avoidance (Additive Increase)</a></li>
+                        <li><a href="#sub-4-2">4.2 Fast Retransmit &amp; Fast Recovery (Multiplicative Decrease)</a></li>
+                        <li><a href="#sub-4-3">4.3 Numerical Trace: Window Evolution Across RTTs</a></li>
                     </ul>
                 </li>
                 <li>
-                    <a href="#topic-5">5. TCP Flavors & Modern Extensions<span class="sub-count">3</span></a>
+                    <a href="#topic-5">5. TCP Flavors &amp; Modern TCP CUBIC<span class="sub-count">3</span></a>
                     <ul class="sub-index">
-                        <li><a href="#sub-5-1">5.1 TCP Tahoe vs. TCP Reno</a></li><li><a href="#sub-5-2">5.2 Fast Retransmit via 3 Duplicate ACKs</a></li><li><a href="#sub-5-3">5.3 TCP CUBIC Standard</a></li>
+                        <li><a href="#sub-5-1">5.1 TCP Tahoe vs. TCP Reno State Machines</a></li>
+                        <li><a href="#sub-5-2">5.2 TCP CUBIC Algorithm &amp; Window Function</a></li>
+                        <li><a href="#sub-5-3">5.3 Linux Web Server Default &amp; High-BDP Scaling</a></li>
                     </ul>
                 </li>
                 <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
@@ -96,22 +106,45 @@
                 </div>
             </section>
 
+            <!-- Topic 1 -->
             <section class="topic-section" id="topic-1">
                 <div class="topic-header" onclick="toggleSection('content-1')">
                     <div class="topic-number">1</div>
-                    <h2>Network Congestion Principles & Cost of Congestion</h2>
+                    <h2>Principles of Congestion &amp; Traffic Jam Analogy</h2>
                 </div>
                 <div class="collapsible-content" id="content-1">
-                    
-                    <h3 id="sub-1-1">1.1 Definition of Congestion</h3>
-                    <p>Network <strong>Congestion</strong> occurs when too many sources attempt to send data through a network link faster than link routers can process and buffer it.</p>
-                    <h3 id="sub-1-2">1.2 Causes & Costs of Congestion</h3>
+                    <h3 id="sub-1-1">1.1 Causes &amp; High Costs of Congestion</h3>
+                    <p>Network <strong>Congestion</strong> arises when too many sources send data at high rates, causing aggregate traffic to exceed the capacity of intermediate routers and transmission links. As router buffers reach capacity, the network incurs severe performance penalties:</p>
                     <ul>
-                        <li>High queueing delays as router buffers fill up.</li>
-                        <li>Packet drops when router buffers overflow.</li>
-                        <li>Wasted link capacity due to spurious retransmissions of delayed packets.</li>
+                        <li><strong>Excessive Queueing Delays:</strong> Packets sit in bottleneck router queues, drastically raising end-to-end Round Trip Time (RTT).</li>
+                        <li><strong>Buffer Overflow Drops:</strong> Routers drop incoming packets when their internal hardware queues fill completely.</li>
+                        <li><strong>Unnecessary Retransmissions &amp; Capacity Waste:</strong> Delayed packets cause premature sender timeouts. Retransmitting packets already in transit wastes link bandwidth that upstream routers spent resources forwarding.</li>
+                        <li><strong>Congestion Collapse:</strong> Throughput drops toward zero when almost all network capacity is consumed forwarding retransmitted duplicates of dropped or delayed packets.</li>
                     </ul>
-                
+
+                    <h3 id="sub-1-2">1.2 Traffic Jam Analogy (Flow vs. Congestion Control)</h3>
+                    <p>To distinguish between the two core transmission limits in transport protocols, consider the analogy of highway traffic and vehicle movement:</p>
+                    <div class="box box-blue">
+                        <div class="box-title">The Highway &amp; Tow Mater Analogy</div>
+                        <ul>
+                            <li><strong>Flow Control (Single Vehicle Speed Matching):</strong> Imagine a fast car following an old truck (such as Mater from <em>Cars</em>) driving slowly down a single-lane road. The fast car must slow down specifically to avoid rear-ending Mater. Similarly, <strong>Flow Control</strong> is an end-to-end service between two communicating endpoints: it prevents a high-speed sender from overflowing the specific receive buffer of a slow receiver.</li>
+                            <li><strong>Congestion Control (City-Wide Traffic Jam):</strong> Imagine hundreds of cars attempting to merge onto a highway during rush hour at the exact same moment. Even if every individual car is in top mechanical condition, the entire highway grid slows to a crawl or grinds to a halt because aggregate load exceeds road capacity. Similarly, <strong>Congestion Control</strong> prevents the aggregate flow of all senders from overwhelming the shared routers and links in the core network.</li>
+                        </ul>
+                    </div>
+
+                    <h3 id="sub-1-3">1.3 Special Cases of TCP Timeouts</h3>
+                    <p>TCP relies on retransmission timers (Retransmission Timeout &mdash; RTO) to infer segment loss. Two subtle scenarios frequently occur due to real-world network delays and cumulative ACK behavior:</p>
+                    <ol>
+                        <li><strong>Lost ACK Scenario:</strong>
+                            <br />
+                            A sender transmits Segment 1 successfully, and the receiver ingests it and replies with ACK 2. However, the ACK packet is dropped in transit by a congested intermediate router. The sender timer expires even though the receiver already holds the segment. The sender retransmits Segment 1, which the receiver identifies as a duplicate via sequence numbers, discards from its application buffer, and re-sends ACK 2.
+                        </li>
+                        <li style="margin-top: 0.75rem;"><strong>Premature Timeout Scenario (Cumulative ACK Resolution):</strong>
+                            <br />
+                            A sender dispatches Segment 1 and Segment 2 back-to-back. Intermediate network delays cause the sender's timeout timer for Segment 1 to expire right before ACK 1 arrives. Just as the sender initiates retransmission of Segment 1, an ACK 2 arrives (or arrives shortly after). Because TCP ACKs are <strong>cumulative</strong>, ACK 2 implicitly confirms that the receiver has successfully received all bytes up to Segment 2. The sender immediately advances its send window, avoiding an unnecessary retransmission of Segment 2.
+                        </li>
+                    </ol>
+
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('short-notes').scrollIntoView()">Previous Topic</button>
                         <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
@@ -119,22 +152,41 @@
                 </div>
             </section>
 
+            <!-- Topic 2 -->
             <section class="topic-section" id="topic-2">
                 <div class="topic-header" onclick="toggleSection('content-2')">
                     <div class="topic-number">2</div>
-                    <h2>TCP Flow Control: The Receive Window (rwnd)</h2>
+                    <h2>TCP Flow Control &amp; Sliding Window Mechanics</h2>
                 </div>
                 <div class="collapsible-content" id="content-2">
-                    
-                    <h3 id="sub-2-1">2.1 Flow Control vs. Congestion Control</h3>
+                    <h3 id="sub-2-1">2.1 Sliding Window Protocol &amp; Pipelining</h3>
+                    <p>In a simple Stop-and-Wait protocol, the sender transmits one packet and waits for its ACK before sending the next, yielding an extremely low link utilization factor:</p>
+                    $$U_{\text{stop-and-wait}} = \frac{L / R}{RTT + L / R}$$
+                    <p>To maximize link throughput, TCP implements <strong>Pipelining</strong> via a <strong>Sliding Window Protocol</strong>. Pipelining allows the sender to transmit multiple consecutive segments back-to-back without waiting for intervening ACKs, as long as the total unacknowledged volume remains within the window boundaries:</p>
                     <ul>
-                        <li><strong>Flow Control:</strong> Speed-matching service preventing a fast sender from overwhelming a slow receiving application's buffer.</li>
-                        <li><strong>Congestion Control:</strong> Mechanism preventing sender traffic from overwhelming intermediate network router buffers.</li>
+                        <li>The <strong>Send Window</strong> slides forward as cumulative acknowledgments arrive from the receiver.</li>
+                        <li>Transmission pipelines remain full, allowing network link utilization to approach $100\%$ on high-bandwidth-delay product (BDP) links.</li>
                     </ul>
+
                     <h3 id="sub-2-2">2.2 TCP Receive Buffer Architecture</h3>
-                    <p>The receiver advertises available buffer space in the TCP header <strong>Receive Window (rwnd)</strong> field.</p>
-                    $$rwnd = RcvBuffer - [LastByteRcvd - LastByteRead]$$
-                
+                    <p>Each TCP socket maintains a dedicated allocated buffer in OS memory (`RcvBuffer`). Incoming segments reside in this buffer until the local application process issues a `read()` system call:</p>
+                    <ul>
+                        <li>$\text{LastByteRcvd}$: The sequence number of the most recent byte arriving from the network that was placed into the buffer.</li>
+                        <li>$\text{LastByteRead}$: The sequence number of the most recent byte extracted and processed by the receiving application.</li>
+                        <li>To prevent buffer overflow, the receiver must reserve space:</li>
+                    </ul>
+                    $$\text{LastByteRcvd} - \text{LastByteRead} \le \text{RcvBuffer}$$
+
+                    <h3 id="sub-2-3">2.3 The rwnd Flow Control Equation</h3>
+                    <p>The receiver dynamically calculates the spare room in its receive buffer and advertises this value in every outgoing TCP header via the 16-bit <strong>Receive Window (rwnd)</strong> field:</p>
+                    $$rwnd = \text{RcvBuffer} - [\text{LastByteRcvd} - \text{LastByteRead}]$$
+                    <p>The sender enforces flow control by guaranteeing that the volume of unacknowledged data sent does not exceed the advertised window:</p>
+                    $$\text{LastByteSent} - \text{LastByteAcked} \le rwnd$$
+                    <div class="box box-blue">
+                        <div class="box-title">Zero Window Probing</div>
+                        <p>If $rwnd = 0$, the sender pauses transmission. To prevent a deadlock where the receiver clears buffer space but the sender never hears about it, the sender sends periodic 1-byte probe segments to elicit updated ACK packets carrying non-zero $rwnd$ values.</p>
+                    </div>
+
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
                         <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
@@ -142,19 +194,41 @@
                 </div>
             </section>
 
+            <!-- Topic 3 -->
             <section class="topic-section" id="topic-3">
                 <div class="topic-header" onclick="toggleSection('content-3')">
                     <div class="topic-number">3</div>
-                    <h2>TCP Congestion Control Principles & State Machine</h2>
+                    <h2>TCP Congestion Control: 3 Phases &amp; Slow Start</h2>
                 </div>
                 <div class="collapsible-content" id="content-3">
-                    
-                    <h3 id="sub-3-1">3.1 The Congestion Window (cwnd)</h3>
-                    <p>TCP sender maintains a state variable <strong>cwnd (Congestion Window)</strong> limiting max unacked data in flight:</p>
-                    $$\text{LastByteSent} - \text{LastByteAcked} \le \min(cwnd, rwnd)$$
-                    <h3 id="sub-3-2">3.2 Dynamic Transmission Limit Formula</h3>
-                    <p>The effective transmission rate is roughly $\frac{cwnd}{RTT}$ bytes/sec.</p>
-                
+                    <h3 id="sub-3-1">3.1 Overview of the 3 Operational Phases</h3>
+                    <p>TCP congestion control operates at the sender using an internal state variable called the <strong>Congestion Window (cwnd)</strong>. The effective limit of unacknowledged data in flight is the minimum of flow control and congestion control:</p>
+                    $$\text{MaxInFlight} \le \min(cwnd, rwnd)$$
+                    <p>TCP congestion control transitions between three distinct phases:</p>
+                    <ol>
+                        <li><strong>Phase 1: Slow Start:</strong> Fast, exponential ramp-up of transmission rate from an initial base window to discover link bandwidth quickly.</li>
+                        <li><strong>Phase 2: Congestion Avoidance:</strong> Conservative linear probe (+1 MSS per RTT) once window reaches a safe estimated ceiling ($ssthresh$).</li>
+                        <li><strong>Phase 3: Congestion Detection &amp; Recovery:</strong> Reactive throttling when packet loss indicates buffer exhaustion, resetting or halving the window depending on loss severity (Timeout vs. 3 Dup ACKs).</li>
+                    </ol>
+
+                    <h3 id="sub-3-2">3.2 Slow Start Deep-Dive &amp; Exponential Growth</h3>
+                    <p>When a connection begins or resumes after a major timeout, the sender does not know the available bandwidth along the path. Starting at line rate would trigger catastrophic buffer drops.</p>
+                    <ul>
+                        <li><strong>Initial Window:</strong> Historically $cwnd = 1 \text{ MSS}$. Modern operating systems (Linux, Windows, macOS) initialize with $cwnd = 10 \text{ MSS}$ (RFC 6928) to accelerate modern web object loading.</li>
+                        <li><strong>Growth Mechanism:</strong> For <em>every individual ACK</em> received, the sender increments $cwnd$ by $1 \text{ MSS}$. When all segments in a window are acknowledged, $cwnd$ effectively doubles each RTT:</li>
+                    </ul>
+                    $$1 \to 2 \to 4 \to 8 \to 16 \text{ MSS}$$
+                    <p>Despite the name "Slow" Start, the growth rate is <strong>exponential</strong> ($2^k$ after $k$ RTTs), rapidly filling large network pipes.</p>
+
+                    <h3 id="sub-3-3">3.3 The Slow Start Threshold (ssthresh) Transition</h3>
+                    <p>Exponential doubling cannot continue indefinitely without causing severe buffer overflow. TCP uses a state variable called <strong>ssthresh (Slow Start Threshold)</strong> to determine when to switch modes:</p>
+                    <ul>
+                        <li>While $cwnd < ssthresh$: Sender operates in <strong>Slow Start</strong> (exponential increase).</li>
+                        <li>When $cwnd \ge ssthresh$: Sender switches to <strong>Congestion Avoidance</strong> (linear additive increase).</li>
+                        <li><strong>Setting ssthresh on Loss:</strong> Whenever loss is detected:</li>
+                    </ul>
+                    $$ssthresh = \max\left(\frac{cwnd}{2}, 2 \text{ MSS}\right)$$
+
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
                         <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
@@ -162,23 +236,119 @@
                 </div>
             </section>
 
+            <!-- Topic 4 -->
             <section class="topic-section" id="topic-4">
                 <div class="topic-header" onclick="toggleSection('content-4')">
                     <div class="topic-number">4</div>
-                    <h2>Additive Increase / Multiplicative Decrease (AIMD)</h2>
+                    <h2>AIMD &amp; Fast Recovery RTT Trace</h2>
                 </div>
                 <div class="collapsible-content" id="content-4">
-                    
-                    <h3 id="sub-4-1">4.1 AIMD Sawtooth Pattern</h3>
-                    <p>TCP probes for available bandwidth by linearly increasing $cwnd$ until loss occurs, then abruptly halving $cwnd$, creating a characteristic <strong>sawtooth wave pattern</strong>.</p>
+                    <h3 id="sub-4-1">4.1 Congestion Avoidance (Additive Increase)</h3>
+                    <p>In Congestion Avoidance ($cwnd \ge ssthresh$), TCP acts cautiously. Instead of doubling each RTT, $cwnd$ increases by <strong>1 MSS per RTT</strong> regardless of how many ACKs arrive:</p>
+                    $$cwnd = cwnd + \frac{1 \text{ MSS}}{cwnd} \quad (\text{per ACK received})$$
+                    <p>This linear upward slope gently probes for newly available link bandwidth without overwhelming router buffers.</p>
+
+                    <h3 id="sub-4-2">4.2 Fast Retransmit &amp; Fast Recovery (Multiplicative Decrease)</h3>
+                    <p>TCP distinguishes between two types of loss signals:</p>
+                    <ul>
+                        <li><strong>Timeout (Severe Congestion):</strong> No packets are arriving; timer expires. $ssthresh = cwnd / 2$, $cwnd$ resets to $1 \text{ MSS}$, and connection restarts in Slow Start.</li>
+                        <li><strong>3 Duplicate ACKs (Mild Congestion):</strong> Network is still delivering subsequent packets, which trigger identical duplicate ACKs. TCP triggers <strong>Fast Retransmit</strong> (immediate retransmission without waiting for timer) followed by <strong>Fast Recovery</strong> (TCP Reno):</li>
+                    </ul>
                     <div class="box box-blue">
-                        <div class="box-title">AIMD Rules</div>
+                        <div class="box-title">Fast Recovery Rules (TCP Reno)</div>
                         <ul>
-                            <li><strong>Additive Increase:</strong> $cwnd = cwnd + 1 \text{ MSS}$ for every RTT without loss.</li>
-                            <li><strong>Multiplicative Decrease:</strong> $cwnd = cwnd / 2$ upon detecting packet loss via triple duplicate ACKs.</li>
+                            <li>Set $ssthresh = cwnd / 2$.</li>
+                            <li>Set $cwnd = ssthresh + 3 \text{ MSS}$ (accounting for 3 packets that left the network and generated the dup ACKs).</li>
+                            <li>Stay in Fast Recovery until a "fresh" new ACK arrives acknowledging the lost segment, then set $cwnd = ssthresh$ and resume linear Congestion Avoidance. <strong>Slow Start is completely bypassed.</strong></li>
                         </ul>
                     </div>
-                
+
+                    <h3 id="sub-4-3">4.3 Numerical Trace: Window Evolution Across RTTs</h3>
+                    <p>The table below traces a complete scenario illustrating Slow Start, Congestion Avoidance, Fast Retransmit, and recovery after timeout:</p>
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 1rem; border: 1px solid var(--gray-border);">
+                        <thead>
+                            <tr style="background: var(--bg-secondary); text-align: left;">
+                                <th style="padding: 0.75rem; border: 1px solid var(--gray-border);">RTT / Event</th>
+                                <th style="padding: 0.75rem; border: 1px solid var(--gray-border);">$cwnd$ (MSS)</th>
+                                <th style="padding: 0.75rem; border: 1px solid var(--gray-border);">$ssthresh$ (MSS)</th>
+                                <th style="padding: 0.75rem; border: 1px solid var(--gray-border);">State</th>
+                                <th style="padding: 0.75rem; border: 1px solid var(--gray-border);">Explanation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);"><strong>RTT 1</strong></td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">1</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">16</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Slow Start</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Connection start; initial window = 1 MSS.</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);"><strong>RTT 2</strong></td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">2</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">16</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Slow Start</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Doubles on ACK arrival ($1 \times 2 = 2$).</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);"><strong>RTT 3</strong></td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">4</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">16</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Slow Start</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Exponential growth continues ($2 \times 2 = 4$).</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);"><strong>RTT 4</strong></td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">8</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">16</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Slow Start</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Exponential growth continues ($4 \times 2 = 8$).</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);"><strong>RTT 5</strong></td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">16</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">16</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Slow Start &rarr; CA</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">$cwnd$ hits $ssthresh = 16$. Switches to Congestion Avoidance.</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);"><strong>RTT 6</strong></td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">17</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">16</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Congestion Avoidance</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Linear additive increase (+1 MSS).</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);"><strong>RTT 7</strong></td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">18</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">16</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Congestion Avoidance</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Linear additive increase (+1 MSS). Packet loss occurs!</td>
+                            </tr>
+                            <tr style="background: rgba(220, 53, 69, 0.08);">
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);"><strong>3 Dup ACKs</strong></td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">9</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">9</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Fast Recovery</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Multiplicative decrease: $ssthresh = 18 / 2 = 9$. Reno resumes at $cwnd = 9$.</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);"><strong>RTT 8</strong></td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">10</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">9</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Congestion Avoidance</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Fresh ACK arrives; resumes linear probe ($9 \to 10 \text{ MSS}$).</td>
+                            </tr>
+                            <tr style="background: rgba(220, 53, 69, 0.15);">
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);"><strong>Timeout</strong></td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">1</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">5</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Slow Start</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Severe loss timeout: $ssthresh = 10 / 2 = 5$; $cwnd$ collapses to 1.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
                         <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
@@ -186,21 +356,48 @@
                 </div>
             </section>
 
+            <!-- Topic 5 -->
             <section class="topic-section" id="topic-5">
                 <div class="topic-header" onclick="toggleSection('content-5')">
                     <div class="topic-number">5</div>
-                    <h2>TCP Flavors & Modern Extensions</h2>
+                    <h2>TCP Flavors &amp; Modern TCP CUBIC</h2>
                 </div>
                 <div class="collapsible-content" id="content-5">
-                    
-                    <h3 id="sub-5-1">5.1 TCP Tahoe vs. TCP Reno</h3>
+                    <h3 id="sub-5-1">5.1 TCP Tahoe vs. TCP Reno State Machines</h3>
+                    <p>The core distinction between traditional TCP implementations lies in their reaction to packet loss:</p>
                     <ul>
-                        <li><strong>TCP Tahoe:</strong> On any loss (timeout OR 3 dup ACKs), resets $cwnd = 1 \text{ MSS}$ and enters Slow Start.</li>
-                        <li><strong>TCP Reno:</strong> Distinguishes loss types. On 3 dup ACKs, cuts $cwnd = cwnd / 2$ and enters Fast Recovery (bypasses Slow Start). On Timeout, resets $cwnd = 1 \text{ MSS}$.</li>
+                        <li><strong>TCP Tahoe:</strong> Treats <em>all</em> losses identically. Whether triggered by timer expiration or 3 duplicate ACKs, Tahoe resets $cwnd = 1 \text{ MSS}$, cuts $ssthresh = cwnd / 2$, and forces a slow start recovery.</li>
+                        <li><strong>TCP Reno:</strong> Introduces Fast Recovery. On 3 duplicate ACKs, Reno cuts $cwnd$ in half, retransmits the missing segment, and directly resumes Congestion Avoidance, avoiding the severe performance drop to 1 MSS.</li>
                     </ul>
-                    <h3 id="sub-5-2">5.2 Fast Retransmit via 3 Duplicate ACKs</h3>
-                    <p>Receiving 3 duplicate ACKs triggers immediate retransmission of missing segment before timer expiration.</p>
-                
+
+                    <h3 id="sub-5-2">5.2 TCP CUBIC Algorithm &amp; Window Function</h3>
+                    <p>Standard TCP AIMD increases $cwnd$ too slowly on modern high-speed, long-distance networks with massive <strong>Bandwidth-Delay Products (BDP)</strong> (e.g., 10 Gbps transcontinental links where recovering from a loss event via +1 MSS per RTT takes minutes).</p>
+                    <p><strong>TCP CUBIC</strong> replaces the linear additive increase function with a mathematical cubic function based on the elapsed real time $t$ since the last loss event:</p>
+                    $$W_{\text{cubic}}(t) = C \cdot (t - K)^3 + W_{\max}$$
+                    <div class="box box-blue">
+                        <div class="box-title">Components of the CUBIC Growth Function</div>
+                        <ul>
+                            <li>$W_{\max}$: The congestion window size just prior to the most recent packet drop.</li>
+                            <li>$C$: A scaling constant determining growth velocity.</li>
+                            <li>$K$: The time period required to ramp the window back up to $W_{\max}$ in the absence of further packet loss:</li>
+                        </ul>
+                        $$K = \sqrt[3]{\frac{W_{\max} \cdot \beta}{C}}$$
+                        <p>Where $\beta$ is the multiplicative decrease factor (typically $0.7$ in CUBIC, retaining $70\%$ of the window on loss rather than Reno's $50\%$).</p>
+                    </div>
+                    <p>The cubic curve possesses an inflection point at $t = K$:</p>
+                    <ul>
+                        <li><strong>Concave Phase ($t < K$):</strong> $cwnd$ grows quickly at first, then decelerates as it approaches $W_{\max}$ to gently test former stability.</li>
+                        <li><strong>Plateau Phase ($t \approx K$):</strong> Near $W_{\max}$, growth flattens, maximizing time spent near link capacity with minimal risk of overflow.</li>
+                        <li><strong>Convex Phase ($t > K$):</strong> If no loss occurs at $W_{\max}$, CUBIC accelerates growth upward to aggressively probe for newly added or unlocked capacity.</li>
+                    </ul>
+
+                    <h3 id="sub-5-3">5.3 Linux Web Server Default &amp; High-BDP Scaling</h3>
+                    <p>Because CUBIC window growth is governed by elapsed wall-clock time $t$ rather than RTT duration, it provides two transformative real-world advantages:</p>
+                    <ul>
+                        <li><strong>RTT Independence &amp; Fairness:</strong> In traditional TCP Reno, connections with short RTTs grow their windows much faster than flows with long RTTs. In CUBIC, flows sharing a bottleneck link with disparate RTTs achieve equitable bandwidth allocation.</li>
+                        <li><strong>Default Linux Algorithm:</strong> TCP CUBIC is the default congestion control algorithm in standard Linux kernels (and by extension the vast majority of cloud web servers, CDN edges, and enterprise distributions worldwide).</li>
+                    </ul>
+
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
                         <button class="btn" onclick="document.getElementById('original-pdf').scrollIntoView()">Next Topic</button>
@@ -250,4 +447,5 @@
     </script>
     <script src="../js/script.js"></script>
 </body>
+
 </html>

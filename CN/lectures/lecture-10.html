@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Computer Networks - Lecture 10</title>
-    <meta content="Study notes for Computer Networks (CSAI321), Lecture 10 covering Reliable Data Transfer (rdt 1.0 to 3.0), Stop-and-Wait Bottlenecks, Go-Back-N (GBN), and Selective Repeat (SR)." name="description" />
+    <meta content="Study notes for Computer Networks (CSAI321), Lecture 10 covering TCP Fundamentals, 4-Way Handshake Teardown, Binary Checksum, RTT & Ping Diagnostics, Stop-and-Wait vs Pipelining, and Zero Window Probing." name="description" />
     <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>10</text></svg>" rel="icon" />
     <link href="../css/style.css" rel="stylesheet" />
     <!-- KaTeX for math rendering -->
@@ -18,7 +18,7 @@
     <header>
         <div class="header-titles">
             <h1>Computer Networks Foundations</h1>
-            <p>Lecture 10 - Principles of Reliable Data Transfer (rdt)</p>
+            <p>Lecture 10 - TCP Reliability, Teardown, Checksums &amp; Flow Control</p>
             <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
             <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
             <a href="../pdfs/10.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
@@ -37,33 +37,43 @@
             <ul class="index-list" id="indexList">
                 <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>Short Notes</a></li>
                 <li>
-                    <a href="#topic-1">1. The Reliable Data Transfer (rdt) Problem Framework<span class="sub-count">3</span></a>
+                    <a href="#topic-1">1. TCP Reliable Transfer &amp; Connection Teardown<span class="sub-count">3</span></a>
                     <ul class="sub-index">
-                        <li><a href="#sub-1-1">1.1 Unreliable Network Channel Model</a></li><li><a href="#sub-1-2">1.2 Layered Interface Primitives</a></li><li><a href="#sub-1-3">1.3 Finite State Machine (FSM) Formalism</a></li>
+                        <li><a href="#sub-1-1">1.1 Transport Layer Reliability Primitives</a></li>
+                        <li><a href="#sub-1-2">1.2 TCP Connection Teardown (4-Way Handshake)</a></li>
+                        <li><a href="#sub-1-3">1.3 Half-Closed Connections &amp; TIME_WAIT State</a></li>
                     </ul>
                 </li>
                 <li>
-                    <a href="#topic-2">2. Building Blocks of Reliability: rdt 1.0 to rdt 3.0<span class="sub-count">3</span></a>
+                    <a href="#topic-2">2. Error Detection: Binary Checksum Calculation<span class="sub-count">3</span></a>
                     <ul class="sub-index">
-                        <li><a href="#sub-2-1">2.1 rdt 1.0: Reliable Channel Baseline</a></li><li><a href="#sub-2-2">2.2 rdt 2.0/2.1/2.2: Handling Bit Corruption (ACKs, NAKs, Sequence Numbers)</a></li><li><a href="#sub-2-3">2.3 rdt 3.0: Handling Packet Loss with Countdown Timers</a></li>
+                        <li><a href="#sub-2-1">2.1 The 16-Bit Internet Checksum Concept</a></li>
+                        <li><a href="#sub-2-2">2.2 Step-by-Step Binary Addition with Carry Wraparound</a></li>
+                        <li><a href="#sub-2-3">2.3 1's Complement &amp; Receiver Verification</a></li>
                     </ul>
                 </li>
                 <li>
-                    <a href="#topic-3">3. Stop-and-Wait Protocol & Utilization Bottleneck<span class="sub-count">3</span></a>
+                    <a href="#topic-3">3. Round Trip Time (RTT) &amp; Ping Diagnostics<span class="sub-count">3</span></a>
                     <ul class="sub-index">
-                        <li><a href="#sub-3-1">3.1 Stop-and-Wait Operational Flow</a></li><li><a href="#sub-3-2">3.2 Sender Channel Utilization Formula</a></li><li><a href="#sub-3-3">3.3 Mathematical Example Breakdown</a></li>
+                        <li><a href="#sub-3-1">3.1 RTT Journey &amp; Propagation Factors</a></li>
+                        <li><a href="#sub-3-2">3.2 Ping Diagnostics &amp; Latency Measurement</a></li>
+                        <li><a href="#sub-3-3">3.3 Comparing Low vs. High Latency Destinations</a></li>
                     </ul>
                 </li>
                 <li>
-                    <a href="#topic-4">4. Pipelined Protocols: Go-Back-N (GBN)<span class="sub-count">3</span></a>
+                    <a href="#topic-4">4. Stop-and-Wait Bottleneck &amp; Pipelining Solutions<span class="sub-count">3</span></a>
                     <ul class="sub-index">
-                        <li><a href="#sub-4-1">4.1 Pipelining & Sliding Window Concept</a></li><li><a href="#sub-4-2">4.2 Go-Back-N Sender & Receiver Windows</a></li><li><a href="#sub-4-3">4.3 Cumulative ACKs & Timeout Retransmissions</a></li>
+                        <li><a href="#sub-4-1">4.1 Stop-and-Wait Utilization Inefficiency</a></li>
+                        <li><a href="#sub-4-2">4.2 Mathematical Link Utilization Breakdown</a></li>
+                        <li><a href="#sub-4-3">4.3 Pipelined Windows (GBN vs. Selective Repeat)</a></li>
                     </ul>
                 </li>
                 <li>
-                    <a href="#topic-5">5. Pipelined Protocols: Selective Repeat (SR)<span class="sub-count">3</span></a>
+                    <a href="#topic-5">5. TCP Flow Control &amp; Zero Window Probing<span class="sub-count">3</span></a>
                     <ul class="sub-index">
-                        <li><a href="#sub-5-1">5.1 Selective Repeat Individual ACKs</a></li><li><a href="#sub-5-2">5.2 Out-of-Order Buffering</a></li><li><a href="#sub-5-3">5.3 Sequence Number Space Constraint</a></li>
+                        <li><a href="#sub-5-1">5.1 The Receive Window (rwnd) Mechanism</a></li>
+                        <li><a href="#sub-5-2">5.2 The Zero Window Condition (rwnd = 0)</a></li>
+                        <li><a href="#sub-5-3">5.3 Zero Window Probes (ZWP) &amp; Deadlock Prevention</a></li>
                     </ul>
                 </li>
                 <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
@@ -96,23 +106,41 @@
                 </div>
             </section>
 
+            <!-- Topic 1 -->
             <section class="topic-section" id="topic-1">
                 <div class="topic-header" onclick="toggleSection('content-1')">
                     <div class="topic-number">1</div>
-                    <h2>The Reliable Data Transfer (rdt) Problem Framework</h2>
+                    <h2>TCP Reliable Transfer &amp; Connection Teardown</h2>
                 </div>
                 <div class="collapsible-content" id="content-1">
-                    
-                    <h3 id="sub-1-1">1.1 Unreliable Network Channel Model</h3>
-                    <p>The core challenge of the Transport Layer is providing a <strong>Reliable Data Transfer (rdt)</strong> service on top of an inherently unreliable underlying Network Layer (IP) that can drop, corrupt, duplicate, or reorder packets.</p>
-                    <h3 id="sub-1-2">1.2 Layered Interface Primitives</h3>
+                    <h3 id="sub-1-1">1.1 Transport Layer Reliability Primitives</h3>
+                    <p>The network layer (IP protocol) provides a best-effort datagram delivery service that is inherently unreliable: packets can be dropped, delayed, duplicated, or corrupted in transit. TCP provides an abstraction of an error-free, in-order byte stream between applications using three core mechanisms:</p>
                     <ul>
-                        <li><code>rdt_send()</code>: Called by high-level app layer to pass data payload down.</li>
-                        <li><code>udt_send()</code>: Called by rdt protocol to transmit packet over unreliable channel.</li>
-                        <li><code>rdt_rcv()</code>: Called by network layer when a packet arrives at receiving host.</li>
-                        <li><code>deliver_data()</code>: Called by rdt to pass validated payload up to application.</li>
+                        <li><strong>Checksums:</strong> Detect bit corruption inside headers and payloads.</li>
+                        <li><strong>Sequence &amp; Acknowledgment Numbers:</strong> Detect missing segments, eliminate duplicates, and reassemble out-of-order bytes into the correct sequence.</li>
+                        <li><strong>Retransmission Timers:</strong> Recover lost segments when expected acknowledgments fail to arrive within a calculated timeout interval.</li>
                     </ul>
-                
+
+                    <h3 id="sub-1-2">1.2 TCP Connection Teardown (4-Way Handshake)</h3>
+                    <p>While establishing a TCP connection takes a 3-way handshake (SYN &rarr; SYN-ACK &rarr; ACK), terminating a full-duplex TCP connection requires a <strong>4-Way Handshake</strong> because each direction of data transfer must be closed independently:</p>
+                    <div class="box box-blue">
+                        <div class="box-title">The 4 Teardown Steps</div>
+                        <ol>
+                            <li><strong>Step 1 (Client FIN):</strong> The client application calls <code>close()</code>. The client TCP stack transmits a segment with the <strong>FIN</strong> flag set ($seq = u$) to notify the server that it has no more data to send. The client transitions to the <code>FIN_WAIT_1</code> state.</li>
+                            <li><strong>Step 2 (Server ACK):</strong> The server receives the FIN, acknowledges it with an <strong>ACK</strong> segment ($ack = u + 1$), and transitions to <code>CLOSE_WAIT</code>. The client receives this ACK and enters <code>FIN_WAIT_2</code>. Data can still flow from server to client.</li>
+                            <li><strong>Step 3 (Server FIN):</strong> Once the server finishes sending all remaining application data, its application layer calls <code>close()</code>. The server transmits its own <strong>FIN</strong> segment ($seq = w, ack = u + 1$) and transitions to <code>LAST_ACK</code>.</li>
+                            <li><strong>Step 4 (Client ACK):</strong> The client receives the server's FIN, replies with an <strong>ACK</strong> ($ack = w + 1$), and transitions to the <code>TIME_WAIT</code> state. The server receives the final ACK and immediately moves to <code>CLOSED</code>.</li>
+                        </ol>
+                    </div>
+
+                    <h3 id="sub-1-3">1.3 Half-Closed Connections &amp; TIME_WAIT State</h3>
+                    <p>Between Step 2 and Step 3, the connection is in a <strong>half-closed</strong> state: the client cannot send new application data, but it continues to accept data transmitted by the server.</p>
+                    <p>The client does not close immediately after sending the final ACK; it stays in <code>TIME_WAIT</code> for <strong>$2 \times \text{MSL}$</strong> (Maximum Segment Lifetime, typically 60&ndash;120 seconds):</p>
+                    <ul>
+                        <li><strong>Ensure Server Receives Final ACK:</strong> If the final ACK in Step 4 is lost, the server will retransmit its FIN. The client must remain alive to re-acknowledge that FIN rather than returning a <code>RST</code> error.</li>
+                        <li><strong>Drain In-Flight Segments:</strong> It guarantees that any delayed packets belonging to the current connection expire inside intermediate routers before a new connection reuses the same socket pair (IP and port).</li>
+                    </ul>
+
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('short-notes').scrollIntoView()">Previous Topic</button>
                         <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
@@ -120,24 +148,59 @@
                 </div>
             </section>
 
+            <!-- Topic 2 -->
             <section class="topic-section" id="topic-2">
                 <div class="topic-header" onclick="toggleSection('content-2')">
                     <div class="topic-number">2</div>
-                    <h2>Building Blocks of Reliability: rdt 1.0 to rdt 3.0</h2>
+                    <h2>Error Detection: Binary Checksum Calculation</h2>
                 </div>
                 <div class="collapsible-content" id="content-2">
-                    
-                    <h3 id="sub-2-1">2.1 rdt 1.0: Reliable Channel Baseline</h3>
-                    <p>Assumes underlying channel is completely reliable (no bit errors, no lost packets). FSM needs only 1 state for sender and receiver.</p>
-                    <h3 id="sub-2-2">2.2 rdt 2.0/2.1/2.2: Handling Bit Corruption</h3>
-                    <ul>
-                        <li><strong>rdt 2.0:</strong> Adds Checksums, Positive ACKs, and Negative ACKs (NAKs). <em>Flaw:</em> NAK/ACK corruption causes duplicate packet delivery.</li>
-                        <li><strong>rdt 2.1:</strong> Adds 1-bit Sequence Numbers (0 or 1) to packets. Receiver detects duplicate packets.</li>
-                        <li><strong>rdt 2.2:</strong> Eliminates NAKs entirely by sending duplicate ACKs for the last correctly received packet sequence number.</li>
-                    </ul>
-                    <h3 id="sub-2-3">2.3 rdt 3.0: Handling Packet Loss with Countdown Timers</h3>
-                    <p><strong>rdt 3.0 (Alternating Bit Protocol)</strong> handles packet loss by introducing a <strong>countdown timer</strong> at the sender. If ACK is not received within timeout period, the sender retransmits packet.</p>
-                
+                    <h3 id="sub-2-1">2.1 The 16-Bit Internet Checksum Concept</h3>
+                    <p>Both TCP and UDP utilize the <strong>Internet Checksum</strong> algorithm (RFC 1071) to detect bit errors introduced during transmission over noisy physical links or faulty router memory. The protocol treats all header and data bytes as a sequence of 16-bit integers and computes their 1's complement sum.</p>
+
+                    <h3 id="sub-2-2">2.2 Step-by-Step Binary Addition with Carry Wraparound</h3>
+                    <p>To understand the mathematics, consider an 8-bit model adding two numbers:</p>
+                    <div class="box box-blue">
+                        <div class="box-title">Worked Example: 10010011 + 01010110</div>
+                        <p><strong>Input Words:</strong></p>
+                        <ul>
+                            <li>Word 1: <code>10010011</code> (147 in decimal)</li>
+                            <li>Word 2: <code>01010110</code> (86 in decimal)</li>
+                        </ul>
+                        <p><strong>Step 1: Perform standard binary addition:</strong></p>
+                        <pre style="background: var(--bg-secondary); padding: 0.75rem; border-radius: 6px; font-family: monospace; font-size: 0.95rem; border: 1px solid var(--gray-border);">
+   1 0 0 1 0 0 1 1  (Word 1)
++  0 1 0 1 0 1 1 0  (Word 2)
+------------------
+ 1 1 1 1 0 1 0 0 1  (9-bit sum with carry-out bit '1')
+</pre>
+                        <p><strong>Step 2: Add the carry-over bit back into the least significant bit (wraparound):</strong></p>
+                        <pre style="background: var(--bg-secondary); padding: 0.75rem; border-radius: 6px; font-family: monospace; font-size: 0.95rem; border: 1px solid var(--gray-border);">
+   1 1 1 0 1 0 0 1  (Lower 8 bits)
++                1  (Carry-over bit)
+------------------
+   1 1 1 0 1 0 1 0  (Final wrapped sum)
+</pre>
+                    </div>
+
+                    <h3 id="sub-2-3">2.3 1's Complement &amp; Receiver Verification</h3>
+                    <p>To calculate the transmitted checksum, take the <strong>1's complement</strong> of the wrapped sum by flipping every bit (0 becomes 1, 1 becomes 0):</p>
+                    <pre style="background: var(--bg-secondary); padding: 0.75rem; border-radius: 6px; font-family: monospace; font-size: 0.95rem; border: 1px solid var(--gray-border);">
+Wrapped Sum: 1 1 1 0 1 0 1 0
+Checksum:    0 0 0 1 0 1 0 1  (Transmitted in TCP Header)
+</pre>
+                    <div class="box box-green">
+                        <div class="box-title">Receiver Verification Check</div>
+                        <p>The receiver sums all incoming words plus the received checksum. If no bits were corrupted:</p>
+                        <pre style="background: var(--bg-secondary); padding: 0.75rem; border-radius: 6px; font-family: monospace; font-size: 0.95rem; border: 1px solid var(--gray-border);">
+   1 1 1 0 1 0 1 0  (Sum of received data words)
++  0 0 0 1 0 1 0 1  (Received checksum)
+------------------
+   1 1 1 1 1 1 1 1  (All 1s -> No error detected)
+</pre>
+                        <p>If the result contains even a single <code>0</code> bit, bit corruption has occurred and the segment is discarded.</p>
+                    </div>
+
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
                         <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
@@ -145,26 +208,73 @@
                 </div>
             </section>
 
+            <!-- Topic 3 -->
             <section class="topic-section" id="topic-3">
                 <div class="topic-header" onclick="toggleSection('content-3')">
                     <div class="topic-number">3</div>
-                    <h2>Stop-and-Wait Protocol & Utilization Bottleneck</h2>
+                    <h2>Round Trip Time (RTT) &amp; Ping Diagnostics</h2>
                 </div>
                 <div class="collapsible-content" id="content-3">
-                    
-                    <h3 id="sub-3-1">3.1 Stop-and-Wait Operational Flow</h3>
-                    <p>In rdt 3.0, the sender transmits 1 packet and stops, waiting for receiver's ACK before transmitting the next packet.</p>
-                    <h3 id="sub-3-2">3.2 Sender Channel Utilization Formula</h3>
-                    $$\text{Transmission Delay } t_{\text{trans}} = \frac{L}{R}$$
-                    $$U_{\text{sender}} = \frac{t_{\text{trans}}}{\text{RTT} + t_{\text{trans}}} = \frac{L / R}{\text{RTT} + L / R}$$
-                    <h3 id="sub-3-3">3.3 Mathematical Example Breakdown</h3>
-                    <div class="box box-red">
-                        <div class="box-title">The Stop-and-Wait Efficiency Disaster</div>
-                        <p>Consider a 1 Gbps link ($R = 10^9$ b/s), 30 ms RTT, 1 KB packet ($L = 8000$ bits):</p>
-                        $$t_{\text{trans}} = \frac{8000}{10^9} = 0.008 \text{ ms}$$
-                        $$U_{\text{sender}} = \frac{0.008}{30 + 0.008} = 0.000267 \quad (\text{Only } 0.027\% \text{ utilization!})$$
-                    </div>
-                
+                    <h3 id="sub-3-1">3.1 RTT Journey &amp; Propagation Factors</h3>
+                    <p><strong>Round Trip Time (RTT)</strong> is the total duration required for a data packet to travel from a sender across the network to a destination, plus the time required for the destination's acknowledgment (or response) to travel back to the sender:</p>
+                    $$\text{RTT} = t_{\text{prop, forward}} + t_{\text{queue, forward}} + t_{\text{trans, forward}} + t_{\text{proc}} + t_{\text{prop, return}} + t_{\text{queue, return}} + t_{\text{trans, return}}$$
+                    <ul>
+                        <li><strong>Propagation Delay:</strong> Determined by physical distance and speed of light through medium ($\sim 200,000\text{ km/s}$ in optical fiber).</li>
+                        <li><strong>Queueing Delay:</strong> Varies dynamically with real-time router buffer congestion along the path.</li>
+                    </ul>
+
+                    <h3 id="sub-3-2">3.2 Ping Diagnostics &amp; Latency Measurement</h3>
+                    <p>The <code>ping</code> utility uses ICMP (Internet Control Message Protocol) Echo Request and Echo Reply messages to measure round-trip latency and packet loss:</p>
+                    <pre style="background: var(--bg-secondary); padding: 0.75rem; border-radius: 6px; font-family: monospace; font-size: 0.9rem; border: 1px solid var(--gray-border);">
+$ ping -c 4 8.8.8.8
+64 bytes from 8.8.8.8: icmp_seq=1 ttl=117 time=14.2 ms
+64 bytes from 8.8.8.8: icmp_seq=2 ttl=117 time=13.8 ms
+64 bytes from 8.8.8.8: icmp_seq=3 ttl=117 time=14.1 ms
+64 bytes from 8.8.8.8: icmp_seq=4 ttl=117 time=14.0 ms
+
+--- 8.8.8.8 ping statistics ---
+4 packets transmitted, 4 received, 0% packet loss, time 3004ms
+rtt min/avg/max/mdev = 13.812/14.025/14.218/0.145 ms
+</pre>
+                    <p>Key metrics reported:</p>
+                    <ul>
+                        <li><strong>time:</strong> RTT for individual probe packet in milliseconds.</li>
+                        <li><strong>packet loss:</strong> Percentage of packets dropped by congested routers or filtered by firewalls.</li>
+                        <li><strong>mdev / jitter:</strong> Standard deviation of RTT, indicating route stability and queueing fluctuations.</li>
+                    </ul>
+
+                    <h3 id="sub-3-3">3.3 Comparing Low vs. High Latency Destinations</h3>
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 1rem; border: 1px solid var(--gray-border);">
+                        <thead>
+                            <tr style="background: var(--bg-secondary); text-align: left;">
+                                <th style="padding: 0.75rem; border: 1px solid var(--gray-border);">Target Type</th>
+                                <th style="padding: 0.75rem; border: 1px solid var(--gray-border);">Typical RTT</th>
+                                <th style="padding: 0.75rem; border: 1px solid var(--gray-border);">Dominant Delay Factor</th>
+                                <th style="padding: 0.75rem; border: 1px solid var(--gray-border);">Impact on TCP</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);"><strong>Local Gateway / LAN</strong></td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">&lt; 1 &ndash; 3 ms</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Switching / processing</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Instant handshakes; near-instantaneous slow-start ramp-up.</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);"><strong>Same Country / CDN Edge</strong></td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">10 &ndash; 30 ms</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Regional fiber propagation</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Fast interactive web rendering; rapid ACK turnaround.</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);"><strong>Cross-Continent / Transoceanic</strong></td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">150 &ndash; 280 ms</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">Subsea optical cable distance</td>
+                                <td style="padding: 0.6rem; border: 1px solid var(--gray-border);">High Bandwidth-Delay Product (BDP); slow window expansion under Stop-and-Wait.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
                         <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
@@ -172,23 +282,34 @@
                 </div>
             </section>
 
+            <!-- Topic 4 -->
             <section class="topic-section" id="topic-4">
                 <div class="topic-header" onclick="toggleSection('content-4')">
                     <div class="topic-number">4</div>
-                    <h2>Pipelined Protocols: Go-Back-N (GBN)</h2>
+                    <h2>Stop-and-Wait Bottleneck &amp; Pipelining Solutions</h2>
                 </div>
                 <div class="collapsible-content" id="content-4">
-                    
-                    <h3 id="sub-4-1">4.1 Pipelining & Sliding Window Concept</h3>
-                    <p>Pipelining allows the sender to have up to $N$ unacknowledged packets in flight simultaneously, increasing channel utilization by factor $N$.</p>
-                    <h3 id="sub-4-2">4.2 Go-Back-N Sender & Receiver Windows</h3>
-                    <p>Sender window size is $N$. The receiver has a window size of 1 (accepts packets strictly in order).</p>
-                    <h3 id="sub-4-3">4.3 Cumulative ACKs & Timeout Retransmissions</h3>
+                    <h3 id="sub-4-1">4.1 Stop-and-Wait Utilization Inefficiency</h3>
+                    <p>In a simple Stop-and-Wait protocol, the sender transmits a single packet of size $L$ bits onto a channel of bandwidth $R$ bps, then pauses completely until the receiver's acknowledgment travels back over the RTT. The link remains completely idle for almost the entire duration.</p>
+
+                    <h3 id="sub-4-2">4.2 Mathematical Link Utilization Breakdown</h3>
+                    <p>The transmission duration is $t_{\text{trans}} = L / R$. The sender utilization $U_{\text{sender}}$ is the fraction of time the sender is actively transmitting data onto the physical link:</p>
+                    $$U_{\text{sender}} = \frac{t_{\text{trans}}}{\text{RTT} + t_{\text{trans}}} = \frac{L / R}{\text{RTT} + L / R}$$
+                    <div class="box box-red">
+                        <div class="box-title">Concrete Utilization Calculation</div>
+                        <p>Consider a 1 Gbps cross-country link ($R = 10^9$ bps) with an RTT of 30 ms and a 1 KB packet size ($L = 8000$ bits):</p>
+                        $$t_{\text{trans}} = \frac{8000 \text{ bits}}{10^9 \text{ bps}} = 8 \times 10^{-6} \text{ s} = 0.008 \text{ ms}$$
+                        $$U_{\text{sender}} = \frac{0.008 \text{ ms}}{30 \text{ ms} + 0.008 \text{ ms}} = \frac{0.008}{30.008} \approx 0.000267 = 0.027\%$$
+                        <p>The sender transmits for only 8 microseconds out of every 30,008 microseconds. The gigabit link delivers an effective throughput of only <strong>267 kbps</strong>!</p>
+                    </div>
+
+                    <h3 id="sub-4-3">4.3 Pipelined Windows (GBN vs. Selective Repeat)</h3>
+                    <p>To overcome this bottleneck, modern transport protocols implement <strong>Pipelining</strong>: the sender is allowed to transmit up to $N$ unacknowledged packets back-to-back, multiplying utilization by up to factor $N$ ($U_{\text{pipelined}} = N \cdot U_{\text{stop-and-wait}}$):</p>
                     <ul>
-                        <li><strong>Cumulative ACK:</strong> ACK($n$) indicates all packets up to and including sequence $n$ have been received correctly.</li>
-                        <li><strong>Single Timer:</strong> Timer tracks oldest unacked packet. On timeout, GBN retransmits <em>all</em> $N$ unacked packets in current window.</li>
+                        <li><strong>Go-Back-N (GBN):</strong> Uses cumulative ACKs and a single retransmission timer. If packet $k$ is dropped, the sender retransmits packet $k$ and <em>all subsequent unacknowledged packets</em> in the window, even if they were already received correctly.</li>
+                        <li><strong>Selective Repeat (SR):</strong> The receiver individually acknowledges every correctly received packet and buffers out-of-order packets. On timeout, the sender retransmits <em>only the single missing packet</em>.</li>
                     </ul>
-                
+
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
                         <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
@@ -196,24 +317,39 @@
                 </div>
             </section>
 
+            <!-- Topic 5 -->
             <section class="topic-section" id="topic-5">
                 <div class="topic-header" onclick="toggleSection('content-5')">
                     <div class="topic-number">5</div>
-                    <h2>Pipelined Protocols: Selective Repeat (SR)</h2>
+                    <h2>TCP Flow Control &amp; Zero Window Probing</h2>
                 </div>
                 <div class="collapsible-content" id="content-5">
-                    
-                    <h3 id="sub-5-1">5.1 Selective Repeat Individual ACKs</h3>
-                    <p>Selective Repeat (SR) avoids GBN's unnecessary retransmissions by having the receiver individually acknowledge every correctly received packet.</p>
-                    <h3 id="sub-5-2">5.2 Out-of-Order Buffering</h3>
-                    <p>The SR receiver maintains a buffer of size $N$ to hold out-of-order packets until missing lower-sequence packets arrive.</p>
-                    <h3 id="sub-5-3">5.3 Sequence Number Space Constraint</h3>
-                    <div class="box box-green">
-                        <div class="box-title">SR Sequence Space Rule</div>
-                        <p>To avoid ambiguity when sequence numbers wrap around, window size $N$ must satisfy:</p>
-                        $$N_{\text{sender}} + N_{\text{receiver}} \le 2^k \implies N \le 2^{k-1}$$
+                    <h3 id="sub-5-1">5.1 The Receive Window (rwnd) Mechanism</h3>
+                    <p>TCP provides <strong>Flow Control</strong> to ensure a fast sender never floods a slow receiving application whose CPU cannot drain its incoming buffer fast enough. The receiver advertises its available buffer capacity in the 16-bit <strong>Receive Window (rwnd)</strong> field of every ACK packet:</p>
+                    $$rwnd = \text{RcvBuffer} - [\text{LastByteRcvd} - \text{LastByteRead}]$$
+                    <p>The sender enforces this limit before transmitting new bytes:</p>
+                    $$\text{LastByteSent} - \text{LastByteAcked} \le rwnd$$
+
+                    <h3 id="sub-5-2">5.2 The Zero Window Condition (rwnd = 0)</h3>
+                    <p>When the receiving application stalls, locks, or performs intensive processing without calling <code>read()</code>, the receiver's socket buffer completely fills up ($\text{LastByteRcvd} - \text{LastByteRead} = \text{RcvBuffer}$).</p>
+                    <ul>
+                        <li>The receiver sends an ACK advertising <code>rwnd = 0</code>.</li>
+                        <li>This event is known as the <strong>Zero Window Condition</strong>.</li>
+                        <li>Upon receiving <code>rwnd = 0</code>, the sender immediately halts further data transmission to avoid dropping packets.</li>
+                    </ul>
+
+                    <h3 id="sub-5-3">5.3 Zero Window Probes (ZWP) &amp; Deadlock Prevention</h3>
+                    <p>If the sender simply waited passively for the receiver to send an updated ACK with <code>rwnd > 0</code>, a catastrophic deadlock could occur: if that window update ACK were dropped in the network, the sender would wait forever for an update, and the receiver would wait forever for new data.</p>
+                    <div class="box box-blue">
+                        <div class="box-title">Zero Window Probe (ZWP) Mechanics</div>
+                        <ul>
+                            <li><strong>Persist Timer:</strong> When the sender receives <code>rwnd = 0</code>, it activates a <strong>persist timer</strong>.</li>
+                            <li><strong>1-Byte Probe Segment:</strong> When the persist timer expires, the sender dispatches a <strong>Zero Window Probe (ZWP)</strong> containing 1 byte of payload (or an empty payload segment with the next valid sequence number).</li>
+                            <li><strong>Mandatory ACK Response:</strong> The receiver cannot drop the probe silently; it is forced to reply with an ACK acknowledging the probe byte and stating its current <code>rwnd</code>.</li>
+                            <li><strong>Exponential Backoff:</strong> If <code>rwnd</code> is still 0, the sender restarts its persist timer with exponential backoff (e.g., 5s, 10s, 20s up to 60s) and continues probing until buffer space re-opens.</li>
+                        </ul>
                     </div>
-                
+
                     <div class="topic-nav">
                         <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
                         <button class="btn" onclick="document.getElementById('original-pdf').scrollIntoView()">Next Topic</button>
@@ -263,4 +399,5 @@
     </script>
     <script src="../js/script.js"></script>
 </body>
+
 </html>
