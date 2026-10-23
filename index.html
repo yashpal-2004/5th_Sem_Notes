@@ -180,6 +180,15 @@
     margin: -0.2rem -0.4rem;
 }
 
+.past-contest {
+    opacity: 0.35;
+    filter: grayscale(0.2);
+}
+
+.past-contest:hover {
+    opacity: 0.85;
+}
+
 .days-left-badge {
     font-size: 0.7rem;
     font-weight: 700;
@@ -224,33 +233,35 @@
 
     <!-- Navigation Bar -->
     <nav>
-        <a href="index.html" class="logo-container">
-            <svg class="logo-symbol" viewBox="0 0 24 24">
-                <circle cx="12" cy="6" r="3" />
-                <circle cx="6" cy="16" r="3" />
-                <circle cx="18" cy="16" r="3" />
-            </svg>
-            <span class="logo-text">NST Notes</span>
-        </a>
-        <ul class="nav-menu">
-            <li><a href="DL_Sem5/index.html">Deep Learning</a></li>
-            <li><a href="AML/index.html">Advanced Machine Learning</a></li>
-            <li><a href="CN/index.html">Computer Networks</a></li>
-            <li><a href="MCA/index.html">Modern Computer Architecture</a></li>
-            <li><a href="#timetable">Timetable</a></li>
-            <li><a href="assignments.html">Assignments</a></li>
-            <li><a href="archive.html">Archive</a></li>
-        </ul>
-        <div style="display:flex;align-items:center;gap:12px;">
-            <div class="nav-stats" id="navPlatformStats">57 Lectures &bull; 306 Topics</div>
-            <a href="evaluation-criteria.html" title="Course Handbook &amp; Evaluation Criteria" style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;background:rgba(0,0,0,0.05);color:inherit;text-decoration:none;transition:background 0.2s;flex-shrink:0;" onmouseover="this.style.background='rgba(0,0,0,0.12)'" onmouseout="this.style.background='rgba(0,0,0,0.05)'">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                    <line x1="16" y1="2" x2="16" y2="6"/>
-                    <line x1="8" y1="2" x2="8" y2="6"/>
-                    <line x1="3" y1="10" x2="21" y2="10"/>
+        <div class="nav-inner">
+            <a href="index.html" class="logo-container">
+                <svg class="logo-symbol" viewBox="0 0 24 24">
+                    <circle cx="12" cy="6" r="3" />
+                    <circle cx="6" cy="16" r="3" />
+                    <circle cx="18" cy="16" r="3" />
                 </svg>
+                <span class="logo-text">NST Notes</span>
             </a>
+            <ul class="nav-menu">
+                <li><a href="DL_Sem5/index.html">Deep Learning</a></li>
+                <li><a href="AML/index.html">Advanced Machine Learning</a></li>
+                <li><a href="CN/index.html">Computer Networks</a></li>
+                <li><a href="MCA/index.html">Modern Computer Architecture</a></li>
+                <li><a href="#timetable">Timetable</a></li>
+                <li><a href="assignments.html">Assignments</a></li>
+                <li><a href="archive.html">Archive</a></li>
+            </ul>
+            <div class="nav-right-actions">
+                <div class="nav-stats" id="navPlatformStats">57 Lectures &bull; 306 Topics</div>
+                <a href="evaluation-criteria.html" class="nav-icon-btn" title="Course Handbook &amp; Evaluation Criteria" aria-label="Course Handbook and Evaluation Criteria">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                        <line x1="16" y1="2" x2="16" y2="6"/>
+                        <line x1="8" y1="2" x2="8" y2="6"/>
+                        <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                </a>
+            </div>
         </div>
     </nav>
 
@@ -592,46 +603,75 @@
                 }
             }
 
-            // Update dynamic countdown and active highlighting for upcoming contests
+            // Update dynamic countdown, cyclic sorting, and active highlighting for upcoming contests
             function updateTimeline() {
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
 
-                const items = document.querySelectorAll('.hero-timeline-item');
+                const listContainer = document.querySelector('.hero-timeline-list');
+                if (!listContainer) return;
+
+                const items = Array.from(listContainer.querySelectorAll('.hero-timeline-item'));
                 let nextUpcoming = null;
                 let minDaysLeft = Infinity;
 
+                // Clean existing badges and highlights
                 items.forEach(item => {
-                    item.classList.remove('upcoming-contest');
+                    item.classList.remove('upcoming-contest', 'past-contest');
                     const badge = item.querySelector('.days-left-badge');
                     if (badge) badge.remove();
                 });
 
-                items.forEach(item => {
+                // Calculate diffDays for each item
+                const categorizedItems = items.map(item => {
                     const dateStr = item.getAttribute('data-date');
-                    if (!dateStr) return;
-
-                    const contestDate = new Date(dateStr);
+                    const contestDate = dateStr ? new Date(dateStr) : new Date(0);
                     contestDate.setHours(0, 0, 0, 0);
 
                     const diffTime = contestDate - today;
                     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    return { item, contestDate, diffDays };
+                });
 
-                    if (diffDays >= 0) {
-                        if (diffDays < minDaysLeft) {
-                            minDaysLeft = diffDays;
-                            nextUpcoming = { item, days: diffDays };
-                        }
+                // Find next upcoming
+                categorizedItems.forEach(({ item, diffDays }) => {
+                    if (diffDays >= 0 && diffDays < minDaysLeft) {
+                        minDaysLeft = diffDays;
+                        nextUpcoming = { item, days: diffDays };
                     }
                 });
 
+                // Sort cyclically:
+                // 1. Upcoming & today items (diffDays >= 0) sorted chronologically ascending
+                // 2. Past items (diffDays < 0) pushed below, sorted chronologically ascending
+                categorizedItems.sort((a, b) => {
+                    const aIsUpcoming = a.diffDays >= 0;
+                    const bIsUpcoming = b.diffDays >= 0;
+
+                    if (aIsUpcoming && !bIsUpcoming) return -1;
+                    if (!aIsUpcoming && bIsUpcoming) return 1;
+
+                    return a.contestDate - b.contestDate;
+                });
+
+                // Re-append items in the cyclic sorted order
+                categorizedItems.forEach(({ item, diffDays }) => {
+                    if (diffDays < 0) {
+                        item.classList.add('past-contest');
+                    }
+                    listContainer.appendChild(item);
+                });
+
+                // Highlight next upcoming item with badge
                 if (nextUpcoming) {
                     nextUpcoming.item.classList.add('upcoming-contest');
                     const nameSpan = nextUpcoming.item.querySelector('.hero-timeline-name');
-                    const badge = document.createElement('span');
-                    badge.className = 'days-left-badge';
-                    badge.textContent = nextUpcoming.days === 0 ? 'Today' : (nextUpcoming.days === 1 ? '1 day left' : `${nextUpcoming.days} days left`);
-                    nameSpan.appendChild(badge);
+                    if (nameSpan) {
+                        const badge = document.createElement('span');
+                        badge.className = 'days-left-badge';
+                        badge.textContent = nextUpcoming.days === 0 ? 'Today' : (nextUpcoming.days === 1 ? '1 day left' : `${nextUpcoming.days} days left`);
+                        nameSpan.appendChild(badge);
+                    }
                 }
             }
 

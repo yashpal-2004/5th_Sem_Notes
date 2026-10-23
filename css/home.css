@@ -25,50 +25,74 @@ body {
 }
 
 /* Header Navigation */
+/* Header Navigation */
 nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1.5rem 3rem;
-    background-color: var(--bg-beige);
+    padding: 0.9rem 2.5rem;
+    background-color: rgba(250, 247, 242, 0.88);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border-light);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.nav-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     max-width: 1440px;
     margin: 0 auto;
     width: 100%;
-    box-sizing: border-box;
 }
 
 .logo-container {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.65rem;
     text-decoration: none;
     color: var(--text-dark);
     white-space: nowrap;
     flex-shrink: 0;
+    padding: 0.35rem 0.6rem;
+    border-radius: 8px;
+    transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.logo-container:hover {
+    background: rgba(19, 34, 25, 0.04);
 }
 
 .logo-symbol {
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
     fill: var(--text-dark);
     flex-shrink: 0;
 }
 
 .logo-text {
     font-weight: 700;
-    font-size: 0.95rem;
-    letter-spacing: 0.05em;
+    font-size: 0.92rem;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
     white-space: nowrap;
 }
 
 .nav-menu {
     display: flex;
-    gap: 1.4rem;
-    list-style: none;
     align-items: center;
+    gap: 0.25rem;
+    list-style: none;
     margin: 0 1rem;
-    padding: 0;
+    padding: 0.25rem;
+    background: rgba(19, 34, 25, 0.035);
+    border: 1px solid rgba(19, 34, 25, 0.06);
+    border-radius: 30px;
 }
 
 .nav-menu li {
@@ -76,41 +100,75 @@ nav {
 }
 
 .nav-menu a {
+    display: inline-block;
     text-decoration: none;
     color: var(--text-dark);
-    font-size: 0.88rem;
+    font-size: 0.84rem;
     font-weight: 500;
     white-space: nowrap;
-    transition: opacity 0.3s;
+    padding: 0.4rem 0.85rem;
+    border-radius: 20px;
+    transition: background 0.2s ease, color 0.2s ease;
 }
 
 .nav-menu a:hover {
-    opacity: 0.7;
+    background: #ffffff;
+    color: var(--text-dark);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
-.nav-stats {
-    font-size: 0.8rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--text-muted);
-    background-color: var(--bg-mint);
-    padding: 0.45rem 0.9rem;
-    border-radius: 20px;
-    border: 1px solid var(--border-light);
-    white-space: nowrap;
+.nav-right-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     flex-shrink: 0;
 }
 
-@media (max-width: 1300px) {
+.nav-stats {
+    font-size: 0.76rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-dark);
+    background-color: var(--bg-mint);
+    padding: 0.42rem 0.85rem;
+    border-radius: 20px;
+    border: 1px solid rgba(19, 34, 25, 0.08);
+    white-space: nowrap;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.nav-icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: rgba(19, 34, 25, 0.04);
+    border: 1px solid rgba(19, 34, 25, 0.08);
+    color: var(--text-dark);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.nav-icon-btn:hover {
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
+}
+
+@media (max-width: 1320px) {
     nav {
-        padding: 1.25rem 2rem;
+        padding: 0.75rem 1.5rem;
     }
     .nav-menu {
-        gap: 1rem;
+        gap: 0.15rem;
     }
     .nav-menu a {
-        font-size: 0.82rem;
+        font-size: 0.79rem;
+        padding: 0.35rem 0.65rem;
     }
 }
 
@@ -118,23 +176,27 @@ nav {
     .nav-stats {
         display: none;
     }
-    .nav-menu {
-        gap: 0.85rem;
+    .nav-menu a {
+        font-size: 0.78rem;
+        padding: 0.32rem 0.55rem;
     }
 }
 
 @media (max-width: 960px) {
     nav {
+        padding: 0.75rem 1.25rem;
+    }
+    .nav-inner {
         flex-wrap: wrap;
-        gap: 1rem;
-        padding: 1rem 1.5rem;
+        gap: 0.75rem;
     }
     .nav-menu {
         order: 3;
         width: 100%;
-        margin: 0.5rem 0 0;
+        margin: 0.25rem 0 0;
         overflow-x: auto;
-        padding-bottom: 6px;
+        padding: 0.3rem 0.4rem;
+        border-radius: 12px;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
     }
