@@ -47,11 +47,15 @@
 
     <!-- Lectures Section -->
     <section class="coursework-section">
+        <div class="coursework-container">
             <div class="section-header-row">
                 <div class="status-filter-bar" id="statusFilterBar">
-                    <button class="status-pill active" onclick="filterLectures('all')">All <span class="pill-count" id="countAll">17</span></button>
-                    <button class="status-pill" onclick="filterLectures('completed')">Completed <span class="pill-count" id="countCompleted">0</span></button>
-                    <button class="status-pill" onclick="filterLectures('pending')">Pending <span class="pill-count" id="countPending">17</span></button>
+                    <button class="status-pill active" onclick="filterLectures('all')">All <span class="pill-count"
+                            id="countAll">17</span></button>
+                    <button class="status-pill" onclick="filterLectures('completed')">Completed <span class="pill-count"
+                            id="countCompleted">0</span></button>
+                    <button class="status-pill" onclick="filterLectures('pending')">Pending <span class="pill-count"
+                            id="countPending">17</span></button>
                 </div>
                 <div class="bulk-actions">
                     <button class="bulk-btn" onclick="openAllNotes()"
@@ -61,7 +65,7 @@
                             <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
                             <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
                         </svg>
-                        Open All HTML Notes
+                        HTML Notes
                     </button>
                     <button class="bulk-btn" onclick="openAllPDFs()" title="Open all 17 Lecture PDFs in separate tabs">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -71,7 +75,7 @@
                             <line x1="16" y1="13" x2="8" y2="13" />
                             <line x1="16" y1="17" x2="8" y2="17" />
                         </svg>
-                        Open All PDFs
+                        PDFs
                     </button>
                     <button class="bulk-btn" onclick="openAllShortNotes()"
                         title="Open all Short Notes Images in separate tabs">
@@ -81,46 +85,46 @@
                             <circle cx="8.5" cy="8.5" r="1.5" />
                             <polyline points="21 15 16 10 5 21" />
                         </svg>
-                        Open All Short Notes
+                        Short Notes
                     </button>
                     <button class="bulk-btn" onclick="window.open('AML_MCQ_Practice.html', '_blank')"
-                    title="Open AML MCQ Practice Lab">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                    <polyline points="22 4 12 14.01 9 11.01" />
-                </svg>
-                MCQ Practice Lab
-            </button>
-            <button class="bulk-btn" onclick="window.open('AML_MidSem_Practice.html', '_blank')"
-            title="Open AML Mid-Sem Practice Lab">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-        </svg>
-        Mid-Sem Lab
-    </button>
-    <button class="bulk-btn" onclick="window.location.href='../assignments.html?subj=aml'"
-    title="Open AML Portal Assignments">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
-    <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
-    <path d="m9 14 2 2 4-4" />
-</svg>
-Assignments
-</button>
-<button class="bulk-btn bulk-btn-primary" onclick="openHandbookModal()"
-    title="Download Custom Short Notes Handbook (Choose Lecture Range, auto-generated Index & PDF)">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-        <polyline points="7 10 12 15 17 10" />
-        <line x1="12" y1="15" x2="12" y2="3" />
-    </svg>
-    Download Handbook (PDF)
-</button>
+                        title="Open AML MCQ Practice Lab">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                            <polyline points="22 4 12 14.01 9 11.01" />
+                        </svg>
+                        MCQ
+                    </button>
+                    <button class="bulk-btn" onclick="window.open('AML_MidSem_Practice.html', '_blank')"
+                        title="Open AML Mid-Sem Practice Lab">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                        </svg>
+                        Mid-Sem Lab
+                    </button>
+                    <button class="bulk-btn" onclick="window.location.href='../assignments.html?subj=aml'"
+                        title="Open AML Portal Assignments">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+                            <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+                            <path d="m9 14 2 2 4-4" />
+                        </svg>
+                        Assignments
+                    </button>
+                    <button class="bulk-btn bulk-btn-primary" onclick="openHandbookModal()"
+                        title="Download Custom Short Notes Handbook (Choose Lecture Range, auto-generated Index & PDF)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="7 10 12 15 17 10" />
+                            <line x1="12" y1="15" x2="12" y2="3" />
+                        </svg>
+                        Handbook
+                    </button>
                 </div>
             </div>
 
