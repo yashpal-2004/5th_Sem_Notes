@@ -53,28 +53,31 @@
         .status-filter-bar {
             display: inline-flex;
             align-items: center;
-            background: rgba(19, 34, 25, 0.05);
+            background: #ffffff;
             padding: 3px;
-            border-radius: 20px;
+            border-radius: 30px;
             border: 1px solid var(--border-light);
             gap: 2px;
+            box-shadow: 0 2px 6px rgba(19, 34, 25, 0.04);
+            flex-shrink: 0;
         }
 
         .status-pill {
             display: inline-flex;
             align-items: center;
-            gap: 5px;
-            padding: 0.28rem 0.75rem;
-            border-radius: 16px;
+            gap: 6px;
+            padding: 0.42rem 0.95rem;
+            border-radius: 20px;
             border: none;
             background: transparent;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             font-weight: 600;
             color: var(--text-muted);
             cursor: pointer;
             transition: all 0.2s ease;
             line-height: 1.2;
             font-family: inherit;
+            white-space: nowrap;
         }
 
         .status-pill:hover {
@@ -82,22 +85,23 @@
         }
 
         .status-pill.active {
-            background: white;
-            color: var(--text-dark);
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+            background: var(--text-dark);
+            color: #ffffff;
+            box-shadow: 0 2px 6px rgba(19, 34, 25, 0.15);
         }
 
         .status-pill .pill-count {
             display: inline-block;
-            font-size: 0.68rem;
-            padding: 1px 5px;
+            font-size: 0.72rem;
+            padding: 1px 6px;
             border-radius: 10px;
             background: rgba(19, 34, 25, 0.08);
             font-weight: 700;
         }
 
         .status-pill.active .pill-count {
-            background: rgba(19, 34, 25, 0.12);
+            background: rgba(255, 255, 255, 0.22);
+            color: #ffffff;
         }
 
         .add-btn {
@@ -152,134 +156,252 @@
 
         .type-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
-            gap: 2rem;
+            grid-template-columns: 1fr;
+            gap: 1.75rem;
+            align-items: start;
         }
 
-        @media (max-width: 600px) {
-            .type-grid {
-                grid-template-columns: 1fr;
-            }
+        .category-filter-bar {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(19, 34, 25, 0.05);
+            padding: 3px;
+            border-radius: 30px;
+            border: 1px solid var(--border-light);
+            gap: 2px;
+            flex-shrink: 0;
+        }
+
+        .category-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0.38rem 0.85rem;
+            border-radius: 20px;
+            border: none;
+            background: transparent;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            line-height: 1.2;
+            font-family: inherit;
+            white-space: nowrap;
+        }
+
+        .category-pill:hover {
+            color: var(--text-dark);
+        }
+
+        .category-pill.active {
+            background: #ffffff;
+            color: var(--text-dark);
+            box-shadow: 0 2px 6px rgba(19, 34, 25, 0.08);
+        }
+
+        .category-pill .pill-count {
+            display: inline-block;
+            font-size: 0.7rem;
+            padding: 1px 6px;
+            border-radius: 10px;
+            background: rgba(19, 34, 25, 0.08);
+            font-weight: 700;
+        }
+
+        .category-pill.active .pill-count {
+            background: rgba(19, 34, 25, 0.12);
+            color: var(--text-dark);
+        }
+
+        .q-cat-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .q-cat-tag.class {
+            background: rgba(30, 64, 175, 0.08);
+            color: #1e40af;
+        }
+
+        .q-cat-tag.lab {
+            background: rgba(146, 64, 14, 0.08);
+            color: #b45309;
         }
 
         .type-column {
-            background: white;
-            border-radius: 16px;
+            background: #ffffff;
+            border-radius: 20px;
             border: 1px solid var(--border-light);
-            padding: 1.5rem;
-            box-shadow: var(--shadow);
+            padding: 1.6rem 1.75rem;
+            box-shadow: 0 4px 18px rgba(19, 34, 25, 0.04);
             display: flex;
             flex-direction: column;
+            transition: box-shadow 0.25s ease, border-color 0.25s ease;
+        }
+
+        .type-column:hover {
+            box-shadow: 0 8px 26px rgba(19, 34, 25, 0.07);
+            border-color: rgba(19, 34, 25, 0.16);
         }
 
         .type-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid var(--border-light);
-            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(19, 34, 25, 0.07);
+            padding-bottom: 1.1rem;
             margin-bottom: 1.25rem;
         }
 
         .type-title {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             font-weight: 700;
+            color: var(--text-dark);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            letter-spacing: -0.01em;
         }
 
         .type-icon {
             width: 20px;
             height: 20px;
-            opacity: 0.8;
+            color: var(--text-dark);
+            opacity: 0.85;
+            flex-shrink: 0;
+        }
+
+        .type-count-badge {
+            font-size: 0.76rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            background: rgba(19, 34, 25, 0.05);
+            padding: 3px 9px;
+            border-radius: 12px;
+            letter-spacing: 0.02em;
         }
 
         .questions-list {
             display: flex;
             flex-direction: column;
-            gap: 0.85rem;
+            gap: 0.75rem;
         }
 
         .question-card {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: var(--bg-beige);
-            border: 1px solid rgba(19, 34, 25, 0.06);
-            border-radius: 10px;
-            padding: 0.85rem 1rem;
-            transition: all 0.2s ease;
+            background: #fbf9f5;
+            border: 1px solid rgba(19, 34, 25, 0.07);
+            border-radius: 14px;
+            padding: 0.9rem 1.1rem;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
         }
 
         .question-card:hover {
+            background: #ffffff;
             border-color: rgba(19, 34, 25, 0.18);
-            transform: translateX(3px);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 14px rgba(19, 34, 25, 0.06);
+        }
+
+        .question-card.done {
+            background: rgba(247, 245, 240, 0.6);
+            border-color: rgba(19, 34, 25, 0.05);
+        }
+
+        .question-card.done:hover {
+            background: #ffffff;
+            border-color: rgba(19, 34, 25, 0.12);
         }
 
         .question-left {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
             flex: 1;
             min-width: 0;
         }
 
         .q-check {
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
             border-radius: 50%;
-            border: 2px solid var(--text-muted);
+            border: 2px solid #cbd5e1;
             cursor: pointer;
             flex-shrink: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s;
-            background: transparent;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            background: #ffffff;
+        }
+
+        .q-check:hover {
+            border-color: var(--text-dark);
+            transform: scale(1.08);
         }
 
         .question-card.done .q-check {
-            background: var(--accent-purple, #7c3aed);
-            border-color: var(--accent-purple, #7c3aed);
+            background: var(--text-dark);
+            border-color: var(--text-dark);
+            color: #ffffff;
         }
 
         .question-card.done .q-check::after {
-            content: '✓';
-            color: white;
-            font-size: 12px;
-            font-weight: bold;
+            content: '';
+            width: 5px;
+            height: 9px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+            margin-bottom: 2px;
         }
 
         .question-card.done .q-title {
-            text-decoration: line-through;
-            opacity: 0.55;
+            color: #94a3b8;
+            text-decoration: none;
         }
 
         .q-info {
             display: flex;
             flex-direction: column;
-            gap: 2px;
+            gap: 3px;
             overflow: hidden;
+            flex: 1;
+            min-width: 0;
         }
 
         .q-title {
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 0.92rem;
             color: var(--text-dark);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             text-decoration: none;
+            transition: color 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .q-title:hover {
-            text-decoration: underline;
-            text-underline-offset: 3px;
+            color: #047857;
         }
 
         .q-meta {
-            font-size: 0.75rem;
+            font-size: 0.74rem;
+            font-weight: 500;
             color: var(--text-muted);
             display: flex;
             align-items: center;
@@ -289,8 +411,8 @@
         .q-actions {
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-left: 1rem;
+            gap: 6px;
+            margin-left: 0.85rem;
             flex-shrink: 0;
         }
 
@@ -298,72 +420,61 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 6px 12px;
-            border-radius: 6px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
             font-size: 0.8rem;
             font-weight: 600;
             text-decoration: none;
             transition: all 0.2s ease;
             cursor: pointer;
             border: none;
-        }
-
-        .q-btn-link {
-            background: rgba(19, 34, 25, 0.06);
-            color: var(--text-dark);
-        }
-
-        .q-btn-link:hover {
-            background: var(--text-dark);
-            color: white;
-        }
-
-        .q-btn-del {
             background: transparent;
-            color: #ef4444;
-            opacity: 0.6;
-            padding: 6px;
-        }
-
-        .q-btn-del:hover {
-            opacity: 1;
-            background: rgba(239, 68, 68, 0.1);
         }
 
         .q-btn-edit {
-            background: transparent;
             color: var(--text-muted);
-            opacity: 0.65;
-            padding: 6px;
         }
 
         .q-btn-edit:hover {
-            opacity: 1;
             background: rgba(19, 34, 25, 0.08);
             color: var(--text-dark);
+        }
+
+        .q-btn-del {
+            color: #94a3b8;
+        }
+
+        .q-btn-del:hover {
+            background: #fee2e2;
+            color: #dc2626;
         }
 
         .open-all-btn {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            padding: 0.45rem 1rem;
-            border-radius: 20px;
+            padding: 0.45rem 0.95rem;
+            border-radius: 30px;
             border: 1px solid var(--border-light);
-            background: white;
+            background: #ffffff;
             color: var(--text-dark);
             font-size: 0.8rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 6px rgba(19, 34, 25, 0.04);
             text-decoration: none;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
         .open-all-btn:hover {
             background: var(--text-dark);
-            color: white;
+            color: #ffffff;
             border-color: var(--text-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(19, 34, 25, 0.1);
         }
 
         .empty-state {
@@ -372,49 +483,63 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: 2.5rem 1.5rem;
-            background: rgba(19, 34, 25, 0.02);
-            border: 1px dashed rgba(19, 34, 25, 0.12);
-            border-radius: 12px;
+            padding: 3rem 1.5rem;
+            background: #fbf9f5;
+            border: 1.5px dashed rgba(19, 34, 25, 0.12);
+            border-radius: 14px;
             color: var(--text-muted);
+            transition: all 0.2s ease;
+        }
+
+        .empty-state:hover {
+            border-color: rgba(19, 34, 25, 0.22);
+            background: #ffffff;
         }
 
         .empty-state-icon {
-            width: 36px;
-            height: 36px;
-            margin-bottom: 0.75rem;
-            opacity: 0.35;
+            width: 38px;
+            height: 38px;
+            margin-bottom: 0.85rem;
+            color: var(--text-muted);
+            opacity: 0.45;
         }
 
         .empty-state-text {
-            font-size: 0.9rem;
-            font-weight: 600;
+            font-size: 0.92rem;
+            font-weight: 700;
             color: var(--text-dark);
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.3rem;
+            letter-spacing: -0.01em;
         }
 
         .empty-state-sub {
-            font-size: 0.78rem;
+            font-size: 0.8rem;
             color: var(--text-muted);
-            margin-bottom: 1rem;
+            margin-bottom: 1.15rem;
+            max-width: 280px;
+            line-height: 1.45;
         }
 
         .empty-state-btn {
-            font-size: 0.75rem;
+            font-size: 0.78rem;
             font-weight: 700;
-            padding: 0.4rem 0.85rem;
-            border-radius: 20px;
-            background: white;
+            padding: 0.45rem 1rem;
+            border-radius: 30px;
+            background: #ffffff;
             color: var(--text-dark);
             border: 1px solid var(--border-light);
             cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.04);
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(19, 34, 25, 0.04);
+            letter-spacing: 0.01em;
         }
 
         .empty-state-btn:hover {
             background: var(--text-dark);
-            color: white;
+            color: #ffffff;
+            border-color: var(--text-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(19, 34, 25, 0.12);
         }
 
         /* Modal Popup */
@@ -441,71 +566,102 @@
         }
 
         .modal-card {
-            background: white;
-            border-radius: 16px;
-            padding: 2rem;
-            width: 90%;
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 2.25rem;
+            width: 92%;
             max-width: 520px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-            transform: translateY(15px);
-            transition: transform 0.25s ease;
+            box-shadow: 0 25px 60px -15px rgba(19, 34, 25, 0.22), 0 0 0 1px rgba(19, 34, 25, 0.05);
+            transform: translateY(20px) scale(0.98);
+            transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .modal-overlay.active .modal-card {
-            transform: translateY(0);
+            transform: translateY(0) scale(1);
         }
 
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.75rem;
+            padding-bottom: 0.5rem;
         }
 
         .modal-title {
             font-family: 'Playfair Display', serif;
-            font-size: 1.6rem;
+            font-size: 1.75rem;
             font-weight: 600;
+            color: var(--text-dark);
+            letter-spacing: -0.02em;
         }
 
         .modal-close {
-            background: none;
+            background: rgba(19, 34, 25, 0.05);
             border: none;
-            font-size: 1.5rem;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
             cursor: pointer;
             color: var(--text-muted);
+            transition: all 0.2s ease;
             line-height: 1;
+        }
+
+        .modal-close:hover {
+            background: var(--text-dark);
+            color: #ffffff;
         }
 
         .form-group {
             margin-bottom: 1.25rem;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 7px;
         }
 
         .form-group label {
-            font-size: 0.82rem;
+            font-size: 0.76rem;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.06em;
             color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
         .form-control {
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
-            border: 1px solid var(--border-light);
+            padding: 0.8rem 1rem;
+            border-radius: 12px;
+            border: 1.5px solid var(--border-light);
             font-family: inherit;
-            font-size: 0.95rem;
-            background: var(--bg-beige);
-            transition: border-color 0.2s;
+            font-size: 0.92rem;
+            background: #fbf9f5;
+            color: var(--text-dark);
+            transition: all 0.2s ease;
+            box-shadow: inset 0 1px 2px rgba(19, 34, 25, 0.02);
         }
 
         .form-control:focus {
             outline: none;
             border-color: var(--text-dark);
-            background: white;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(19, 34, 25, 0.08);
+        }
+
+        select.form-control {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 14px;
+            padding-right: 2.5rem;
         }
 
         .form-row {
@@ -516,20 +672,23 @@
 
         .modal-submit {
             width: 100%;
-            padding: 0.85rem;
+            padding: 0.9rem;
             border-radius: 30px;
             background: var(--text-dark);
-            color: white;
+            color: #ffffff;
             font-weight: 600;
             font-size: 0.95rem;
             border: none;
             cursor: pointer;
-            margin-top: 0.5rem;
-            transition: background 0.2s;
+            margin-top: 0.75rem;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 14px rgba(19, 34, 25, 0.18);
         }
 
         .modal-submit:hover {
             background: #000;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(19, 34, 25, 0.25);
         }
     </style>
 </head>
@@ -680,6 +839,13 @@
             if (editId) editId.value = '';
             if (title) title.textContent = 'Add Portal Question';
             if (btn) btn.textContent = 'Save Question Globally';
+
+            // Default to currently active subject filter if not 'all'
+            var subjSelect = document.getElementById('subjectSelect');
+            if (subjSelect && window.currentFilter && window.currentFilter !== 'all') {
+                subjSelect.value = window.currentFilter;
+            }
+
             if (modal) modal.classList.add('active');
         }
         window.openAddModal = openAddModal;
@@ -733,10 +899,15 @@
 
         function openAllSubjectQuestions(subjKey) {
             var status = (window.subjectStatusFilters && window.subjectStatusFilters[subjKey]) || 'all';
+            var cat = (window.subjectCategoryFilters && window.subjectCategoryFilters[subjKey]) || 'all';
             var questions = (window.questionsData || []).filter(function(q) {
                 if (q.subject !== subjKey) return false;
-                if (status === 'pending') return !q.done;
-                if (status === 'done') return !!q.done;
+                if (status === 'completed' || status === 'done') {
+                    if (!q.done) return false;
+                } else if (status === 'pending') {
+                    if (q.done) return false;
+                }
+                if (cat !== 'all' && q.category !== cat) return false;
                 return true;
             });
             if (questions.length === 0) return;
@@ -778,6 +949,15 @@
             }
         }
         window.setSubjectStatusFilter = setSubjectStatusFilter;
+
+        window.subjectCategoryFilters = {};
+        function setSubjectCategoryFilter(subjKey, category) {
+            window.subjectCategoryFilters[subjKey] = category;
+            if (typeof window.renderAssignments === 'function') {
+                window.renderAssignments();
+            }
+        }
+        window.setSubjectCategoryFilter = setSubjectCategoryFilter;
     </script>
 
     <script type="module">
@@ -894,41 +1074,39 @@
                 const subjQuestions = window.questionsData.filter(q => q.subject === subjKey);
 
                 const currentStatus = window.subjectStatusFilters[subjKey] || 'all';
+                const currentCategory = window.subjectCategoryFilters[subjKey] || 'all';
 
                 // Status counts for this subject
                 const allCount = subjQuestions.length;
                 const pendingCount = subjQuestions.filter(q => !q.done).length;
                 const doneCount = subjQuestions.filter(q => q.done).length;
 
-                // Filter questions for display by subject status filter
+                // Category counts for this subject
+                const classCount = subjQuestions.filter(q => q.category === 'class').length;
+                const labCount = subjQuestions.filter(q => q.category === 'lab').length;
+
+                // Filter questions for display by subject status filter AND category sub-filter
                 const filteredQuestions = subjQuestions.filter(q => {
-                    if (currentStatus === 'pending') return !q.done;
-                    if (currentStatus === 'done') return !!q.done;
+                    if (currentStatus === 'completed' || currentStatus === 'done') {
+                        if (!q.done) return false;
+                    } else if (currentStatus === 'pending') {
+                        if (q.done) return false;
+                    }
+                    if (currentCategory === 'class') {
+                        if (q.category !== 'class') return false;
+                    } else if (currentCategory === 'lab') {
+                        if (q.category !== 'lab') return false;
+                    }
                     return true;
                 });
 
-                const classQs = filteredQuestions.filter(q => q.category === 'class');
-                const labQs = filteredQuestions.filter(q => q.category === 'lab');
+                const isCompletedActive = currentStatus === 'completed' || currentStatus === 'done';
+                const isPendingActive = currentStatus === 'pending';
+                const isAllStatusActive = !isCompletedActive && !isPendingActive;
 
-                const statusLabel = currentStatus === 'all' ? '' : ` (${currentStatus})`;
-
-                const classEmptyHtml = `
-                    <div class="empty-state">
-                        <svg class="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-                        <div class="empty-state-text">No Class Assignments${statusLabel}</div>
-                        <div class="empty-state-sub">${currentStatus === 'all' ? 'There are no class questions logged for this subject yet.' : `No ${currentStatus} class questions for this subject.`}</div>
-                        <button class="empty-state-btn" onclick="openAddModalWithDefaults('${subjKey}', 'class')">+ Add Class Task</button>
-                    </div>
-                `;
-
-                const labEmptyHtml = `
-                    <div class="empty-state">
-                        <svg class="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.5M14 2v7.5M8.5 2h7M14 9.5a5 5 0 1 1-4 0"/></svg>
-                        <div class="empty-state-text">No Lab Assignments${statusLabel}</div>
-                        <div class="empty-state-sub">${currentStatus === 'all' ? 'There are no practical lab questions logged for this subject yet.' : `No ${currentStatus} lab questions for this subject.`}</div>
-                        <button class="empty-state-btn" onclick="openAddModalWithDefaults('${subjKey}', 'lab')">+ Add Lab Task</button>
-                    </div>
-                `;
+                const isAllCategoryActive = currentCategory === 'all';
+                const isClassActive = currentCategory === 'class';
+                const isLabActive = currentCategory === 'lab';
 
                 const openAllBtn = filteredQuestions.length > 0
                     ? `<button class="open-all-btn" onclick="openAllSubjectQuestions('${subjKey}')" title="Open all ${filteredQuestions.length} visible questions in new tabs">
@@ -939,57 +1117,62 @@
 
                 const statusFilterBarHtml = `
                     <div class="status-filter-bar">
-                        <button class="status-pill ${currentStatus === 'all' ? 'active' : ''}" onclick="setSubjectStatusFilter('${subjKey}', 'all')">
+                        <button class="status-pill ${isAllStatusActive ? 'active' : ''}" onclick="setSubjectStatusFilter('${subjKey}', 'all')">
                             All <span class="pill-count">${allCount}</span>
                         </button>
-                        <button class="status-pill ${currentStatus === 'pending' ? 'active' : ''}" onclick="setSubjectStatusFilter('${subjKey}', 'pending')">
+                        <button class="status-pill ${isCompletedActive ? 'active' : ''}" onclick="setSubjectStatusFilter('${subjKey}', 'completed')">
+                            Completed <span class="pill-count">${doneCount}</span>
+                        </button>
+                        <button class="status-pill ${isPendingActive ? 'active' : ''}" onclick="setSubjectStatusFilter('${subjKey}', 'pending')">
                             Pending <span class="pill-count">${pendingCount}</span>
                         </button>
-                        <button class="status-pill ${currentStatus === 'done' ? 'active' : ''}" onclick="setSubjectStatusFilter('${subjKey}', 'done')">
-                            Done <span class="pill-count">${doneCount}</span>
+                    </div>
+                `;
+
+                const categoryFilterBarHtml = `
+                    <div class="category-filter-bar">
+                        <button class="category-pill ${isAllCategoryActive ? 'active' : ''}" onclick="setSubjectCategoryFilter('${subjKey}', 'all')">
+                            All Tasks <span class="pill-count">${allCount}</span>
                         </button>
+                        <button class="category-pill ${isClassActive ? 'active' : ''}" onclick="setSubjectCategoryFilter('${subjKey}', 'class')">
+                            Class <span class="pill-count">${classCount}</span>
+                        </button>
+                        <button class="category-pill ${isLabActive ? 'active' : ''}" onclick="setSubjectCategoryFilter('${subjKey}', 'lab')">
+                            Lab <span class="pill-count">${labCount}</span>
+                        </button>
+                    </div>
+                `;
+
+                const filterSummary = [];
+                if (currentCategory !== 'all') filterSummary.push(currentCategory === 'class' ? 'Class' : 'Lab');
+                if (currentStatus !== 'all') filterSummary.push(currentStatus === 'completed' || currentStatus === 'done' ? 'completed' : 'pending');
+                const emptyFilterText = filterSummary.length > 0 ? ` (${filterSummary.join(', ')})` : '';
+
+                const emptyHtml = `
+                    <div class="empty-state">
+                        <svg class="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                        <div class="empty-state-text">No Assignments Found${emptyFilterText}</div>
+                        <div class="empty-state-sub">${allCount === 0 ? 'There are no questions logged for this subject yet.' : 'No questions match the current filter selection.'}</div>
+                        <button class="empty-state-btn" onclick="openAddModalWithDefaults('${subjKey}', '${currentCategory === 'lab' ? 'lab' : 'class'}')">+ Add Task</button>
                     </div>
                 `;
 
                 const sectionHtml = `
                     <div class="subject-section">
-                        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; margin-bottom:1.5rem;">
+                        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; margin-bottom:1.25rem;">
                             <h3 class="subject-section-title" style="margin-bottom:0;">
                                 ${subjObj.name}
                                 <span class="subject-badge ${subjObj.badge}">${allCount} Questions</span>
                             </h3>
                             <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
+                                ${categoryFilterBarHtml}
                                 ${statusFilterBarHtml}
                                 ${openAllBtn}
                             </div>
                         </div>
-                        <div class="type-grid">
-                            <!-- Class Column -->
-                            <div class="type-column">
-                                <div class="type-header">
-                                    <div class="type-title">
-                                        <svg class="type-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-                                        Class Assignments
-                                    </div>
-                                    <span style="font-size:0.8rem; font-weight:600; color:var(--text-muted);">${classQs.length} Tasks</span>
-                                </div>
-                                <div class="questions-list">
-                                    ${classQs.length > 0 ? classQs.map(q => renderQuestionCard(q)).join('') : classEmptyHtml}
-                                </div>
-                            </div>
-
-                            <!-- Lab Column -->
-                            <div class="type-column">
-                                <div class="type-header">
-                                    <div class="type-title">
-                                        <svg class="type-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.5M14 2v7.5M8.5 2h7M14 9.5a5 5 0 1 1-4 0"/></svg>
-                                        Lab Assignments
-                                    </div>
-                                    <span style="font-size:0.8rem; font-weight:600; color:var(--text-muted);">${labQs.length} Tasks</span>
-                                </div>
-                                <div class="questions-list">
-                                    ${labQs.length > 0 ? labQs.map(q => renderQuestionCard(q)).join('') : labEmptyHtml}
-                                </div>
+                        <div class="type-column">
+                            <div class="questions-list">
+                                ${filteredQuestions.length > 0 ? filteredQuestions.map(q => renderQuestionCard(q)).join('') : emptyHtml}
                             </div>
                         </div>
                     </div>
@@ -1010,6 +1193,9 @@
         };
 
         function renderQuestionCard(q) {
+            const isLab = q.category === 'lab';
+            const catLabel = isLab ? 'Lab' : 'Class';
+            const catClass = isLab ? 'lab' : 'class';
             return `
                 <div class="question-card ${q.done ? 'done' : ''}" id="q-card-${q.id}">
                     <div class="question-left">
@@ -1017,6 +1203,7 @@
                         <div class="q-info">
                             <a href="${escapeHtml(q.url)}" target="_blank" class="q-title" title="${escapeHtml(q.title)}" onclick="event.stopPropagation()">${escapeHtml(q.title)} <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;opacity:0.45;flex-shrink:0;"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>
                             <div class="q-meta">
+                                <span class="q-cat-tag ${catClass}">${catLabel}</span>
                                 ${q.deadline ? `<span style="display: inline-flex; align-items: center; gap: 4px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>${escapeHtml(q.deadline)}</span>` : ''}
                             </div>
                         </div>
