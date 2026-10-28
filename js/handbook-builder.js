@@ -37,7 +37,9 @@
                 { index: 9, displayNum: '09', title: 'Regularisation: L2, L1, Early Stopping & Dropout', imgUrl: 'images/9.png' },
                 { index: 10, displayNum: '10a', title: 'CNN Foundations: From Pixels to Patterns', imgUrl: 'images/10_part_1.png' },
                 { index: 11, displayNum: '10b', title: 'Inside LeNet, AlexNet & VGG-16', imgUrl: 'images/10_part_2.png' },
-                { index: 12, displayNum: '11', title: 'Modern Architectures: Inception & ResNet', imgUrl: 'images/11.png' }
+                { index: 12, displayNum: '11', title: 'Modern Architectures: Inception & ResNet', imgUrl: 'images/11.png' },
+                { index: 13, displayNum: '12a', title: 'Recurrent Networks: LSTM & GRU Architecture (Part 1)', imgUrl: 'images/12_1.png' },
+                { index: 14, displayNum: '12b', title: 'Recurrent Networks: LSTM & GRU Architecture (Part 2)', imgUrl: 'images/12_2.png' }
             ]
         },
         aml: {

@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Deep Learning - Lecture 12</title>
+    <meta content="Study notes for Deep Learning, Lecture 12 covering Recurrent Networks: Why Vanilla RNNs Forget, Long-Term Memory Lane (Additive Cell State), LSTM Three-Gate Architecture (Forget, Input, Output), Gated Recurrent Units (GRU), and Bidirectional RNNs." name="description" />
+    <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>12</text></svg>" rel="icon" />
+    <link href="../css/style.css" rel="stylesheet" />
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Deep Learning Foundations</h1>
+            <p>Lecture 12 - Recurrent Networks: LSTM &amp; GRU Architecture</p>
+            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/12.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF Worksheet ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text" />
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 6</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>Short Notes</a></li>
+                <li>
+                    <a href="#topic-1">1. Why the Vanilla RNN Forgets<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 Vanilla RNN Formulation &amp; Continuous Overwriting</a></li>
+                        <li><a href="#sub-1-2">1.2 Hand Calculation: Step-by-Step Sentiment Decay</a></li>
+                        <li><a href="#sub-1-3">1.3 Vanishing Gradients Across Long Token Gaps</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. The Additive Long-Term Memory Lane ($C_t$)<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 The Two-Memory Separation ($C_t$ vs. $h_t$)</a></li>
+                        <li><a href="#sub-2-2">2.2 Candidate Generation ($\tilde{C}_t$) via Tanh</a></li>
+                        <li><a href="#sub-2-3">2.3 Failure of Pure Addition: The Inability to Forget</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Gating Mechanism: Multiplicative Switches<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 Anatomy of a Gate: Affine Score Squeezed by Sigmoid ($\sigma$)</a></li>
+                        <li><a href="#sub-3-2">3.2 The Forget Gate ($f_t$): Learning When to Erase</a></li>
+                        <li><a href="#sub-3-3">3.3 The Three Gates at a Glance: $f_t$, $i_t$, and $o_t$</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. The Complete LSTM Architecture<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 Full Vector Equations &amp; Forward Equations</a></li>
+                        <li><a href="#sub-4-2">4.2 Tracing Review B Word-by-Word: Overwriting via Gating</a></li>
+                        <li><a href="#sub-4-3">4.3 Gradient Highway: Unbroken Backpropagation over Time</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. The Gated Recurrent Unit (GRU)<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 Design Philosophy: Streamlining Memory into One State</a></li>
+                        <li><a href="#sub-5-2">5.2 Coupled Update Gate ($z_t$) and Reset Gate ($r_t$)</a></li>
+                        <li><a href="#sub-5-3">5.3 Comparative Matrix: LSTM vs. GRU</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-6">6. Bidirectional RNNs (BiRNN) &amp; Self-Check Review<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-6-1">6.1 Future Context Ambiguity: Forward vs. Backward Readers</a></li>
+                        <li><a href="#sub-6-2">6.2 Concatenated Hidden States &amp; Generative Limitations</a></li>
+                        <li><a href="#sub-6-3">6.3 Worksheet Exit Ticket Analysis</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" x2="8" y2="13"></line><line x1="16" x2="8" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Short Notes Placeholder -->
+            <section id="short-notes" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-short-notes')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                    </div>
+                    <h2>Short Notes &amp; Visual Summary</h2>
+                </div>
+                <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
+                    <p style="margin-bottom: 1rem;">Handwritten / quick summary notes for Lecture 12 (2 Pages):</p>
+                    <div style="display: flex; flex-direction: column; gap: 1.5rem; align-items: center; background: var(--bg-secondary, #f8f9fa); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--gray-border);">
+                        <!-- Page 1 -->
+                        <div style="text-align: center; width: 100%; max-width: 900px;">
+                            <div style="font-weight: 600; font-size: 0.9rem; margin-bottom: 0.5rem; color: var(--text-dark);">Page 1</div>
+                            <a href="../images/12_1.png" target="_blank" title="Click to view Page 1 full size">
+                                <img src="../images/12_1.png" alt="Lecture 12 Short Notes - Page 1" style="max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
+                            </a>
+                            <p style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-muted);">Click image to open Page 1 in new tab</p>
+                        </div>
+
+                        <!-- Page 2 -->
+                        <div style="text-align: center; width: 100%; max-width: 900px;">
+                            <div style="font-weight: 600; font-size: 0.9rem; margin-bottom: 0.5rem; color: var(--text-dark);">Page 2</div>
+                            <a href="../images/12_2.png" target="_blank" title="Click to view Page 2 full size">
+                                <img src="../images/12_2.png" alt="Lecture 12 Short Notes - Page 2" onerror="this.onerror=null; this.src='../images/12_1.png';" style="max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
+                            </a>
+                            <p style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-muted);">Click image to open Page 2 in new tab</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 1 -->
+            <section class="topic-section" id="topic-1">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>Why the Vanilla RNN Forgets</h2>
+                </div>
+                <div class="collapsible-content" id="content-1">
+                    <h3 id="sub-1-1">1.1 Vanilla RNN Formulation &amp; Continuous Overwriting</h3>
+                    <p>In standard Recurrent Neural Networks (RNNs), processing a sequence of tokens $x_1, x_2, \dots, x_T$ relies on a single hidden state vector $h_t$ that serves simultaneously as the working memory and the network output:</p>
+                    $$h_t = \tanh\left( w \cdot x_t + w_h \cdot h_{t-1} + b \right)$$
+                    <p>Where:</p>
+                    <ul>
+                        <li>$x_t$: Input token embedding at timestep $t$.</li>
+                        <li>$w$: Input-to-hidden projection weight.</li>
+                        <li>$w_h$: Recurrent hidden-to-hidden weight.</li>
+                        <li>$b$: Bias parameter.</li>
+                        <li>$\tanh$: Hyperbolic tangent non-linearity squeezing values strictly into $(-1, 1)$.</li>
+                    </ul>
+
+                    <div class="box box-amber">
+                        <div class="box-title">The Fundamental Flaw: Loss of Separation</div>
+                        <p>At every incoming word, the RNN forces the network to calculate a weighted sum and squeeze it through $\tanh$. Because there is no persistent storage separate from the active state, <strong>every new word overwrites part of the past memory</strong>.</p>
+                    </div>
+
+                    <h3 id="sub-1-2">1.2 Hand Calculation: Step-by-Step Sentiment Decay</h3>
+                    <p>Consider the task of sentiment classification across two benchmark movie reviews:</p>
+                    <ul>
+                        <li><strong>Review A (Target = Positive):</strong> <em>"The movie was <strong>brilliant</strong>, and I watched it with my friends on a Sunday evening."</em> (16 words total; sentiment word appears at word 4, followed by 12 neutral words).</li>
+                        <li><strong>Review B (Target = Positive):</strong> <em>"The movie was <strong>long</strong> and <strong>slow</strong>, <strong>but</strong> the ending was <strong>brilliant</strong>."</em> (Sentiment flips at <em>"but"</em>; initial negative memory must be discarded).</li>
+                    </ul>
+
+                    <p>Let each word be represented as a 4-dimensional feature vector: $[\text{positive}, \text{negative}, \text{turn}, \text{end}]^T$:</p>
+                    <ul>
+                        <li><em>"brilliant"</em>: $[1, 0, 0, 0]^T$</li>
+                        <li><em>"long"</em>: $[0, 0.5, 0, 0]^T$</li>
+                        <li><em>"slow"</em>: $[0, 1, 0, 0]^T$</li>
+                        <li><em>"but"</em>: $[0, 0, 1, 0]^T$</li>
+                        <li><em>"." (verdict)</em>: $[0, 0, 0, 1]^T$</li>
+                        <li>Neutral words (<em>"the", "movie", "was", "and", "I"</em>): $[0, 0, 0, 0]^T$</li>
+                    </ul>
+
+                    <p>Given parameters: $w^{\text{pos}} = 2.0$, $w^{\text{neg}} = -2.0$, $w_h = 0.5$, and $b = 0$:</p>
+                    <ol>
+                        <li><strong>Step 1 to 3 (Neutral words):</strong> $w \cdot x_t = 0 \implies h_1 = h_2 = h_3 = 0$.</li>
+                        <li><strong>Step 4 ("brilliant"):</strong> $w \cdot x_4 = 2 \times 1 = 2 \implies h_4 = \tanh(2 + 0.5 \times 0) = \tanh(2) \approx 0.96$.</li>
+                        <li><strong>Step 5 ("and"):</strong> $w \cdot x_5 = 0 \implies h_5 = \tanh(0 + 0.5 \times 0.96) = \tanh(0.48) \approx 0.45$.</li>
+                        <li><strong>Step 6 ("I"):</strong> $w \cdot x_6 = 0 \implies h_6 = \tanh(0 + 0.5 \times 0.45) = \tanh(0.22) \approx 0.22$.</li>
+                    </ol>
+
+                    <div class="box box-blue">
+                        <div class="box-title">Mathematical Insight: The Small-Angle Tanh Approximation</div>
+                        <p>For small values of $z$, $\tanh(z) \approx z$. Since $w \cdot x_t = 0$ for neutral words:
+                        $$h_t = \tanh(w_h \cdot h_{t-1}) \approx w_h \cdot h_{t-1} = 0.5 \cdot h_{t-1}$$
+                        Every neutral word halves the remaining memory signal! After 12 neutral words:
+                        $$h_{16} \approx (0.5)^{12} \times 0.96 \approx 0.00023$$
+                        By the final punctuation mark, the evidence that the movie was "brilliant" has decayed to zero.</p>
+                    </div>
+
+                    <h3 id="sub-1-3">1.3 Vanishing Gradients Across Long Token Gaps</h3>
+                    <p>During training via Backpropagation Through Time (BPTT), the gradient of the loss with respect to $h_4$ must flow backward through 12 Jacobians:</p>
+                    $$\frac{\partial L}{\partial h_4} = \frac{\partial L}{\partial h_{16}} \prod_{k=5}^{16} \frac{\partial h_k}{\partial h_{k-1}} = \frac{\partial L}{\partial h_{16}} \prod_{k=5}^{16} \left( w_h \cdot (1 - \tanh^2(z_k)) \right)$$
+                    <p>Since $\tanh'(z) \le 1.0$ and $w_h < 1$, the gradient diminishes exponentially ($\approx 0.018\%$). The network cannot compute a meaningful parameter update for early tokens, making vanilla RNNs fundamentally incapable of bridging long-range contextual gaps.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('short-notes').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section class="topic-section" id="topic-2">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>The Additive Long-Term Memory Lane ($C_t$)</h2>
+                </div>
+                <div class="collapsible-content" id="content-2">
+                    <h3 id="sub-2-1">2.1 The Two-Memory Separation ($C_t$ vs. $h_t$)</h3>
+                    <p>To eliminate memory degradation, Long Short-Term Memory (LSTM) decouples working memory into two concurrent streams:</p>
+                    <ul>
+                        <li><strong>Long-Term Memory ($C_t$, Cell State):</strong> A dedicated vector that persists across dozens or hundreds of timesteps. Modifications occur primarily via <strong>pure addition</strong> rather than destructive matrix multiplication.</li>
+                        <li><strong>Short-Term Memory ($h_t$, Hidden State):</strong> The immediate output extracted from $C_t$ at timestep $t$, passed to the next recurrent step and the task classifier.</li>
+                    </ul>
+
+                    <h3 id="sub-2-2">2.2 Candidate Generation ($\tilde{C}_t$) via Tanh</h3>
+                    <p>At each timestep, the network analyzes the current word $x_t$ and previous hidden state $h_{t-1}$ to propose a <strong>candidate update</strong> $\tilde{C}_t$:</p>
+                    $$\tilde{C}_t = \tanh\left( w_C \cdot x_t + w_{hC} \cdot h_{t-1} + b_C \right)$$
+                    <p>If the network simply adds the candidate update directly:
+                    $$C_t = C_{t-1} + \tilde{C}_t$$
+                    $$h_t = \tanh(C_t)$$</p>
+                    <p>Under Review A:</p>
+                    <ul>
+                        <li>Neutral words produce $\tilde{C}_t = 0 \implies C_t = C_{t-1} + 0 = C_{t-1}$.</li>
+                        <li><em>"brilliant"</em> adds $+1.00 \implies C_4 = 1.00$.</li>
+                        <li>Across the subsequent 12 neutral words, adding $0$ leaves $C_t = 1.00$ completely intact!</li>
+                        <li>At the verdict ($t=16$): $h_{16} = \tanh(1.00) = 0.76 > 0$ &rarr; <strong>Positive prediction succeeds!</strong></li>
+                    </ul>
+
+                    <h3 id="sub-2-3">2.3 Failure of Pure Addition: The Inability to Forget</h3>
+                    <p>While naive addition solves Review A, it completely fails on <strong>Review B</strong> (<em>"The movie was long and slow, but the ending was brilliant."</em>):</p>
+                    <ol>
+                        <li><em>"long"</em> ($x_4$): Candidate $\tilde{C}_4 = -0.96 \implies C_4 = -0.96$.</li>
+                        <li><em>"slow"</em> ($x_6$): Candidate $\tilde{C}_6 = -1.00 \implies C_6 = -0.96 + (-1.00) = -1.96$.</li>
+                        <li><em>"but"</em> ($x_7$): Turn word adds $0 \implies C_7 = -1.96$.</li>
+                        <li><em>"brilliant"</em> ($x_{11}$): Candidate adds $+1.00 \implies C_{11} = -1.96 + 1.00 = -0.96$.</li>
+                        <li>Verdict ($t=12$): $h_{12} = \tanh(-0.96) = -0.75$ &rarr; <span style="color: #dc2626; font-weight: bold;">Incorrect Negative Verdict!</span></li>
+                    </ol>
+
+                    <div class="box box-amber">
+                        <div class="box-title">The Need for Gating</div>
+                        <p>One positive word cannot cancel out two negative words under unweighted addition! A network must not only add memories—it must possess a trainable mechanism to <strong>erase</strong> outdated information when a sentiment flip occurs.</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section class="topic-section" id="topic-3">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>Gating Mechanism: Multiplicative Switches</h2>
+                </div>
+                <div class="collapsible-content" id="content-3">
+                    <h3 id="sub-3-1">3.1 Anatomy of a Gate: Affine Score Squeezed by Sigmoid ($\sigma$)</h3>
+                    <p>A gate in deep learning is a learned continuous filter ranging strictly between $0$ and $1$. It acts as a multiplicative valve on vector elements:</p>
+                    $$\text{Gate} = \sigma\left( \sum \right) = \sigma\left( w_{\text{gate}} \cdot x_t + w_{h,\text{gate}} \cdot h_{t-1} + b_{\text{gate}} \right)$$
+                    <p>Where the standard sigmoid activation function is defined as:</p>
+                    $$\sigma(z) = \frac{1}{1 + e^{-z}}$$
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Gate Output ($\sigma(z)$)</th>
+                                <th>Physical Interpretation</th>
+                                <th>Multiplication Effect on Memory</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>$1.0$ (Open)</strong></td>
+                                <td>Score $z \gg 0$ (e.g., $\sigma(9) \approx 1.0$)</td>
+                                <td>$(-1.96) \times 1.0 = -1.96$ &rarr; <strong>Keep 100% of information</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>$0.5$ (Half)</strong></td>
+                                <td>Score $z = 0$ (e.g., $\sigma(0) = 0.5$)</td>
+                                <td>$(-1.96) \times 0.5 = -0.98$ &rarr; <strong>Keep 50% of information</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>$0.0$ (Closed)</strong></td>
+                                <td>Score $z \ll 0$ (e.g., $\sigma(-9) \approx 0.0$)</td>
+                                <td>$(-1.96) \times 0.0 = 0.00$ &rarr; <strong>Completely erase / forget</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3 id="sub-3-2">3.2 The Forget Gate ($f_t$): Learning When to Erase</h3>
+                    <p>The <strong>Forget Gate</strong> controls what fraction of the previous cell state $C_{t-1}$ is preserved:</p>
+                    $$f_t = \sigma\left( w_f \cdot x_t + w_{hf} \cdot h_{t-1} + b_f \right)$$
+                    <p>In our sentiment model, training discovers:</p>
+                    <ul>
+                        <li>On neutral words ($x_t = \text{neutral}$): $\Sigma_f = b_f = +9 \implies f_t = \sigma(9) \approx 1.0$ (Preserve memory).</li>
+                        <li>On the contrastive conjunction <em>"but"</em>: Feature vector activates $w_f^{\text{turn}} = -18$ with $b_f = 9$:
+                            $$\Sigma_f = (-18 \times 1) + 9 = -9 \implies f_t = \sigma(-9) \approx 0.0$$
+                        </li>
+                    </ul>
+                    <p>Multiplying $C_{t-1}$ by $f_t = 0$ completely resets the negative sentiment from <em>"long and slow"</em> to exactly $0.00$, preparing a clean slate for <em>"brilliant"</em>.</p>
+
+                    <h3 id="sub-3-3">3.3 The Three Gates at a Glance: $f_t$, $i_t$, and $o_t$</h3>
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Gate Symbol</th>
+                                <th>Name</th>
+                                <th>Primary Role</th>
+                                <th>Operational Behavior</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>$f_t$</strong></td>
+                                <td><strong>Forget Gate</strong></td>
+                                <td>$\%$ of old cell state $C_{t-1}$ to retain</td>
+                                <td>$1$ on neutral and sentiment words; drops to $0$ on turn words like <em>"but"</em>.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>$i_t$</strong></td>
+                                <td><strong>Input Gate</strong></td>
+                                <td>$\%$ of candidate $\tilde{C}_t$ to write into $C_t$</td>
+                                <td>$1$ on emotionally charged words (<em>"brilliant", "slow"</em>); $0$ on neutral filler words.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>$o_t$</strong></td>
+                                <td><strong>Output Gate</strong></td>
+                                <td>$\%$ of cell state $C_t$ to reveal to $h_t$</td>
+                                <td>$0$ throughout the sentence; opens to $1$ only at the sentence boundary punctuation <em>"."</em>.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section class="topic-section" id="topic-4">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>The Complete LSTM Architecture</h2>
+                </div>
+                <div class="collapsible-content" id="content-4">
+                    <h3 id="sub-4-1">4.1 Full Vector Equations &amp; Forward Equations</h3>
+                    <p>At every step $t$, the standard LSTM cell executes four affine transformations followed by cell state and hidden state updates:</p>
+                    <div class="box box-blue">
+                        <div class="box-title">The Complete LSTM Equations</div>
+                        $$\begin{aligned}
+                        f_t &= \sigma\left( W_f x_t + U_f h_{t-1} + b_f \right) && \text{[Forget Gate: What to erase from } C_{t-1} \text{]} \\
+                        i_t &= \sigma\left( W_i x_t + U_i h_{t-1} + b_i \right) && \text{[Input Gate: What to write to } C_t \text{]} \\
+                        \tilde{C}_t \equiv g_t &= \tanh\left( W_c x_t + U_c h_{t-1} + b_c \right) && \text{[Candidate State: New proposed content]} \\
+                        C_t &= f_t \odot C_{t-1} + i_t \odot \tilde{C}_t && \text{[Cell State Update: Additive Highway]} \\
+                        o_t &= \sigma\left( W_o x_t + U_o h_{t-1} + b_o \right) && \text{[Output Gate: What to reveal]} \\
+                        h_t &= o_t \odot \tanh(C_t) && \text{[Hidden State: Filtered readout]}
+                        \end{aligned}$$
+                        <p style="margin: 0.5rem 0 0; font-size: 0.9rem; color: var(--text-dark);">
+                            <strong>Notation Note:</strong> In modern machine learning frameworks such as PyTorch, the candidate state $\tilde{C}_t$ is canonically designated as <strong>$g_t$</strong>:
+                            $$g_t = \tanh\left( W_{ig} x_t + W_{hg} h_{t-1} + b_g \right)$$
+                        </p>
+                        <p style="margin: 0.35rem 0 0; font-size: 0.85rem; color: var(--text-muted);">All gate operations ($f_t \odot C_{t-1}$, $i_t \odot \tilde{C}_t$, and $o_t \odot \tanh(C_t)$) employ the element-wise <strong>Hadamard product ($\odot$)</strong>.</p>
+                    </div>
+
+                    <div class="box box-purple">
+                        <div class="box-title">PyTorch Implementation Deep Dive: Weight Unpacking Order</div>
+                        <p style="margin-bottom: 0.5rem;">
+                            In PyTorch's native <code>nn.LSTM</code> module, for maximum GPU kernel efficiency via fused GEMM (General Matrix Multiply), the four gate parameter matrices are concatenated into a single master tensor <code>weight_ih</code> ($4h \times d$) and <code>weight_hh</code> ($4h \times h$):
+                        </p>
+                        <pre style="background: #1e1e1e; color: #d4d4d4; padding: 0.85rem; border-radius: 6px; font-family: monospace; font-size: 0.88rem; overflow-x: auto;"><code># PyTorch internal gate arrangement order: IFGO
+# Input (i), Forget (f), Cell/Candidate (g), Output (o)
+
+# Splitting weight matrices into the 4 constituent gates:
+W_ii, W_if, W_ig, W_io = rnn.weight_ih_l0.chunk(4, dim=0)
+W_hi, W_hf, W_hg, W_ho = rnn.weight_hh_l0.chunk(4, dim=0)
+b_i,  b_f,  b_g,  b_o  = (rnn.bias_ih_l0 + rnn.bias_hh_l0).chunk(4, dim=0)</code></pre>
+                        <p style="margin: 0.5rem 0 0; font-size: 0.88rem;">
+                            <strong>Critical Takeaway:</strong> When decomposing PyTorch LSTM parameters via <code>.chunk(4, dim=0)</code>, always assign them in the strict order: <strong>Input ($i$), Forget ($f$), Candidate/Cell ($g$), Output ($o$)</strong>.
+                        </p>
+                    </div>
+
+                    <h3 id="sub-4-2">4.2 Tracing Review B Word-by-Word: Overwriting via Gating</h3>
+                    <p>Let us observe how the full gated mechanism processes Review B:</p>
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Token ($t$)</th>
+                                <th>$f_t$</th>
+                                <th>$i_t$</th>
+                                <th>$\tilde{C}_t$</th>
+                                <th>$C_t = f_t C_{t-1} + i_t \tilde{C}_t$</th>
+                                <th>$o_t$</th>
+                                <th>$h_t = o_t \tanh(C_t)$</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><em>"The"</em></td>
+                                <td>$1.00$</td>
+                                <td>$0.00$</td>
+                                <td>$0.00$</td>
+                                <td>$1.00(0.00) + 0(0) = \mathbf{0.00}$</td>
+                                <td>$0.00$</td>
+                                <td>$\mathbf{0.00}$</td>
+                            </tr>
+                            <tr>
+                                <td><em>"long"</em></td>
+                                <td>$1.00$</td>
+                                <td>$0.50$</td>
+                                <td>$-0.96$</td>
+                                <td>$1.00(0.00) + 0.50(-0.96) = \mathbf{-0.48}$</td>
+                                <td>$0.00$</td>
+                                <td>$\mathbf{0.00}$</td>
+                            </tr>
+                            <tr>
+                                <td><em>"slow"</em></td>
+                                <td>$1.00$</td>
+                                <td>$1.00$</td>
+                                <td>$-1.00$</td>
+                                <td>$1.00(-0.48) + 1.00(-1.00) = \mathbf{-1.48}$</td>
+                                <td>$0.00$</td>
+                                <td>$\mathbf{0.00}$</td>
+                            </tr>
+                            <tr>
+                                <td><em>"but"</em></td>
+                                <td>$\mathbf{0.00}$</td>
+                                <td>$0.00$</td>
+                                <td>$0.00$</td>
+                                <td>$\mathbf{0.00}(-1.48) + 0(0) = \mathbf{0.00}$</td>
+                                <td>$0.00$</td>
+                                <td>$\mathbf{0.00}$</td>
+                            </tr>
+                            <tr>
+                                <td><em>"brilliant"</em></td>
+                                <td>$1.00$</td>
+                                <td>$1.00$</td>
+                                <td>$+1.00$</td>
+                                <td>$1.00(0.00) + 1.00(1.00) = \mathbf{1.00}$</td>
+                                <td>$0.00$</td>
+                                <td>$\mathbf{0.00}$</td>
+                            </tr>
+                            <tr>
+                                <td><em>"." (verdict)</em></td>
+                                <td>$1.00$</td>
+                                <td>$0.00$</td>
+                                <td>$0.00$</td>
+                                <td>$1.00(1.00) + 0(0) = \mathbf{1.00}$</td>
+                                <td>$\mathbf{1.00}$</td>
+                                <td>$1.00 \times \tanh(1.00) = \mathbf{+0.76}$</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="box box-green">
+                        <div class="box-title">Why the Verdict Succeeds</div>
+                        <p>At <em>"but"</em>, the forget gate completely zeroes out the $-1.48$ negative penalty. When <em>"brilliant"</em> arrives, it writes $+1.00$ onto an empty slate. The output gate stays closed ($0.00$) throughout the text, preventing intermediate tokens from polluting $h_t$, and opens exclusively at the terminal period to expose the classification decision.</p>
+                    </div>
+
+                    <h3 id="sub-4-3">4.3 Gradient Highway: Unbroken Backpropagation over Time</h3>
+                    <p>In backpropagation through time for an LSTM, the gradient flows directly along the cell state channel:</p>
+                    $$\frac{\partial C_t}{\partial C_{t-1}} = f_t$$
+                    <p>If the network learns to keep $f_t \approx 1.00$ across neutral tokens, the gradient Jacobian product is:</p>
+                    $$\frac{\partial C_T}{\partial C_0} = \prod_{k=1}^T f_k \approx 1.00 \times 1.00 \times \dots = 1.00$$
+                    <p>This forms a literal <strong>Constant Error Carousel (CEC)</strong> or gradient highway, completely shielding the gradient from vanishing regardless of how many words separate the cause from the effect!</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 5 -->
+            <section class="topic-section" id="topic-5">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>The Gated Recurrent Unit (GRU)</h2>
+                </div>
+                <div class="collapsible-content" id="content-5">
+                    <h3 id="sub-5-1">5.1 Design Philosophy: Streamlining Memory into One State</h3>
+                    <p>Introduced by Cho et al. (2014), the <strong>Gated Recurrent Unit (GRU)</strong> compresses the LSTM architecture into a lighter, computationally faster formulation by combining the cell state $C_t$ and hidden state $h_t$ into a single hidden vector $h_t$.</p>
+
+                    <h3 id="sub-5-2">5.2 Coupled Update Gate ($z_t$) and Reset Gate ($r_t$)</h3>
+                    <p>The GRU replaces the separate forget and input gates with a single <strong>coupled update slider</strong> $z_t$:</p>
+                    $$\begin{aligned}
+                    z_t &= \sigma\left( W_z x_t + U_z h_{t-1} + b_z \right) && \text{[Update Gate: Slider between past & candidate]} \\
+                    r_t &= \sigma\left( W_r x_t + U_r h_{t-1} + b_r \right) && \text{[Reset Gate: How much of past to expose to candidate]} \\
+                    \tilde{h}_t &= \tanh\left( W_h x_t + U_h (r_t \odot h_{t-1}) + b_h \right) && \text{[Candidate Hidden State]} \\
+                    h_t &= (1 - z_t) \odot h_{t-1} + z_t \odot \tilde{h}_t && \text{[Linear Interpolation Update]}
+                    \end{aligned}$$
+
+                    <div class="box box-blue">
+                        <div class="box-title">The Update Gate as a Conservation Slider</div>
+                        <p>The fraction of the old memory kept is $(1 - z_t)$, while the fraction of the new candidate written is $z_t$. Because:
+                        $$(1 - z_t) + z_t = 1.0$$
+                        The two shares always sum strictly to 1. The network can never accidentally duplicate or multiply memory intensity.</p>
+                    </div>
+
+                    <p><strong>The Role of the Reset Gate ($r_t$):</strong><br>
+                    At the turn word <em>"but"</em>, even if $z_t = 1.0$ (commanding 100% write of $\tilde{h}_t$), the candidate formula would still read $h_{t-1} = -0.76$ if uncontrolled! The reset gate drops to $r_t = 0.0$, applying $r_t \odot h_{t-1} = 0.0$ and ensuring that candidate $\tilde{h}_t$ starts completely fresh without old negativity.</p>
+
+                    <h3 id="sub-5-3">5.3 Comparative Matrix: LSTM vs. GRU</h3>
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Architectural Feature</th>
+                                <th>Long Short-Term Memory (LSTM)</th>
+                                <th>Gated Recurrent Unit (GRU)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Memory Representation</strong></td>
+                                <td>Two states: Cell State $C_t$ &amp; Hidden State $h_t$</td>
+                                <td>Single unified hidden state $h_t$</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Gate Inventory</strong></td>
+                                <td>3 gates ($f_t$ forget, $i_t$ input, $o_t$ output)</td>
+                                <td>2 gates ($z_t$ update, $r_t$ reset)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Erase &amp; Write Mechanism</strong></td>
+                                <td>Independent gates ($f_t$ and $i_t$)</td>
+                                <td>Coupled slider: keep $(1 - z_t)$, write $z_t$</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Parameter Count ($\Sigma$ boxes)</strong></td>
+                                <td><strong>4 affine projections:</strong> $f_t, i_t, \tilde{C}_t \equiv g_t, o_t$</td>
+                                <td><strong>3 affine projections:</strong> $z_t, r_t, \tilde{h}_t$</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Computational Speed</strong></td>
+                                <td>Slower; higher GPU memory footprint</td>
+                                <td>$\sim 25\%$ faster execution; fewer parameters to train</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Long-Gap Protection</strong></td>
+                                <td>Yes, via additive channel: $f_t \odot C_{t-1}$</td>
+                                <td>Yes, via slider channel: $(1 - z_t) \odot h_{t-1}$</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 6 -->
+            <section class="topic-section" id="topic-6">
+                <div class="topic-header" onclick="toggleSection('content-6')">
+                    <div class="topic-number">6</div>
+                    <h2>Bidirectional RNNs (BiRNN) &amp; Self-Check Review</h2>
+                </div>
+                <div class="collapsible-content" id="content-6">
+                    <h3 id="sub-6-1">6.1 Future Context Ambiguity: Forward vs. Backward Readers</h3>
+                    <p>Standard unidirectional RNNs read text strictly left-to-right. However, in human language, the true semantic meaning of a word frequently depends on words that appear <em>after</em> it:</p>
+                    <ul>
+                        <li>Sentence 1: <em>"He said <strong>Teddy</strong> bears are on sale."</em></li>
+                        <li>Sentence 2: <em>"He said <strong>Teddy</strong> Roosevelt was a president."</em></li>
+                    </ul>
+                    <p>When a forward reader reaches <em>"Teddy"</em>, it has only seen <em>"He said"</em>, making it impossible to distinguish between a plush toy and a historical US president!</p>
+
+                    <h3 id="sub-6-2">6.2 Concatenated Hidden States &amp; Generative Limitations</h3>
+                    <p>A <strong>Bidirectional Recurrent Neural Network (BiRNN)</strong> resolves this ambiguity by deploying two independent recurrent layers running in opposite directions over the same sequence:</p>
+                    <ol>
+                        <li><strong>Forward Layer ($\overrightarrow{h}_t$):</strong> Reads sequence from left to right: $x_1 \rightarrow x_2 \rightarrow \dots \rightarrow x_T$.</li>
+                        <li><strong>Backward Layer ($\overleftarrow{h}_t$):</strong> Reads sequence from right to left: $x_T \rightarrow x_{T-1} \rightarrow \dots \rightarrow x_1$.</li>
+                    </ol>
+                    <p>The final contextual representation for token $t$ concatenates both states:</p>
+                    $$h_t = \left[ \overrightarrow{h}_t \;;\; \overleftarrow{h}_t \right]$$
+                    <p>At the token <em>"Teddy"</em>, the backward reader has already ingested <em>"bears are on sale"</em> in Sentence 1 and <em>"Roosevelt was a president"</em> in Sentence 2, allowing unambiguous feature representation.</p>
+
+                    <div class="box box-amber">
+                        <div class="box-title">Critical Generative Limitation</div>
+                        <p><strong>Why can a Bidirectional RNN NOT generate text word-by-word?</strong><br>
+                        Autoregressive generation (such as GPT text completion) predicts word $t+1$ given past tokens. A backward reader requires the complete sentence to exist before it can execute. Because future tokens are not yet written, backward passes cannot execute at generation time.</p>
+                    </div>
+
+                    <h3 id="sub-6-3">6.3 Worksheet Exit Ticket Analysis</h3>
+                    <div class="box box-green">
+                        <div class="box-title">Worksheet Exit Ticket Review &amp; Rationales</div>
+                        <p><strong>Q1: Which line represents the LSTM memory update?</strong><br>
+                        <em>Correct:</em> <strong>B) $C_t = f_t \cdot C_{t-1} + i_t \cdot \tilde{C}_t$</strong><br>
+                        <em>Rationale:</em> The cell state updates additively using the forget gate $f_t$ and input gate $i_t$.</p>
+
+                        <p><strong>Q2: Why does the LSTM keep "brilliant" until the end of Review A?</strong><br>
+                        <em>Correct:</em> <strong>C) The forget gate keeps it ($f_t \approx 1.00$), and small words write nothing because $i_t \approx 0$.</strong><br>
+                        <em>Rationale:</em> Neutral tokens produce $i_t = 0$, so adding $0$ leaves $C_t$ completely invariant across the 12-word gap.</p>
+
+                        <p><strong>Q3: What does a GRU have?</strong><br>
+                        <em>Correct:</em> <strong>C) One memory $h_t$ and two gates, $z_t$ and $r_t$.</strong><br>
+                        <em>Rationale:</em> GRU combines cell and hidden states into a single vector $h_t$ and utilizes only update and reset gates.</p>
+
+                        <p><strong>Q4: In a GRU with $z_t = 0.9$, how much of $h_{t-1}$ is kept?</strong><br>
+                        <em>Correct:</em> <strong>B) $0.1$</strong><br>
+                        <em>Rationale:</em> The retention share is $(1 - z_t) = 1 - 0.9 = 0.1$.</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('original-pdf').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" x2="8" y1="13" y2="13"></line>
+                            <line x1="16" x2="8" y1="17" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/12.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+
+</html>
