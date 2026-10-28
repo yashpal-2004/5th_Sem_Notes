@@ -1003,8 +1003,16 @@
                 container.insertAdjacentHTML('beforeend', sectionHtml);
             });
 
+            const totalAssignments = window.questionsData.length;
+            const doneAssignments = window.questionsData.filter(q => q.done).length;
+            const remainingAssignments = totalAssignments - doneAssignments;
             const statElem = document.getElementById('totalQuestionsStat');
-            if (statElem) statElem.innerText = `${window.questionsData.length} Assignments`;
+            if (statElem) {
+                const remainingText = remainingAssignments === 0 && totalAssignments > 0
+                    ? `<span style="color:#059669;font-weight:700;">Completed</span>`
+                    : `<span style="color:#d97706;font-weight:700;">${remainingAssignments} Left</span>`;
+                statElem.innerHTML = `${totalAssignments} Assignments &bull; ${doneAssignments} Done &bull; ${remainingText}`;
+            }
         };
 
         function renderQuestionCard(q) {

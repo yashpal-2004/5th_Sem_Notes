@@ -258,14 +258,21 @@ nav {
     font-weight: 400;
 }
 
-/* Subject Grid & Lectures Grid Mapping */
-.subject-grid, .lectures-grid {
+/* Subject Grid Mapping */
+.subject-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     gap: 4rem;
 }
 
-.subject-card, .lecture-card {
+/* Lectures Grid — compact, minimal, no descriptions */
+.lectures-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+}
+
+.subject-card {
     border-top: 1px solid var(--border-light);
     padding-top: 2rem;
     display: flex;
@@ -275,18 +282,48 @@ nav {
     transition: transform 0.3s ease;
 }
 
-.subject-card:hover, .lecture-card:hover {
+.lecture-card {
+    border-top: 1px solid var(--border-light);
+    border-right: 1px solid var(--border-light);
+    padding: 1.75rem 1.75rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    position: relative;
+}
+
+.lecture-card:nth-child(4n) {
+    border-right: none;
+}
+
+.lecture-card:hover {
+    background: rgba(19, 34, 25, 0.025);
+}
+
+.subject-card:hover {
     transform: translateY(-4px);
 }
 
-.subject-number, .lecture-number {
+.subject-number {
     font-family: 'Playfair Display', serif;
     font-size: 2rem;
     color: var(--text-dark);
     margin-bottom: 1.5rem;
 }
 
-.subject-title, .lecture-card h2 {
+.lecture-number {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.subject-title {
     font-family: 'Playfair Display', serif;
     font-size: 1.8rem;
     font-weight: 400;
@@ -294,6 +331,17 @@ nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+.lecture-card h2 {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.98rem;
+    font-weight: 600;
+    margin-bottom: 0;
+    line-height: 1.45;
+    flex-grow: 1;
+    margin-top: 0.6rem;
+    color: var(--text-dark);
 }
 
 .subject-title::after, .lecture-card h2::after {
@@ -304,8 +352,11 @@ nav {
     transition: opacity 0.3s, transform 0.3s;
 }
 
-.subject-card:hover .subject-title::after,
-.lecture-card:hover h2::after {
+.lecture-card h2::after {
+    display: none;
+}
+
+.subject-card:hover .subject-title::after {
     opacity: 1;
     transform: translate(2px, -2px);
 }
@@ -328,12 +379,31 @@ nav {
     text-transform: uppercase;
 }
 
+.lecture-card-header {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-light);
+}
+
 .subject-tag, .lecture-tag {
     color: var(--text-dark);
 }
 
+.lecture-tag {
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
 .subject-stats, .lecture-stats {
     color: var(--text-muted);
+}
+
+.lecture-stats {
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    font-weight: 600;
 }
 
 /* Statistics Section */
@@ -486,6 +556,39 @@ footer {
     fill: var(--text-dark);
 }
 
+@media (max-width: 1200px) {
+    .lectures-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    .lecture-card:nth-child(4n) {
+        border-right: 1px solid var(--border-light);
+    }
+    .lecture-card:nth-child(3n) {
+        border-right: none;
+    }
+}
+
+@media (max-width: 800px) {
+    .lectures-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .lecture-card:nth-child(3n) {
+        border-right: 1px solid var(--border-light);
+    }
+    .lecture-card:nth-child(2n) {
+        border-right: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .lectures-grid {
+        grid-template-columns: 1fr;
+    }
+    .lecture-card:nth-child(n) {
+        border-right: none;
+    }
+}
+
 @media (max-width: 1024px) {
     .footer-container {
         grid-template-columns: repeat(2, 1fr);
@@ -539,7 +642,7 @@ footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: 0;
     width: 100%;
 }
 .lecture-checkbox {
@@ -571,11 +674,11 @@ footer {
     transform: translate(-50%, -50%);
 }
 .lecture-card.completed {
-    opacity: 0.75;
+    opacity: 0.6;
 }
 .lecture-card.completed h2 {
     text-decoration: line-through;
-    opacity: 0.8;
+    opacity: 0.7;
 }
 
 
