@@ -255,9 +255,63 @@ nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 2.5rem;
+    margin-bottom: 2rem;
     flex-wrap: wrap;
-    gap: 1.5rem;
+    gap: 1.25rem;
+}
+
+/* Status Filter Bar */
+.status-filter-bar {
+    display: inline-flex;
+    align-items: center;
+    background: #ffffff;
+    padding: 3px;
+    border-radius: 30px;
+    border: 1px solid var(--border-light);
+    gap: 2px;
+    box-shadow: 0 2px 6px rgba(19, 34, 25, 0.04);
+}
+
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0.42rem 0.95rem;
+    border-radius: 20px;
+    border: none;
+    background: transparent;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    line-height: 1.2;
+    font-family: inherit;
+    white-space: nowrap;
+}
+
+.status-pill:hover {
+    color: var(--text-dark);
+}
+
+.status-pill.active {
+    background: var(--text-dark);
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(19, 34, 25, 0.15);
+}
+
+.status-pill .pill-count {
+    display: inline-block;
+    font-size: 0.72rem;
+    padding: 1px 6px;
+    border-radius: 10px;
+    background: rgba(19, 34, 25, 0.08);
+    font-weight: 700;
+}
+
+.status-pill.active .pill-count {
+    background: rgba(255, 255, 255, 0.22);
+    color: #ffffff;
 }
 
 .section-label {
@@ -270,19 +324,26 @@ nav {
 .bulk-actions {
     display: flex;
     align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
+    gap: 8px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+.bulk-actions::-webkit-scrollbar {
+    display: none;
 }
 
 .bulk-btn {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 0.55rem 1.15rem;
+    gap: 6px;
+    padding: 0.45rem 0.85rem;
     border-radius: 30px;
     background: #ffffff;
     color: var(--text-dark);
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 600;
     text-decoration: none;
     border: 1px solid var(--border-light);
@@ -290,6 +351,7 @@ nav {
     cursor: pointer;
     transition: all 0.2s ease;
     white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .bulk-btn:hover {
