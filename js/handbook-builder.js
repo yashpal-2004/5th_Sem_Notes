@@ -105,7 +105,9 @@
                 { index: 14, displayNum: '14', title: 'Subnetting in Practice & Network Address Translation (NAT)', imgUrl: 'images/14.png' },
                 { index: 15, displayNum: '15', title: 'NAT, PAT & DHCP — and How VPC Route Tables Wire It Together', imgUrl: 'images/15.png' },
                 { index: 16, displayNum: '16', title: 'Diagnostics with ICMP, and the Move to IPv6', imgUrl: 'images/16.png' },
-                { index: 17, displayNum: '17', title: 'Finding the Path: Link-State & Distance-Vector Routing', imgUrl: 'images/17.png' }
+                { index: 17, displayNum: '17', title: 'Finding the Path: Link-State & Distance-Vector Routing', imgUrl: 'images/17.png' },
+                { index: 18, displayNum: '18a', title: 'Routing Protocols in the Wild (Part 1)', imgUrl: 'images/18_1.png' },
+                { index: 19, displayNum: '18b', title: 'Routing Protocols in the Wild (Part 2)', imgUrl: 'images/18_2.png' }
             ]
         },
         mca: {
@@ -191,21 +193,38 @@
     function getLecturesForSubject(subject) {
         const cards = Array.from(document.querySelectorAll('.lecture-card'));
         if (cards.length > 0) {
-            return cards.map((card, idx) => {
+            const list = [];
+            let itemIndex = 1;
+            cards.forEach((card, idx) => {
                 const numEl = card.querySelector('.lecture-number');
                 const titleEl = card.querySelector('h2');
-                const imgLink = card.querySelector('a[href*="images/"]');
+                const imgLinks = Array.from(card.querySelectorAll('a[href*="images/"]'));
                 
                 const numText = numEl ? numEl.textContent.trim() : String(idx + 1).padStart(2, '0');
                 const titleText = titleEl ? titleEl.textContent.trim() : `Lecture ${numText}`;
-                let imgUrl = imgLink ? imgLink.getAttribute('href') : `images/${idx + 1}.png`;
-                return {
-                    index: idx + 1,
-                    displayNum: numText,
-                    title: titleText,
-                    imgUrl: imgUrl
-                };
+                
+                if (imgLinks.length > 1) {
+                    imgLinks.forEach((link, pIdx) => {
+                        const imgUrl = link.getAttribute('href');
+                        const partSuffix = String.fromCharCode(97 + pIdx); // 'a', 'b', ...
+                        list.push({
+                            index: itemIndex++,
+                            displayNum: `${numText}${partSuffix}`,
+                            title: `${titleText} (Part ${pIdx + 1})`,
+                            imgUrl: imgUrl
+                        });
+                    });
+                } else {
+                    const imgUrl = imgLinks.length === 1 ? imgLinks[0].getAttribute('href') : `images/${idx + 1}.png`;
+                    list.push({
+                        index: itemIndex++,
+                        displayNum: numText,
+                        title: titleText,
+                        imgUrl: imgUrl
+                    });
+                }
             });
+            return list;
         }
 
         if (subject && subject.lectures && subject.lectures.length) {
@@ -469,19 +488,35 @@
                     const doc = parser.parseFromString(html, 'text/html');
                     const fetchedCards = Array.from(doc.querySelectorAll('.lecture-card'));
                     if (fetchedCards.length > 0 && currentSubject && (currentSubject.folder === subjectKey || currentSubject.id.toLowerCase() === (subjectKey || '').toLowerCase())) {
-                        const refreshed = fetchedCards.map((card, idx) => {
+                        const refreshed = [];
+                        let rIndex = 1;
+                        fetchedCards.forEach((card, idx) => {
                             const numEl = card.querySelector('.lecture-number');
                             const titleEl = card.querySelector('h2');
-                            const imgLink = card.querySelector('a[href*="images/"]');
+                            const imgLinks = Array.from(card.querySelectorAll('a[href*="images/"]'));
                             const numText = numEl ? numEl.textContent.trim() : String(idx + 1).padStart(2, '0');
                             const titleText = titleEl ? titleEl.textContent.trim() : `Lecture ${numText}`;
-                            const imgUrl = imgLink ? imgLink.getAttribute('href') : `images/${idx + 1}.png`;
-                            return {
-                                index: idx + 1,
-                                displayNum: numText,
-                                title: titleText,
-                                imgUrl: imgUrl
-                            };
+
+                            if (imgLinks.length > 1) {
+                                imgLinks.forEach((link, pIdx) => {
+                                    const imgUrl = link.getAttribute('href');
+                                    const partSuffix = String.fromCharCode(97 + pIdx);
+                                    refreshed.push({
+                                        index: rIndex++,
+                                        displayNum: `${numText}${partSuffix}`,
+                                        title: `${titleText} (Part ${pIdx + 1})`,
+                                        imgUrl: imgUrl
+                                    });
+                                });
+                            } else {
+                                const imgUrl = imgLinks.length === 1 ? imgLinks[0].getAttribute('href') : `images/${idx + 1}.png`;
+                                refreshed.push({
+                                    index: rIndex++,
+                                    displayNum: numText,
+                                    title: titleText,
+                                    imgUrl: imgUrl
+                                });
+                            }
                         });
                         if (refreshed.length !== currentLectures.length) {
                             currentLectures = refreshed;

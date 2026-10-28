@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Computer Networks - Lecture 18</title>
+    <meta content="Study notes for Computer Networks (CSAI321), Lecture 18 covering Routing Protocols in the Wild: RIP, OSPF, BGP (Autonomous Systems, Path-Vector, Business Policy), and AWS Declarative VPC Route Tables." name="description" />
+    <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%230d282d%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>18</text></svg>" rel="icon" />
+    <link href="../css/style.css" rel="stylesheet" />
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Computer Networks Foundations</h1>
+            <p>Lecture 18 - Routing Protocols in the Wild: RIP, OSPF, BGP &amp; AWS Route Tables</p>
+            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/18.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF in New Tab ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text" />
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 5</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>Short Notes</a></li>
+                <li>
+                    <a href="#topic-1">1. From Algorithms to Real-World Protocols<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 The Routing Triad: Algorithm &rarr; Protocol &rarr; Cloud</a></li>
+                        <li><a href="#sub-1-2">1.2 Warm-Up Trap: Fewer Hops &ne; Faster</a></li>
+                        <li><a href="#sub-1-3">1.3 Metric Selection Determines the Optimal Path</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. Interior Routing (IGP): RIP vs. OSPF<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 The Two Worlds: Interior vs. Exterior Routing</a></li>
+                        <li><a href="#sub-2-2">2.2 RIP: Distance-Vector by Counting Doors</a></li>
+                        <li><a href="#sub-2-3">2.3 OSPF: Link-State with Full Network Topography</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. Exterior Routing (EGP): BGP &amp; Autonomous Systems<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 Autonomous Systems (AS) &amp; Path-Vector</a></li>
+                        <li><a href="#sub-3-2">3.2 Policy Beats Shortest Path: Economic Routing</a></li>
+                        <li><a href="#sub-3-3">3.3 CIDR Aggregation Callback for Global BGP Scale</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Cloud Routing: The AWS VPC Route Table Abstraction<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 Declarative Intent vs. Distributed Negotiation</a></li>
+                        <li><a href="#sub-4-2">4.2 VPC Route Table Structure: Destination &rarr; Target</a></li>
+                        <li><a href="#sub-4-3">4.3 Where BGP Sneaks Back In: VPN &amp; Direct Connect</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Hands-On Bake-Off &amp; Decision Framework<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 The Packet Tracer Bake-Off: Static vs. OSPF vs. Cloud</a></li>
+                        <li><a href="#sub-5-2">5.2 Comparative Architectural Matrix: RIP vs. OSPF vs. BGP vs. AWS</a></li>
+                        <li><a href="#sub-5-3">5.3 Concept Checkpoints &amp; Protocol Selection Scenarios</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Short Notes Placeholder -->
+            <section id="short-notes" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-short-notes')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                    </div>
+                    <h2>Short Notes &amp; Visual Summary</h2>
+                </div>
+                <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
+                    <p style="margin-bottom: 1rem;">Handwritten / quick summary notes for Lecture 18 (2 Pages):</p>
+                    <div style="display: flex; flex-direction: column; gap: 1.5rem; align-items: center; background: var(--bg-secondary, #f8f9fa); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--gray-border);">
+                        <!-- Page 1 -->
+                        <div style="text-align: center; width: 100%; max-width: 900px;">
+                            <div style="font-weight: 600; font-size: 0.9rem; margin-bottom: 0.5rem; color: var(--text-dark);">Page 1</div>
+                            <a href="../images/18_1.png" target="_blank" title="Click to view Page 1 full size">
+                                <img src="../images/18_1.png" alt="Lecture 18 Short Notes - Page 1" style="max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
+                            </a>
+                            <p style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-muted);">Click image to open Page 1 in new tab</p>
+                        </div>
+
+                        <!-- Page 2 -->
+                        <div style="text-align: center; width: 100%; max-width: 900px;">
+                            <div style="font-weight: 600; font-size: 0.9rem; margin-bottom: 0.5rem; color: var(--text-dark);">Page 2</div>
+                            <a href="../images/18_2.png" target="_blank" title="Click to view Page 2 full size">
+                                <img src="../images/18_2.png" alt="Lecture 18 Short Notes - Page 2" style="max-width: 100%; height: auto; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
+                            </a>
+                            <p style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-muted);">Click image to open Page 2 in new tab</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 1 -->
+            <section class="topic-section" id="topic-1">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>From Algorithms to Real-World Protocols</h2>
+                </div>
+                <div class="collapsible-content" id="content-1">
+                    <h3 id="sub-1-1">1.1 The Routing Triad: Algorithm &rarr; Protocol &rarr; Cloud</h3>
+                    <p>In theoretical networking, routing is formulated mathematically through graph algorithms like <strong>Bellman-Ford</strong> and <strong>Dijkstra</strong>. However, practical infrastructure operates across three distinct evolutionary tiers:</p>
+                    <ul>
+                        <li><strong>Theoretical Algorithms:</strong> Pure mathematical formulations that compute minimum cost paths over abstract graph models $G=(V, E)$.</li>
+                        <li><strong>Named Routing Protocols:</strong> Distributed software implementations executed directly on physical/virtual routers (e.g., RIP, OSPF, BGP) equipped with operational knobs, metric calculations, timers, failure-detection keepalives, and finite scalability limits.</li>
+                        <li><strong>Cloud Console Abstractions:</strong> Modern Software-Defined Networking (SDN) environments (e.g., AWS VPC Route Tables) where dynamic peer-to-peer negotiation is hidden behind a declarative management plane where network architects declare pure traffic intent.</li>
+                    </ul>
+
+                    <div class="box box-blue">
+                        <div class="box-title">Universal Objective</div>
+                        <p><em>Same fundamental job:</em> Move packets to the correct destination subnet, executed via three very different paradigms: <strong>computed</strong> by algorithms, <strong>negotiated</strong> by distributed protocols, or <strong>declared</strong> in cloud consoles.</p>
+                    </div>
+
+                    <h3 id="sub-1-2">1.2 Warm-Up Trap: Fewer Hops &ne; Faster</h3>
+                    <p>A fundamental design failure in early routing was equating path distance solely with <strong>hop count</strong> (the number of intermediate routers). Consider two prospective transmission paths connecting source router $S$ to destination $D$:</p>
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Path Option</th>
+                                <th>Physical Medium</th>
+                                <th>Hop Count</th>
+                                <th>One-Way Latency</th>
+                                <th>Protocol Selection</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Path A</strong></td>
+                                <td>Geostationary Satellite Link</td>
+                                <td><strong>1 Hop</strong></td>
+                                <td>$\sim 600\text{ ms}$ (propagation delay)</td>
+                                <td><span style="color: #dc2626; font-weight: bold;">RIP Chooses This (Fewer Hops)</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Path B</strong></td>
+                                <td>Terrestrial Optical Fiber</td>
+                                <td><strong>2 Hops</strong></td>
+                                <td>$\sim 8\text{ ms}$</td>
+                                <td><span style="color: #16a34a; font-weight: bold;">OSPF Chooses This (Lower Cost / Faster)</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="box box-amber">
+                        <div class="box-title">Everyday Analogy: Road Travel</div>
+                        <p>Counting only hops is like choosing a road route simply because it has fewer turns, completely ignoring that the road is an unpaved gravel trail with a 15 km/h speed limit, while a 2-turn highway route lets you drive at 120 km/h.</p>
+                    </div>
+
+                    <h3 id="sub-1-3">1.3 Metric Selection Determines the Optimal Path</h3>
+                    <p>Routing protocol correctness is strictly bound to metric fidelity: <em>"If the metric is wrong, the 'best' path is wrong."</em></p>
+                    <p>When an algorithm calculates a shortest path over an erroneous or naive metric, the resulting mathematical optimum can severely degrade application throughput and latency. This severe limitation directly motivated the transition from naive distance-vector hop counters to bandwidth-aware link-state protocols.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('short-notes').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section class="topic-section" id="topic-2">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>Interior Routing (IGP): RIP vs. OSPF</h2>
+                </div>
+                <div class="collapsible-content" id="content-2">
+                    <h3 id="sub-2-1">2.1 The Two Worlds: Interior vs. Exterior Routing</h3>
+                    <p>Global networking is bifurcated into two mutually exclusive administrative domains governed by differing trust models and technical goals:</p>
+                    <ul>
+                        <li><strong>Interior Routing (IGP - Interior Gateway Protocols):</strong> Operates strictly <em>within a single administrative organisation</em> (enterprise campus, corporate intranet, university data network).
+                            <ul>
+                                <li><strong>Core Goal:</strong> Discover the optimal, highest-performance physical path (minimize latency, maximize bandwidth).</li>
+                                <li><strong>Trust Model:</strong> Complete mutual trust—all routers are configured and managed by the same network administration team.</li>
+                                <li><strong>Standard Protocols:</strong> RIP (Routing Information Protocol), OSPF (Open Shortest Path First), IS-IS, EIGRP.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Exterior Routing (EGP - Exterior Gateway Protocols):</strong> Operates <em>between disparate autonomous organisations</em> (interconnecting ISPs, cloud providers, and global telecommunications carriers).
+                            <ul>
+                                <li><strong>Core Goal:</strong> Enforce commercial contractual agreements and business peering policies.</li>
+                                <li><strong>Trust Model:</strong> Zero mutual trust—nobody fully trusts competitor networks.</li>
+                                <li><strong>Standard Protocol:</strong> BGP (Border Gateway Protocol).</li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <div class="box box-green">
+                        <div class="box-title">Organising Principle</div>
+                        <p><strong>Inside your building you optimize for raw speed; between buildings you negotiate business contracts.</strong></p>
+                    </div>
+
+                    <h3 id="sub-2-2">2.2 RIP: Distance-Vector by Counting Doors</h3>
+                    <p>The <strong>Routing Information Protocol (RIP)</strong> is an implementation of decentralized Bellman-Ford distance-vector routing:</p>
+                    <ul>
+                        <li><strong>Single Metric:</strong> Strictly hop count (each traversed router interface counts as $1$ hop). It does not evaluate link bandwidth, congestion, or latency.</li>
+                        <li><strong>Hop Limit &amp; Infinity:</strong> The maximum allowable path length is <strong>15 hops</strong>. A metric value of <strong>16 hops denotes infinity / destination unreachable</strong>. This hard ceiling limits routing loop persistence but confines RIP strictly to small LANs.</li>
+                        <li><strong>Periodic Advertisement:</strong> Every 30 seconds, a router broadcasts its complete distance vector to immediate neighbors.</li>
+                        <li><strong>Key Trade-offs:</strong>
+                            <ul>
+                                <li><em>Advantages:</em> Exceptionally simple to configure; minimal computational memory and CPU overhead.</li>
+                                <li><em>Disadvantages:</em> Exceptionally slow convergence, vulnerable to count-to-infinity routing loops, completely blind to link speeds (treats 10 Gbps fiber identical to a 56 kbps dial-up line).</li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <h3 id="sub-2-3">2.3 OSPF: Link-State with Full Network Topography</h3>
+                    <p><strong>Open Shortest Path First (OSPF)</strong> represents modern, enterprise-scale link-state routing built upon Dijkstra's algorithm:</p>
+                    <ul>
+                        <li><strong>Bandwidth-Based Cost Metric:</strong> Link cost is inversely proportional to link capacity:
+                            $$\text{Cost} = \frac{\text{Reference Bandwidth}}{\text{Interface Bandwidth}} = \frac{10^8\text{ bps}}{\text{Bandwidth in bps}}$$
+                            A 100 Mbps link has cost 1; a 10 Mbps link has cost 10. Higher bandwidth guarantees lower cost.
+                        </li>
+                        <li><strong>Global Topology Synchronization:</strong> Rather than passing computed vectors, routers flood raw <strong>Link-State Advertisements (LSAs)</strong> across the network. Every router maintains an identical Link-State Database (LSDB)—a complete, synchronized roadmap of the entire enterprise.</li>
+                        <li><strong>Hierarchical Areas:</strong> Supports multi-level partitioning into <strong>Areas</strong> (with Area 0 serving as the mandatory Backbone Area). Routers only calculate detailed SPF trees within their local area, while inter-area summary routes are summarized at Area Border Routers (ABRs). This prevents SPF recalculation storms and allows OSPF to scale to hundreds of thousands of hosts.</li>
+                        <li><strong>Convergence:</strong> Sub-second convergence triggered instantly by link-state change notifications without periodic broadcast overhead.</li>
+                    </ul>
+
+                    <div class="box box-blue">
+                        <div class="box-title">Weighing Roads, Not Turns: The Cost Metric Analogy</div>
+                        <p>A GPS that knows actual road speeds always beats a naive map that only counts intersections. In the slide's explicit scenario:</p>
+                        <ul>
+                            <li><strong>Path A:</strong> 2 hops over an unpaved gravel road &rarr; <strong style="color: #dc2626;">Cumulative Cost = 100</strong> (Fewer turns, but slow and expensive).</li>
+                            <li><strong>Path B:</strong> 3 hops over high-speed optical fiber &rarr; <strong style="color: #16a34a;">Cumulative Cost = 12 &#10003;</strong> (More hops, but drastically faster and lower cost).</li>
+                        </ul>
+                        <p style="margin-bottom: 0;"><strong>Decision:</strong> OSPF chooses <strong>Path B</strong> because its bandwidth-derived metric reflects real link quality, whereas RIP would blindly take the slower Path A.</p>
+                    </div>
+
+                    <h3>RIP vs. OSPF at a Glance</h3>
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Property</th>
+                                <th>RIP</th>
+                                <th>OSPF</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Type</strong></td>
+                                <td>Distance-vector</td>
+                                <td>Link-state</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Metric</strong></td>
+                                <td>Hop count (max 15)</td>
+                                <td>Cost (bandwidth)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Convergence</strong></td>
+                                <td>Slow</td>
+                                <td>Fast (flooding)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Best for</strong></td>
+                                <td>Tiny networks</td>
+                                <td>Large enterprises</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="box box-green" style="margin-top: 1rem;">
+                        <div class="box-title">Checkpoint</div>
+                        <p style="margin-bottom: 0;"><strong>Why does OSPF choose better paths?</strong> Its metric directly reflects physical link quality and available bandwidth; RIP only counts hops.</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section class="topic-section" id="topic-3">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>Exterior Routing (EGP): BGP &amp; Autonomous Systems</h2>
+                </div>
+                <div class="collapsible-content" id="content-3">
+                    <div class="box box-amber" style="margin-bottom: 1.5rem;">
+                        <div class="box-title">Course Scope Note: BGP</div>
+                        <p style="margin-bottom: 0;"><strong>Scope Note:</strong> BGP is essential to understand conceptually for global internet architecture and hybrid cloud edges, but hands-on protocol configuration is outside the scope of this course.</p>
+                    </div>
+
+                    <h3 id="sub-3-1">3.1 Autonomous Systems (AS) &amp; Path-Vector</h3>
+                    <p>The global Internet does not operate as a single unified network running one massive algorithm. Instead, it is an interconnected mesh of tens of thousands of independent <strong>Autonomous Systems (AS)</strong>:</p>
+                    <ul>
+                        <li><strong>Definition:</strong> An Autonomous System is a collection of IP subnets and routers under single administrative control that implements a uniform interior routing policy (e.g., Google AS15169, AWS AS16509, Comcast AS7922).</li>
+                        <li><strong>Border Gateway Protocol (BGP):</strong> The de facto exterior routing protocol that binds all independent ASes into the global Internet.</li>
+                        <li><strong>Path-Vector Abstraction:</strong> Instead of advertising isolated distance values, BGP advertises the <em>entire sequence of AS Numbers (AS-PATH)</em> required to reach a target destination prefix:
+                            $$\text{Prefix: } 198.51.100.0/24 \implies \text{AS-PATH: } [\text{AS 100} \rightarrow \text{AS 200} \rightarrow \text{AS 300}]$$
+                        </li>
+                        <li><strong>Inherent Loop Immunity:</strong> If an autonomous border router receives an advertisement containing its own local AS number within the AS-PATH attribute, it discards the route instantly, eliminating forwarding loops by design.</li>
+                    </ul>
+
+                    <div class="box box-green">
+                        <div class="box-title">Highway Analogy</div>
+                        <p><em>Inside a sovereign country you drive freely on internal roads (OSPF/RIP); when crossing national international borders you must stop at customs checkpoints and comply with bilateral treaties (BGP).</em></p>
+                    </div>
+
+                    <h3 id="sub-3-2">3.2 Policy Beats Shortest Path: Economic Routing</h3>
+                    <p>Unlike interior protocols that obsess over latency or physical link length, BGP route selection is dictated primarily by <strong>commercial contracts, monetary settlement, and business policy</strong>:</p>
+                    <ul>
+                        <li><strong>Customer Routes (Preferred):</strong> Traffic received from paying down-stream customers generates revenue. Routers assign customer routes the highest local preference.</li>
+                        <li><strong>Peer Routes (Secondary):</strong> Settlement-free exchange of traffic between carriers of comparable scale where traffic is exchanged mutually without billing.</li>
+                        <li><strong>Provider / Transit Routes (Least Preferred):</strong> Routing traffic through an upstream transit ISP costs money per gigabyte. Routers will deliberately prefer a longer 4-hop customer path over a cheaper 2-hop transit provider link to optimize financial margin.</li>
+                    </ul>
+
+                    <div class="box box-amber">
+                        <div class="box-title">Follow the Money, Not the Miles</div>
+                        <p>The global Internet does not execute one giant Dijkstra algorithm. It executes thousands of independently negotiated commercial, political, and financial agreements.</p>
+                    </div>
+
+                    <h3 id="sub-3-3">3.3 CIDR Aggregation Callback for Global BGP Scale</h3>
+                    <p>Connecting back to Classless Inter-Domain Routing (CIDR, Lecture 13): with hundreds of millions of IP hosts globally, advertising every distinct $/24$ subnet across border gateways would collapse router TCAM memories. BGP relies critically on <strong>CIDR route aggregation / summarization</strong> (e.g., summarizing hundreds of contiguous $/24$ subnets into a single $/18$ or $/16$ route advertisement), keeping the global Internet routing table manageable ($\sim 950{,}000$ active routes today).</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section class="topic-section" id="topic-4">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>Cloud Routing: The AWS VPC Route Table Abstraction</h2>
+                </div>
+                <div class="collapsible-content" id="content-4">
+                    <h3 id="sub-4-1">4.1 Declarative Intent vs. Distributed Negotiation</h3>
+                    <p>When engineering within hyperscale cloud platforms (Amazon Web Services, Microsoft Azure, Google Cloud), engineers do not configure dynamic interior routing protocols like OSPF or RIP inside their Virtual Private Clouds (VPCs):</p>
+                    <ul>
+                        <li><strong>Traditional On-Premises:</strong> Distributed routers communicate through continuous broadcast handshakes. Forwarding tables emerge organically through protocol convergence.</li>
+                        <li><strong>Cloud Virtualization:</strong> Network engineers declare deterministic forwarding intent within a centralized web console or via Infrastructure-as-Code (Terraform, AWS CloudFormation). The hypervisor SDN substrate enforces traffic forwarding invisibly under the hood.</li>
+                    </ul>
+
+                    <h3 id="sub-4-2">4.2 VPC Route Table Structure: Destination &rarr; Target</h3>
+                    <p>Within an AWS VPC, every route table consists of clean, declarative pairs mapping a destination CIDR block to an underlying virtual network target construct:</p>
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Destination (CIDR Block)</th>
+                                <th>Target Construct</th>
+                                <th>Forwarding Behavior</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>10.0.0.0/16</code></td>
+                                <td><code>local</code></td>
+                                <td>Internal intra-VPC communication between subnets; automatically provisioned, non-removable.</td>
+                            </tr>
+                            <tr>
+                                <td><code>0.0.0.0/0</code></td>
+                                <td><code>igw-0a1b2c3d</code></td>
+                                <td>Default gateway sending all non-VPC Internet traffic through an attached Internet Gateway (Public Subnet).</td>
+                            </tr>
+                            <tr>
+                                <td><code>172.16.0.0/16</code></td>
+                                <td><code>vgw-9f8e7d6c</code></td>
+                                <td>Corporate on-premises traffic steered into a Virtual Private Gateway (VPN / Direct Connect).</td>
+                            </tr>
+                            <tr>
+                                <td><code>0.0.0.0/0</code></td>
+                                <td><code>nat-0412ab34</code></td>
+                                <td>Outbound-only secure Internet access for Private Subnets lacking public IPs.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="box box-blue">
+                        <div class="box-title">Declarative Simplicity</div>
+                        <p>Configuring a VPC route table is like setting a destination into your car's GPS: you specify <em>where</em> you want packets delivered; you do not program each individual traffic light and intersection yourself.</p>
+                    </div>
+
+                    <h3 id="sub-4-3">4.3 Where BGP Sneaks Back In: VPN &amp; Direct Connect</h3>
+                    <p>While intra-VPC routing is strictly declarative, where does dynamic routing re-enter cloud architecture?</p>
+                    <p><strong>At the Hybrid Edge!</strong> When connecting corporate data centers to AWS via <strong>Site-to-Site IPsec VPN</strong> or dedicated <strong>AWS Direct Connect</strong> physical circuits, BGP runs across the tunnel interfaces between the customer router (Customer Gateway - CGW) and AWS (Virtual Private Gateway - VGW / AWS Transit Gateway):</p>
+                    <ul>
+                        <li><strong>Route Propagation:</strong> An AWS route table can enable <em>Route Propagation</em>, allowing the VGW to dynamically learn on-premises corporate subnets via BGP and automatically inject them into the VPC route table without manual intervention.</li>
+                        <li><em>Preview:</em> The full enterprise hybrid multi-region routing architecture arrives in Lecture 24.</li>
+                    </ul>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 5 -->
+            <section class="topic-section" id="topic-5">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>Hands-On Bake-Off &amp; Decision Framework</h2>
+                </div>
+                <div class="collapsible-content" id="content-5">
+                    <h3 id="sub-5-1">5.1 The Packet Tracer Bake-Off: Static vs. OSPF vs. Cloud</h3>
+                    <p>To demonstrate the practical resilience of routing architectures, three approaches are evaluated under an unexpected link failure scenario:</p>
+                    <ol>
+                        <li><strong>Static Routing:</strong> Routes are manually typed into each router (<code>ip route 10.0.2.0 255.255.255.0 192.168.1.2</code>). When a physical trunk cable is severed, traffic enters a dead black-hole. Static routes have zero adaptability and require human intervention to remediate.</li>
+                        <li><strong>OSPF Dynamic Routing:</strong> Routers exchange periodic Hello keepalives. When the cable drops, neighbor adjacency times out, Link-State Update (LSU) packets flood across redundant rings, Dijkstra recalculates the shortest path tree, and the network reconverges and heals autonomously in 1 to 2 seconds.</li>
+                        <li><strong>AWS VPC Route Table:</strong> Provides static-route configuration simplicity (simple table entries) combined with cloud-managed physical multi-AZ redundancy underneath—the SDN substrate reroutes packets around hardware failures transparently without running interior protocol daemons on virtual machines.</li>
+                    </ol>
+
+                    <h3 id="sub-5-2">5.2 Comparative Architectural Matrix: RIP vs. OSPF vs. BGP vs. AWS</h3>
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Dimension</th>
+                                <th>RIP</th>
+                                <th>OSPF</th>
+                                <th>BGP</th>
+                                <th>AWS Route Tables</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Scope Domain</strong></td>
+                                <td>Interior (IGP)</td>
+                                <td>Interior (IGP)</td>
+                                <td>Exterior (EGP)</td>
+                                <td>Cloud Virtual Network (VPC)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Algorithm Class</strong></td>
+                                <td>Distance-Vector (Bellman-Ford)</td>
+                                <td>Link-State (Dijkstra SPF)</td>
+                                <td>Path-Vector</td>
+                                <td>Centralized Declarative SDN</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Primary Metric</strong></td>
+                                <td>Hop Count (Max 15)</td>
+                                <td>Cost (Inverse Bandwidth)</td>
+                                <td>Business Policy &amp; AS-PATH</td>
+                                <td>Longest Prefix Match (LPM)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Convergence Speed</strong></td>
+                                <td>Slow (Periodic 30s broadcast)</td>
+                                <td>Very Fast (Event-driven flooding)</td>
+                                <td>Moderate (Policy-constrained)</td>
+                                <td>Instantaneous (Software-defined)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Scalability Target</strong></td>
+                                <td>Tiny legacy LANs (&lt; 15 hops)</td>
+                                <td>Large multi-building enterprise</td>
+                                <td>Global Internet Backbone</td>
+                                <td>Hyperscale Virtual Infrastructure</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Trust Architecture</strong></td>
+                                <td>Complete Trust</td>
+                                <td>Complete Trust (Area auth)</td>
+                                <td>Zero Mutual Trust</td>
+                                <td>Tenant-Controlled Identity (IAM)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3 id="sub-5-3">5.3 Concept Checkpoints &amp; Protocol Selection Scenarios</h3>
+                    <div class="box box-green">
+                        <div class="box-title">Checkpoint Questions &amp; Answers</div>
+                        <p><strong>Q1: Which protocol runs between independent Autonomous Systems?</strong><br>
+                        <em>Answer:</em> <strong>c) BGP</strong> (Border Gateway Protocol). RIP and OSPF are strictly interior gateway protocols, while ICMP is an error/diagnostic utility.</p>
+                        
+                        <p><strong>Q2: True or False: "In AWS you typically run OSPF inside your VPC."</strong><br>
+                        <em>Answer:</em> <strong>False.</strong> VPCs use centralized declarative route tables configured in the cloud control plane, not peer-to-peer interior routing protocols.</p>
+                        
+                        <p><strong>Q3: Why does OSPF choose higher bandwidth paths even if hop count is higher?</strong><br>
+                        <em>Answer:</em> OSPF metrics calculate cumulative link cost derived inversely from link speed. A 3-hop 10 Gbps fiber path has drastically lower mathematical cost than a 1-hop saturated 10 Mbps satellite link.</p>
+                    </div>
+
+                    <h4>Protocol Selection Scenarios</h4>
+                    <ul>
+                        <li><strong>Scenario A: Tiny branch LAN with 2 routers &amp; 30 clients &rarr;</strong> Use <em>Static Routes or RIP</em> (simplicity outweighs dynamic protocol overhead).</li>
+                        <li><strong>Scenario B: University campus connecting 15 departmental buildings &rarr;</strong> Use <em>OSPF</em> (hierarchical multi-area design provides bandwidth optimization and rapid convergence).</li>
+                        <li><strong>Scenario C: Regional ISP peering with a Tier-1 global transit carrier &rarr;</strong> Use <em>BGP</em> (path-vector filtering enforces transit billing and bilateral peering policies).</li>
+                        <li><strong>Scenario D: Microservices communicating across private and public subnets in the cloud &rarr;</strong> Use <em>AWS VPC Route Tables</em> (declarative cloud routing with NAT/Internet Gateway targets).</li>
+                    </ul>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('original-pdf').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" x2="8" y1="13" y2="13"></line>
+                            <line x1="16" x2="8" y1="17" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/18.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+
+</html>
