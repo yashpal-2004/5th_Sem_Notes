@@ -453,6 +453,25 @@
 
                 </div>
 
+                <!-- Lecture 13 -->
+                <div class="lecture-card" data-lecture-id="dl-l13" onclick="window.location.href='lectures/lecture-13.html'">
+                    <div class="lecture-card-top">
+                        <div class="lecture-number">13</div>
+                        <div class="lecture-card-actions">
+                            <a href="pdfs/13.pdf" target="_blank" class="card-action-btn" title="Open Original PDF" onclick="event.stopPropagation();">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            </a>
+                            <div class="lecture-checkbox" onclick="toggleComplete(event, 'dl-l13')" title="Toggle completion status"></div>
+                        </div>
+                    </div>
+                    <h2>The Transformer Architecture: Nine Problems, One Architecture</h2>
+                    <div class="lecture-card-header">
+                        <span class="lecture-tag">Sequence Models</span>
+                        <span class="lecture-stats">8 Topics</span>
+                    </div>
+
+                </div>
+
             </div>
         </div>
     </section>
@@ -579,7 +598,8 @@
             { note: 'lecture-10-part-1.html', pdf: '10 Part_1.pdf', img: '10_part_1.png' },
             { note: 'lecture-10-part-2.html', pdf: '10 Part_2.pdf', img: '10_part_2.png' },
             { note: 'lecture-11.html', pdf: '11.pdf', img: '11.png' },
-            { note: 'lecture-12.html', pdf: '12.pdf', img: '12_1.png', img2: '12_2.png' }
+            { note: 'lecture-12.html', pdf: '12.pdf', img: '12_1.png', img2: '12_2.png' },
+            { note: 'lecture-13.html', pdf: '13.pdf' }
         ];
 
         function openAllNotes() {
@@ -592,7 +612,9 @@
 
         function openAllShortNotes() {
             dlLecturesList.forEach(l => {
-                window.open(`images/${l.img}`, '_blank');
+                if (l.img) {
+                    window.open(`images/${l.img}`, '_blank');
+                }
                 if (l.img2) {
                     window.open(`images/${l.img2}`, '_blank');
                 }

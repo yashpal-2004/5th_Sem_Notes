@@ -207,7 +207,7 @@ nav {
 
 /* Hero Section */
 .hero-section {
-    padding: 6rem 4rem;
+    padding: 3rem 4rem 2.5rem;
     max-width: 1200px;
     margin: 0 auto;
     width: 100%;
@@ -241,7 +241,7 @@ nav {
 /* Coursework / Lectures Section (Mint Green) */
 .coursework-section {
     background-color: var(--bg-mint);
-    padding: 8rem 4rem;
+    padding: 3.5rem 4rem;
     width: 100%;
 }
 
@@ -252,55 +252,66 @@ nav {
 
 .section-label {
     font-family: 'Playfair Display', serif;
-    font-size: 2.5rem;
-    margin-bottom: 4rem;
+    font-size: 2.2rem;
+    margin-bottom: 2rem;
     font-weight: 400;
 }
 
 /* Subject Grid & Lectures Grid Mapping */
 .subject-grid, .lectures-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 4rem;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
 }
 
 .subject-card, .lecture-card {
-    border-top: 1px solid var(--border-light);
-    padding-top: 2rem;
+    border: 1px solid rgba(19, 34, 25, 0.08);
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(8px);
+    border-radius: 12px;
+    padding: 1.5rem 1.4rem;
     display: flex;
     flex-direction: column;
     text-decoration: none;
     color: inherit;
-    transition: transform 0.3s ease;
+    transition: all 0.25s ease;
 }
 
 .subject-card:hover, .lecture-card:hover {
-    transform: translateY(-4px);
+    transform: translateY(-3px);
+    background: #ffffff;
+    border-color: rgba(19, 34, 25, 0.16);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
 }
 
 .subject-number, .lecture-number {
-    font-family: 'Playfair Display', serif;
-    font-size: 2rem;
-    color: var(--text-dark);
-    margin-bottom: 1.5rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
 }
 
 .subject-title, .lecture-card h2 {
     font-family: 'Playfair Display', serif;
-    font-size: 1.8rem;
-    font-weight: 400;
-    margin-bottom: 1rem;
+    font-size: 1.35rem;
+    font-weight: 600;
+    line-height: 1.25;
+    margin-bottom: 0.75rem;
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
+    gap: 0.5rem;
 }
 
 .subject-title::after, .lecture-card h2::after {
     content: '↗';
     font-family: 'Inter', sans-serif;
-    font-size: 1.2rem;
-    opacity: 0.5;
-    transition: opacity 0.3s, transform 0.3s;
+    font-size: 1rem;
+    opacity: 0.4;
+    transition: opacity 0.25s, transform 0.25s;
+    flex-shrink: 0;
 }
 
 .subject-card:hover .subject-title::after,
@@ -321,10 +332,10 @@ nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     font-weight: 600;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-bottom: 1rem;
 }
 
 .subject-tag, .lecture-tag {
@@ -333,11 +344,13 @@ nav {
 
 .subject-stats, .lecture-stats {
     color: var(--text-muted);
+    font-size: 0.76rem;
+    line-height: 1.4;
 }
 
 /* Statistics Section */
 .stats-section {
-    padding: 8rem 4rem;
+    padding: 3rem 4rem;
     max-width: 1200px;
     margin: 0 auto;
     width: 100%;
@@ -346,7 +359,7 @@ nav {
 .stats-title {
     font-family: 'Playfair Display', serif;
     font-size: 2.2rem;
-    margin-bottom: 4rem;
+    margin-bottom: 2rem;
     font-weight: 400;
 }
 
@@ -499,12 +512,23 @@ footer {
     }
 }
 
+@media (max-width: 1024px) {
+    .subject-grid, .lectures-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+}
+
 @media (max-width: 768px) {
+    .subject-grid, .lectures-grid {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+    }
     nav {
         padding: 1.5rem 2rem;
     }
     .hero-section {
-        padding: 4rem 2rem;
+        padding: 2rem 2rem 1.5rem;
     }
     .hero-title {
         font-size: 3rem;

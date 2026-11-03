@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Deep Learning - Lecture 13</title>
+    <meta content="Study notes for Deep Learning, Lecture 13 covering The Transformer Architecture: Nine Problems, One Architecture, Recurrent Limitations, Encoder-Decoder Seq2Seq, Cross-Attention vs Self-Attention, Scaled Dot-Product QKV, Positional Encoding, Multi-Head Attention, Feed-Forward Networks, Residual Add & Norm, and Masked Attention." name="description" />
+    <link href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23132219%22/><text x=%2250%22 y=%2250%22 font-family=%22Arial%22 font-size=%2255%22 fill=%22white%22 font-weight=%22bold%22 text-anchor=%22middle%22 dominant-baseline=%22central%22>13</text></svg>" rel="icon" />
+    <link href="../css/style.css" rel="stylesheet" />
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}, {left: '$', right: '$', display: false}]});"></script>
+</head>
+
+<body>
+    <header>
+        <div class="header-titles">
+            <h1>Deep Learning Foundations</h1>
+            <p>Lecture 13 - Sequence Models: The Transformer Architecture</p>
+            <a href="../index.html" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;">← Back to Dashboard</a>
+            <span style="color: var(--text-muted); margin: 0 0.5rem;">|</span>
+            <a href="../pdfs/13.pdf" style="color: var(--blue); text-decoration: none; font-weight: bold; font-size: 0.9rem; margin-top: 0.5rem; display: inline-block;" target="_blank">Open PDF Worksheet ↗</a>
+        </div>
+        <div class="search-container">
+            <input id="searchInput" placeholder="Search notes..." type="text" />
+        </div>
+    </header>
+    <div class="container">
+        <!-- Sidebar Index -->
+        <aside>
+            <div class="aside-header">
+                <h3>Table of Contents</h3>
+                <div class="topic-count">Total Topics: 8</div>
+            </div>
+            <ul class="index-list" id="indexList">
+                <li><a href="#short-notes" style="font-weight: 600; color: var(--blue);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: text-bottom; margin-right: 4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>Short Notes</a></li>
+                <li>
+                    <a href="#topic-1">1. The Collapse of Recurrent Networks<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-1-1">1.1 Sequential Bottleneck &amp; Hardware Starvation</a></li>
+                        <li><a href="#sub-1-2">1.2 Fading Memory &amp; Gradient Decay across Steps</a></li>
+                        <li><a href="#sub-1-3">1.3 Lockstep Failure in Translation Tasks</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-2">2. The 2014 Breakthrough: Seq2Seq &amp; Cross-Attention<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-2-1">2.1 Encoder-Decoder Separation (Sutskever &amp; Cho)</a></li>
+                        <li><a href="#sub-2-2">2.2 The Fixed-Size Context Vector Bottleneck</a></li>
+                        <li><a href="#sub-2-3">2.3 Bahdanau Attention: Dynamic Alignment &amp; Softmax Weights</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-3">3. The Bold Leap: Eliminating Recurrence (Self-Attention)<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-3-1">3.1 Jakob Uszkoreit's Heresy: Attention is All You Need</a></li>
+                        <li><a href="#sub-3-2">3.2 Self-Attention Core Concept &amp; Contextual Word Meanings</a></li>
+                        <li><a href="#sub-3-3">3.3 What Recurrence Gave Away &amp; The 4 Things to Win Back</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-4">4. Query, Key, Value &amp; Scaled Dot-Product Mechanics<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-4-1">4.1 Why Embeddings Need Directional Roles (Asymmetric Relevance)</a></li>
+                        <li><a href="#sub-4-2">4.2 The Q, K, V Triplet Formulations</a></li>
+                        <li><a href="#sub-4-3">4.3 Scaled Dot-Product Attention Equation &amp; Softmax Normalization</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-5">5. Injecting Geometry &amp; Multi-Faceted Relationships<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-5-1">5.1 Permutation Invariance &amp; Sinusoidal Positional Encoding</a></li>
+                        <li><a href="#sub-5-2">5.2 Multi-Head Attention: Disentangling Semantic Subspaces</a></li>
+                        <li><a href="#sub-5-3">5.3 Position-Wise Feed-Forward Networks (FFN)</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-6">6. Training Stability &amp; Autoregressive Masking<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-6-1">6.1 Deep Stacking &amp; Residual Highways (Add &amp; Norm)</a></li>
+                        <li><a href="#sub-6-2">6.2 Decoder Causal Masking: Preventing Future Peeking</a></li>
+                        <li><a href="#sub-6-3">6.3 Cross-Attention in the Decoder Stack</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-7">7. The Complete Transformer Architecture &amp; 9-Problem Matrix<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-7-1">7.1 Full System Walkthrough (Vaswani et al., 2017)</a></li>
+                        <li><a href="#sub-7-2">7.2 Comprehensive Component-to-Problem Mapping Matrix</a></li>
+                        <li><a href="#sub-7-3">7.3 Empirical Dominance (WMT BLEU Scores &amp; 23x Compute Efficiency)</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#topic-8">8. The Lineage (BERT vs. GPT) &amp; Self-Check Knowledge Review<span class="sub-count">3</span></a>
+                    <ul class="sub-index">
+                        <li><a href="#sub-8-1">8.1 Architectural Divergence: Encoder-Only (BERT) vs. Decoder-Only (GPT)</a></li>
+                        <li><a href="#sub-8-2">8.2 The 8 Authors &amp; The Long Beach NeurIPS Poster Session</a></li>
+                        <li><a href="#sub-8-3">8.3 Knowledge Checks &amp; Exit Ticket Solutions</a></li>
+                    </ul>
+                </li>
+                <li><a href="#original-pdf"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="vertical-align: text-bottom; margin-right: 4px;" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" x2="8" y2="13"></line><line x1="16" x2="8" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>Original PDF</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="notesContent">
+            <!-- Short Notes Placeholder -->
+            <section id="short-notes" class="topic-section">
+                <div class="topic-header" onclick="toggleSection('content-short-notes')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                    </div>
+                    <h2>Short Notes &amp; Visual Summary</h2>
+                </div>
+                <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
+                    <p style="margin-bottom: 1rem;">Summary cheat sheet for Lecture 13 &mdash; The Transformer Architecture:</p>
+                    
+                    <div class="box box-green">
+                        <div class="box-title">The Core Transformer Mental Model</div>
+                        <p><strong>"Nine problems, one architecture: how researchers escaped the limits of the RNN, one problem at a time."</strong></p>
+                        <p>Rather than continually patching recurrence (as LSTMs and GRUs attempted with gates), the Transformer completely discarded the sequential recurrence loop. In its place, it built an entire computing paradigm on <strong>pairwise attention</strong>, scaling dot products, and position-wise feed-forward processing.</p>
+                    </div>
+
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.88rem;">
+                        <thead>
+                            <tr style="background: var(--bg-secondary); border-bottom: 2px solid var(--gray-border);">
+                                <th style="padding: 10px; text-align: left;">#</th>
+                                <th style="padding: 10px; text-align: left;">Component</th>
+                                <th style="padding: 10px; text-align: left;">Core Mathematical Operation</th>
+                                <th style="padding: 10px; text-align: left;">Fundamental Problem Solved</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid var(--gray-border);">
+                                <td style="padding: 8px 10px;"><strong>1</strong></td>
+                                <td style="padding: 8px 10px;"><strong>Encoder-Decoder</strong></td>
+                                <td style="padding: 8px 10px;">Separate modules: $P(Y|X) = \prod_{t=1}^M P(y_t | y_{<t}, c)$</td>
+                                <td style="padding: 8px 10px;">Input and output lengths differ; target order differs from source order.</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--gray-border); background: rgba(0,0,0,0.01);">
+                                <td style="padding: 8px 10px;"><strong>2</strong></td>
+                                <td style="padding: 8px 10px;"><strong>Cross-Attention</strong></td>
+                                <td style="padding: 8px 10px;">$c_i = \sum_j \alpha_{ij} h_j$, where $\alpha_{ij} = \text{softmax}(e_{ij})$</td>
+                                <td style="padding: 8px 10px;">One fixed context vector cannot hold an entire long sentence (information bottleneck).</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--gray-border);">
+                                <td style="padding: 8px 10px;"><strong>3</strong></td>
+                                <td style="padding: 8px 10px;"><strong>Self-Attention</strong></td>
+                                <td style="padding: 8px 10px;">Direct all-to-all connectivity: $\mathcal{O}(1)$ sequential operations</td>
+                                <td style="padding: 8px 10px;">Recurrence is strictly sequential (idle GPUs) and links distant words through long chains.</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--gray-border); background: rgba(0,0,0,0.01);">
+                                <td style="padding: 8px 10px;"><strong>4</strong></td>
+                                <td style="padding: 8px 10px;"><strong>Query, Key, Value</strong></td>
+                                <td style="padding: 8px 10px;">$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V$</td>
+                                <td style="padding: 8px 10px;">Relevance is asymmetric ($A \to B \neq B \to A$) and requires distinct functional projections.</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--gray-border);">
+                                <td style="padding: 8px 10px;"><strong>5</strong></td>
+                                <td style="padding: 8px 10px;"><strong>Positional Encoding</strong></td>
+                                <td style="padding: 8px 10px;">$PE_{(pos, 2i)} = \sin(pos/10000^{2i/d})$, $\cos(\dots)$</td>
+                                <td style="padding: 8px 10px;">Self-attention is set-based (permutation invariant); shuffling tokens changes nothing without position codes.</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--gray-border); background: rgba(0,0,0,0.01);">
+                                <td style="padding: 8px 10px;"><strong>6</strong></td>
+                                <td style="padding: 8px 10px;"><strong>Multi-Head Attention</strong></td>
+                                <td style="padding: 8px 10px;">$\text{MultiHead}(Q, K, V) = \text{Concat}(\text{head}_1, \dots, \text{head}_h)W^O$</td>
+                                <td style="padding: 8px 10px;">One attention head computes one single weighted average, averaging out distinct relationships.</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--gray-border);">
+                                <td style="padding: 8px 10px;"><strong>7</strong></td>
+                                <td style="padding: 8px 10px;"><strong>Feed-Forward (FFN)</strong></td>
+                                <td style="padding: 8px 10px;">$\text{FFN}(x) = \max(0, xW_1 + b_1)W_2 + b_2$</td>
+                                <td style="padding: 8px 10px;">Attention only mixes information between words; tokens still require independent non-linear processing.</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--gray-border); background: rgba(0,0,0,0.01);">
+                                <td style="padding: 8px 10px;"><strong>8</strong></td>
+                                <td style="padding: 8px 10px;"><strong>Residual + Layer Norm</strong></td>
+                                <td style="padding: 8px 10px;">$\text{LN}(x + \text{Sublayer}(x))$</td>
+                                <td style="padding: 8px 10px;">Deep multi-layer stacks suffer from vanishing/exploding gradients during backpropagation.</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 10px;"><strong>9</strong></td>
+                                <td style="padding: 8px 10px;"><strong>Causal Masking</strong></td>
+                                <td style="padding: 8px 10px;">$M_{ij} = -\infty \text{ for } j > i$ prior to $\text{softmax}$</td>
+                                <td style="padding: 8px 10px;">During parallel training, the decoder could peek at future ground-truth target tokens (cheating).</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Topic 1 -->
+            <section class="topic-section" id="topic-1">
+                <div class="topic-header" onclick="toggleSection('content-1')">
+                    <div class="topic-number">1</div>
+                    <h2>The Collapse of Recurrent Networks</h2>
+                </div>
+                <div class="collapsible-content" id="content-1">
+                    <h3 id="sub-1-1">1.1 Sequential Bottleneck &amp; Hardware Starvation</h3>
+                    <p>Throughout the deep learning renaissance of 2012&ndash;2017, sequential modeling was dominated by Recurrent Neural Networks (RNNs) and their gated variants (LSTM and GRU). By construction, an RNN updates its hidden state step-by-step:</p>
+                    $$h_t = f(h_{t-1}, x_t; \theta)$$
+                    <p>While intuitive for modeling temporal phenomena, this formulation introduces a fundamental computational barrier: <strong>strict sequential dependency</strong>. Step $t$ cannot begin until step $t-1$ has fully completed its forward pass and emitted $h_{t-1}$.</p>
+                    <div class="box box-amber">
+                        <div class="box-title">Hardware Starvation: Leaving the GPU Idle</div>
+                        <p>Modern GPUs and TPUs derive their performance advantages from massive parallel arithmetic throughput (thousands of tensor cores computing matrix multiplications simultaneously). Under an RNN, a sequence of $N = 1000$ tokens forces 1000 sequential kernel launches. While batches can be parallelized, token processing within every single sequence remains bound to serial execution, severely capping throughput and scaling potential.</p>
+                    </div>
+
+                    <h3 id="sub-1-2">1.2 Fading Memory &amp; Gradient Decay across Steps</h3>
+                    <p>Even with LSTM cell states and additive highways, recurrence requires information to survive across a chain of $T$ matrix multiplications:</p>
+                    $$\frac{\partial \mathcal{L}}{\partial h_1} = \frac{\partial \mathcal{L}}{\partial h_T} \prod_{k=2}^T \frac{\partial h_k}{\partial h_{k-1}}$$
+                    <p>As the token gap $T$ scales to 40, 100, or 500 words, signal retention deteriorates. In a 40-word sentence, early syntactic tokens (e.g., subject-verb agreement or initiating clauses) struggle to influence downstream generation because gradients exponentially decay or blow up across the long recurrent chain.</p>
+
+                    <h3 id="sub-1-3">1.3 Lockstep Failure in Translation Tasks</h3>
+                    <p>Consider translating between two languages with completely different syntactic grammars, such as English (Subject-Verb-Object) and Hindi (Subject-Object-Verb):</p>
+                    <div style="background: var(--bg-secondary); padding: 1rem 1.25rem; border-radius: 8px; border-left: 4px solid var(--blue); margin: 1rem 0;">
+                        <p style="margin: 0; font-weight: 600;">Target Translation Task:</p>
+                        <p style="margin: 0.25rem 0 0 0; font-family: monospace; font-size: 1.05rem;">"I am reading a book" &rarr; "मैं एक किताब पढ़ रहा हूँ"</p>
+                        <p style="margin: 0.25rem 0 0 0; font-size: 0.85rem; color: var(--text-muted);">(I &bull; a &bull; book &bull; read &bull; -ing &bull; am)</p>
+                    </div>
+                    <p><strong>Problem 1 of 9:</strong> A vanilla RNN produces exactly one output token for every input token in strict synchronization. However:</p>
+                    <ul>
+                        <li><strong>Different lengths:</strong> English uses 5 words; Hindi uses 6 words.</li>
+                        <li><strong>Inverted order:</strong> <em>"book"</em> appears as the 5th token in English, but its translation <em>"किताब" (kitaab)</em> must be generated at step 3 in Hindi.</li>
+                        <li><strong>Future dependency:</strong> To generate step 3 in Hindi, the model must already know what the final word of the English sentence was. Lockstep sequence models cannot wait or look ahead.</li>
+                    </ul>
+
+                    <div class="topic-nav">
+                        <button class="btn" disabled="">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 2 -->
+            <section class="topic-section" id="topic-2">
+                <div class="topic-header" onclick="toggleSection('content-2')">
+                    <div class="topic-number">2</div>
+                    <h2>The 2014 Breakthrough: Seq2Seq &amp; Cross-Attention</h2>
+                </div>
+                <div class="collapsible-content" id="content-2">
+                    <h3 id="sub-2-1">2.1 Encoder-Decoder Separation (Sutskever &amp; Cho)</h3>
+                    <p>In 2014, two independent labs led by <strong>Ilya Sutskever</strong> (Google, 8 GPUs) and <strong>Kyunghyun Cho &amp; Yoshua Bengio</strong> (Université de Montréal, 1 GPU) introduced the Sequence-to-Sequence (Seq2Seq) paradigm. Instead of generating outputs in lockstep, the task was split into two separate recurrent networks:</p>
+                    <ol>
+                        <li><strong>The Encoder RNN:</strong> Consumes the source sentence token-by-token until reaching an end-of-sequence token $\langle\text{EOS}\rangle$. Its final hidden state $h_T$ is compressed into a single vector $c$, termed the <strong>context vector</strong>.</li>
+                        <li><strong>The Decoder RNN:</strong> Initialized with context vector $c$, the decoder unrolls sequentially to emit target language tokens one by one until emitting $\langle\text{EOS}\rangle$.</li>
+                    </ol>
+                    <p><em>Key Breakthrough:</em> Input and output lengths no longer had to match, and the decoder did not need synchronous inputs from the future.</p>
+
+                    <h3 id="sub-2-2">2.2 The Fixed-Size Context Vector Bottleneck</h3>
+                    <p><strong>Problem 2 of 9:</strong> While Seq2Seq decoupled sequence lengths, it created an severe information bottleneck: <strong>the entire input sentence had to be compressed into a single fixed-size vector $c \in \mathbb{R}^d$</strong>.</p>
+                    <div class="box box-amber">
+                        <div class="box-title">The Doubting Intern: Dzmitry Bahdanau</div>
+                        <p>Dzmitry Bahdanau, a master's graduate and first-year PhD intern in Yoshua Bengio's lab, noticed that as sentence length exceeded 15&ndash;20 tokens, the BLEU score of Seq2Seq plummeted dramatically. Forcing a 40-word complex sentence into a single 512-dimensional vector is like memorizing an entire page of a book and then reproducing it from memory without ever glancing back.</p>
+                    </div>
+
+                    <h3 id="sub-2-3">2.3 Bahdanau Attention: Dynamic Alignment &amp; Softmax Weights</h3>
+                    <p>Bahdanau proposed a radical modification (initially named <em>RNNsearch</em>, later popularized as <strong>Attention</strong>): <em>Keep every encoder hidden state</em> $h_1, h_2, \dots, h_T$. At each decoding step $i$, allow the decoder to look back and compute a custom weighted combination across all encoder states:</p>
+                    $$e_{ij} = v_a^T \tanh(W_a s_{i-1} + U_a h_j)$$
+                    $$\alpha_{ij} = \frac{\exp(e_{ij})}{\sum_{k=1}^T \exp(e_{ik})}$$
+                    $$c_i = \sum_{j=1}^T \alpha_{ij} h_j$$
+                    <p>Where:</p>
+                    <ul>
+                        <li>$s_{i-1}$: The decoder's previous hidden state (what it has translated so far).</li>
+                        <li>$h_j$: The encoder's hidden state for source word $j$.</li>
+                        <li>$\alpha_{ij}$: Attention weight (alignment probability) denoting how much decoder word $i$ attends to source word $j$.</li>
+                        <li>$c_i$: Dynamic context vector recomputed for every individual output token!</li>
+                    </ul>
+                    <p><strong>Result:</strong> On sentences with no unknown words, Bahdanau's attention boosted test BLEU score from <strong>26.71 &rarr; 34.16</strong>. The model dynamically aligned words on its own (e.g., aligning Hindi <em>"किताब"</em> with English <em>"book"</em>) without any manual phonetic or bilingual supervision.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-1').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 3 -->
+            <section class="topic-section" id="topic-3">
+                <div class="topic-header" onclick="toggleSection('content-3')">
+                    <div class="topic-number">3</div>
+                    <h2>The Bold Leap: Eliminating Recurrence (Self-Attention)</h2>
+                </div>
+                <div class="collapsible-content" id="content-3">
+                    <h3 id="sub-3-1">3.1 Jakob Uszkoreit's Heresy: Attention is All You Need</h3>
+                    <p><strong>Problem 3 of 9:</strong> Although Bahdanau attention fixed how the decoder inspected the input sentence, <em>the encoder was still an RNN</em>. Distant words in the source sentence were still linked through a long sequential chain of steps, and training was still crippled by GPU serial waiting.</p>
+                    <div class="box box-green">
+                        <div class="box-title">The Heretic: Jakob Uszkoreit (Google Research, 2016)</div>
+                        <p>Jakob Uszkoreit proposed an audacious hypothesis: <strong>Throw away recurrence entirely</strong>. Rely exclusively on attention to model dependencies within the sentence. His proposal met skepticism&mdash;even his father, a renowned computational linguist, argued against him during dinner. But Uszkoreit teamed up with Illia Polosukhin and later assembled a working group at Google Mountain View to pursue attention-only networks.</p>
+                    </div>
+
+                    <h3 id="sub-3-2">3.2 Self-Attention Core Concept &amp; Contextual Word Meanings</h3>
+                    <p>In <strong>Self-Attention</strong>, every token in a sentence directly attends to every other token in that exact same sentence simultaneously in a single computational step ($\mathcal{O}(1)$ sequential path length):</p>
+                    <div style="background: var(--bg-secondary); padding: 1.25rem; border-radius: 8px; margin: 1rem 0;">
+                        <p style="margin: 0; font-weight: 600;">Disambiguating Polysemy ("bank"):</p>
+                        <ul style="margin-top: 0.5rem;">
+                            <li><em>"I sat on the river <strong>bank</strong>."</em> &rarr; <em>"bank"</em> attends strongly to <em>"river"</em> and <em>"water"</em> &rarr; vector updates to mean a natural water edge.</li>
+                            <li><em>"I opened a <strong>bank</strong> account."</em> &rarr; <em>"bank"</em> attends strongly to <em>"account"</em> and <em>"money"</em> &rarr; vector updates to mean a financial depository.</li>
+                        </ul>
+                    </div>
+                    <p>Both sentences start with the exact same initial dictionary embedding for <em>"bank"</em>. Through self-attention, the token absorbs information from surrounding context tokens in parallel.</p>
+
+                    <h3 id="sub-3-3">3.3 What Recurrence Gave Away &amp; The 4 Things to Win Back</h3>
+                    <p>Recurrent models had flaws, but they naturally possessed four crucial structural properties. In discarding recurrence, the team realized they had accidentally sacrificed these properties and had to deliberately engineer them back:</p>
+                    <ul>
+                        <li><strong>Property 1 &mdash; Word Order (Problem 5):</strong> Recurrence processed tokens sequentially, naturally tracking sequence order. Self-attention treats tokens as an unordered bag of words. &rarr; <em>Won back via Positional Encoding.</em></li>
+                        <li><strong>Property 2 &mdash; Independent Word Processing (Problem 7):</strong> Every recurrent step applied non-linear activation functions to each token. Attention only mixes vectors. &rarr; <em>Won back via Position-wise Feed-Forward Networks.</em></li>
+                        <li><strong>Property 3 &mdash; Trainable Deep Stacks (Problem 8):</strong> Very deep networks suffer vanishing gradients. &rarr; <em>Won back via Residual Connections (Add &amp; Norm).</em></li>
+                        <li><strong>Property 4 &mdash; Causal Autoregressive Decoding (Problem 9):</strong> A generating decoder must not peek into future words. &rarr; <em>Won back via Causal Masking.</em></li>
+                    </ul>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-2').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 4 -->
+            <section class="topic-section" id="topic-4">
+                <div class="topic-header" onclick="toggleSection('content-4')">
+                    <div class="topic-number">4</div>
+                    <h2>Query, Key, Value &amp; Scaled Dot-Product Mechanics</h2>
+                </div>
+                <div class="collapsible-content" id="content-4">
+                    <h3 id="sub-4-1">4.1 Why Embeddings Need Directional Roles (Asymmetric Relevance)</h3>
+                    <p><strong>Problem 4 of 9:</strong> Suppose we compute self-attention simply by taking dot products between raw word embeddings ($x_i^T x_j$). This suffers from two catastrophic mathematical limitations:</p>
+                    <ol>
+                        <li><strong>Symmetry:</strong> Dot products are strictly commutative ($x_i \cdot x_j = x_j \cdot x_i$). But semantic relationships are asymmetric! In <em>"The animal didn't cross the street because <strong>it</strong> was too tired"</em>, the pronoun <em>"it"</em> desperately needs information from <em>"animal"</em> to know what it refers to. But <em>"animal"</em> has no need to absorb <em>"it"</em>!</li>
+                        <li><strong>Self-Bias:</strong> Any vector's dot product with itself ($x_i^T x_i = \|x_i\|^2$) is typically much larger than with any other word, causing words to attend almost exclusively to themselves.</li>
+                    </ol>
+
+                    <h3 id="sub-4-2">4.2 The Q, K, V Triplet Formulations</h3>
+                    <p>To break symmetry, the Transformer borrows an information-retrieval abstraction (similar to database search):</p>
+                    <div class="box box-blue">
+                        <div class="box-title">The Three Functional Roles</div>
+                        <ul>
+                            <li><strong>Query ($Q$):</strong> What this token is <em>searching for</em> (e.g., <em>"I am a pronoun; where is the noun I refer to?"</em>).</li>
+                            <li><strong>Key ($K$):</strong> What this token <em>offers or announces</em> so other words can match with it (e.g., <em>"I am a noun denoting a living creature."</em>).</li>
+                            <li><strong>Value ($V$):</strong> The actual <em>content/information</em> this token transmits once matched.</li>
+                        </ul>
+                    </div>
+                    <p>For input representations $X \in \mathbb{R}^{n \times d_{\text{model}}}$, each word is projected into three distinct learned subspaces:</p>
+                    $$Q = X W^Q, \quad K = X W^K, \quad V = X W^V$$
+                    <p>Where $W^Q, W^K \in \mathbb{R}^{d_{\text{model}} \times d_k}$ and $W^V \in \mathbb{R}^{d_{\text{model}} \times d_v}$. In the standard architecture, $d_{\text{model}} = 512$ and $d_k = d_v = 64$.</p>
+
+                    <h3 id="sub-4-3">4.3 Scaled Dot-Product Attention Equation &amp; Softmax Normalization</h3>
+                    <p>The attention weight between query $i$ and key $j$ is computed by their inner product, divided by a scaling factor $\sqrt{d_k}$:</p>
+                    $$\text{Attention}(Q, K, V) = \text{softmax}\left( \frac{Q K^T}{\sqrt{d_k}} \right) V$$
+                    <div class="box box-amber">
+                        <div class="box-title">Why the Scaling Factor $\sqrt{d_k}$ is Essential</div>
+                        <p>Assume components of $q$ and $k$ are independent random variables with zero mean and unit variance ($\mu = 0, \sigma^2 = 1$). Their dot product $q \cdot k = \sum_{m=1}^{d_k} q_m k_m$ has mean $0$ and variance $d_k$.</p>
+                        <p>For large dimensions (e.g., $d_k = 64$), the variance is $64$ and standard deviation is $\sqrt{64} = 8$. Without scaling, dot products grow large in magnitude, pushing the $\text{softmax}$ function into regions with near-zero gradients (vanishing gradient cliff). Dividing by $\sqrt{d_k}$ preserves unit variance and maintains healthy gradient flow!</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-3').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 5 -->
+            <section class="topic-section" id="topic-5">
+                <div class="topic-header" onclick="toggleSection('content-5')">
+                    <div class="topic-number">5</div>
+                    <h2>Injecting Geometry &amp; Multi-Faceted Relationships</h2>
+                </div>
+                <div class="collapsible-content" id="content-5">
+                    <h3 id="sub-5-1">5.1 Permutation Invariance &amp; Sinusoidal Positional Encoding</h3>
+                    <p><strong>Problem 5 of 9:</strong> Pure self-attention is <em>permutation invariant</em>. If you shuffle the words in a sentence, the set of pairwise dot products remains identical. Consequently, <em>"dog bites man"</em> and <em>"man bites dog"</em> yield the exact same self-attention output for <em>"dog"</em>!</p>
+                    <p>To win back order without recurrent steps, Vaswani et al. injected <strong>Positional Encodings</strong> directly into the input embeddings:</p>
+                    $$x_{\text{input}} = x_{\text{embedding}} + PE$$
+                    <p>The positional encodings use geometric sine and cosine functions of varying frequencies:</p>
+                    $$PE_{(pos, 2i)} = \sin\left( \frac{pos}{10000^{2i / d_{\text{model}}}} \right)$$
+                    $$PE_{(pos, 2i+1)} = \cos\left( \frac{pos}{10000^{2i / d_{\text{model}}}} \right)$$
+                    <p>Where $pos$ is the token position index ($0, 1, 2, \dots$) and $i$ is the dimension index ($0 \le i < d_{\text{model}} / 2$).</p>
+                    <ul>
+                        <li>Each position receives a unique continuous wave signature.</li>
+                        <li>Allows the model to easily learn relative positions: for any fixed offset $k$, $PE_{pos+k}$ can be represented as a linear function of $PE_{pos}$ via trigonometric angle-addition identities.</li>
+                    </ul>
+
+                    <h3 id="sub-5-2">5.2 Multi-Head Attention: Disentangling Semantic Subspaces</h3>
+                    <p><strong>Problem 6 of 9:</strong> A single attention mechanism computes one weighted average across values. But in a complex sentence, a word simultaneously participates in multiple disparate linguistic relationships:</p>
+                    <ul>
+                        <li>Syntactic: Which verb governs this noun?</li>
+                        <li>Coreference: Which noun does this pronoun replace?</li>
+                        <li>Descriptive: Which adjective modifies this noun?</li>
+                    </ul>
+                    <p>Compressing all relationships into one single weighted average causes distinct signals to blur together. Vaswani et al. introduced <strong>Multi-Head Attention (MHA)</strong>:</p>
+                    $$\text{MultiHead}(Q, K, V) = \text{Concat}(\text{head}_1, \dots, \text{head}_h) W^O$$
+                    $$\text{where} \quad \text{head}_i = \text{Attention}(Q W_i^Q, K W_i^K, V W_i^V)$$
+                    <p>With $h = 8$ parallel heads and $d_k = d_v = d_{\text{model}} / h = 64$:</p>
+                    <ul>
+                        <li>Head 1 might specialize in subject-verb tracking.</li>
+                        <li>Head 2 tracks pronoun reference resolution.</li>
+                        <li>Head 3 tracks adjective modifiers.</li>
+                        <li>Due to reduced dimension per head, total computational cost is identical to single-head attention with full dimensionality!</li>
+                    </ul>
+
+                    <h3 id="sub-5-3">5.3 Position-Wise Feed-Forward Networks (FFN)</h3>
+                    <p><strong>Problem 7 of 9:</strong> Attention is purely a communication mechanism&mdash;it computes linear mixtures of value vectors across tokens, but does not apply any non-linear transformations to individual tokens.</p>
+                    <p>To win back non-linear processing, each block feeds every token position separately and identically through a two-layer Feed-Forward Network with ReLU activation:</p>
+                    $$\text{FFN}(x) = \max(0, x W_1 + b_1) W_2 + b_2$$
+                    <p>The inner dimension expands by a factor of 4: from $d_{\text{model}} = 512$ up to $d_{ff} = 2048$, and then projects back down to $512$. This allows the token to synthesize and process the contextual information it just gathered.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-4').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 6 -->
+            <section class="topic-section" id="topic-6">
+                <div class="topic-header" onclick="toggleSection('content-6')">
+                    <div class="topic-number">6</div>
+                    <h2>Training Stability &amp; Autoregressive Masking</h2>
+                </div>
+                <div class="collapsible-content" id="content-6">
+                    <h3 id="sub-6-1">6.1 Deep Stacking &amp; Residual Highways (Add &amp; Norm)</h3>
+                    <p><strong>Problem 8 of 9:</strong> Deep Transformer stacks ($N = 6$ identical encoder layers stacked on top of each other) face severe gradient degradation during backpropagation.</p>
+                    <p>To enable stable optimization, every sub-layer (both Multi-Head Attention and FFN) is wrapped in a <strong>Residual Connection</strong> followed by <strong>Layer Normalization</strong>:</p>
+                    $$\text{Output} = \text{LayerNorm}(x + \text{SubLayer}(x))$$
+                    <ul>
+                        <li><strong>Additive Shortcut:</strong> The $+ x$ operation creates an unbroken linear gradient highway back through all 6 blocks, identical in spirit to ResNet's skip connections.</li>
+                        <li><strong>Layer Normalization:</strong> Unlike Batch Norm (which normalizes across batch items), Layer Norm normalizes across feature dimensions for each individual token independently, preventing activation values from blowing up.</li>
+                    </ul>
+
+                    <h3 id="sub-6-2">6.2 Decoder Causal Masking: Preventing Future Peeking</h3>
+                    <p><strong>Problem 9 of 9:</strong> During training on target sequences (e.g., Hindi translation), all target words are fed into the decoder simultaneously so gradients can be computed across all positions in parallel.</p>
+                    <p><em>The Cheating Problem:</em> If decoder self-attention allowed every position to attend to all tokens, position 2 (predicting the 3rd word) could simply look ahead at position 3 and copy the answer!</p>
+                    <div class="box box-green">
+                        <div class="box-title">The Causal Masking Solution</div>
+                        <p>Before applying $\text{softmax}$, future attention scores are overwritten with $-\infty$:</p>
+                        $$S_{\text{masked}} = S + M, \quad M_{ij} = \begin{cases} 0 & j \le i \\ -\infty & j > i \end{cases}$$
+                        <p>Since $\exp(-\infty) = 0$, attention weights to all subsequent tokens become strictly $0$. Each decoder token can only look at tokens that came before it.</p>
+                    </div>
+
+                    <h3 id="sub-6-3">6.3 Cross-Attention in the Decoder Stack</h3>
+                    <p>In addition to masked self-attention, each decoder layer contains a third sub-layer: <strong>Cross-Attention</strong> (Encoder-Decoder Attention). Here:</p>
+                    <ul>
+                        <li><strong>Queries ($Q$):</strong> Derived from the decoder's prior sub-layer (the target words generated so far).</li>
+                        <li><strong>Keys ($K$) and Values ($V$):</strong> Derived from the <em>output of the 6-layer encoder stack</em> (the complete source sentence).</li>
+                    </ul>
+                    <p>This allows the decoder to repeatedly query the entire source sentence at every single layer while synthesizing each translated word.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-5').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-7').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 7 -->
+            <section class="topic-section" id="topic-7">
+                <div class="topic-header" onclick="toggleSection('content-7')">
+                    <div class="topic-number">7</div>
+                    <h2>The Complete Transformer Architecture &amp; 9-Problem Matrix</h2>
+                </div>
+                <div class="collapsible-content" id="content-7">
+                    <h3 id="sub-7-1">7.1 Full System Walkthrough (Vaswani et al., 2017)</h3>
+                    <p>The original Transformer architecture consists of two stacked sections of $N = 6$ identical layers each:</p>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin: 1.25rem 0;">
+                        <div style="background: var(--bg-secondary); padding: 1.25rem; border-radius: 8px; border-top: 3px solid var(--blue);">
+                            <h4 style="margin-top: 0; color: var(--blue);">Encoder Stack (N = 6)</h4>
+                            <p style="font-size: 0.9rem; color: var(--text-muted);">Processes input English sentence simultaneously.</p>
+                            <ol style="font-size: 0.88rem; padding-left: 1.25rem;">
+                                <li>Input Word Embeddings + Positional Encoding</li>
+                                <li><strong>Sublayer 1:</strong> Multi-Head Self-Attention + Add &amp; Norm</li>
+                                <li><strong>Sublayer 2:</strong> Position-wise Feed-Forward Network + Add &amp; Norm</li>
+                                <li>Repeats through 6 stacked blocks; passes final $K, V$ to decoder.</li>
+                            </ol>
+                        </div>
+                        <div style="background: var(--bg-secondary); padding: 1.25rem; border-radius: 8px; border-top: 3px solid var(--green);">
+                            <h4 style="margin-top: 0; color: var(--green);">Decoder Stack (N = 6)</h4>
+                            <p style="font-size: 0.9rem; color: var(--text-muted);">Generates output Hindi tokens autoregressively.</p>
+                            <ol style="font-size: 0.88rem; padding-left: 1.25rem;">
+                                <li>Output Word Embeddings (shifted right) + Positional Encoding</li>
+                                <li><strong>Sublayer 1:</strong> Masked Multi-Head Self-Attention + Add &amp; Norm</li>
+                                <li><strong>Sublayer 2:</strong> Cross-Attention (Q from Decoder, K/V from Encoder) + Add &amp; Norm</li>
+                                <li><strong>Sublayer 3:</strong> Position-wise FFN + Add &amp; Norm</li>
+                                <li>Linear projection &rarr; Softmax over vocabulary.</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <h3 id="sub-7-2">7.2 Comprehensive Component-to-Problem Mapping Matrix</h3>
+                    <p>The definitive synthesis of the architecture&mdash;how every individual component directly addresses one of the nine historical failure modes:</p>
+                    <table style="width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.88rem;">
+                        <thead>
+                            <tr style="background: var(--bg-secondary); border-bottom: 2px solid var(--gray-border);">
+                                <th style="padding: 10px; text-align: left;">Problem #</th>
+                                <th style="padding: 10px; text-align: left;">Historical Failure Mode</th>
+                                <th style="padding: 10px; text-align: left;">Transformer Solution</th>
+                                <th style="padding: 10px; text-align: left;">Why It Works</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid var(--gray-border);">
+                                <td style="padding: 8px 10px;"><strong>1</strong></td>
+                                <td style="padding: 8px 10px;">RNN cannot translate in lockstep</td>
+                                <td style="padding: 8px 10px;">Encoder-Decoder Separation</td>
+                                <td style="padding: 8px 10px;">Decouples sequence lengths and eliminates step-by-step synchronous generation.</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--gray-border); background: rgba(0,0,0,0.01);">
+                                <td style="padding: 8px 10px;"><strong>2</strong></td>
+                                <td style="padding: 8px 10px;">Fixed vector context bottleneck</td>
+                                <td style="padding: 8px 10px;">Cross-Attention mechanism</td>
+                                <td style="padding: 8px 10px;">Decoder directly inspects every encoder hidden state at every generation step.</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--gray-border);">
+                                <td style="padding: 8px 10px;"><strong>3</strong></td>
+                                <td style="padding: 8px 10px;">Encoder recurrence is serial &amp; fades</td>
+                                <td style="padding: 8px 10px;">Self-Attention</td>
+                                <td style="padding: 8px 10px;">Replaces recurrent chains with direct $\mathcal{O}(1)$ pairwise token connections.</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--gray-border); background: rgba(0,0,0,0.01);">
+                                <td style="padding: 8px 10px;"><strong>4</strong></td>
+                                <td style="padding: 8px 10px;">Word relevance is asymmetric</td>
+                                <td style="padding: 8px 10px;">Query, Key, Value triplet</td>
+                                <td style="padding: 8px 10px;">Separate projections break symmetry and eliminate self-dot-product dominance.</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--gray-border);">
+                                <td style="padding: 8px 10px;"><strong>5</strong></td>
+                                <td style="padding: 8px 10px;">Word order is lost (bag of words)</td>
+                                <td style="padding: 8px 10px;">Positional Encodings</td>
+                                <td style="padding: 8px 10px;">Sinusoidal wave signatures inject order information into initial embeddings.</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--gray-border); background: rgba(0,0,0,0.01);">
+                                <td style="padding: 8px 10px;"><strong>6</strong></td>
+                                <td style="padding: 8px 10px;">Single attention blends relationships</td>
+                                <td style="padding: 8px 10px;">Multi-Head Attention</td>
+                                <td style="padding: 8px 10px;">8 parallel subspaces track syntax, coreference, and modifiers independently.</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--gray-border);">
+                                <td style="padding: 8px 10px;"><strong>7</strong></td>
+                                <td style="padding: 8px 10px;">Attention only mixes, doesn't compute</td>
+                                <td style="padding: 8px 10px;">Position-wise Feed-Forward</td>
+                                <td style="padding: 8px 10px;">Applies non-linear ReLU transformations ($512 \to 2048 \to 512$) to each token.</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--gray-border); background: rgba(0,0,0,0.01);">
+                                <td style="padding: 8px 10px;"><strong>8</strong></td>
+                                <td style="padding: 8px 10px;">Deep 6-layer stacks cannot train</td>
+                                <td style="padding: 8px 10px;">Residual Add &amp; Layer Norm</td>
+                                <td style="padding: 8px 10px;">Unbroken gradient highways preserve backpropagation across all layers.</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 10px;"><strong>9</strong></td>
+                                <td style="padding: 8px 10px;">Decoder cheats by seeing answers</td>
+                                <td style="padding: 8px 10px;">Causal Masking ($-\infty$)</td>
+                                <td style="padding: 8px 10px;">Zeros out attention weights to future tokens, enforcing autoregressive generation.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3 id="sub-7-3">7.3 Empirical Dominance (WMT BLEU Scores &amp; 23x Compute Efficiency)</h3>
+                    <p>On the competitive WMT 2014 English-to-German benchmark, the Transformer established an unprecedented performance leap:</p>
+                    <ul>
+                        <li>ByteNet: 23.75 BLEU</li>
+                        <li>Google GNMT + RL: 24.60 BLEU</li>
+                        <li>ConvS2S: 25.16 BLEU</li>
+                        <li>ConvS2S Ensemble: 26.36 BLEU</li>
+                        <li><strong>Transformer (Base): 27.30 BLEU</strong></li>
+                        <li><strong>Transformer (Big): 28.40 BLEU</strong></li>
+                    </ul>
+                    <p><strong>Training Cost Advantage:</strong> The Transformer base model trained in just <strong>12 hours on 8 P100 GPUs</strong>&mdash;requiring <strong>23 times less compute</strong> than the state-of-the-art convolutional ensemble it outperformed.</p>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-6').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('topic-8').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Topic 8 -->
+            <section class="topic-section" id="topic-8">
+                <div class="topic-header" onclick="toggleSection('content-8')">
+                    <div class="topic-number">8</div>
+                    <h2>The Lineage (BERT vs. GPT) &amp; Self-Check Knowledge Review</h2>
+                </div>
+                <div class="collapsible-content" id="content-8">
+                    <h3 id="sub-8-1">8.1 Architectural Divergence: Encoder-Only (BERT) vs. Decoder-Only (GPT)</h3>
+                    <p>While the original 2017 Transformer combined both Encoder and Decoder for machine translation, modern foundation models branched into two distinct lineages:</p>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin: 1rem 0;">
+                        <div style="background: var(--bg-secondary); padding: 1.25rem; border-radius: 8px; border-left: 4px solid var(--blue);">
+                            <h4 style="margin-top: 0; color: var(--blue);">BERT (Encoder-Only)</h4>
+                            <p style="font-size: 0.88rem; color: var(--text-dark);"><strong>"Understanding the Entire Sequence"</strong></p>
+                            <p style="font-size: 0.85rem; color: var(--text-muted);">Keeps only the Encoder. Self-attention is unmasked and fully bidirectional across all tokens simultaneously. Optimized for representation learning, classification, extraction, and search.</p>
+                        </div>
+                        <div style="background: var(--bg-secondary); padding: 1.25rem; border-radius: 8px; border-left: 4px solid var(--green);">
+                            <h4 style="margin-top: 0; color: var(--green);">GPT (Decoder-Only)</h4>
+                            <p style="font-size: 0.88rem; color: var(--text-dark);"><strong>"Generating Text One Token at a Time"</strong></p>
+                            <p style="font-size: 0.85rem; color: var(--text-muted);">Keeps only the Decoder stack with causal masking. Trained autoregressively to predict the next word given prior context. Formed the foundation for ChatGPT and modern LLMs.</p>
+                        </div>
+                    </div>
+
+                    <h3 id="sub-8-2">8.2 The 8 Authors &amp; The Long Beach NeurIPS Poster Session</h3>
+                    <p>The groundbreaking paper <em>"Attention Is All You Need"</em> was published at NeurIPS 2017 by eight researchers: Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan Gomez, &Lstrok;ukasz Kaiser, and Illia Polosukhin (listed in random order; title inspired by The Beatles).</p>
+                    <p>At the Long Beach poster session, the crowd was so dense that security had to clear the hall at 10:30 PM. <strong>Sepp Hochreiter</strong> (co-inventor of the LSTM in 1991) walked over to personally congratulate the team on the architecture that had successfully solved the recurrent limitations he had studied for 26 years.</p>
+
+                    <h3 id="sub-8-3">8.3 Knowledge Checks &amp; Exit Ticket Solutions</h3>
+                    
+                    <div class="box box-green" style="margin-top: 1rem;">
+                        <div class="box-title">Knowledge Check 1: Asymmetric Pronoun Resolution</div>
+                        <p><strong>Question:</strong> In <em>"The animal didn't cross the street because it was too tired"</em>, why can <em>"it"</em> attend strongly to <em>"animal"</em> while <em>"animal"</em> attends weakly to <em>"it"</em>?<br>
+                        <em>Correct:</em> <strong>The query of one word and the key of another come from different learned transformations ($W^Q 
+e W^K$).</strong><br>
+                        <em>Rationale:</em> The Query-Key matrix product $q_{\text{it}} \cdot k_{\text{animal}}$ is completely independent from $q_{\text{animal}} \cdot k_{\text{it}}$, breaking the commutative symmetry of raw embeddings.</p>
+                    </div>
+
+                    <div class="box box-green">
+                        <div class="box-title">Knowledge Check 2: Word Order Invariance</div>
+                        <p><strong>Question:</strong> Without positional encoding, why does self-attention give <em>"dog"</em> the identical output in <em>"dog bites man"</em> and <em>"man bites dog"</em>?<br>
+                        <em>Correct:</em> <strong>Each word's attention scores depend solely on word content/dot products, never on token position.</strong><br>
+                        <em>Rationale:</em> Dot product attention treats input sequences as an unordered multiset of vectors.</p>
+                    </div>
+
+                    <div class="box box-green">
+                        <div class="box-title">Exit Ticket 1: The Role of the Feed-Forward Network</div>
+                        <p><strong>Question:</strong> Which component of the Transformer exists because attention only mixes information between words?<br>
+                        <em>Correct:</em> <strong>B) The feed-forward network, which processes each position's vector on its own.</strong><br>
+                        <em>Rationale:</em> Attention is communication; the position-wise FFN provides the non-linear token-level computation.</p>
+                    </div>
+
+                    <div class="box box-green">
+                        <div class="box-title">Exit Ticket 2: Cross-Attention in Translation</div>
+                        <p><strong>Question:</strong> Which component lets the decoder look at the English sentence while it writes Hindi?<br>
+                        <em>Correct:</em> <strong>C) Cross-attention, which lets each Hindi word look at the encoder's output.</strong><br>
+                        <em>Rationale:</em> Masked self-attention looks at previous target words; cross-attention bridges target queries with source keys and values.</p>
+                    </div>
+
+                    <div class="box box-green">
+                        <div class="box-title">Exit Ticket 3: Parallel Processing in the Encoder</div>
+                        <p><strong>Question:</strong> Why can the Transformer encoder process all the words of a sentence at the exact same time?<br>
+                        <em>Correct:</em> <strong>A) Self-attention links every pair of words directly, with no step waiting for another.</strong><br>
+                        <em>Rationale:</em> Eliminating recurrent hidden state passing allows the entire $n \times d$ matrix to be computed in a single GPU kernel.</p>
+                    </div>
+
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-7').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" onclick="document.getElementById('original-pdf').scrollIntoView()">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Original PDF -->
+            <section class="topic-section" id="original-pdf">
+                <div class="topic-header" onclick="toggleSection('content-pdf')">
+                    <div class="topic-number" style="background:transparent; color: var(--blue); width: auto; margin-right: 0.5rem;">
+                        <svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" x2="8" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" x2="8" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <h2>Original PDF Notes</h2>
+                </div>
+                <div class="collapsible-content" id="content-pdf">
+                    <p>Below is the original PDF document for reference:</p>
+                    <button class="btn" id="loadPdfBtn" onclick="loadPDF()" style="margin-top: 1rem; display: block;">Load Original PDF</button>
+                    <div id="pdfContainer" style="margin-top: 1rem;"></div>
+                    <div class="topic-nav">
+                        <button class="btn" onclick="document.getElementById('topic-8').scrollIntoView()">Previous Topic</button>
+                        <button class="btn" disabled="">Next Topic</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <button id="backToTop" onclick="scrollToTop()">↑</button>
+    <script>
+        function loadPDF() {
+            const container = document.getElementById('pdfContainer');
+            const btn = document.getElementById('loadPdfBtn');
+            if (container.innerHTML === '') {
+                container.innerHTML = '<embed src="../pdfs/13.pdf" type="application/pdf" width="100%" height="800px" style="border: 1px solid var(--gray-border); border-radius: 8px;" />';
+                btn.innerText = "Hide PDF";
+            } else {
+                container.innerHTML = '';
+                btn.innerText = "Load Original PDF";
+            }
+        }
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+
+</html>

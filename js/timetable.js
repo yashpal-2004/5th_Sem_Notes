@@ -578,7 +578,7 @@
 
                 <div class="hero-live-footer-row">
                     <span class="hero-live-clock">NST &bull; Sec A Sem V</span>
-                    <a href="#timetable" class="hero-view-all-link">Full Timetable &darr;</a>
+                    <a href="timetable.html" class="hero-view-all-link">Full Timetable &darr;</a>
                 </div>
             `;
             return;
@@ -681,18 +681,25 @@
             `;
         }
 
-        // Today's list
+        // Today's list — show only upcoming classes; hide past slots and breaks
         let todayListHtml = '';
+        let upcomingClassCount = 0;
         todayObj.schedule.forEach(itemRaw => {
             const item = resolvePeriod(itemRaw);
-            const slot = TIMETABLE_DATA.slots.find(s => s.id === itemRaw.slotId) || { label: itemRaw.customTimeLabel || '', start: '', startM: 0, endM: 0 };
+            const slot = TIMETABLE_DATA.slots.find(s => s.id === itemRaw.slotId) || { label: itemRaw.customTimeLabel || '', start: '', startM: 0, endM: 0, isBreak: false };
+
+            // Skip break slots (Lunch, Evening Snacks, etc.)
+            if (slot.isBreak || item.code === 'break') return;
 
             const isCurrent = curM >= slot.startM && curM < slot.endM;
             const isPast = curM >= slot.endM;
 
+            // Skip already-finished and currently-active classes (active is shown in featured card)
+            if (isPast || isCurrent) return;
+
+            upcomingClassCount++;
             let rowClass = 'hero-today-item';
             if (isCurrent) rowClass += ' is-current';
-            if (isPast) rowClass += ' is-past';
 
             todayListHtml += `
                 <div class="${rowClass}" title="${item.subject} (${slot.label})">
@@ -704,6 +711,11 @@
                 </div>
             `;
         });
+
+        // If nothing upcoming, show a friendly message
+        if (upcomingClassCount === 0) {
+            todayListHtml = `<div class="hero-today-item" style="opacity:0.55; font-style:italic; justify-content:center;">No more classes today 🎉</div>`;
+        }
 
         const dayDisplay = todayObj.name;
 
@@ -720,7 +732,7 @@
 
             <div class="hero-live-footer-row">
                 <span class="hero-live-clock">Auto-refreshing &bull; 30s</span>
-                <a href="#timetable" class="hero-view-all-link">Full Timetable &darr;</a>
+                <a href="timetable.html" class="hero-view-all-link">Full Timetable &darr;</a>
             </div>
         `;
     }
