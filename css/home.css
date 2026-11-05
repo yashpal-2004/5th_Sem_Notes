@@ -751,68 +751,6 @@ footer {
     background-color: white;
 }
 
-/* Calculator Section */
-.calc-container {
-    max-width: 800px;
-    margin: 5rem auto;
-    padding: 3rem;
-    background-color: white;
-    border-radius: 16px;
-    border: 1px solid var(--border-light);
-    box-shadow: var(--shadow-hover);
-}
-
-.calc-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 2.2rem;
-    margin-bottom: 1rem;
-    text-align: center;
-}
-
-.calc-desc {
-    text-align: center;
-    color: var(--text-muted);
-    margin-bottom: 2.5rem;
-    font-size: 0.95rem;
-}
-
-.calc-form-group {
-    margin-bottom: 1.5rem;
-}
-
-.calc-label {
-    display: block;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    font-size: 0.9rem;
-    color: var(--text-dark);
-}
-
-.calc-select, .calc-input {
-    width: 100%;
-    padding: 0.85rem 1.2rem;
-    border-radius: 8px;
-    border: 1px solid var(--border-light);
-    font-family: 'Inter', sans-serif;
-    font-size: 1rem;
-    background-color: var(--bg-beige);
-    color: var(--text-dark);
-    transition: all 0.3s ease;
-}
-
-.calc-select:focus, .calc-input:focus {
-    outline: none;
-    border-color: var(--accent-purple);
-    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
-}
-
-.calc-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-}
-
 .btn-primary {
     display: inline-block;
     background-color: var(--accent-purple);
@@ -853,29 +791,6 @@ footer {
     transform: translateY(-2px);
 }
 
-.calc-result-box {
-    margin-top: 2.5rem;
-    padding: 2rem;
-    border-radius: 12px;
-    background-color: var(--bg-mint);
-    border: 1px solid var(--border-light);
-    display: none;
-    animation: fadeIn 0.5s ease;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.calc-result-score {
-    font-family: 'Playfair Display', serif;
-    font-size: 3rem;
-    color: var(--accent-purple);
-    font-weight: bold;
-    margin: 1rem 0;
-}
-
 @media (max-width: 768px) {
     .eval-section, .pdf-section {
         padding: 3rem 1.5rem;
@@ -883,14 +798,6 @@ footer {
     .eval-grid {
         grid-template-columns: 1fr;
         gap: 2rem;
-    }
-    .calc-container {
-        padding: 2rem 1.5rem;
-        margin: 3rem 1.5rem;
-    }
-    .calc-grid {
-        grid-template-columns: 1fr;
-        gap: 1rem;
     }
     .eval-tabs {
         flex-wrap: wrap;
@@ -902,6 +809,7 @@ footer {
         padding: 0.5rem 1rem;
     }
 }
+
 
 /* Timeline Styles */
 .timeline-section {
