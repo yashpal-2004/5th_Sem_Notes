@@ -121,6 +121,7 @@
                 </div>
                 <div id="content-short-notes" class="collapsible-content" style="max-height: none;">
                     <p style="margin-bottom: 1rem;">Summary cheat sheet for Lecture 13 &mdash; The Transformer Architecture:</p>
+                    <a href="../images/13.png" target="_blank" title="Open full-size Lecture 13 short notes image"><img src="../images/13.png" alt="Lecture 13 short notes: Transformer architecture" style="display:block; width:100%; max-width:900px; height:auto; margin:1rem auto 1.5rem; border:1px solid var(--gray-border); border-radius:12px;"></a>
                     
                     <div class="box box-green">
                         <div class="box-title">The Core Transformer Mental Model</div>
@@ -141,7 +142,7 @@
                             <tr style="border-bottom: 1px solid var(--gray-border);">
                                 <td style="padding: 8px 10px;"><strong>1</strong></td>
                                 <td style="padding: 8px 10px;"><strong>Encoder-Decoder</strong></td>
-                                <td style="padding: 8px 10px;">Separate modules: $P(Y|X) = \prod_{t=1}^M P(y_t | y_{<t}, c)$</td>
+                                <td style="padding: 8px 10px;">Separate modules: $P(Y|X)=\prod_t P(y_t \mid y_{&lt;t}, c)$</td>
                                 <td style="padding: 8px 10px;">Input and output lengths differ; target order differs from source order.</td>
                             </tr>
                             <tr style="border-bottom: 1px solid var(--gray-border); background: rgba(0,0,0,0.01);">
