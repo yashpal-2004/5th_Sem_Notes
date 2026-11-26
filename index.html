@@ -171,6 +171,106 @@
 .hero-timeline-name.aml {
     color: #7c3aed;
 }
+.hero-timeline-date.other {
+    color: #64748b;
+    background-color: rgba(100, 116, 139, 0.08);
+}
+.hero-timeline-name.other {
+    color: #64748b;
+}
+.endsem-divider {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0.6rem 0 0.2rem;
+}
+.endsem-divider::before,
+.endsem-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(220, 38, 38, 0.2);
+}
+.endsem-divider-label {
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #dc2626;
+    white-space: nowrap;
+}
+.endsem-item-left {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    flex: 1;
+}
+.endsem-pill {
+    flex-shrink: 0;
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #dc2626;
+    background-color: rgba(220, 38, 38, 0.08);
+    border: 1px solid rgba(220, 38, 38, 0.18);
+    padding: 1px 5px;
+    border-radius: 4px;
+    white-space: nowrap;
+    line-height: 1.6;
+}
+.holiday-gap-row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin: 0.25rem 0;
+    padding: 0.3rem 0.6rem;
+    background: rgba(16, 185, 129, 0.05);
+    border: 1px dashed rgba(16, 185, 129, 0.25);
+    border-radius: 6px;
+}
+.holiday-gap-icon {
+    font-size: 0.75rem;
+    flex-shrink: 0;
+}
+.holiday-gap-text {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #059669;
+    flex: 1;
+}
+.holiday-gap-days {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #059669;
+    background: rgba(16, 185, 129, 0.1);
+    padding: 1px 7px;
+    border-radius: 10px;
+    white-space: nowrap;
+}
+.days-remaining-badge {
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 1px 6px;
+    border-radius: 10px;
+    margin-left: 5px;
+    white-space: nowrap;
+    background: rgba(0,0,0,0.05);
+    color: var(--text-muted, #8a9099);
+}
+.days-remaining-badge.urgent {
+    background: rgba(220, 38, 38, 0.1);
+    color: #dc2626;
+}
+.days-remaining-badge.soon {
+    background: rgba(217, 119, 6, 0.1);
+    color: #d97706;
+}
+.days-remaining-badge.comfortable {
+    background: rgba(5, 150, 105, 0.1);
+    color: #059669;
+}
 
 .upcoming-contest {
     background-color: rgba(5, 150, 105, 0.05);
@@ -253,7 +353,7 @@
             </ul>
             <div class="nav-right-actions">
                 <div class="nav-stats" id="navPlatformStats">62 Lectures</div>
-                <a href="https://nst5end.vercel.app" class="nav-icon-btn" title="NST Notes App" aria-label="Open NST Notes App">
+                <a href="https://nst5end.vercel.app" class="nav-icon-btn" target="_blank" rel="noopener noreferrer" title="NST Notes App" aria-label="Open NST Notes App">
                     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
                         <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
@@ -340,6 +440,55 @@
                     <div class="hero-timeline-item" data-date="2026-11-27">
                         <span class="hero-timeline-name mca">MCA (C2) <small style="font-weight: normal; opacity: 0.75;">(10%)</small></span>
                         <span class="hero-timeline-date mca">27 Nov</span>
+                    </div>
+
+                    <!-- End Semester Divider -->
+                    <div class="endsem-divider">
+                        <span class="endsem-divider-label">End Semester Exams</span>
+                    </div>
+
+                    <!-- End Semester Exams -->
+                    <div class="hero-timeline-item" data-date="2026-12-09">
+                        <div class="endsem-item-left">
+                            <span class="endsem-pill">End Sem</span>
+                            <span class="hero-timeline-name other">Strategies for Business Growth</span>
+                        </div>
+                        <span class="hero-timeline-date other">09 Dec</span>
+                    </div>
+                    <div class="hero-timeline-item" data-date="2026-12-10" data-holiday-after="3">
+                        <div class="endsem-item-left">
+                            <span class="endsem-pill">End Sem</span>
+                            <span class="hero-timeline-name mca">Modern Computer Architecture</span>
+                        </div>
+                        <span class="hero-timeline-date mca">10 Dec</span>
+                    </div>
+                    <div class="hero-timeline-item" data-date="2026-12-14" data-holiday-after="1">
+                        <div class="endsem-item-left">
+                            <span class="endsem-pill">End Sem</span>
+                            <span class="hero-timeline-name cn">Computer Networks</span>
+                        </div>
+                        <span class="hero-timeline-date cn">14 Dec</span>
+                    </div>
+                    <div class="hero-timeline-item" data-date="2026-12-16" data-holiday-after="1">
+                        <div class="endsem-item-left">
+                            <span class="endsem-pill">End Sem</span>
+                            <span class="hero-timeline-name dl">Deep Learning</span>
+                        </div>
+                        <span class="hero-timeline-date dl">16 Dec</span>
+                    </div>
+                    <div class="hero-timeline-item" data-date="2026-12-18" data-holiday-after="3">
+                        <div class="endsem-item-left">
+                            <span class="endsem-pill">End Sem</span>
+                            <span class="hero-timeline-name aml">Advanced Machine Learning</span>
+                        </div>
+                        <span class="hero-timeline-date aml">18 Dec</span>
+                    </div>
+                    <div class="hero-timeline-item" data-date="2026-12-22">
+                        <div class="endsem-item-left">
+                            <span class="endsem-pill">End Sem</span>
+                            <span class="hero-timeline-name other">Corporate Governance &amp; Ethics</span>
+                        </div>
+                        <span class="hero-timeline-date other">22 Dec</span>
                     </div>
                 </div>
                 <div class="hero-live-footer-row" style="margin-top: auto;">
@@ -564,6 +713,9 @@
                 const listContainer = document.querySelector('.hero-timeline-list');
                 if (!listContainer) return;
 
+                // Remove any previously injected holiday rows
+                listContainer.querySelectorAll('.holiday-gap-row').forEach(r => r.remove());
+
                 const items = Array.from(listContainer.querySelectorAll('.hero-timeline-item'));
                 let nextUpcoming = null;
                 let minDaysLeft = Infinity;
@@ -571,8 +723,7 @@
                 // Clean existing badges and highlights
                 items.forEach(item => {
                     item.classList.remove('upcoming-contest', 'past-contest');
-                    const badge = item.querySelector('.days-left-badge');
-                    if (badge) badge.remove();
+                    item.querySelectorAll('.days-remaining-badge').forEach(b => b.remove());
                 });
 
                 // Calculate diffDays for each item
@@ -580,7 +731,6 @@
                     const dateStr = item.getAttribute('data-date');
                     const contestDate = dateStr ? new Date(dateStr) : new Date(0);
                     contestDate.setHours(0, 0, 0, 0);
-
                     const diffTime = contestDate - today;
                     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                     return { item, contestDate, diffDays };
@@ -594,49 +744,66 @@
                     }
                 });
 
-                // Sort cyclically:
-                // 1. Upcoming & today items (diffDays >= 0) sorted chronologically ascending
-                // 2. Past items (diffDays < 0) pushed below, sorted chronologically ascending
-                categorizedItems.sort((a, b) => {
-                    const aIsUpcoming = a.diffDays >= 0;
-                    const bIsUpcoming = b.diffDays >= 0;
-
-                    if (aIsUpcoming && !bIsUpcoming) return -1;
-                    if (!aIsUpcoming && bIsUpcoming) return 1;
-
-                    return a.contestDate - b.contestDate;
-                });
-
-                // Show only upcoming items; hide past ones
-                let upcomingCount = 0;
+                // Sort chronologically
                 categorizedItems.sort((a, b) => a.contestDate - b.contestDate);
+
+                // Append items in sorted order; inject holiday rows from data-holiday-after attribute
+                let upcomingCount = 0;
                 categorizedItems.forEach(({ item, diffDays }) => {
                     if (diffDays < 0) {
                         item.style.display = 'none';
-                    } else {
-                        item.style.display = '';
-                        listContainer.appendChild(item);
-                        upcomingCount++;
+                        return;
+                    }
+                    item.style.display = '';
+                    listContainer.appendChild(item);
+                    upcomingCount++;
+
+                    // Inject holiday row if this exam has days off after it
+                    const holidayDays = parseInt(item.getAttribute('data-holiday-after'), 10);
+                    if (holidayDays > 0) {
+                        const row = document.createElement('div');
+                        row.className = 'holiday-gap-row';
+                        row.innerHTML = `
+                            <span class="holiday-gap-icon">🌴</span>
+                            <span class="holiday-gap-text">Holiday Break</span>
+                            <span class="holiday-gap-days">${holidayDays === 1 ? '1 day off' : holidayDays + ' days off'}</span>
+                        `;
+                        listContainer.appendChild(row);
                     }
                 });
 
-                // Update footer count to reflect upcoming only
+                // Update footer count
                 const clockEl = document.querySelector('.hero-exams-card .hero-live-clock');
                 if (clockEl) {
                     clockEl.textContent = upcomingCount === 0 ? 'No upcoming' : `${upcomingCount} Upcoming`;
                 }
 
-                // Highlight next upcoming item with badge
-                if (nextUpcoming) {
-                    nextUpcoming.item.classList.add('upcoming-contest');
-                    const nameSpan = nextUpcoming.item.querySelector('.hero-timeline-name');
-                    if (nameSpan) {
-                        const badge = document.createElement('span');
-                        badge.className = 'days-left-badge';
-                        badge.textContent = nextUpcoming.days === 0 ? 'Today' : (nextUpcoming.days === 1 ? '1 day left' : `${nextUpcoming.days} days left`);
-                        nameSpan.appendChild(badge);
+                // Add days-remaining badge to ALL upcoming items; highlight the next one
+                categorizedItems.forEach(({ item, diffDays }) => {
+                    if (diffDays < 0) return;
+                    const nameSpan = item.querySelector('.hero-timeline-name');
+                    if (!nameSpan) return;
+
+                    const badge = document.createElement('span');
+                    if (diffDays === 0) {
+                        badge.className = 'days-remaining-badge urgent';
+                        badge.textContent = 'Today';
+                    } else if (diffDays <= 7) {
+                        badge.className = 'days-remaining-badge urgent';
+                        badge.textContent = `${diffDays}d left`;
+                    } else if (diffDays <= 14) {
+                        badge.className = 'days-remaining-badge soon';
+                        badge.textContent = `${diffDays}d left`;
+                    } else {
+                        badge.className = 'days-remaining-badge comfortable';
+                        badge.textContent = `${diffDays}d left`;
                     }
-                }
+                    nameSpan.appendChild(badge);
+
+                    if (nextUpcoming && item === nextUpcoming.item) {
+                        item.classList.add('upcoming-contest');
+                    }
+                });
             }
 
             // Initial load & real-time listener
